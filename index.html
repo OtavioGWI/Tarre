@@ -173,8 +173,40 @@
     .fechar-modal:hover {
         color: white;
     }
+    
+    /* AJUSTES PARA CELULAR */
+@media only screen and (max-width: 600px) {
+    /* Menu de províncias fica menor e centralizado no topo */
+    #menu-provincias {
+        width: 80% !important;
+        right: 10% !important;
+        top: 10px !important;
+        max-height: 40vh;
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    /* Botão Voltar fica menor para não tapar o mapa */
+    .botao-fixo-voltar, .btn-popup {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+    }
+
+    /* A janela de detalhes (Modal) ocupa quase a tela toda */
+    .modal-conteudo {
+        width: 90% !important;
+        padding: 15px !important;
+    }
+
+    /* Ajuste de escala da imagem de Hukmal'tep */
+    #img-provincia {
+        max-height: 70vh !important;
+        max-width: 95vw !important;
+    }
+}
 
 </style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 </head>
 <body>
     <div id="map-container">
@@ -230,23 +262,27 @@
     let mapaAtualAtivo = 'continente';
 
     // --- 2. INICIALIZAÇÃO DO MAPA ---
-    function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
+   function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
         if (map) { map.remove(); } 
 
         const limites = [[0, 0], [altura, largura]];
         
+        // Detecta se é celular para melhorar a experiência touch
+        const isMobile = window.innerWidth < 600;
+
         map = L.map('map', {
             crs: L.CRS.Simple,
             minZoom: minZoom,
             maxZoom: maxZoom,
             maxBounds: limites,
-            maxBoundsViscosity: 1.0
+            maxBoundsViscosity: 1.0,
+            tap: false // Importante para evitar bugs em telas touch
         });
 
         L.imageOverlay(arquivo, limites).addTo(map);
         map.fitBounds(limites);
 
-        // Ferramenta de Coordenadas
+        // Mantive sua ferramenta de coordenadas aqui:
         map.on('click', function(e) {
             const y = e.latlng.lat.toFixed(0);
             const x = e.latlng.lng.toFixed(0);
@@ -273,7 +309,7 @@
 // --- BANCO DE DADOS DAS PROVÍNCIAS ---
     const dadosProvincias = {
         'Hukmal_tep.jpg': {
-            titulo: "Hukmal'tep - As Terras Altas",
+            titulo: "Hukmal'tep - O Inverno Absoluto",
             descricao: `
                 <p><strong>📜 Descrição:</strong> Uma região montanhosa e de frio intenso, marcada por grandes picos e vales profundos onde o vento uiva constantemente.</p>
                 <p><strong>👑 Governo:</strong> Conselho das Três Tribos (Felistas, Malistas e Garra do Inverno). Não há um rei único, mas sim uma trégua tensa.</p>
@@ -378,7 +414,7 @@
         }
     }
 
-    // --- 4. MARCADORES LOCAIS (PROVÍNCIAS) ---
+// --- 4. MARCADORES LOCAIS (PROVÍNCIAS) ---
     function adicionarMarcadoresLocais(nomeDoMapa) {
         
         const hitboxPadrao = L.icon({
@@ -390,11 +426,10 @@
             iconSize: [100, 100], iconAnchor: [50, 50], popupAnchor: [0, -50]
         });
 
-        // CORREÇÃO: Removi a parte que tentava adicionar na lista lateral inexistente
         function criarPontoLocal(coord, nome, info, foto = null, grande = false) {
             const m = L.marker(coord, { 
                 icon: grande ? hitboxGrande : hitboxPadrao, 
-                opacity: 0 // Mantive invisível (hitbox). Mude para 0.5 se quiser ver para testar.
+                opacity: 0 
             }).addTo(map);
 
             let popupHtml = `<div style="text-align:center;"><b>${nome}</b><br><small>${info}</small>`;
@@ -406,7 +441,6 @@
         }
 
         if (nomeDoMapa === 'Hukmal_tep.jpg') {
-            // Seus pontos de Hukmal'tep
             criarPontoLocal([1396, 780], "Capital de Hukmal'tep", "Felista", "Cópia de capital de hukmal_tep.png", true);
             criarPontoLocal([1422, 441], "Torre de Vigia", "(Felista)");
             criarPontoLocal([1209, 520], "Torre de Vigia", "(Felista)");
@@ -415,12 +449,10 @@
             criarPontoLocal([1474, 546], "Porto", "(Felista)");
             criarPontoLocal([1256, 1129], "Vilarejo", "(Felista)");
             criarPontoLocal([1106, 505], "Vilarejo", "(Felista)");
-
             criarPontoLocal([157, 267], "Cidade", "(Garra do Inverno)");
             criarPontoLocal([419, 483], "Vilarejo", "(Garra do Inverno)");
             criarPontoLocal([242, 1338], "Vilarejo", "(Garra do Inverno)", "Cópia de cidade ponte.png", true);
             criarPontoLocal([369, 868], "Vilarejo", "(Garra do inverno)", "Cópia de Cidade neve 3.png", true);
-
             criarPontoLocal([268, 1472], "Torre de Vigia", "(Malista)");
             criarPontoLocal([513, 1617], "Cidade", "(Malista)", "Cópia de Cidade neve 5.png", true);
             criarPontoLocal([534, 1918], "Vilarejo", "(Malista)");
@@ -436,15 +468,14 @@
             criarPontoLocal([621, 358], "Torre de Vigia", "(Malista)");
             criarPontoLocal([740, 452], "Torre de Vigia", "(Malista)");
             criarPontoLocal([713, 257], "Cidade Malista", "(Malista)", "Cópia de Cidade portuaria gelo.png", true);
-
             criarPontoLocal([141, 578], "Vilarejo", "(Neutro)", "inicial.png", true);
             criarPontoLocal([1184, 1014], "Vilarejo", "(Neutro)");
         }
 
         if (nomeDoMapa === 'Blat_khyr.jpg') {
-            criarPontoLocal( [382, 1359], "Capital de Blat'khyr", "Elfos", "cidade magica.png", true);
+            criarPontoLocal([382, 1359], "Capital de Blat'khyr", "Elfos", "cidade magica.png", true);
             criarPontoLocal([986, 1239], "Vilarejo", "Desconhecido");
-            criarPontoLocal( [1091, 606], "Vilarejo", "Desconhecido");
+            criarPontoLocal([1091, 606], "Vilarejo", "Desconhecido");
             criarPontoLocal([1463, 1151], "Vilarejo", "Desconhecido");
             criarPontoLocal([491, 371], "Cidade", "Elfos", "Cidade portuária 4.png", true);
             criarPontoLocal([741, 963], "Cidade", "Elfos", "Cidade portuária.png", true);
@@ -479,7 +510,23 @@
             iconSize: [120, 120], iconAnchor: [60, 60], popupAnchor: [0, -60]
         });
 
-        function criarPonto(coord, nome, arquivo, tipo, grande = false) {
+        function criarPonto(coord, nome, arg3, arg4, arg5) {
+            
+            let descricao = "";
+            let arquivo = "";
+            let tipo = "";
+            let grande = false;
+
+            if (arg3 && (arg3.includes('.png') || arg3.includes('.jpg') || arg3.includes('.webp') || arg3 === null)) {
+                arquivo = arg3;
+                tipo = arg4;
+                grande = arg5 || false;
+            } else {
+                descricao = arg3;
+                arquivo = arg4;
+                tipo = arg5;
+            }
+
             const m = L.marker(coord, { icon: grande ? iconeGrande : iconePadrao, opacity: 0 }).addTo(map);
             let btn = "";
 
@@ -488,22 +535,32 @@
             } else if (tipo === 'imagem') {
                 btn = `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup">Ver Foto</button>`;
             } else {
-                btn = `<p style="color:#aaa;">Sem detalhes.</p>`;
+                // CORREÇÃO: Removemos a tag <p> com margem padrão e colocamos um span simples
+                btn = `<span style="color:#aaa; font-style:italic;">Sem detalhes.</span>`;
             }
 
-            m.bindPopup(`<div style="text-align:center;"><b>${nome}</b><br><br>${btn}</div>`);
+            // CORREÇÃO: Substituímos o <br><br> por uma DIV com margem controlada
+            let conteudoPopup = `<div style="text-align:center;"><b>${nome}</b>`;
+            if (descricao) {
+                conteudoPopup += `<br><small style="color:#ccc;">${descricao}</small>`;
+            }
+            
+            // Aqui está o segredo: margin-top cria o espaço só se precisar, sem empurrar demais
+            conteudoPopup += `<div style="margin-top: 12px;">${btn}</div></div>`;
+
+            m.bindPopup(conteudoPopup);
         }
 
-        // Seus pontos continentais originais
-        criarPonto([824, 2330], "Deserto", "Deserto.jpg", 'mapa');
-        criarPonto([3850, 3580], "Hukmal'tep", "Hukmal_tep.jpg", 'mapa');
-        criarPonto([2902, 5464], "Blat'khyr", "Blat_khyr.jpg", 'mapa');
-        criarPonto([1118, 4346], "Lago", "Lago.jpg", 'mapa');
-        criarPonto([1356, 3284], "Alcova", "Alcova.jpg", 'mapa', true);
-        criarPonto([2250, 4258], "Espinha do Gigante", "Espinha do Gigante.jpg", 'mapa', true);
-        criarPonto([2142, 4378], "Espinha do Gigante", "Espinha do Gigante.jpg", 'mapa', true);
+        // Seus pontos
+        criarPonto([824, 2330], "Deserto","A Origem do Mundo", "Deserto.jpg", 'mapa');
+        criarPonto([3850, 3580], "Hukmal'tep", "O Inverno Absoluto","Hukmal_tep.jpg", 'mapa');
+        criarPonto([2902, 5464], "Blat'khyr", "O Berço da Magia", "Blat_khyr.jpg", 'mapa');
+        criarPonto([1118, 4346], "Lago", "O Solo Abençoado", "Lago.jpg", 'mapa');
+        criarPonto([1356, 3284], "Alcova","O Lar dos Piratas", "Alcova.jpg", 'mapa', true);
+        criarPonto([2250, 4258], "Espinha do Gigante", "As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
+        criarPonto([2142, 4378], "Espinha do Gigante","As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
 
-        criarPonto([2370, 3767], "Capital Imperial", "Capital.png", 'imagem');
+        criarPonto([2370, 3767], "Capital Imperial", "A Casa do Império", "Capital.png", 'imagem');
         criarPonto([1648, 4438], "Cidade Santa", "Cidade Santa.png", 'imagem');
         criarPonto([2862, 2890], "Torre dos Sábios", "Torre dos Sabios.png", 'imagem');
         criarPonto([1188, 5574], "Ilha Paradisíaca", "ilha 2.png", 'imagem');
@@ -512,23 +569,24 @@
         criarPonto([2142, 3254], "Vilarejo", "vilarejo 2.jpg", 'imagem');
         criarPonto([1758, 4620], "Vilarejo", "vilarejo 3.jpg", 'imagem');
 
-
         criarPonto([2252, 2880], "Pântano", "pantano.png", 'imagem');
         criarPonto([2138, 2890], "Pântano", "pantano.png", 'imagem');
         criarPonto([2228, 3032], "Pântano", "pantano.png", 'imagem');
         criarPonto([2220, 2656], "Pântano", "pantano.png", 'imagem');
-        criarPonto([2232, 3936], "Vilarejo");
-        criarPonto([2300, 3400], "Vilarejo");
-        criarPonto([1830, 4354], "Vilarejo");
-        criarPonto([2464, 4974], "Ilha de Blat'khyr", "Ilha.png", 'imagem');
+        
+        // Agora esses pontos ficarão bonitos, sem buraco gigante
+        criarPonto([2232, 3936], "Vilarejo", null, 'none');
+        criarPonto([2300, 3400], "Vilarejo", null, 'none');
+        criarPonto([1830, 4354], "Vilarejo", null, 'none');
+        
+        criarPonto([2464, 4974], "Ilha de Blat'khyr", "Cadê?", "Ilha.png", 'imagem');
+        
         criarPonto([1838, 3526], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         criarPonto([1750, 3320], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         criarPonto([1536, 3634], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         criarPonto([2070, 3642], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         criarPonto([3912, 1780], "Inverno Desolado", null, 'none', true);
     }
-
-    // Inicialização
     carregarMapaPrincipal();
     </script>
 </body>
