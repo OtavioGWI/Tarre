@@ -3,30 +3,32 @@
 <head>
     <title>Mapa RPG Interativo 8K</title>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
-    /* Remove margens e define o fundo */
-    body { margin: 0; background: #1a1a1a; overflow: hidden; font-family: sans-serif; }
+    /* --- ESTILOS GERAIS --- */
     
-    /* Garante que o mapa ocupe a tela toda */
-    #map { height: 100vh; width: 100vw; z-index: 1; }
+    /* MUDANÇA: Fundo Azul Escuro (#0f1c25) para combinar com a água */
+    body { margin: 0; background: #4F686E; overflow: hidden; font-family: sans-serif; }
+    
+    /* O fundo do mapa também precisa ser o mesmo azul */
+    #map { height: 100vh; width: 100vw; z-index: 1; background: #4F686E; }
 
-    /* MENU LATERAL DE PROVÍNCIAS */
+    /* MENU LATERAL */
     #menu-provincias {
         position: fixed;
-        top: 20px;
-        right: 20px;
+        top: 20px; right: 20px;
         width: 220px;
-        background: rgba(26, 26, 26, 0.95);
+        background: rgba(15, 28, 37, 0.95); /* Azul escuro semi-transparente */
         border: 2px solid #8b4513;
         border-radius: 8px;
         color: white;
-        z-index: 2000; /* Garante que fique acima do mapa */
+        z-index: 2000;
         padding: 15px;
         box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        transition: 0.3s;
     }
 
     #menu-provincias h3 {
@@ -35,278 +37,206 @@
         color: #cd853f;
         border-bottom: 1px solid #555;
         padding-bottom: 10px;
+        cursor: pointer;
     }
 
+    /* No PC: Seta invisível, Lista visível */
+    #seta-menu { display: none; }
+    #lista-botoes-provincia { display: block; }
+
     .botao-provincia {
-        display: block;
-        width: 100%;
-        padding: 10px;
-        margin: 5px 0;
-        background: transparent;
-        color: #ddd;
-        border: 1px solid #444;
-        border-radius: 4px;
-        text-align: left;
-        cursor: pointer;
+        display: block; width: 100%;
+        padding: 10px; margin: 5px 0;
+        background: transparent; color: #ddd;
+        border: 1px solid #444; border-radius: 4px;
+        text-align: left; cursor: pointer;
         transition: 0.3s;
     }
 
     .botao-provincia:hover {
-        background: #8b4513;
-        color: white;
-        border-color: #a0522d;
+        background: #8b4513; color: white; border-color: #a0522d;
     }
 
-    /* CONTAINER DA FOTO DA CIDADE (Centralizado) */
+    /* CONTAINER DA FOTO ESTÁTICA */
     #provincia-container {
-        display: none; /* Controlado pelo JS */
-        background: #1a1a1a; 
-        height: 100vh; 
-        width: 100vw; 
-        position: fixed;
-        top: 0; left: 0;
-        z-index: 3000; /* Acima de tudo */
-        
+        display: none;
+        background: #0f1c25; /* Fundo azul aqui também */
+        height: 100vh; width: 100vw; 
+        position: fixed; top: 0; left: 0;
+        z-index: 3000;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        align-items: center; justify-content: center;
     }
 
     #img-provincia {
-        max-height: 85vh; 
-        max-width: 90vw;
+        max-height: 85vh; max-width: 90vw;
         object-fit: contain;
         box-shadow: 0 0 50px rgba(0,0,0,1);
         border: 2px solid #333;
     }
 
-    /* BOTÃO VOLTAR (Fixo no topo esquerdo) */
-    .botao-fixo-voltar {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-        padding: 10px 20px;
-        background: #8b4513;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: bold;
-        z-index: 3001;
-        font-size: 14px; /* Tamanho controlado */
-    }
-
-    /* Estilo dos Popups do Leaflet */
-    .leaflet-popup-content-wrapper {
-        background: #2c2c2c;
-        color: #fff;
-        font-size: 14px;
-    }
+    /* POPUPS E BOTÕES */
+    .leaflet-popup-content-wrapper { background: #2c2c2c; color: #fff; font-size: 14px; }
     .leaflet-popup-tip { background: #2c2c2c; }
     
-    /* Botões dentro dos popups */
     .btn-popup {
-        background: #8b4513;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 3px;
-        cursor: pointer;
-        margin-top: 5px;
+        background: #8b4513; color: white; border: none;
+        padding: 5px 10px; border-radius: 3px;
+        cursor: pointer; 
     }
 
-    /* Fundo escuro atrás da janela */
+    /* MODAL DE DETALHES */
     #modal-info {
-        position: fixed;
-        z-index: 5000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.8); /* Fundo preto transparente */
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position: fixed; z-index: 5000; left: 0; top: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.8);
+        display: flex; align-items: center; justify-content: center;
     }
 
-    /* A janela em si */
     .modal-conteudo {
-        background-color: #2c2c2c;
-        border: 2px solid #cd853f; /* Borda dourada/cobre */
-        width: 60%;
-        max-width: 800px;
-        max-height: 80vh;
-        overflow-y: auto;
-        padding: 30px;
-        border-radius: 10px;
-        color: #ddd;
-        font-family: serif;
-        box-shadow: 0 0 20px #cd853f;
+        background-color: #2c2c2c; border: 2px solid #cd853f;
+        width: 60%; max-width: 800px; max-height: 80vh;
+        overflow-y: auto; padding: 30px; border-radius: 10px;
+        color: #ddd; font-family: serif; box-shadow: 0 0 20px #cd853f;
         position: relative;
     }
+    .modal-conteudo h2 { color: #cd853f; border-bottom: 1px solid #555; padding-bottom: 10px; margin-top: 0; }
+    .modal-conteudo p { line-height: 1.6; font-size: 18px; }
+    .modal-conteudo strong { color: #ffdead; }
+    .fechar-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
 
-    .modal-conteudo h2 {
-        color: #cd853f;
-        border-bottom: 1px solid #555;
-        padding-bottom: 10px;
-        margin-top: 0;
-    }
+    /* --- AJUSTES PARA CELULAR --- */
+    @media only screen and (max-width: 600px) {
+        
+        #menu-provincias {
+            width: auto !important;
+            right: 10px !important; top: 10px !important;
+            padding: 10px; max-width: 70vw; 
+        }
 
-    .modal-conteudo p {
-        line-height: 1.6;
-        font-size: 18px;
-    }
+        #menu-provincias h3 {
+            margin: 0; padding-bottom: 0; border-bottom: none; font-size: 14px;
+        }
 
-    .modal-conteudo strong {
-        color: #ffdead; /* Cor de destaque para títulos internos */
-    }
+        /* Celular: Seta visível, Lista começa escondida */
+        #seta-menu { display: inline; margin-left: 5px; }
+        #lista-botoes-provincia { 
+            display: none; 
+            margin-top: 10px; border-top: 1px solid #555; padding-top: 5px;
+        }
 
-    /* Botão de fechar (X) */
-    .fechar-modal {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
+        .modal-conteudo { width: 90% !important; padding: 15px !important; }
+        #img-provincia { max-height: 70vh !important; max-width: 95vw !important; }
     }
-
-    .fechar-modal:hover {
-        color: white;
-    }
-    
-    /* AJUSTES PARA CELULAR */
-@media only screen and (max-width: 600px) {
-    /* Menu de províncias fica menor e centralizado no topo */
-    #menu-provincias {
-        width: 80% !important;
-        right: 10% !important;
-        top: 10px !important;
-        max-height: 40vh;
-        font-size: 14px;
-        padding: 10px;
-    }
-
-    /* Botão Voltar fica menor para não tapar o mapa */
-    .botao-fixo-voltar, .btn-popup {
-        padding: 8px 12px !important;
-        font-size: 12px !important;
-    }
-
-    /* A janela de detalhes (Modal) ocupa quase a tela toda */
-    .modal-conteudo {
-        width: 90% !important;
-        padding: 15px !important;
-    }
-
-    /* Ajuste de escala da imagem de Hukmal'tep */
-    #img-provincia {
-        max-height: 70vh !important;
-        max-width: 95vw !important;
-    }
-}
-
-</style>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    </style>
 </head>
 <body>
     <div id="map-container">
-        <div id="map" style="height: 100vh; width: 100vw;"></div>
+        <div id="map"></div>
     </div>
 
     <div id="modal-info" style="display: none;">
-    <div class="modal-conteudo">
-        <span class="fechar-modal" onclick="fecharModalInfo()">&times;</span>
-        <h2 id="titulo-provincia">Título da Província</h2>
-        <div id="texto-provincia">
-            </div>
+        <div class="modal-conteudo">
+            <span class="fechar-modal" onclick="fecharModalInfo()">&times;</span>
+            <h2 id="titulo-provincia">Título</h2>
+            <div id="texto-provincia"></div>
+        </div>
     </div>
-</div>
 
-<div id="menu-provincias">
-    <h3>Províncias</h3>
-    <button class="botao-provincia" onclick="abrirMapaProvincia('Hukmal_tep.jpg')">Hukmal'tep</button>
-    <button class="botao-provincia" onclick="abrirMapaProvincia('Blat_khyr.jpg')">Blat'khyr</button>
-    <button class="botao-provincia" onclick="abrirMapaProvincia('Deserto.jpg')">Deserto</button>
-    <button class="botao-provincia" onclick="abrirMapaProvincia('Lago.jpg')">Lago</button>
-    <button class="botao-provincia" onclick="abrirMapaProvincia('Alcova.jpg')">Alcova</button>
-    <button class="botao-provincia" onclick="abrirMapaProvincia('Espinha do Gigante.jpg')">Espinha do Gigante</button>
-</div>
+    <div id="menu-provincias">
+        <h3 onclick="alternarMenuMobile()">Províncias <span id="seta-menu">▼</span></h3>
+        <div id="lista-botoes-provincia">
+            <button class="botao-provincia" onclick="abrirMapaProvincia('Hukmal_tep.jpg')">Hukmal'tep</button>
+            <button class="botao-provincia" onclick="abrirMapaProvincia('Blat_khyr.jpg')">Blat'khyr</button>
+            <button class="botao-provincia" onclick="abrirMapaProvincia('Deserto.jpg')">Deserto</button>
+            <button class="botao-provincia" onclick="abrirMapaProvincia('Lago.jpg')">Lago</button>
+            <button class="botao-provincia" onclick="abrirMapaProvincia('Alcova.jpg')">Alcova</button>
+            <button class="botao-provincia" onclick="abrirMapaProvincia('Espinha do Gigante.jpg')">Espinha do Gigante</button>
+        </div>
+    </div>
 
-<div id="provincia-container" style="display: none;">
-    <button onclick="voltarParaMapa()" class="botao-fixo-voltar" style="padding: 10px 20px; cursor: pointer; background: #8b4513; color: white; border: none; border-radius: 5px; font-family: sans-serif;">
-        ⬅ Voltar para o Mapa
-    </button>
-    <img id="img-provincia" src="">
-</div>
+    <div id="provincia-container">
+        <button onclick="voltarParaMapa()" class="btn-popup" style="position: absolute; top: 20px; left: 20px; font-size: 16px;">
+            ⬅ Voltar
+        </button>
+        <img id="img-provincia" src="">
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-// --- 1. CONFIGURAÇÕES TÉCNICAS ---
-    const configContinental = {
-        arquivo: 'Mapa teste.png',
-        largura: 7680,
-        altura: 4320,
-        minZoom: -1.5,
-        maxZoom: 3
-    };
-
-    const configProvincia = {
-        largura: 2048,
-        altura: 1536,
-        minZoom: -0.5,
-        maxZoom: 2
-    };
-
+    // --- 1. CONFIGURAÇÕES TÉCNICAS ---
+    const configContinental = { arquivo: 'Mapa teste.png', largura: 7680, altura: 4320, minZoom: -2.0, maxZoom: 3 };
+    const configProvincia = { largura: 2048, altura: 1536, minZoom: -1.0, maxZoom: 2 };
     let map; 
     let mapaAtualAtivo = 'continente';
 
-    // --- 2. INICIALIZAÇÃO DO MAPA ---
-   function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
+    // --- 2. INICIALIZAÇÃO DO MAPA (COM FIX DE BORDAS e FUNDO AZUL) ---
+    function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
         if (map) { map.remove(); } 
 
-        const limites = [[0, 0], [altura, largura]];
-        
-        // Detecta se é celular para melhorar a experiência touch
-        const isMobile = window.innerWidth < 600;
+        // Limites reais da imagem
+        const limitesImagem = [[0, 0], [altura, largura]];
 
+        // Limites de navegação (com padding/folga extra)
+        const padding = 1500; 
+        const limitesNavegacao = [[-padding, -padding], [altura + padding, largura + padding]];
+        
         map = L.map('map', {
             crs: L.CRS.Simple,
             minZoom: minZoom,
             maxZoom: maxZoom,
-            maxBounds: limites,
-            maxBoundsViscosity: 1.0,
-            tap: false // Importante para evitar bugs em telas touch
+            maxBounds: limitesNavegacao, 
+            maxBoundsViscosity: 0.5,     
+            tap: false 
         });
 
-        L.imageOverlay(arquivo, limites).addTo(map);
-        map.fitBounds(limites);
+        // Adiciona a imagem nos limites ORIGINAIS
+        L.imageOverlay(arquivo, limitesImagem).addTo(map);
+        
+        map.fitBounds(limitesImagem);
 
-        // Mantive sua ferramenta de coordenadas aqui:
         map.on('click', function(e) {
-            const y = e.latlng.lat.toFixed(0);
-            const x = e.latlng.lng.toFixed(0);
-            L.popup().setLatLng(e.latlng).setContent(`Coordenadas: [${y}, ${x}]`).openOn(map);
-            console.log(`[${y}, ${x}]`);
+            console.log(`[${e.latlng.lat.toFixed(0)}, ${e.latlng.lng.toFixed(0)}]`);
         });
     }
 
-    // --- 3. NAVEGAÇÃO ---
+    // --- 3. LÓGICA DO MENU CELULAR ---
+    function alternarMenuMobile() {
+        if (window.innerWidth > 600) return; // Bloqueia no PC
+
+        const lista = document.getElementById('lista-botoes-provincia');
+        const seta = document.getElementById('seta-menu');
+        const estiloAtual = window.getComputedStyle(lista).display;
+
+        if (estiloAtual === 'none') {
+            lista.style.display = 'block';
+            seta.innerHTML = '▲';
+        } else {
+            lista.style.display = 'none';
+            seta.innerHTML = '▼';
+        }
+    }
+
+    // --- 4. NAVEGAÇÃO ---
     function carregarMapaPrincipal() {
         mapaAtualAtivo = 'continente';
         document.getElementById('map-container').style.display = 'block';
         document.getElementById('provincia-container').style.display = 'none';
-        
-        // Mostra o Menu de Províncias no Continente
         document.getElementById('menu-provincias').style.display = 'block';
+        
+        if (window.innerWidth <= 600) {
+            document.getElementById('lista-botoes-provincia').style.display = 'none';
+            document.getElementById('seta-menu').innerHTML = '▼';
+        } else {
+            document.getElementById('lista-botoes-provincia').style.display = 'block';
+        }
 
         inicializarMapa(configContinental.arquivo, configContinental.largura, configContinental.altura, configContinental.minZoom, configContinental.maxZoom);
-        
-        // CORREÇÃO: Chama os marcadores do continente de volta!
         adicionarMarcadoresPrincipais();
     }
 
-// --- BANCO DE DADOS DAS PROVÍNCIAS ---
+    // --- 5. BANCO DE DADOS ---
     const dadosProvincias = {
         'Hukmal_tep.jpg': {
             titulo: "Hukmal'tep - O Inverno Absoluto",
@@ -328,70 +258,41 @@
                 <p><strong>💎 Economia:</strong> O comércio é focado em itens mágicos diversos.</p>
             `
         },
-        // Adicione as outras províncias aqui...
-        'default': {
-            titulo: "Região Desconhecida",
-            descricao: "<p>Não há registros detalhados sobre esta área nos arquivos imperiais.</p>"
-        }
+        'default': { titulo: "Região Desconhecida", descricao: "<p>Não há registros detalhados sobre esta área.</p>" }
     };
 
-    // --- FUNÇÕES DO MODAL ---
     function abrirModalInfo() {
         const dados = dadosProvincias[mapaAtualAtivo] || dadosProvincias['default'];
-        
         document.getElementById('titulo-provincia').innerHTML = dados.titulo;
         document.getElementById('texto-provincia').innerHTML = dados.descricao;
         document.getElementById('modal-info').style.display = 'flex';
     }
+    function fecharModalInfo() { document.getElementById('modal-info').style.display = 'none'; }
 
-    function fecharModalInfo() {
-        document.getElementById('modal-info').style.display = 'none';
-    }
-
-    // --- SUA FUNÇÃO ATUALIZADA ---
     function abrirMapaProvincia(arquivo) {
         mapaAtualAtivo = arquivo;
-        
         document.getElementById('menu-provincias').style.display = 'none';
         document.getElementById('map-container').style.display = 'block';
         document.getElementById('provincia-container').style.display = 'none';
 
         inicializarMapa(arquivo, configProvincia.largura, configProvincia.altura, configProvincia.minZoom, configProvincia.maxZoom);
 
-        // 1. Botão Voltar (Já existente)
-        const botaoVoltar = L.control({position: 'topleft'});
+        const posicaoBtn = window.innerWidth < 600 ? 'bottomleft' : 'topleft';
+        const botaoVoltar = L.control({position: posicaoBtn});
         botaoVoltar.onAdd = function() {
             const btn = L.DomUtil.create('button', ''); 
             btn.innerHTML = "⬅ Voltar ao Continente";
-            btn.style.whiteSpace = "nowrap";
-            btn.style.padding = "10px 15px";
-            btn.style.background = "#8b4513";
-            btn.style.color = "white";
-            btn.style.border = "2px solid #5e2f0d";
-            btn.style.borderRadius = "5px";
-            btn.style.cursor = "pointer";
-            btn.style.fontWeight = "bold";
+            btn.style.cssText = "white-space:nowrap; padding:10px 15px; background:#8b4513; color:white; border:2px solid #5e2f0d; border-radius:5px; cursor:pointer; font-weight:bold;";
             btn.onclick = carregarMapaPrincipal; 
             return btn;
         };
         botaoVoltar.addTo(map);
 
-        // 2. NOVO: Botão de Detalhes da Província (Canto Superior Direito)
         const botaoInfo = L.control({position: 'topright'});
         botaoInfo.onAdd = function() {
             const btn = L.DomUtil.create('button', ''); 
-            btn.innerHTML = "📜 Detalhes da Região";
-            btn.style.whiteSpace = "nowrap";
-            btn.style.padding = "10px 15px";
-            btn.style.background = "#2c3e50"; /* Azul escuro para diferenciar */
-            btn.style.color = "#cd853f";      /* Texto dourado */
-            btn.style.border = "2px solid #cd853f";
-            btn.style.borderRadius = "5px";
-            btn.style.cursor = "pointer";
-            btn.style.fontWeight = "bold";
-            btn.style.fontSize = "16px";
-            
-            // Ao clicar, abre a janela que criamos
+            btn.innerHTML = "📜 Detalhes";
+            btn.style.cssText = "white-space:nowrap; padding:10px 15px; background:#2c3e50; color:#cd853f; border:2px solid #cd853f; border-radius:5px; cursor:pointer; font-weight:bold;";
             btn.onclick = abrirModalInfo; 
             return btn;
         };
@@ -407,34 +308,21 @@
     }
 
     function voltarParaMapa() {
-        if (mapaAtualAtivo === 'continente') {
-            carregarMapaPrincipal();
-        } else {
-            abrirMapaProvincia(mapaAtualAtivo);
-        }
+        if (mapaAtualAtivo === 'continente') carregarMapaPrincipal();
+        else abrirMapaProvincia(mapaAtualAtivo);
     }
 
-// --- 4. MARCADORES LOCAIS (PROVÍNCIAS) ---
+    // --- 6. MARCADORES LOCAIS ---
     function adicionarMarcadoresLocais(nomeDoMapa) {
-        
-        const hitboxPadrao = L.icon({
-            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-            iconSize: [50, 50], iconAnchor: [25, 25], popupAnchor: [0, -25]
-        });
-        const hitboxGrande = L.icon({
-            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-            iconSize: [100, 100], iconAnchor: [50, 50], popupAnchor: [0, -50]
-        });
+        const iconP = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [50, 50], iconAnchor: [25, 25], popupAnchor: [0, -25]});
+        const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [100, 100], iconAnchor: [50, 50], popupAnchor: [0, -50]});
 
         function criarPontoLocal(coord, nome, info, foto = null, grande = false) {
-            const m = L.marker(coord, { 
-                icon: grande ? hitboxGrande : hitboxPadrao, 
-                opacity: 0 
-            }).addTo(map);
-
+            const m = L.marker(coord, {icon: grande ? iconG : iconP, opacity: 0}).addTo(map);
+            
             let popupHtml = `<div style="text-align:center;"><b>${nome}</b><br><small>${info}</small>`;
             if (foto) {
-                popupHtml += `<br><br><button onclick="verImagemEstatica('${foto}')" class="btn-popup">Ver Foto</button>`;
+                popupHtml += `<div style="margin-top: 10px;"><button onclick="verImagemEstatica('${foto}')" class="btn-popup">Ver Foto</button></div>`;
             }
             popupHtml += `</div>`;
             m.bindPopup(popupHtml);
@@ -498,36 +386,24 @@
         }
     }
 
-    // --- 5. MARCADORES DO CONTINENTE ---
+    // --- 7. MARCADORES DO CONTINENTE ---
     function adicionarMarcadoresPrincipais() {
-        const iconePadrao = L.icon({
-            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-            iconSize: [80, 80], iconAnchor: [40, 40], popupAnchor: [0, -40]
-        });
-
-        const iconeGrande = L.icon({
-            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-            iconSize: [120, 120], iconAnchor: [60, 60], popupAnchor: [0, -60]
-        });
+        const iconP = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [80, 80], iconAnchor: [40, 40], popupAnchor: [0, -40]});
+        const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [120, 120], iconAnchor: [60, 60], popupAnchor: [0, -60]});
 
         function criarPonto(coord, nome, arg3, arg4, arg5) {
-            
             let descricao = "";
             let arquivo = "";
             let tipo = "";
             let grande = false;
 
             if (arg3 && (arg3.includes('.png') || arg3.includes('.jpg') || arg3.includes('.webp') || arg3 === null)) {
-                arquivo = arg3;
-                tipo = arg4;
-                grande = arg5 || false;
+                arquivo = arg3; tipo = arg4; grande = arg5 || false;
             } else {
-                descricao = arg3;
-                arquivo = arg4;
-                tipo = arg5;
+                descricao = arg3; arquivo = arg4; tipo = arg5;
             }
 
-            const m = L.marker(coord, { icon: grande ? iconeGrande : iconePadrao, opacity: 0 }).addTo(map);
+            const m = L.marker(coord, { icon: grande ? iconG : iconP, opacity: 0 }).addTo(map);
             let btn = "";
 
             if (tipo === 'mapa') {
@@ -535,23 +411,19 @@
             } else if (tipo === 'imagem') {
                 btn = `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup">Ver Foto</button>`;
             } else {
-                // CORREÇÃO: Removemos a tag <p> com margem padrão e colocamos um span simples
-                btn = `<span style="color:#aaa; font-style:italic;">Sem detalhes.</span>`;
+                btn = `<span style="color:#aaa; font-style:italic;">Sem detalhes visuais.</span>`;
             }
 
-            // CORREÇÃO: Substituímos o <br><br> por uma DIV com margem controlada
             let conteudoPopup = `<div style="text-align:center;"><b>${nome}</b>`;
             if (descricao) {
                 conteudoPopup += `<br><small style="color:#ccc;">${descricao}</small>`;
             }
-            
-            // Aqui está o segredo: margin-top cria o espaço só se precisar, sem empurrar demais
-            conteudoPopup += `<div style="margin-top: 12px;">${btn}</div></div>`;
+            conteudoPopup += `<div style="margin-top: 10px;">${btn}</div></div>`;
 
             m.bindPopup(conteudoPopup);
         }
 
-        // Seus pontos
+        // SEUS PONTOS DO CONTINENTE
         criarPonto([824, 2330], "Deserto","A Origem do Mundo", "Deserto.jpg", 'mapa');
         criarPonto([3850, 3580], "Hukmal'tep", "O Inverno Absoluto","Hukmal_tep.jpg", 'mapa');
         criarPonto([2902, 5464], "Blat'khyr", "O Berço da Magia", "Blat_khyr.jpg", 'mapa');
@@ -574,7 +446,6 @@
         criarPonto([2228, 3032], "Pântano", "pantano.png", 'imagem');
         criarPonto([2220, 2656], "Pântano", "pantano.png", 'imagem');
         
-        // Agora esses pontos ficarão bonitos, sem buraco gigante
         criarPonto([2232, 3936], "Vilarejo", null, 'none');
         criarPonto([2300, 3400], "Vilarejo", null, 'none');
         criarPonto([1830, 4354], "Vilarejo", null, 'none');
@@ -587,6 +458,8 @@
         criarPonto([2070, 3642], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         criarPonto([3912, 1780], "Inverno Desolado", null, 'none', true);
     }
+
+    // Inicialização
     carregarMapaPrincipal();
     </script>
 </body>
