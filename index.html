@@ -14,7 +14,7 @@
     body { margin: 0; background: #4F686E; overflow: hidden; font-family: sans-serif; }
     #map { height: 100vh; width: 100vw; z-index: 1; background: #4F686E; }
 
-    /* MENU LATERAL (VOLTOU A SER PRETO) */
+    /* MENU LATERAL (PRETO) */
     #menu-provincias {
         position: fixed;
         top: 20px; right: 20px;
@@ -118,9 +118,9 @@
         .modal-conteudo { width: 90% !important; padding: 15px !important; }
         #img-provincia { max-height: 70vh !important; max-width: 95vw !important; }
         
+        /* Ajuste do botão de voltar para ficar no topo, abaixo do zoom */
         .leaflet-control-button-voltar {
-            margin-bottom: 25px !important;
-            margin-left: 15px !important;
+            margin-top: 10px !important; 
         }
     }
     </style>
@@ -183,9 +183,15 @@
         L.imageOverlay(arquivo, limitesImagem).addTo(map);
         map.fitBounds(limitesImagem);
         
-        // Ferramenta de Coordenadas (Console)
+        // FERRAMENTA DE COORDENADAS (POPUP RESTAURADO)
         map.on('click', function(e) {
-            console.log(`[${e.latlng.lat.toFixed(0)}, ${e.latlng.lng.toFixed(0)}]`);
+            const y = e.latlng.lat.toFixed(0);
+            const x = e.latlng.lng.toFixed(0);
+            L.popup()
+                .setLatLng(e.latlng)
+                .setContent(`Coordenadas: [${y}, ${x}]`)
+                .openOn(map);
+            console.log(`[${y}, ${x}]`); // Também manda pro console se precisar copiar
         });
     }
 
@@ -226,23 +232,11 @@
     const dadosProvincias = {
         'Hukmal_tep.jpg': {
             titulo: "Hukmal'tep - O Inverno Absoluto",
-            descricao: `
-                <p><strong>📜 Descrição:</strong> Uma região montanhosa e de frio intenso, marcada por grandes picos e vales profundos onde o vento uiva constantemente.</p>
-                <p><strong>👑 Governo:</strong> Conselho das Três Tribos (Felistas, Malistas e Garra do Inverno). Não há um rei único, mas sim uma trégua tensa.</p>
-                <p><strong>🧑‍🤝‍🧑 Raças Principais:</strong> Humanos (adaptados ao frio), Anões e Mestiços.</p>
-                <p><strong>⚔️ Cultura:</strong> Valorizam a força e a sobrevivência. A magia é vista com desconfiança. Não é muito comum haver estudiosos na província.</p>
-                <p><strong>💎 Economia:</strong> O comércio é focado em peles e outros produtos originados de monstros e animais da região.</p>
-            `
+            descricao: `<p><strong>📜 Descrição:</strong> Uma região montanhosa e de frio intenso...</p>`
         },
         'Blat_khyr.jpg': {
             titulo: "Blat'khyr - O Berço da Magia",
-            descricao: `
-                <p><strong>📜 Descrição:</strong> Uma região repleta de magia onde todo o ambiente foi transformado devido à alta densidade de mana da província.</p>
-                <p><strong>👑 Governo:</strong> Existe uma família real élfica mas em geral quem cuida da gestão da província é o conselho élfico que é formados por elfos anciões.</p>
-                <p><strong>🧑‍🤝‍🧑 Raças Principais:</strong> Elfos e Humanos.</p>
-                <p><strong>⚔️ Cultura:</strong> Valorizam a inteligência, elegância e o poder mágico acima de tudo. Muitos elfos não gostam de misturar com outras raças pois "diminui o potencial mágico deles"</p>
-                <p><strong>💎 Economia:</strong> O comércio é focado em itens mágicos diversos.</p>
-            `
+            descricao: `<p><strong>📜 Descrição:</strong> Uma região repleta de magia...</p>`
         },
         'default': { titulo: "Região Desconhecida", descricao: "<p>Não há registros detalhados sobre esta área.</p>" }
     };
@@ -263,10 +257,9 @@
 
         inicializarMapa(arquivo, configProvincia.largura, configProvincia.altura, configProvincia.minZoom, configProvincia.maxZoom);
 
-        // BOTÃO VOLTAR CORRIGIDO PARA CELULAR
-        const isMobile = window.innerWidth < 600;
+        // BOTÃO VOLTAR (SEMPRE NO TOPO AGORA)
         const BotaoVoltarControl = L.Control.extend({
-            options: { position: isMobile ? 'bottomleft' : 'topleft' },
+            options: { position: 'topleft' }, // Sempre Top-Left
             onAdd: function() {
                 const btn = L.DomUtil.create('button', 'leaflet-control-button-voltar');
                 btn.innerHTML = "⬅ Voltar ao Continente";
@@ -304,6 +297,7 @@
         const btnVoltarImg = document.createElement('button');
         btnVoltarImg.innerHTML = "⬅ Voltar";
         btnVoltarImg.className = "btn-popup";
+        // Ajustado para ficar seguro no topo
         btnVoltarImg.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
         btnVoltarImg.onclick = voltarParaMapa;
         
@@ -318,7 +312,7 @@
         else abrirMapaProvincia(mapaAtualAtivo);
     }
 
-    // --- 6. MARCADORES LOCAIS (TODOS RESTAURADOS) ---
+    // --- 6. MARCADORES LOCAIS ---
     function adicionarMarcadoresLocais(nomeDoMapa) {
         const iconP = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [50, 50], iconAnchor: [25, 25], popupAnchor: [0, -25]});
         const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [100, 100], iconAnchor: [50, 50], popupAnchor: [0, -50]});
@@ -404,7 +398,7 @@
             const m = L.marker(coord, { icon: grande ? iconG : iconP, opacity: 0 }).addTo(map);
             let btn = (tipo === 'mapa') ? `<button onclick="abrirMapaProvincia('${arquivo}')" class="btn-popup">Explorar Província</button>` : 
                       (tipo === 'imagem') ? `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup">Ver Foto</button>` : 
-                      `<span style="color:#aaa; font-style:italic;">Sem detalhes visuais.</span>`;
+                      `<span style="color:#aaa; font-style:italic;">Sem detalhes.</span>`;
 
             let conteudoPopup = `<div style="text-align:center;"><b>${nome}</b>`;
             if (descricao) conteudoPopup += `<br><small style="color:#ccc;">${descricao}</small>`;
@@ -434,6 +428,7 @@
         criarPonto([2232, 3936], "Vilarejo", null, 'none');
         criarPonto([2300, 3400], "Vilarejo", null, 'none');
         criarPonto([1830, 4354], "Vilarejo", null, 'none');
+        criarPonto([1630, 3054], "Vilarejo", null, 'none');
         criarPonto([2464, 4974], "Ilha de Blat'khyr", "Cadê?", "Ilha.png", 'imagem');
         criarPonto([1838, 3526], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         criarPonto([1750, 3320], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
