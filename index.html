@@ -10,18 +10,16 @@
     <style>
     /* --- ESTILOS GERAIS --- */
     
-    /* MUDANÇA: Fundo Azul Escuro (#0f1c25) para combinar com a água */
+    /* Fundo Azul Escolhido (#4F686E) */
     body { margin: 0; background: #4F686E; overflow: hidden; font-family: sans-serif; }
-    
-    /* O fundo do mapa também precisa ser o mesmo azul */
     #map { height: 100vh; width: 100vw; z-index: 1; background: #4F686E; }
 
-    /* MENU LATERAL */
+    /* MENU LATERAL (VOLTOU A SER PRETO) */
     #menu-provincias {
         position: fixed;
         top: 20px; right: 20px;
         width: 220px;
-        background: rgba(15, 28, 37, 0.95); /* Azul escuro semi-transparente */
+        background: rgba(26, 26, 26, 0.95); 
         border: 2px solid #8b4513;
         border-radius: 8px;
         color: white;
@@ -40,7 +38,6 @@
         cursor: pointer;
     }
 
-    /* No PC: Seta invisível, Lista visível */
     #seta-menu { display: none; }
     #lista-botoes-provincia { display: block; }
 
@@ -60,7 +57,7 @@
     /* CONTAINER DA FOTO ESTÁTICA */
     #provincia-container {
         display: none;
-        background: #0f1c25; /* Fundo azul aqui também */
+        background: #4F686E; 
         height: 100vh; width: 100vw; 
         position: fixed; top: 0; left: 0;
         z-index: 3000;
@@ -81,8 +78,8 @@
     
     .btn-popup {
         background: #8b4513; color: white; border: none;
-        padding: 5px 10px; border-radius: 3px;
-        cursor: pointer; 
+        padding: 8px 12px; border-radius: 3px;
+        cursor: pointer; font-weight: bold;
     }
 
     /* MODAL DE DETALHES */
@@ -107,26 +104,24 @@
 
     /* --- AJUSTES PARA CELULAR --- */
     @media only screen and (max-width: 600px) {
-        
         #menu-provincias {
             width: auto !important;
             right: 10px !important; top: 10px !important;
             padding: 10px; max-width: 70vw; 
         }
-
-        #menu-provincias h3 {
-            margin: 0; padding-bottom: 0; border-bottom: none; font-size: 14px;
-        }
-
-        /* Celular: Seta visível, Lista começa escondida */
+        #menu-provincias h3 { margin: 0; padding-bottom: 0; border-bottom: none; font-size: 14px; }
         #seta-menu { display: inline; margin-left: 5px; }
         #lista-botoes-provincia { 
             display: none; 
             margin-top: 10px; border-top: 1px solid #555; padding-top: 5px;
         }
-
         .modal-conteudo { width: 90% !important; padding: 15px !important; }
         #img-provincia { max-height: 70vh !important; max-width: 95vw !important; }
+        
+        .leaflet-control-button-voltar {
+            margin-bottom: 25px !important;
+            margin-left: 15px !important;
+        }
     }
     </style>
 </head>
@@ -156,9 +151,6 @@
     </div>
 
     <div id="provincia-container">
-        <button onclick="voltarParaMapa()" class="btn-popup" style="position: absolute; top: 20px; left: 20px; font-size: 16px;">
-            ⬅ Voltar
-        </button>
         <img id="img-provincia" src="">
     </div>
 
@@ -171,14 +163,11 @@
     let map; 
     let mapaAtualAtivo = 'continente';
 
-    // --- 2. INICIALIZAÇÃO DO MAPA (COM FIX DE BORDAS e FUNDO AZUL) ---
+    // --- 2. INICIALIZAÇÃO DO MAPA ---
     function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
         if (map) { map.remove(); } 
 
-        // Limites reais da imagem
         const limitesImagem = [[0, 0], [altura, largura]];
-
-        // Limites de navegação (com padding/folga extra)
         const padding = 1500; 
         const limitesNavegacao = [[-padding, -padding], [altura + padding, largura + padding]];
         
@@ -191,11 +180,10 @@
             tap: false 
         });
 
-        // Adiciona a imagem nos limites ORIGINAIS
         L.imageOverlay(arquivo, limitesImagem).addTo(map);
-        
         map.fitBounds(limitesImagem);
-
+        
+        // Ferramenta de Coordenadas (Console)
         map.on('click', function(e) {
             console.log(`[${e.latlng.lat.toFixed(0)}, ${e.latlng.lng.toFixed(0)}]`);
         });
@@ -203,12 +191,10 @@
 
     // --- 3. LÓGICA DO MENU CELULAR ---
     function alternarMenuMobile() {
-        if (window.innerWidth > 600) return; // Bloqueia no PC
-
+        if (window.innerWidth > 600) return;
         const lista = document.getElementById('lista-botoes-provincia');
         const seta = document.getElementById('seta-menu');
         const estiloAtual = window.getComputedStyle(lista).display;
-
         if (estiloAtual === 'none') {
             lista.style.display = 'block';
             seta.innerHTML = '▲';
@@ -277,26 +263,35 @@
 
         inicializarMapa(arquivo, configProvincia.largura, configProvincia.altura, configProvincia.minZoom, configProvincia.maxZoom);
 
-        const posicaoBtn = window.innerWidth < 600 ? 'bottomleft' : 'topleft';
-        const botaoVoltar = L.control({position: posicaoBtn});
-        botaoVoltar.onAdd = function() {
-            const btn = L.DomUtil.create('button', ''); 
-            btn.innerHTML = "⬅ Voltar ao Continente";
-            btn.style.cssText = "white-space:nowrap; padding:10px 15px; background:#8b4513; color:white; border:2px solid #5e2f0d; border-radius:5px; cursor:pointer; font-weight:bold;";
-            btn.onclick = carregarMapaPrincipal; 
-            return btn;
-        };
-        botaoVoltar.addTo(map);
+        // BOTÃO VOLTAR CORRIGIDO PARA CELULAR
+        const isMobile = window.innerWidth < 600;
+        const BotaoVoltarControl = L.Control.extend({
+            options: { position: isMobile ? 'bottomleft' : 'topleft' },
+            onAdd: function() {
+                const btn = L.DomUtil.create('button', 'leaflet-control-button-voltar');
+                btn.innerHTML = "⬅ Voltar ao Continente";
+                btn.style.cssText = "white-space:nowrap; padding:12px 18px; background:#8b4513; color:white; border:2px solid #5e2f0d; border-radius:5px; cursor:pointer; font-weight:bold; font-size:14px; z-index:9999;";
+                btn.onclick = function(e) {
+                    L.DomEvent.stopPropagation(e);
+                    carregarMapaPrincipal();
+                };
+                return btn;
+            }
+        });
+        map.addControl(new BotaoVoltarControl());
 
-        const botaoInfo = L.control({position: 'topright'});
-        botaoInfo.onAdd = function() {
-            const btn = L.DomUtil.create('button', ''); 
-            btn.innerHTML = "📜 Detalhes";
-            btn.style.cssText = "white-space:nowrap; padding:10px 15px; background:#2c3e50; color:#cd853f; border:2px solid #cd853f; border-radius:5px; cursor:pointer; font-weight:bold;";
-            btn.onclick = abrirModalInfo; 
-            return btn;
-        };
-        botaoInfo.addTo(map);
+        // Botão Detalhes
+        const BotaoInfoControl = L.Control.extend({
+            options: { position: 'topright' },
+            onAdd: function() {
+                const btn = L.DomUtil.create('button', '');
+                btn.innerHTML = "📜 Detalhes";
+                btn.style.cssText = "white-space:nowrap; padding:10px 15px; background:#2c3e50; color:#cd853f; border:2px solid #cd853f; border-radius:5px; cursor:pointer; font-weight:bold;";
+                btn.onclick = abrirModalInfo;
+                return btn;
+            }
+        });
+        map.addControl(new BotaoInfoControl());
 
         adicionarMarcadoresLocais(arquivo);
     }
@@ -305,6 +300,17 @@
         document.getElementById('map-container').style.display = 'none';
         document.getElementById('provincia-container').style.display = 'flex'; 
         document.getElementById('img-provincia').src = arquivo;
+        
+        const btnVoltarImg = document.createElement('button');
+        btnVoltarImg.innerHTML = "⬅ Voltar";
+        btnVoltarImg.className = "btn-popup";
+        btnVoltarImg.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
+        btnVoltarImg.onclick = voltarParaMapa;
+        
+        const container = document.getElementById('provincia-container');
+        const btnAntigo = container.querySelector('button');
+        if (btnAntigo) container.removeChild(btnAntigo);
+        container.insertBefore(btnVoltarImg, container.firstChild);
     }
 
     function voltarParaMapa() {
@@ -312,52 +318,49 @@
         else abrirMapaProvincia(mapaAtualAtivo);
     }
 
-    // --- 6. MARCADORES LOCAIS ---
+    // --- 6. MARCADORES LOCAIS (TODOS RESTAURADOS) ---
     function adicionarMarcadoresLocais(nomeDoMapa) {
         const iconP = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [50, 50], iconAnchor: [25, 25], popupAnchor: [0, -25]});
         const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [100, 100], iconAnchor: [50, 50], popupAnchor: [0, -50]});
 
         function criarPontoLocal(coord, nome, info, foto = null, grande = false) {
             const m = L.marker(coord, {icon: grande ? iconG : iconP, opacity: 0}).addTo(map);
-            
             let popupHtml = `<div style="text-align:center;"><b>${nome}</b><br><small>${info}</small>`;
-            if (foto) {
-                popupHtml += `<div style="margin-top: 10px;"><button onclick="verImagemEstatica('${foto}')" class="btn-popup">Ver Foto</button></div>`;
-            }
+            if (foto) popupHtml += `<div style="margin-top: 10px;"><button onclick="verImagemEstatica('${foto}')" class="btn-popup">Ver Foto</button></div>`;
             popupHtml += `</div>`;
             m.bindPopup(popupHtml);
         }
 
         if (nomeDoMapa === 'Hukmal_tep.jpg') {
             criarPontoLocal([1396, 780], "Capital de Hukmal'tep", "Felista", "Cópia de capital de hukmal_tep.png", true);
-            criarPontoLocal([1422, 441], "Torre de Vigia", "(Felista)");
-            criarPontoLocal([1209, 520], "Torre de Vigia", "(Felista)");
-            criarPontoLocal([1488, 1081], "Torre de Vigia", "(Felista)");
-            criarPontoLocal([1222, 1158], "Torre de Vigia", "(Felista)");
-            criarPontoLocal([1474, 546], "Porto", "(Felista)");
-            criarPontoLocal([1256, 1129], "Vilarejo", "(Felista)");
-            criarPontoLocal([1106, 505], "Vilarejo", "(Felista)");
-            criarPontoLocal([157, 267], "Cidade", "(Garra do Inverno)");
-            criarPontoLocal([419, 483], "Vilarejo", "(Garra do Inverno)");
-            criarPontoLocal([242, 1338], "Vilarejo", "(Garra do Inverno)", "Cópia de cidade ponte.png", true);
-            criarPontoLocal([369, 868], "Vilarejo", "(Garra do inverno)", "Cópia de Cidade neve 3.png", true);
-            criarPontoLocal([268, 1472], "Torre de Vigia", "(Malista)");
-            criarPontoLocal([513, 1617], "Cidade", "(Malista)", "Cópia de Cidade neve 5.png", true);
-            criarPontoLocal([534, 1918], "Vilarejo", "(Malista)");
-            criarPontoLocal([530, 1710], "Porto", "(Malista)");
-            criarPontoLocal([678, 101], "Porto", "(Malista)");
-            criarPontoLocal([707, 1520], "Vilarejo", "(Malista)");
-            criarPontoLocal([659, 1127], "Vilarejo", "(Malista)", "Cópia de Cidade neve 4.png", true);
-            criarPontoLocal([796, 1134], "Torre de Vigia", "(Malista)");
-            criarPontoLocal([960, 1733], "Torre de Vigia", "(Malista)");
-            criarPontoLocal([1113, 1460], "Vilarejo", "(Malista)");
-            criarPontoLocal([1003, 172], "Vilarejo", "(Malista)");
-            criarPontoLocal([673, 640], "Vilarejo", "(Malista)", "Cópia de cidade dragão.png", true);
-            criarPontoLocal([621, 358], "Torre de Vigia", "(Malista)");
-            criarPontoLocal([740, 452], "Torre de Vigia", "(Malista)");
-            criarPontoLocal([713, 257], "Cidade Malista", "(Malista)", "Cópia de Cidade portuaria gelo.png", true);
-            criarPontoLocal([141, 578], "Vilarejo", "(Neutro)", "inicial.png", true);
-            criarPontoLocal([1184, 1014], "Vilarejo", "(Neutro)");
+            criarPontoLocal([1422, 441], "Torre de Vigia", "Felista");
+            criarPontoLocal([1209, 520], "Torre de Vigia", "Felista");
+            criarPontoLocal([1488, 1081], "Torre de Vigia", "Felista");
+            criarPontoLocal([1222, 1158], "Torre de Vigia", "Felista");
+            criarPontoLocal([1474, 546], "Porto", "Felista");
+            criarPontoLocal([1256, 1129], "Vilarejo", "Felista");
+            criarPontoLocal([1106, 505], "Vilarejo", "Felista");
+            criarPontoLocal([157, 267], "Cidade", "Garra do Inverno");
+            criarPontoLocal([419, 483], "Vilarejo", "Garra do Inverno");
+            criarPontoLocal([242, 1338], "Vilarejo", "Garra do Inverno", "Cópia de cidade ponte.png", true);
+            criarPontoLocal([369, 868], "Vilarejo", "Garra do inverno", "Cópia de Cidade neve 3.png", true);
+            criarPontoLocal([268, 1472], "Torre de Vigia", "Malista");
+            criarPontoLocal([513, 1617], "Cidade", "Malista", "Cópia de Cidade neve 5.png", true);
+            criarPontoLocal([534, 1918], "Vilarejo", "Malista");
+            criarPontoLocal([530, 1710], "Porto", "Malista");
+            criarPontoLocal([678, 101], "Porto", "Malista");
+            criarPontoLocal([707, 1520], "Vilarejo", "Malista");
+            criarPontoLocal([659, 1127], "Vilarejo", "Malista", "Cópia de Cidade neve 4.png", true);
+            criarPontoLocal([796, 1134], "Torre de Vigia", "Malista");
+            criarPontoLocal([960, 1733], "Torre de Vigia", "Malista");
+            criarPontoLocal([1113, 1460], "Vilarejo", "Malista");
+            criarPontoLocal([1003, 172], "Vilarejo", "Malista");
+            criarPontoLocal([673, 640], "Vilarejo", "Malista", "Cópia de cidade dragão.png", true);
+            criarPontoLocal([621, 358], "Torre de Vigia", "Malista");
+            criarPontoLocal([740, 452], "Torre de Vigia", "Malista");
+            criarPontoLocal([713, 257], "Cidade Malista", "Malista", "Cópia de Cidade portuaria gelo.png", true);
+            criarPontoLocal([141, 578], "Vilarejo", "Neutro", "inicial.png", true);
+            criarPontoLocal([1184, 1014], "Vilarejo", "Neutro");
         }
 
         if (nomeDoMapa === 'Blat_khyr.jpg') {
@@ -392,38 +395,23 @@
         const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [120, 120], iconAnchor: [60, 60], popupAnchor: [0, -60]});
 
         function criarPonto(coord, nome, arg3, arg4, arg5) {
-            let descricao = "";
-            let arquivo = "";
-            let tipo = "";
-            let grande = false;
-
+            let descricao = "", arquivo = "", tipo = "", grande = false;
             if (arg3 && (arg3.includes('.png') || arg3.includes('.jpg') || arg3.includes('.webp') || arg3 === null)) {
                 arquivo = arg3; tipo = arg4; grande = arg5 || false;
             } else {
                 descricao = arg3; arquivo = arg4; tipo = arg5;
             }
-
             const m = L.marker(coord, { icon: grande ? iconG : iconP, opacity: 0 }).addTo(map);
-            let btn = "";
-
-            if (tipo === 'mapa') {
-                btn = `<button onclick="abrirMapaProvincia('${arquivo}')" class="btn-popup">Explorar Província</button>`;
-            } else if (tipo === 'imagem') {
-                btn = `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup">Ver Foto</button>`;
-            } else {
-                btn = `<span style="color:#aaa; font-style:italic;">Sem detalhes visuais.</span>`;
-            }
+            let btn = (tipo === 'mapa') ? `<button onclick="abrirMapaProvincia('${arquivo}')" class="btn-popup">Explorar Província</button>` : 
+                      (tipo === 'imagem') ? `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup">Ver Foto</button>` : 
+                      `<span style="color:#aaa; font-style:italic;">Sem detalhes visuais.</span>`;
 
             let conteudoPopup = `<div style="text-align:center;"><b>${nome}</b>`;
-            if (descricao) {
-                conteudoPopup += `<br><small style="color:#ccc;">${descricao}</small>`;
-            }
-            conteudoPopup += `<div style="margin-top: 10px;">${btn}</div></div>`;
-
+            if (descricao) conteudoPopup += `<br><small style="color:#ccc;">${descricao}</small>`;
+            conteudoPopup += `<div style="margin-top: 12px;">${btn}</div></div>`;
             m.bindPopup(conteudoPopup);
         }
 
-        // SEUS PONTOS DO CONTINENTE
         criarPonto([824, 2330], "Deserto","A Origem do Mundo", "Deserto.jpg", 'mapa');
         criarPonto([3850, 3580], "Hukmal'tep", "O Inverno Absoluto","Hukmal_tep.jpg", 'mapa');
         criarPonto([2902, 5464], "Blat'khyr", "O Berço da Magia", "Blat_khyr.jpg", 'mapa');
@@ -431,7 +419,6 @@
         criarPonto([1356, 3284], "Alcova","O Lar dos Piratas", "Alcova.jpg", 'mapa', true);
         criarPonto([2250, 4258], "Espinha do Gigante", "As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
         criarPonto([2142, 4378], "Espinha do Gigante","As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
-
         criarPonto([2370, 3767], "Capital Imperial", "A Casa do Império", "Capital.png", 'imagem');
         criarPonto([1648, 4438], "Cidade Santa", "Cidade Santa.png", 'imagem');
         criarPonto([2862, 2890], "Torre dos Sábios", "Torre dos Sabios.png", 'imagem');
@@ -440,18 +427,14 @@
         criarPonto([2114, 3854], "Vilarejo", "vilarejo.png", 'imagem');
         criarPonto([2142, 3254], "Vilarejo", "vilarejo 2.jpg", 'imagem');
         criarPonto([1758, 4620], "Vilarejo", "vilarejo 3.jpg", 'imagem');
-
         criarPonto([2252, 2880], "Pântano", "pantano.png", 'imagem');
         criarPonto([2138, 2890], "Pântano", "pantano.png", 'imagem');
         criarPonto([2228, 3032], "Pântano", "pantano.png", 'imagem');
         criarPonto([2220, 2656], "Pântano", "pantano.png", 'imagem');
-        
         criarPonto([2232, 3936], "Vilarejo", null, 'none');
         criarPonto([2300, 3400], "Vilarejo", null, 'none');
         criarPonto([1830, 4354], "Vilarejo", null, 'none');
-        
         criarPonto([2464, 4974], "Ilha de Blat'khyr", "Cadê?", "Ilha.png", 'imagem');
-        
         criarPonto([1838, 3526], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         criarPonto([1750, 3320], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         criarPonto([1536, 3634], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
@@ -459,7 +442,6 @@
         criarPonto([3912, 1780], "Inverno Desolado", null, 'none', true);
     }
 
-    // Inicialização
     carregarMapaPrincipal();
     </script>
 </body>
