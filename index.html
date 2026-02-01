@@ -38,6 +38,16 @@
         cursor: pointer;
     }
 
+    /* Adicione isso dentro da tag <style> */
+    .foto-lista { 
+        width: 80px; height: 110px; 
+        object-fit: cover; /* Isso impede a foto de ficar esticada/deformada */
+        border: 1px solid #8b4513; 
+        margin-right: 15px; 
+        flex-shrink: 0; 
+        background: #000;
+    }
+
     #seta-menu { display: none; }
     #lista-botoes-provincia { display: block; }
 
@@ -320,19 +330,106 @@
         }
     };
 
-    // --- DADOS DA CAPITAL (MENU INTERATIVO) ---
+// --- DADOS DA CAPITAL (COM FOTOS) ---
     const dadosCapital = {
         esquadrao: [
-            { nome: "Nome do Jogador 1", classe: "Guerreiro", desc: "Descrição breve..." },
-            { nome: "Nome do Jogador 2", classe: "Mago", desc: "Descrição breve..." }
+            // Coloque o nome EXATO do arquivo da imagem que está na pasta
+            { 
+                nome: "Lythael Serindë", 
+                classe: "Curandeira", 
+                raca: "Elfa alta",
+                foto: "Lythael.png",  // <--- AQUI VAI O ARQUIVO DA FOTO
+                desc: "Uma guardiã serena e observadora, cuja gentileza externa esconde uma força inabalável dedicada a proteger e valorizar toda forma de vida.om uma espada longa." 
+            },
+            { 
+                nome: "Valkia Huniman", 
+                raca: "Meio Anja",
+                classe: "Guerreira", 
+                foto: "Valkia.png",     // <--- AQUI VAI O ARQUIVO DA FOTO
+                desc: "Embora aparente seriedade inicial, logo revela uma natureza vibrante e impetuosa, movida pelo desejo de provar sua evolução enquanto exalta constantemente os nomes de Ryuiki e Daruin." 
+            },
+                        { 
+                nome: "Greta Thunder", 
+                raca: "Elfa da Floresta",
+                classe: "Maga", 
+                foto: "Greta.jpg",     // <--- AQUI VAI O ARQUIVO DA FOTO
+                desc: "Uma guardiã solitária de Desterroth que nutre profundo desprezo pela humanidade e outras raças, confiando apenas na justiça da natureza e em seus cactos; agora, ela é forçada a agir contra uma corrupção obscura que ameaça a floresta que jurou proteger." 
+            },
+                        { 
+                nome: "Balon Blacktide", 
+                raca: "Meio Demônio",
+                classe: "Caçador", 
+                foto: "Balon.jpg",     // <--- AQUI VAI O ARQUIVO DA FOTO
+                desc: "Das lições da nobreza aos naufrágios da pirataria, este meio-demônio de poucas palavras carrega no sobrenome a marca de sua sobrevivência e, na alma, o conflito eterno entre o sangue amaldiçoado e a luz que busca guiá-lo." 
+            },
+                        { 
+                nome: "Thorga Punho de Ferro", 
+                raca: "Anão",
+                classe: "Guerreiro", 
+                foto: "Thorga.jpg",     // <--- AQUI VAI O ARQUIVO DA FOTO
+                desc: "Exilado injustamente das forjas ancestrais, Thorgar é um mercenário impetuoso que rejeita a autoridade de reis e deuses, lutando pela pura emoção da batalha e para provar que sua força basta por si só." 
+            },
+                        { 
+                nome: "Liésty", 
+                raca: "Elfa Negra",
+                classe: "Maga", 
+                foto: "Liésty.jpg",     // <--- AQUI VAI O ARQUIVO DA FOTO
+                desc: "Sobrevivente solitária de uma destruição brutal, esta elfa negra trocou a companhia dos vivos pelo silêncio de sua cabana na floresta, onde sua natureza sombria e suas artes arcanas servem como barreira contra um mundo que ela aprendeu a desprezar." 
+            }
         ],
         procurados: [
-            { nome: "O Sombra", recompensa: "5.000 Moedas", desc: "Visto nas tavernas." },
-            { nome: "Karg, o Bruto", recompensa: "12.000 Moedas", desc: "Extremamente perigoso." }
+            { 
+                nome: "Kalamar", 
+                recompensa: "1.800 Moedas de Ouro", 
+                foto: "Kalamar.png",   // <--- AQUI VAI O ARQUIVO DA FOTO
+                desc: "Vivo ou morto. Lenda dos mares que trocou a glória da aventura pelo submundo. Comanda uma frota colossal que espalha terror pelos oceanos, traficando de relíquias a vidas sem distinção." 
+            },
+            { 
+                nome: "Bruiser", 
+                recompensa: "1.200 Moedas de Ouro", 
+                foto: "Bruiser.png",        // Se não tiver foto, coloque null ou apague a linha foto
+                desc: "Vivo ou morto. Um mago renegado cuja sede de conhecimento ultrapassou a moralidade. Procurado por conduzir experimentos grotescos e ilegais em seres vivos, distorcendo a natureza em busca de poder." 
+            },
+            { 
+                nome: "Leimo", 
+                recompensa: "1.500 Moedas de Ouro", 
+                foto: "Leimo.png",           // Se não tiver foto, coloque null ou apague a linha foto
+                desc: "Morto. Ex-membro da Torre dos Sábios. Sua genialidade tornou-se arrogância; ele se rebelou por acreditar ser uma divindade entre mortais, usando segredos arcanos para cometer crimes contra o Império." 
+            },
+            { 
+                nome: "O Palhaço", 
+                recompensa: "10.000 Moedas de Ouro", 
+                foto: "Palhaço.png",          // Se não tiver foto, coloque null ou apague a linha foto
+                desc: "Vivo. Um agente do caos que semeia discórdia por puro entretenimento. Suspeito de conspirar com forças das trevas, ele manipula reinos para incitar guerras, rindo enquanto o mundo queima." 
+            },
+            { 
+                nome: "Fanastia", 
+                recompensa: "700 Moedas de Ouro", 
+                foto: "Fanastia.png",           // Se não tiver foto, coloque null ou apague a linha foto
+                desc: "Vivo ou morto. Uma vampira ancestral com um rastro de sangue que atravessa séculos. Responsável pelo massacre de mais de mil almas, ela vê a humanidade apenas como alimento para saciar sua sede eterna." 
+            },
+            { 
+                nome: "Mari, a Psicopata", 
+                recompensa: "500 Moedas de Ouro", 
+                foto: "Mari.png",           // Se não tiver foto, coloque null ou apague a linha foto
+                desc: "Morto. Uma força de destruição imprevisível e sem remorso. Não possui agenda política ou mágica; mata por impulso e loucura, deixando um rastro de terror por onde passa." 
+            },
+            { 
+                nome: "Leoncio", 
+                recompensa: "2.000 Moedas", 
+                foto: "Leoncio.png",           // Se não tiver foto, coloque null ou apague a linha foto
+                desc: "Morto. Antigo instrutor de elite do Império, agora seu maior traidor. Conhece todas as táticas militares de seus ex-aliados, usando esse conhecimento para desestabilizar a nação que jurou defender." 
+            },
+            { 
+                nome: "Drai", 
+                recompensa: "2.000 Moedas", 
+                foto: "Drai.png",           // Se não tiver foto, coloque null ou apague a linha foto
+                desc: "Morto. Feiticeira xenófoba obcecada pelos espíritos da floresta. Vê outras raças como pragas e executa assassinatos em massa para 'purificar' a natureza, servindo a uma visão distorcida do equilíbrio." 
+            }
         ]
     };
 
-    // --- FUNÇÕES DE INTERFACE (MODAIS CORRIGIDOS) ---
+// --- FUNÇÃO MENU CAPITAL (ATUALIZADA COM CLIQUE NA FOTO) ---
     function menuCapital(tipo) {
         const modal = document.getElementById('modal-capital');
         const container = document.getElementById('conteudo-menu-capital');
@@ -340,35 +437,69 @@
         modal.style.display = 'flex';
         container.innerHTML = "";
 
-        if (tipo === 'esquadrao') {
-            titulo.innerText = "🛡️ Membros do Esquadrão";
-            dadosCapital.esquadrao.forEach(p => {
-                container.innerHTML += `
-                    <div class="item-menu">
-                        <div class="foto-placeholder">FOTO</div>
-                        <div class="texto-item">
-                            <h4>${p.nome}</h4>
-                            <span class="classe-char">${p.classe}</span>
-                            <p>${p.desc}</p>
-                        </div>
-                    </div>`;
-            });
-        } else if (tipo === 'procurados') {
-            titulo.innerText = "☠️ Cartazes de Procurados";
-            dadosCapital.procurados.forEach(n => {
-                container.innerHTML += `
-                    <div class="item-menu">
-                        <div class="foto-placeholder">WANTED</div>
-                        <div class="texto-item">
-                            <h4>${n.nome}</h4>
-                            <span class="recompensa">💰 ${n.recompensa}</span>
-                            <p>${n.desc}</p>
-                        </div>
-                    </div>`;
-            });
-        }
+        const lista = (tipo === 'esquadrao') ? dadosCapital.esquadrao : dadosCapital.procurados;
+        titulo.innerText = (tipo === 'esquadrao') ? "🛡️ Os Pandemônios" : "☠️ Cartazes de Procurados";
+
+        lista.forEach(item => {
+            // AQUI ESTÁ A MUDANÇA: Adicionei onclick e style
+            let htmlImagem = item.foto 
+                ? `<img src="${item.foto}" class="foto-lista" onclick="verImagemPersonagem('${item.foto}')" style="cursor: zoom-in;" title="Clique para ampliar">` 
+                : `<div class="foto-placeholder">${tipo === 'esquadrao' ? 'RETRATO' : 'WANTED'}</div>`;
+
+            let htmlSubtitulo = "";
+            
+            if (tipo === 'esquadrao') {
+                htmlSubtitulo = `<span class="classe-char">${item.classe} • ${item.raca || 'Desconhecido'}</span>`;
+            } else {
+                htmlSubtitulo = `<span class="recompensa">💰 ${item.recompensa}</span>`;
+            }
+
+            container.innerHTML += `
+                <div class="item-menu">
+                    ${htmlImagem}
+                    <div class="texto-item">
+                        <h4>${item.nome}</h4>
+                        ${htmlSubtitulo}
+                        <p>${item.desc}</p>
+                    </div>
+                </div>`;
+        });
     }
 
+    // --- NOVA FUNÇÃO PARA AMPLIAR FOTO DO PERSONAGEM ---
+    function verImagemPersonagem(arquivo) {
+        // 1. Esconde o menu atual (Modal Capital)
+        document.getElementById('modal-capital').style.display = 'none';
+        
+        // 2. Esconde o mapa
+        document.getElementById('map-container').style.display = 'none';
+        document.getElementById('menu-provincias').style.display = 'none';
+
+        // 3. Mostra o container de imagem (usando o mesmo das províncias)
+        const containerImg = document.getElementById('provincia-container');
+        containerImg.style.display = 'flex'; 
+        document.getElementById('img-provincia').src = arquivo;
+
+        // 4. Cria um botão de voltar ESPECIAL que reabre o menu
+        const btnVoltar = document.createElement('button');
+        btnVoltar.innerHTML = "⬅ Voltar ao Menu";
+        btnVoltar.className = "btn-popup";
+        btnVoltar.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
+        
+        btnVoltar.onclick = function() {
+            // Fecha a imagem
+            containerImg.style.display = 'none';
+            // Mostra o mapa de fundo
+            document.getElementById('map-container').style.display = 'block';
+            // REABRE O MENU DA CAPITAL
+            document.getElementById('modal-capital').style.display = 'flex';
+        };
+
+        // Limpa botão antigo e põe o novo
+        const btnAntigo = containerImg.querySelector('button');
+        if (btnAntigo) containerImg.removeChild(btnAntigo);
+        containerImg.insertBefore(btnVoltar, containerImg.firstChild);
+    }
     // Nova função que apenas fecha a foto sem resetar o mapa
     function fecharImagem() {
         document.getElementById('provincia-container').style.display = 'none';
