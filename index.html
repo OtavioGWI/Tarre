@@ -222,17 +222,6 @@
 
         L.imageOverlay(arquivo, limitesImagem).addTo(map);
         map.fitBounds(limitesImagem);
-        
-        // Ferramenta de Coordenadas (Popup)
-        map.on('click', function(e) {
-            const y = e.latlng.lat.toFixed(0);
-            const x = e.latlng.lng.toFixed(0);
-            L.popup()
-                .setLatLng(e.latlng)
-                .setContent(`Coordenadas: [${y}, ${x}]`)
-                .openOn(map);
-            console.log(`[${y}, ${x}]`); 
-        });
     }
 
     // --- 3. LÓGICA DO MENU CELULAR ---
