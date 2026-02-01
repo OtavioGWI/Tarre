@@ -123,6 +123,28 @@
             margin-top: 10px !important; 
         }
     }
+    /* --- NOVOS ESTILOS PARA O MENU DA CAPITAL --- */
+    #modal-capital {
+        position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center;
+    }
+    
+    /* Estilo da lista de membros/procurados */
+    .item-menu { 
+        border-bottom: 1px solid #444; padding: 15px 0; display: flex; align-items: flex-start; 
+    }
+    .item-menu:last-child { border-bottom: none; }
+    
+    .foto-placeholder { 
+        width: 80px; height: 110px; background: #3d3d3d; border: 1px solid #8b4513; 
+        margin-right: 15px; flex-shrink: 0; display: flex; 
+        align-items: center; justify-content: center; font-size: 10px; color: #777; 
+    }
+    
+    .texto-item h4 { margin: 0 0 5px 0; color: #ffdead; font-size: 18px; }
+    .texto-item p { font-size: 14px; margin: 0; color: #ccc; }
+    .recompensa { color: #ffd700; font-weight: bold; display: block; margin-bottom: 5px; }
+    .classe-char { color: #cd853f; font-weight: bold; font-size: 12px; text-transform: uppercase; display: block; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -135,6 +157,14 @@
             <span class="fechar-modal" onclick="fecharModalInfo()">&times;</span>
             <h2 id="titulo-provincia">Título</h2>
             <div id="texto-provincia"></div>
+        </div>
+    </div>
+    <div id="modal-capital">
+        <div class="modal-conteudo">
+            <span class="fechar-modal" onclick="fecharModais()">&times;</span>
+            <h2 id="titulo-menu-capital" style="color: #cd853f; border-bottom: 1px solid #555;">Capital</h2>
+            <div id="conteudo-menu-capital">
+                </div>
         </div>
     </div>
 
@@ -157,7 +187,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-    // --- 1. CONFIGURAÇÕES TÉCNICAS ---
+   // --- 1. CONFIGURAÇÕES TÉCNICAS ---
     const configContinental = { arquivo: 'Mapa teste.png', largura: 7680, altura: 4320, minZoom: -2.0, maxZoom: 3 };
     const configProvincia = { largura: 2048, altura: 1536, minZoom: -1.0, maxZoom: 2 };
     let map; 
@@ -183,7 +213,7 @@
         L.imageOverlay(arquivo, limitesImagem).addTo(map);
         map.fitBounds(limitesImagem);
         
-        // FERRAMENTA DE COORDENADAS (POPUP RESTAURADO)
+        // Ferramenta de Coordenadas (Popup)
         map.on('click', function(e) {
             const y = e.latlng.lat.toFixed(0);
             const x = e.latlng.lng.toFixed(0);
@@ -191,7 +221,7 @@
                 .setLatLng(e.latlng)
                 .setContent(`Coordenadas: [${y}, ${x}]`)
                 .openOn(map);
-            console.log(`[${y}, ${x}]`); // Também manda pro console se precisar copiar
+            console.log(`[${y}, ${x}]`); 
         });
     }
 
@@ -228,18 +258,136 @@
         adicionarMarcadoresPrincipais();
     }
 
-    // --- 5. BANCO DE DADOS ---
+    // --- 5. BANCO DE DADOS (TEXTOS COMPLETOS RESTAURADOS) ---
     const dadosProvincias = {
         'Hukmal_tep.jpg': {
             titulo: "Hukmal'tep - O Inverno Absoluto",
-            descricao: `<p><strong>📜 Descrição:</strong> Uma região montanhosa e de frio intenso...</p>`
+            descricao: `
+                <p><strong>📜 Panorama:</strong> Uma vastidão dominada por picos colossais e frio implacável. O vento uiva incessantemente entre os vales profundos, moldando uma paisagem onde apenas os mais resilientes prosperam sob o manto de neve eterna.</p>
+                <p><strong>👑 Governança:</strong> O poder é partilhado pelo <em>Conselho das Três Tribos</em> (Felistas, Malistas e Garra do Inverno). Não existe um soberano único, mas sim uma trégua armada e tensa entre os clãs.</p>
+                <p><strong>🧑‍🤝‍🧑 Habitantes:</strong> Predominantemente composta por Humanos adaptados ao clima severo, Anões das montanhas e Mestiços que buscam refúgio na isolação.</p>
+                <p><strong>⚔️ Tradições:</strong> Uma cultura que exalta a força bruta e o instinto de sobrevivência. A magia é encarada com profundo ceticismo e desconfiança; estudiosos e acadêmicos são raros e raramente bem-vindos.</p>
+                <p><strong>💎 Subsistência:</strong> A economia gira em torno do comércio de peles exóticas e subprodutos obtidos da caça de feras colossais que habitam a região.</p>
+            `
         },
         'Blat_khyr.jpg': {
             titulo: "Blat'khyr - O Berço da Magia",
-            descricao: `<p><strong>📜 Descrição:</strong> Uma região repleta de magia...</p>`
+            descricao: `
+                <p><strong>📜 Panorama:</strong> Um reino onde a realidade é moldada pelo fluxo místico. A densidade de mana nesta província é tão alta que a própria fauna e flora sofreram mutações mágicas, criando cenários de beleza surreal e perigo arcano.</p>
+                <p><strong>👑 Governança:</strong> Embora exista uma linhagem real élfica cerimonial, a gestão administrativa e política reside nas mãos do <em>Conselho Élfico</em>, composto pelos mais experientes anciãos da raça.</p>
+                <p><strong>🧑‍🤝‍🧑 Habitantes:</strong> Uma população majoritariamente de Elfos e Humanos com afinidade mágica.</p>
+                <p><strong>⚔️ Tradições:</strong> A sociedade valoriza o intelecto, a elegância estética e a maestria arcana. Existe um forte sentimento de preservação cultural entre os Elfos, que muitas vezes evitam o contato próximo com outras raças para preservar o seu "potencial místico".</p>
+                <p><strong>💎 Subsistência:</strong> O epicentro do mercado arcano, focado na criação, encantamento e exportação de itens mágicos de altíssima qualidade.</p>
+            `
         },
-        'default': { titulo: "Região Desconhecida", descricao: "<p>Não há registros detalhados sobre esta área.</p>" }
+        'Deserto.jpg': {
+            titulo: "O Deserto - A Origem do Mundo",
+            descricao: `
+                <p><strong>📜 Sociedade de Castas:</strong> Uma teocracia rígida baseada no controle da água. No topo estão os <strong>Zha-Ruk</strong> (Senhores da Nascente), seguidos pelos <strong>Atarim</strong> (Buscadores de Relíquias) e os ricos <strong>Samum</strong> (Mercadores). A base é formada pelos <strong>Ghovar</strong> (Trabalhadores) e, à margem, os temidos <strong>Khali</strong> (Os "Secos" ou intocáveis).</p>
+                <p><strong>👑 Governança:</strong> Cidades-estado controladas pelos Zha-Ruk, onde a lei é ditada pela preservação hídrica. Desperdiçar água é punido com a morte ou exílio.</p>
+                <p><strong>🧑‍🤝‍🧑 Raças Principais:</strong> Humanos, Meio-demônios, anões, mestiços e seres adaptados ao calor extremo.</p>
+                <p><strong>⚔️ Tradições:</strong> Forte tradição oral e leis de hospitalidade rígidas. As ruínas antigas são consideradas sagradas e perigosas, acessíveis apenas aos autorizados.</p>
+                <p><strong>💎 Economia:</strong> Extração de especiarias raras, minérios e venda de relíquias da "Primeira Era" encontradas nas escavações.</p>
+            `
+        },
+        'Lago.jpg': {
+            titulo: "O Lago - O Solo Abençoado",
+            descricao: `
+                <p><strong>📜 Panorama:</strong> Uma região de serenidade contemplativa, onde vilas com telhados curvos e pagodes majestosos se refletem nas águas cristalinas. A arquitetura é integrada à natureza, utilizando madeira e pedra em designs orientais clássicos.</p>
+                <p><strong>👑 Governança:</strong> Uma oligarquia de barões de terra e mestres filósofos que governam sob um rígido código de honra e lealdade ao trono imperial.</p>
+                <p><strong>🧑‍🤝‍🧑 Habitantes:</strong> Humanos devotos às tradições, Halflings cultivadores e comunidades de Tritões que habitam as estruturas flutuantes sobre o lago.</p>
+                <p><strong>⚔️ Tradições:</strong> Os costumes são profundamente orientais, valorizando o respeito aos ancestrais, a cerimônia do chá e a disciplina das artes marciais e caligrafia. A harmonia e o equilíbrio espiritual são os pilares da sociedade.</p>
+                <p><strong>💎 Subsistência:</strong> O celeiro do império; produz grãos finos, seda de alta qualidade e pescados raros encontrados apenas nas profundezas do lago.</p>
+            `
+        },
+        'Alcova.jpg': {
+            titulo: "Alcova - O Lar dos Piratas",
+            descricao: `
+                <p><strong>📜 Descrição:</strong> Um arquipélago repleto de baías escondidas, cavernas marinhas e rotas de navegação perigosas.</p>
+                <p><strong>👑 Governo:</strong> Uma "Confederação Livre" onde a lei é ditada por quem possui o navio mais rápido ou os canhões mais fortes.</p>
+                <p><strong>🧑‍🤝‍🧑 Raças Principais:</strong> Uma mistura caótica de todas as raças, principalmente aquelas fugindo da lei imperial.</p>
+                <p><strong>⚔️ Cultura:</strong> Liberdade individual extrema e um código de honra duvidoso entre capitães.</p>
+                <p><strong>💎 Economia:</strong> Pirataria, mercado negro e transporte de mercadorias exóticas "não taxadas".</p>
+            `
+        },
+        'Espinha do Gigante.jpg': {
+            titulo: "Região Desconhecida",
+            descricao: "<p>Não há registros detalhados sobre esta área nos arquivos imperiais.</p>"
+        },
+        'default': { 
+            titulo: "Região Desconhecida", 
+            descricao: "<p>Não há registros detalhados sobre esta área nos arquivos imperiais.</p>" 
+        }
     };
+
+    // --- DADOS DA CAPITAL (MENU INTERATIVO) ---
+    const dadosCapital = {
+        esquadrao: [
+            { nome: "Nome do Jogador 1", classe: "Guerreiro", desc: "Descrição breve..." },
+            { nome: "Nome do Jogador 2", classe: "Mago", desc: "Descrição breve..." }
+        ],
+        procurados: [
+            { nome: "O Sombra", recompensa: "5.000 Moedas", desc: "Visto nas tavernas." },
+            { nome: "Karg, o Bruto", recompensa: "12.000 Moedas", desc: "Extremamente perigoso." }
+        ]
+    };
+
+    // --- FUNÇÕES DE INTERFACE (MODAIS CORRIGIDOS) ---
+    function menuCapital(tipo) {
+        const modal = document.getElementById('modal-capital');
+        const container = document.getElementById('conteudo-menu-capital');
+        const titulo = document.getElementById('titulo-menu-capital');
+        modal.style.display = 'flex';
+        container.innerHTML = "";
+
+        if (tipo === 'esquadrao') {
+            titulo.innerText = "🛡️ Membros do Esquadrão";
+            dadosCapital.esquadrao.forEach(p => {
+                container.innerHTML += `
+                    <div class="item-menu">
+                        <div class="foto-placeholder">FOTO</div>
+                        <div class="texto-item">
+                            <h4>${p.nome}</h4>
+                            <span class="classe-char">${p.classe}</span>
+                            <p>${p.desc}</p>
+                        </div>
+                    </div>`;
+            });
+        } else if (tipo === 'procurados') {
+            titulo.innerText = "☠️ Cartazes de Procurados";
+            dadosCapital.procurados.forEach(n => {
+                container.innerHTML += `
+                    <div class="item-menu">
+                        <div class="foto-placeholder">WANTED</div>
+                        <div class="texto-item">
+                            <h4>${n.nome}</h4>
+                            <span class="recompensa">💰 ${n.recompensa}</span>
+                            <p>${n.desc}</p>
+                        </div>
+                    </div>`;
+            });
+        }
+    }
+
+    // Nova função que apenas fecha a foto sem resetar o mapa
+    function fecharImagem() {
+        document.getElementById('provincia-container').style.display = 'none';
+        document.getElementById('map-container').style.display = 'block';
+        
+        // Se estiver no continente, garante que o menu aparece. 
+        // Se estiver em província, o menu continua escondido (como deve ser).
+        if (mapaAtualAtivo === 'continente') {
+            document.getElementById('menu-provincias').style.display = 'block';
+        }
+    }
+
+    function fecharModais() { 
+        document.getElementById('modal-info').style.display = 'none';
+        document.getElementById('modal-capital').style.display = 'none';
+    }
+    
+    // TRUQUE: Isso garante que se o HTML chamar 'fecharModalInfo', ele usa a nova função
+    window.fecharModalInfo = fecharModais;
 
     function abrirModalInfo() {
         const dados = dadosProvincias[mapaAtualAtivo] || dadosProvincias['default'];
@@ -247,7 +395,6 @@
         document.getElementById('texto-provincia').innerHTML = dados.descricao;
         document.getElementById('modal-info').style.display = 'flex';
     }
-    function fecharModalInfo() { document.getElementById('modal-info').style.display = 'none'; }
 
     function abrirMapaProvincia(arquivo) {
         mapaAtualAtivo = arquivo;
@@ -257,9 +404,9 @@
 
         inicializarMapa(arquivo, configProvincia.largura, configProvincia.altura, configProvincia.minZoom, configProvincia.maxZoom);
 
-        // BOTÃO VOLTAR (SEMPRE NO TOPO AGORA)
+        // Botão Voltar (Topo Esquerdo)
         const BotaoVoltarControl = L.Control.extend({
-            options: { position: 'topleft' }, // Sempre Top-Left
+            options: { position: 'topleft' },
             onAdd: function() {
                 const btn = L.DomUtil.create('button', 'leaflet-control-button-voltar');
                 btn.innerHTML = "⬅ Voltar ao Continente";
@@ -273,7 +420,7 @@
         });
         map.addControl(new BotaoVoltarControl());
 
-        // Botão Detalhes
+        // Botão Detalhes (Topo Direito)
         const BotaoInfoControl = L.Control.extend({
             options: { position: 'topright' },
             onAdd: function() {
@@ -289,17 +436,21 @@
         adicionarMarcadoresLocais(arquivo);
     }
 
-    function verImagemEstatica(arquivo) {
+function verImagemEstatica(arquivo) {
+        // Esconde o mapa (mas ele continua vivo no fundo)
         document.getElementById('map-container').style.display = 'none';
+        document.getElementById('menu-provincias').style.display = 'none'; // Esconde menu pra não atrapalhar a foto
         document.getElementById('provincia-container').style.display = 'flex'; 
         document.getElementById('img-provincia').src = arquivo;
         
         const btnVoltarImg = document.createElement('button');
         btnVoltarImg.innerHTML = "⬅ Voltar";
         btnVoltarImg.className = "btn-popup";
-        // Ajustado para ficar seguro no topo
+        // Ajustado para o topo
         btnVoltarImg.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
-        btnVoltarImg.onclick = voltarParaMapa;
+        
+        // AQUI ESTÁ A MUDANÇA MÁGICA:
+        btnVoltarImg.onclick = fecharImagem; 
         
         const container = document.getElementById('provincia-container');
         const btnAntigo = container.querySelector('button');
@@ -317,10 +468,13 @@
         const iconP = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [50, 50], iconAnchor: [25, 25], popupAnchor: [0, -25]});
         const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [100, 100], iconAnchor: [50, 50], popupAnchor: [0, -50]});
 
+        // Função interna para criar os pontos
         function criarPontoLocal(coord, nome, info, foto = null, grande = false) {
             const m = L.marker(coord, {icon: grande ? iconG : iconP, opacity: 0}).addTo(map);
             let popupHtml = `<div style="text-align:center;"><b>${nome}</b><br><small>${info}</small>`;
-            if (foto) popupHtml += `<div style="margin-top: 10px;"><button onclick="verImagemEstatica('${foto}')" class="btn-popup">Ver Foto</button></div>`;
+            if (foto) {
+                popupHtml += `<div style="margin-top: 10px;"><button onclick="verImagemEstatica('${foto}')" class="btn-popup">Ver Foto</button></div>`;
+            }
             popupHtml += `</div>`;
             m.bindPopup(popupHtml);
         }
@@ -381,6 +535,53 @@
             criarPontoLocal([884, 1094], "Muralha", "Elfos");
             criarPontoLocal([882, 1271], "Muralha", "Elfos");
         }
+         if (nomeDoMapa === 'Deserto.jpg') {
+            criarPontoLocal([240, 762], "Capital do Deserto", "Zha-Ruk", "Capital deserto.png", true);
+            criarPontoLocal([1314, 588], "Vilarejo", "Ghovar", "Vila deserto.png", true);
+            criarPontoLocal([1422, 1582], "Vilarejo", "Ghovar", "Vila de areia.png", true);
+            criarPontoLocal( [1256, 126], "Mineração", "Ghovar");
+            criarPontoLocal( [1436, 112], "Mineração", "Abandonada");
+            criarPontoLocal( [1362, 400], "Mineração", "Ghovar");
+            criarPontoLocal( [1247, 730], "Mineração", "Ghovar");
+            criarPontoLocal( [1213, 846], "Mineração", "Ghovar");
+            criarPontoLocal( [1256, 126], "Mineração", "Ghovar");
+            criarPontoLocal( [1408, 1727], "Mineração", "Abandonada");
+            criarPontoLocal( [1363, 1855], "Mineração", "Ghovar");
+            criarPontoLocal( [1217, 1298], "Mineração", "Abandonada");
+            criarPontoLocal( [1149, 1784], "Mineração", "Abandonada");
+            criarPontoLocal(  [1049, 1809], "Mineração", "Abandonada");
+            criarPontoLocal( [1142, 1921], "Mineração", "Abandonada");
+            criarPontoLocal( [693, 1510], "Mineração", "Ghovar");
+            criarPontoLocal( [871, 1533], "Mineração", "Ghovar");
+            criarPontoLocal( [786, 1775], "Mineração", "Ghovar");
+            criarPontoLocal( [1032, 365], "Mineração", "Ghovar");
+            criarPontoLocal( [990, 617], "Mineração", "Ghovar");
+            criarPontoLocal(  [808, 580], "Mineração", "Ghovar");
+            criarPontoLocal(  [813, 399], "Mineração", "Ghovar");
+            criarPontoLocal( [475, 566], "Mineração", "Abandonada");
+            criarPontoLocal( [326, 539], "Mineração", "Abandonada");
+            criarPontoLocal( [401, 376], "Mineração", "Ghovar");
+        
+            criarPontoLocal([1082, 1619], "Cidade", "Samum", "Cidade anã.png", true);
+            criarPontoLocal([1434, 312], "Cidade", "Samum", "Cidade deserto.png", true);
+            criarPontoLocal([1082, 146], "Cidade", "Samum", "Cidade deserto 2.png", true);
+            criarPontoLocal( [752, 536], "Cidade", "Samum", "Cidade enterrada 2.png", true);
+            criarPontoLocal( [148, 170], "Cidade", "Samum");
+            criarPontoLocal( [188, 1910], "Cidade", "Samum");
+
+            criarPontoLocal( [1394, 814], "Ruínas", "Atarim", "Entrada deserto.png", true);
+            criarPontoLocal( [920, 662], "Ruínas", "Atarim", "paisagem.png", true);
+            criarPontoLocal( [660, 1652], "Ruínas", "Atarim");
+            criarPontoLocal(  [1310, 1502], "Ruínas", "Atarim");
+
+            criarPontoLocal( [792, 912], "Castelo", "Zha-Ruk", "Castelo deserto 1.png", true);
+            criarPontoLocal( [1394, 915], "Castelo", "Zha-Ruk", "Castelo deserto 2.png", true);
+            criarPontoLocal( [332, 1278], "Castelo", "Zha-Ruk");
+            criarPontoLocal( [1020, 1188], "Castelo", "Zha-Ruk");
+            criarPontoLocal( [1210, 1118], "Torre de Vigia", "Zha-Ruk");
+            criarPontoLocal(  [1432, 1196], "Torre de Vigia", "Zha-Ruk");
+
+        }
     }
 
     // --- 7. MARCADORES DO CONTINENTE ---
@@ -389,31 +590,61 @@
         const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [120, 120], iconAnchor: [60, 60], popupAnchor: [0, -60]});
 
         function criarPonto(coord, nome, arg3, arg4, arg5) {
-            let descricao = "", arquivo = "", tipo = "", grande = false;
+            let descricao = "";
+            let arquivo = "";
+            let tipo = "";
+            let grande = false;
+
+            // Lógica para detectar argumentos
             if (arg3 && (arg3.includes('.png') || arg3.includes('.jpg') || arg3.includes('.webp') || arg3 === null)) {
                 arquivo = arg3; tipo = arg4; grande = arg5 || false;
             } else {
                 descricao = arg3; arquivo = arg4; tipo = arg5;
             }
+
             const m = L.marker(coord, { icon: grande ? iconG : iconP, opacity: 0 }).addTo(map);
-            let btn = (tipo === 'mapa') ? `<button onclick="abrirMapaProvincia('${arquivo}')" class="btn-popup">Explorar Província</button>` : 
-                      (tipo === 'imagem') ? `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup">Ver Foto</button>` : 
-                      `<span style="color:#aaa; font-style:italic;">Sem detalhes.</span>`;
+            let botoes = "";
+
+            // --- LÓGICA ESPECIAL PARA A CAPITAL ---
+            if (nome === "Capital Imperial") {
+                if (arquivo) {
+                    botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Cidade</button>`;
+                }
+                botoes += `<button onclick="menuCapital('esquadrao')" class="btn-popup" style="background:#2c3e50; margin-bottom:5px;">🛡️ Ver Esquadrão</button>`;
+                botoes += `<button onclick="menuCapital('procurados')" class="btn-popup" style="background:#8b0000;">☠️ Procurados</button>`;
+            } 
+            // --- LÓGICA PADRÃO ---
+            else {
+                if (tipo === 'mapa') {
+                    botoes = `<button onclick="abrirMapaProvincia('${arquivo}')" class="btn-popup">Explorar Província</button>`;
+                } else if (tipo === 'imagem') {
+                    botoes = `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup">Ver Foto</button>`;
+                } else {
+                    botoes = `<span style="color:#aaa; font-style:italic;">Sem detalhes visuais.</span>`;
+                }
+            }
 
             let conteudoPopup = `<div style="text-align:center;"><b>${nome}</b>`;
-            if (descricao) conteudoPopup += `<br><small style="color:#ccc;">${descricao}</small>`;
-            conteudoPopup += `<div style="margin-top: 12px;">${btn}</div></div>`;
+            if (descricao) {
+                conteudoPopup += `<br><small style="color:#ccc;">${descricao}</small>`;
+            }
+            conteudoPopup += `<div style="margin-top: 12px;">${botoes}</div></div>`;
+
             m.bindPopup(conteudoPopup);
         }
 
+        // PONTOS
         criarPonto([824, 2330], "Deserto","A Origem do Mundo", "Deserto.jpg", 'mapa');
         criarPonto([3850, 3580], "Hukmal'tep", "O Inverno Absoluto","Hukmal_tep.jpg", 'mapa');
         criarPonto([2902, 5464], "Blat'khyr", "O Berço da Magia", "Blat_khyr.jpg", 'mapa');
         criarPonto([1118, 4346], "Lago", "O Solo Abençoado", "Lago.jpg", 'mapa');
-        criarPonto([1356, 3284], "Alcova","O Lar dos Piratas", "Alcova.jpg", 'mapa', true);
+        criarPonto([1356, 3284], "Alcova","O Lar dos Piratas", "Alcova.jpg", 'mapa');
         criarPonto([2250, 4258], "Espinha do Gigante", "As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
         criarPonto([2142, 4378], "Espinha do Gigante","As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
+        
+        // CAPITAL IMPERIAL (Agora com o menu especial)
         criarPonto([2370, 3767], "Capital Imperial", "A Casa do Império", "Capital.png", 'imagem');
+
         criarPonto([1648, 4438], "Cidade Santa", "Cidade Santa.png", 'imagem');
         criarPonto([2862, 2890], "Torre dos Sábios", "Torre dos Sabios.png", 'imagem');
         criarPonto([1188, 5574], "Ilha Paradisíaca", "ilha 2.png", 'imagem');
@@ -437,6 +668,7 @@
         criarPonto([3912, 1780], "Inverno Desolado", null, 'none', true);
     }
 
+    // Inicialização
     carregarMapaPrincipal();
     </script>
 </body>
