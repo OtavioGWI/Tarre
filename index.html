@@ -293,9 +293,9 @@
         'Lago.jpg': {
             titulo: "O Lago - O Solo Abençoado",
             descricao: `
-                <p><strong>📜 Panorama:</strong> Uma região de serenidade contemplativa, onde vilas com telhados curvos e pagodes majestosos se refletem nas águas cristalinas. A arquitetura é integrada à natureza, utilizando madeira e pedra em designs orientais clássicos.</p>
-                <p><strong>👑 Governança:</strong> Uma oligarquia de barões de terra e mestres filósofos que governam sob um rígido código de honra e lealdade ao trono imperial.</p>
-                <p><strong>🧑‍🤝‍🧑 Habitantes:</strong> Humanos devotos às tradições, Halflings cultivadores e comunidades de Tritões que habitam as estruturas flutuantes sobre o lago.</p>
+                <p><strong>📜 Panorama:</strong> Uma região de serenidade contemplativa, onde a honra se reflete nas águas cristalinas do lago sagrado. A arquitetura é integrada à natureza, utilizando madeira e pedra em designs orientais clássicos.</p>
+                <p><strong>👑 Governança:</strong> Uma oligarquia de disnastias que comandam as terras e que governam sob um rígido código de honra e lealdade ao trono imperial.</p>
+                <p><strong>🧑‍🤝‍🧑 Habitantes:</strong> Humanos e Mestiços.</p>
                 <p><strong>⚔️ Tradições:</strong> Os costumes são profundamente orientais, valorizando o respeito aos ancestrais, a cerimônia do chá e a disciplina das artes marciais e caligrafia. A harmonia e o equilíbrio espiritual são os pilares da sociedade.</p>
                 <p><strong>💎 Subsistência:</strong> O celeiro do império; produz grãos finos, seda de alta qualidade e pescados raros encontrados apenas nas profundezas do lago.</p>
             `
@@ -582,6 +582,26 @@ function verImagemEstatica(arquivo) {
             criarPontoLocal(  [1432, 1196], "Torre de Vigia", "Zha-Ruk");
 
         }
+         if (nomeDoMapa === 'Lago.jpg') {
+            criarPontoLocal( [970, 1152], "Templo do Lago", "Guardiões do Templo", "Templo do lago.png", true);
+            criarPontoLocal( [1366, 1578], "Cidade Sagrada", "Igreja dos 12 Deuses", "Cidade Santa.png", true);
+            criarPontoLocal( [1336, 1740], "Cidade Sagrada", "Igreja dos 12 Deuses", "Cidade Santa.png", true);
+            criarPontoLocal([446, 1336], "Vilarejo", "Dinastia Xogum");
+            criarPontoLocal( [180, 912], "Cidade", "Dinastia Xogum", "cidade lago 1.png", true); //imagem com porto
+            criarPontoLocal([898, 1908], "Cidade", "Dinastia Kemono", "capital do lago.png", true); 
+            criarPontoLocal([726, 1366], "Cidade", "Dinastia Kemono", "cidade lago 2.png", true); //imagem beira do lago
+            criarPontoLocal([948, 1672], "Vilarejo", "Dinastia Kemono");
+            criarPontoLocal([980, 818], "Cidade", "Dinastia Kitsune", "cidade na montanha.png", true); //imagem beira do lago
+            criarPontoLocal([1014, 92], "Vilarejo", "Dinastia Kitsune", "vilarejo na montanha.png", true);
+            criarPontoLocal( [610, 706], "Vilarejo", "Dinastia Kitsune");
+            criarPontoLocal( [1190, 532], "Vilarejo", "Dinastia Kitsune", "templo.png", true);
+            criarPontoLocal( [1400, 192], "Vilarejo", "Dinastia Kitsune");
+            criarPontoLocal( [1370, 1016], "Vilarejo", "Dinastia Kitsune");
+            criarPontoLocal( [534, 400], "Vilarejo", "Dinastia Seilor");
+            criarPontoLocal( [786, 460], "Cidade", "Dinastia Seilor", "cidade lago 3.png", true); //imagem com porto
+
+ 
+        }
     }
 
     // --- 7. MARCADORES DO CONTINENTE ---
@@ -645,7 +665,7 @@ function verImagemEstatica(arquivo) {
         // CAPITAL IMPERIAL (Agora com o menu especial)
         criarPonto([2370, 3767], "Capital Imperial", "A Casa do Império", "Capital.png", 'imagem');
 
-        criarPonto([1648, 4438], "Cidade Santa", "Cidade Santa.png", 'imagem');
+        criarPonto([1648, 4438], "Cidade Sagrada", "Cidade Santa.png", 'imagem');
         criarPonto([2862, 2890], "Torre dos Sábios", "Torre dos Sabios.png", 'imagem');
         criarPonto([1188, 5574], "Ilha Paradisíaca", "ilha 2.png", 'imagem');
         criarPonto([1830, 2322], "Vilarejo", "cidade da raça lá.png", 'imagem');
