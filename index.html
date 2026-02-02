@@ -295,6 +295,22 @@
         <img id="img-provincia" src="">
     </div>
 
+<div id="modal-senha" style="display: none; position: fixed; z-index: 6000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); align-items: center; justify-content: center;">
+        <div class="modal-conteudo" style="width: 400px; text-align: center;">
+            <h3 style="color: #cd853f;">🔒 Área Bloqueada</h3>
+            <p>Qual a palavra de passe?</p>
+            
+            <input type="text" id="input-senha-rpg" placeholder="Digite a senha..." 
+                   style="width: 80%; padding: 10px; margin-bottom: 20px; background: #222; border: 1px solid #8b4513; color: white; font-size: 16px; text-align: center;">
+            
+            <br>
+            <button class="btn-popup" onclick="verificarSenha()" style="background: #2E8B57; font-size: 16px; margin-right: 10px;">🔓 Tentar</button>
+            <button class="btn-popup" onclick="fecharModalSenha()" style="background: #8b0000; font-size: 16px;">❌ Cancelar</button>
+            
+            <p id="msg-erro-senha" style="color: #ff4444; display: none; font-size: 14px; margin-top: 10px;">Senha incorreta. A barreira permanece.</p>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
@@ -404,7 +420,83 @@
         // Se você não tiver essa imagem na pasta, vai ficar uma tela cinza vazia.
         verImagemEstatica('bloqueado.jpg');
     }
+// --- VARIÁVEIS PARA O SISTEMA DE SENHA ---
+    let senhaCorretaAtual = "";
+    let mapaDestinoAtual = "";
 
+    // 1. Abre a janela bonita
+    function abrirModalSenha(senha, destino) {
+        senhaCorretaAtual = senha;
+        mapaDestinoAtual = destino;
+        
+        // Limpa o campo e esconde erro anterior
+        document.getElementById('input-senha-rpg').value = "";
+        document.getElementById('msg-erro-senha').style.display = 'none';
+        
+        // Mostra o modal
+        document.getElementById('modal-senha').style.display = 'flex';
+        
+        // Foca no input para digitar direto
+        document.getElementById('input-senha-rpg').focus();
+    }
+
+// --- FUNÇÃO DE VERIFICAÇÃO (SEM POPUPS DO NAVEGADOR) ---
+    function verificarSenha() {
+        const input = document.getElementById('input-senha-rpg');
+        const msgArea = document.getElementById('msg-erro-senha');
+        
+        // Verifica a senha (ignora maiúsculas/minúsculas)
+        if (input.value && input.value.toLowerCase() === senhaCorretaAtual.toLowerCase()) {
+            
+            // 1. Mostra mensagem de SUCESSO (Verde) dentro da janela
+            msgArea.style.display = 'block';
+            msgArea.style.color = '#2ecc71'; // Verde brilhante
+            msgArea.innerHTML = "✨ As águas se abrem... Acesso concedido!";
+            
+            // 2. Trava o campo para não digitar mais nada
+            input.disabled = true;
+
+            // 3. Espera 1.5 segundos para lerem a mensagem e troca o mapa
+            setTimeout(() => {
+                // Fecha o modal
+                document.getElementById('modal-senha').style.display = 'none';
+                
+                // Reseta a janela para a próxima vez
+                input.value = "";
+                input.disabled = false;
+                msgArea.style.display = 'none';
+                msgArea.style.color = '#ff4444'; // Volta para vermelho (padrão de erro)
+                
+                // VAI PARA O NOVO MAPA
+                abrirMapaProvincia(mapaDestinoAtual);
+            }, 1500);
+
+        } else {
+            // 1. Mostra mensagem de ERRO (Vermelho)
+            msgArea.style.display = 'block';
+            msgArea.style.color = '#ff4444';
+            msgArea.innerHTML = "A senha está incorreta. Espere descobrir a senha. PARA DE TENTAR ALEATORIAMENTE, obrigado!";
+            
+            // 2. Efeito visual de erro (Borda vermelha pisca)
+            input.style.borderColor = "red";
+            setTimeout(() => input.style.borderColor = "#8b4513", 500);
+            
+            // Foca e seleciona o texto para digitar de novo rápido
+            input.select(); 
+        }
+    }
+
+    // 3. Fecha sem fazer nada
+    function fecharModalSenha() {
+        document.getElementById('modal-senha').style.display = 'none';
+    }
+
+    // 4. (Opcional) Permitir apertar ENTER para enviar
+    document.getElementById('input-senha-rpg').addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            verificarSenha();
+        }
+    });
 function alternarCoordenadas() {
         modoCoordenadas = !modoCoordenadas; // Inverte o valor
         
@@ -492,9 +584,17 @@ function alternarCoordenadas() {
             titulo: "Região Desconhecida",
             descricao: "<p>Não há registros detalhados sobre esta área nos arquivos imperiais.</p>"
         },
+
+    'Mar.jpg': {
+        titulo: "O Mar Profundo",
+        descricao: "<p><strong>🌊 Descrição:</strong> Uma vastidão azul e perigosa, acessível apenas para aqueles que conhecem os segredos das marés.</p>"
+    },
+    
+    // ... outros mapas
         'default': { 
             titulo: "Região Desconhecida", 
             descricao: "<p>Não há registros detalhados sobre esta área nos arquivos imperiais.</p>" 
+            
         }
     };
 
@@ -1183,17 +1283,34 @@ function verImagemEstatica(arquivo) {
             criarPontoLocal(  [333, 1571], "Cidade", "Desconhecido");
             criarPontoLocal( [291, 1628], "Cidade", "Desconhecido");
             criarPontoLocal( [1311, 391], "Cidade", "Desconhecido", "Cidade alcova.jpg", true);
-            criarPontoLocal( [1052, 540], "Cidade", "Desconhecido", "Alcova.png", true);
+            const btnDescobrir = `<button onclick="abrirModalSenha('mar', 'Mar.jpg')" class="btn-popup" style="background: #2E8B57; margin-top: 5px;">🔍 Descobrir</button>`;
+            criarPontoLocal([1052, 540], "Cidade", "Desconhecido", "Alcova.png", true, btnDescobrir);
             criarPontoLocal( [1131, 688], "Cidade", "Desconhecido", "Alcova 2.png", true);
             criarPontoLocal( [1189, 1455], "Cidade", "Desconhecido", "Alcova 3.png", true);
-            criarPontoLocal( [1317, 1679], "Cidade", "Desconhecido", "Cidade no mar.png", true);
-            criarPontoLocal( [370, 736], "Cidade", "Desconhecido", "mais cidade no mar.png", true);
+            criarPontoLocal( [1317, 1679], "Cidade", "Desconhecido");
+            criarPontoLocal( [370, 736], "Cidade", "Desconhecido"); 
             criarPontoLocal(  [482, 1192], "Ilha dos Afogados", "Desconhecido", "lugar no mar.png", true);
             criarPontoLocal( [778, 1442], "Ilha Naval", "Marinha Imperial", "ilha naval.png", true);
             criarPontoLocal( [866, 1518], "Ilha Naval", "Marinha Imperial", "ilha naval.png", true);
             criarPontoLocal( [134, 1355], "Templo do Fim do Mundo", "Desconhecido", "Templo do fim do mundo.png", true);
           
  
+        }
+if (nomeDoMapa === 'Mar.jpg') {
+
+            const btnSubir = `<button onclick="abrirMapaProvincia('Alcova.jpg')" class="btn-popup" style="background: #4682B4;">⬆️ Subir</button>`;
+            criarPontoLocal([962, 444], "Túneis", "Passagem de volta para a superfície.", null, true, btnSubir);
+            criarPontoLocal([772, 264], "Túneis", "Passagem de volta para a superfície.", null, true, btnSubir);
+            criarPontoLocal([720, 948], "Túneis", "Passagem de volta para a superfície.", null, true, btnSubir);
+            criarPontoLocal([834, 1404], "Túneis", "Passagem de volta para a superfície.", null, true, btnSubir);
+            criarPontoLocal([1180, 1744], "Túneis", "Passagem de volta para a superfície.", null, true, btnSubir);
+            
+            criarPontoLocal( [1020, 954], "Cidade Submersa", "Desconhecido", "Cidade no mar.png", true);
+            criarPontoLocal( [470, 538], "Cidade Submersa", "Desconhecido", "mais cidade no mar.png", true);
+            criarPontoLocal( [982, 1826], "Cidade Submersa", "Desconhecido", "Cidade no mar 2.jpg", true);
+            criarPontoLocal( [292, 1370], "Cidade Submersa", "Desconhecido");
+        
+        
         }
     }
 
