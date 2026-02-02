@@ -167,6 +167,45 @@
         font-weight: 500;
     }
 
+    /* --- ESTILO BANCO --- */
+    .tabela-banco { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+    .tabela-banco th, .tabela-banco td { border: 1px solid #555; padding: 8px; text-align: left; color: #ddd; }
+    .tabela-banco th { background-color: #3e2723; color: #ffdead; }
+    .preco-banco { color: #ffd700; font-weight: bold; }
+    .nota-banco { font-size: 12px; color: #aaa; margin-top: 10px; font-style: italic; }
+
+    /* --- ESTILO DEUSES (ATUALIZADO) --- */
+    .grid-deuses { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    
+    .item-deus { 
+        background: rgba(0,0,0,0.4); 
+        border: 1px solid #444; 
+        padding: 10px; 
+        border-radius: 5px; 
+        text-align: center; /* Centraliza tudo */
+        cursor: pointer;    /* Mãozinha de clique */
+        transition: transform 0.2s, border-color 0.2s;
+    }
+    .item-deus:hover {
+        transform: scale(1.02);
+        border-color: #ffd700;
+        background: rgba(255, 215, 0, 0.1);
+    }
+
+    /* Nova classe para a imagem do deus */
+    .foto-deus-thumb {
+        width: 100%;
+        height: 100px;
+        object-fit: cover; /* Corta a imagem pra caber sem esticar */
+        border-radius: 4px;
+        border: 1px solid #8b4513;
+        margin-bottom: 5px;
+    }
+
+    .nome-deus { color: #87ceeb; font-weight: bold; font-size: 16px; display: block; margin-bottom: 3px; }
+    .desc-deus { font-size: 13px; color: #ccc; display: block; }
+    .dominio-deus { font-size: 11px; color: #aaa; text-transform: uppercase; margin-top: 5px; display: block; }
+
     /* --- AJUSTES PARA CELULAR --- */
     @media only screen and (max-width: 600px) {
         #menu-provincias {
@@ -474,6 +513,39 @@ function alternarCoordenadas() {
         texto: "Dizem que existe um 101º boato que revela o segredo para se tornar um deus, mas ninguém nunca o ouviu. E dizem que tudo o que você ouviu até agora pode ser uma mentira inventada para te manter longe da verdade.",
         descoberto: true
     };
+
+    // --- DADOS GERAIS (BANCO E DEUSES) ---
+    const dadosGerais = {
+        banco: [
+            { nome: "Pacote Econômico", custo: "2 Golds", desc: "Poder enterrar em um canto e o gerente finge que não viu." },
+            { nome: "Pacote Iniciante", custo: "5 Golds", desc: "Guarda até 50 golds e 1 item." },
+            { nome: "Pacote Intermediário", custo: "15 Golds", desc: "Guarda 150g, 1 armadura, 1 arma, 3 itens. (Acesso transporte imperial)" },
+            { nome: "Pacote Avançado", custo: "35 Golds", desc: "Seguro de vida, 300g, 2 armaduras, 4 armas, 6 itens, 1 criatura. (Acesso transporte)" },
+            { nome: "Pacote Arranjado", custo: "A Definir", desc: "Negociado diretamente com o contratante." },
+            { nome: "Pacote VIP", custo: "Exclusivo", desc: "Guarda de objeto/criatura com avaliação personalizada." }
+        ],
+        investimentos: [
+            { nome: "Tesouro Imperial", risco: "Baixo Risco", min: "5g" },
+            { nome: "Ações do Império", risco: "Alto Risco", min: "5g" }
+        ],
+// Dentro de const dadosGerais = { ...
+    
+deuses: [
+        { nome: "Pelor", titulo: "Sol, Luz e Fogo", raca: "Anjos", foto: "Pelor.png" },
+        { nome: "Aqua", titulo: "Água e Serenidade", raca: "Halflings", foto: "Aqua.png" },
+        { nome: "Celeste", titulo: "Espaço", raca: "Estrelas", foto: "Celeste.png" },
+        { nome: "Luna", titulo: "Lua e Trevas", raca: "Demônios", foto: "Luna.png" },
+        { nome: "Laphiaferd", titulo: "Magia", raca: "Espíritos", foto: "Laphiaferd.png" },
+        { nome: "Húngaro", titulo: "Tempo", raca: "Humanos", foto: "Húngaro.png" },
+        { nome: "Terraria", titulo: "Terra e Lealdade", raca: "Anões", foto: "Terraria.png" },
+        { nome: "Astronof", titulo: "Ar e Conhecimento", raca: "Machinas", foto: "Astronof.png" },
+        { nome: "Golias (PVP)", titulo: "Guerra", raca: "Gigantes", foto: "Golias (PvP).png" },
+        { nome: "Dentos", titulo: "Ganância", raca: "Orcs e Trolls", foto: "Dentos.png" },
+        { nome: "Lusitânia", titulo: "Plantas", raca: "Elfos", foto: "Lusitânia.png" },
+        { nome: "Ruegra", titulo: "Animais", raca: "Mestiços", foto: "Ruegra.png" }
+    ]
+};
+
     const dadosCapital = {
         esquadrao: [
             // Coloque o nome EXATO do arquivo da imagem que está na pasta
@@ -604,7 +676,7 @@ function alternarCoordenadas() {
         boatos: listaBoatos
     };
 
-// --- FUNÇÃO MENU CAPITAL (ATUALIZADA COM BOATOS) ---
+// --- FUNÇÃO MENU CAPITAL (ATUALIZADA COM BANCO) ---
     function menuCapital(tipo) {
         const modal = document.getElementById('modal-capital');
         const container = document.getElementById('conteudo-menu-capital');
@@ -612,24 +684,42 @@ function alternarCoordenadas() {
         modal.style.display = 'flex';
         container.innerHTML = "";
 
+        // --- ABA BANCO (NOVO) ---
+        if (tipo === 'banco') {
+            titulo.innerText = "🏦 Banco Imperial";
+            let html = `<h4 style="color:#ffdead; margin-top:0;">Pacotes de Serviços</h4>`;
+            
+            html += `<table class="tabela-banco"><tr><th>Pacote</th><th>Custo</th><th>Benefícios</th></tr>`;
+            dadosGerais.banco.forEach(item => {
+                html += `<tr><td>${item.nome}</td><td class="preco-banco">${item.custo}</td><td>${item.desc}</td></tr>`;
+            });
+            html += `</table>`;
+
+            html += `<h4 style="color:#ffdead; margin-top:20px;">Investimentos</h4>`;
+            html += `<ul style="color:#ccc; padding-left:20px;">`;
+            dadosGerais.investimentos.forEach(inv => {
+                html += `<li><strong>${inv.nome}:</strong> ${inv.risco} (Mínimo ${inv.min})</li>`;
+            });
+            html += `</ul>`;
+
+            html += `<div class="nota-banco">
+                * Garantia total sobre bens guardados.<br>
+                * Não existe upgrade de pacote (preço integral na troca).
+            </div>`;
+            
+            container.innerHTML = html;
+            return;
+        }
+
         // --- ABA BOATOS ---
         if (tipo === 'boatos') {
-            titulo.innerText = "🗣️ Boatos da Capital (1/100)"; // Você pode atualizar esse contador manualmente ou via código
-            
+            titulo.innerText = "🗣️ Boatos da Capital (1/100)";
             let html = `<div class="lista-boatos">`;
-            
             dadosCapital.boatos.forEach(boato => {
-                // Define classe e texto baseado se foi descoberto ou não
                 const classeExtra = boato.descoberto ? 'boato-descoberto' : '';
                 const textoFinal = boato.descoberto ? boato.texto : "??????????????????";
-                
-                html += `
-                    <div class="boato-item ${classeExtra}">
-                        <span class="boato-numero">#${boato.id}</span>
-                        <span class="boato-texto">"${textoFinal}"</span>
-                    </div>`;
+                html += `<div class="boato-item ${classeExtra}"><span class="boato-numero">#${boato.id}</span><span class="boato-texto">"${textoFinal}"</span></div>`;
             });
-            
             html += `</div>`;
             container.innerHTML = html;
             return;
@@ -651,7 +741,7 @@ function alternarCoordenadas() {
             return;
         }
 
-        // --- ABA ESQUADRÃO E PROCURADOS (PADRÃO) ---
+        // --- ABA ESQUADRÃO E PROCURADOS ---
         const lista = (tipo === 'esquadrao') ? dadosCapital.esquadrao : dadosCapital.procurados;
         titulo.innerText = (tipo === 'esquadrao') ? "🛡️ Os Pandemônios" : "☠️ Cartazes de Procurados";
 
@@ -676,6 +766,36 @@ function alternarCoordenadas() {
         });
     }
 
+// --- FUNÇÃO: MENU DO PANTEÃO (ATUALIZADA) ---
+    function menuDeuses() {
+        const modal = document.getElementById('modal-capital');
+        const container = document.getElementById('conteudo-menu-capital');
+        const titulo = document.getElementById('titulo-menu-capital');
+        modal.style.display = 'flex';
+        
+        titulo.innerText = "⚡ Panteão dos 12 Deuses";
+        let html = `<div class="grid-deuses">`;
+        
+        dadosGerais.deuses.forEach(deus => {
+            // Se tiver foto, usa ela. Se não, usa um placeholder cinza.
+            const htmlImagem = deus.foto 
+                ? `<img src="${deus.foto}" class="foto-deus-thumb">`
+                : `<div class="foto-deus-thumb" style="background:#333; display:flex; align-items:center; justify-content:center;">?</div>`;
+
+            // Adiciona o onclick enviando o arquivo da foto
+            html += `
+                <div class="item-deus" onclick="verImagemDeus('${deus.foto}')">
+                    ${htmlImagem}
+                    <span class="nome-deus">${deus.nome}</span>
+                    <span class="desc-deus">${deus.titulo}</span>
+                    <span class="dominio-deus">${deus.raca}</span>
+                </div>`;
+        });
+        
+        html += `</div>`;
+        container.innerHTML = html;
+    }
+
     // --- NOVA: LER O CAPÍTULO ---
     function lerCapitulo(index) {
         const container = document.getElementById('conteudo-menu-capital');
@@ -688,6 +808,45 @@ function alternarCoordenadas() {
         html += `<div class="texto-capitulo">${cap.texto}</div>`;
         
         container.innerHTML = html;
+    }
+
+// --- FUNÇÃO PARA VER IMAGEM DOS DEUSES ---
+    function verImagemDeus(arquivo) {
+        if (!arquivo) return; // Se não tiver foto, não faz nada
+
+        // Esconde tudo
+        document.getElementById('modal-capital').style.display = 'none';
+        document.getElementById('map-container').style.display = 'none';
+        document.getElementById('menu-provincias').style.display = 'none';
+
+        // Prepara visualização
+        const containerImg = document.getElementById('provincia-container');
+        containerImg.style.display = 'flex'; 
+        document.getElementById('img-provincia').src = arquivo;
+
+        // Botão voltar ESPECÍFICO para o menu de Deuses
+        const btnVoltar = document.createElement('button');
+        btnVoltar.innerHTML = "⬅ Voltar ao Panteão";
+        btnVoltar.className = "btn-popup";
+        btnVoltar.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
+        
+        btnVoltar.onclick = function() {
+            containerImg.style.display = 'none';
+            document.getElementById('map-container').style.display = 'block';
+            
+            // Restaura menu lateral se estiver no continente
+            if (mapaAtualAtivo === 'continente') {
+                document.getElementById('menu-provincias').style.display = 'block';
+            }
+
+            // Reabre o modal já carregando os deuses
+            document.getElementById('modal-capital').style.display = 'flex';
+            menuDeuses(); 
+        };
+
+        const btnAntigo = containerImg.querySelector('button');
+        if (btnAntigo) containerImg.removeChild(btnAntigo);
+        containerImg.insertBefore(btnVoltar, containerImg.firstChild);
     }
 
 // --- FUNÇÃO PARA VER IMAGEM NO HISTÓRICO (CORRIGIDA) ---
@@ -854,13 +1013,19 @@ function verImagemEstatica(arquivo) {
         const iconP = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [50, 50], iconAnchor: [25, 25], popupAnchor: [0, -25]});
         const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [100, 100], iconAnchor: [50, 50], popupAnchor: [0, -50]});
 
-        // Função interna para criar os pontos
-        function criarPontoLocal(coord, nome, info, foto = null, grande = false) {
+// Função interna para criar os pontos (ATUALIZADA)
+        function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoExtra = null) {
             const m = L.marker(coord, {icon: grande ? iconG : iconP, opacity: 0}).addTo(map);
             let popupHtml = `<div style="text-align:center;"><b>${nome}</b><br><small>${info}</small>`;
+            
             if (foto) {
                 popupHtml += `<div style="margin-top: 10px;"><button onclick="verImagemEstatica('${foto}')" class="btn-popup">Ver Foto</button></div>`;
             }
+            // NOVO: Adiciona botão extra se existir
+            if (botaoExtra) {
+                popupHtml += `<div style="margin-top: 5px;">${botaoExtra}</div>`;
+            }
+            
             popupHtml += `</div>`;
             m.bindPopup(popupHtml);
         }
@@ -898,7 +1063,8 @@ function verImagemEstatica(arquivo) {
         }
 
         if (nomeDoMapa === 'Blat_khyr.jpg') {
-            criarPontoLocal([382, 1359], "Capital de Blat'khyr", "Elfos", "cidade magica.png", true);
+           const btnEscola = `<button onclick="verImagemEstatica('bloqueado.jpg')" class="btn-popup" style="background:#800080;">🎓 Escola de Magia</button>`;
+            criarPontoLocal([382, 1359], "Capital de Blat'khyr", "Elfos", "cidade magica.png", true, btnEscola);
             criarPontoLocal([986, 1239], "Vilarejo", "Desconhecido");
             criarPontoLocal([1091, 606], "Vilarejo", "Desconhecido");
             criarPontoLocal([1463, 1151], "Vilarejo", "Desconhecido");
@@ -969,9 +1135,10 @@ function verImagemEstatica(arquivo) {
 
         }
          if (nomeDoMapa === 'Lago.jpg') {
-            criarPontoLocal( [970, 1152], "Templo do Lago", "Guardiões do Templo", "Templo do lago.png", true);
-            criarPontoLocal( [1366, 1578], "Cidade Sagrada", "Igreja dos 12 Deuses", "Cidade Santa.png", true);
-            criarPontoLocal( [1336, 1740], "Cidade Sagrada", "Igreja dos 12 Deuses", "Cidade Santa.png", true);
+            criarPontoLocal([970, 1152], "Templo do Lago", "Guardiões do Templo", "Templo do lago.png", true);
+            const btnPanteao = `<button onclick="menuDeuses()" class="btn-popup" style="background:#4682B4;">⚡ Panteão</button>`;
+            criarPontoLocal([1366, 1578], "Cidade Sagrada", "Igreja dos 12 Deuses", "Cidade Santa.png", true, btnPanteao);
+            criarPontoLocal([1336, 1740], "Cidade Sagrada", "Igreja dos 12 Deuses", "Cidade Santa.png", true, btnPanteao);
             criarPontoLocal([446, 1336], "Vilarejo", "Dinastia Xogum");
             criarPontoLocal( [180, 912], "Cidade", "Dinastia Xogum", "cidade lago 1.png", true); //imagem com porto
             criarPontoLocal([898, 1908], "Cidade", "Dinastia Kemono", "capital do lago.png", true); 
@@ -1041,7 +1208,6 @@ function verImagemEstatica(arquivo) {
             let tipo = "";
             let grande = false;
 
-            // Lógica para detectar argumentos
             if (arg3 && (arg3.includes('.png') || arg3.includes('.jpg') || arg3.includes('.webp') || arg3 === null)) {
                 arquivo = arg3; tipo = arg4; grande = arg5 || false;
             } else {
@@ -1051,48 +1217,44 @@ function verImagemEstatica(arquivo) {
             const m = L.marker(coord, { icon: grande ? iconG : iconP, opacity: 0 }).addTo(map);
             let botoes = "";
 
-            // --- LÓGICA ESPECIAL PARA A CAPITAL ---
+            // --- CAPITAL IMPERIAL ---
             if (nome === "Capital Imperial") {
-                if (arquivo) {
-                    botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Cidade</button>`;
-                }
+                if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Cidade</button>`;
                 botoes += `<button onclick="menuCapital('esquadrao')" class="btn-popup" style="background:#2c3e50; margin-bottom:5px;">🛡️ Ver Esquadrão</button>`;
                 botoes += `<button onclick="menuCapital('procurados')" class="btn-popup" style="background:#8b0000; margin-bottom:5px;">☠️ Procurados</button>`;
                 botoes += `<button onclick="menuCapital('historico')" class="btn-popup" style="background:#5e2f0d; margin-bottom:5px;">📜 Histórico</button>`;
-                botoes += `<button onclick="menuCapital('boatos')" class="btn-popup" style="background:#4b0082;">🗣️ Boatos</button>`;
+                botoes += `<button onclick="menuCapital('boatos')" class="btn-popup" style="background:#4b0082; margin-bottom:5px;">🗣️ Boatos</button>`;
+                // NOVO: BANCO
+                botoes += `<button onclick="menuCapital('banco')" class="btn-popup" style="background:#DAA520; color: black;">🏦 Banco Imperial</button>`;
             }
             
-            // --- LÓGICA ESPECIAL PARA A TORRE DOS SÁBIOS (NOVO) ---
+            // --- CIDADE SAGRADA (CONTINENTE) ---
+            else if (nome === "Cidade Sagrada") {
+                if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Cidade</button>`;
+                // NOVO: PANTEÃO
+                botoes += `<button onclick="menuDeuses()" class="btn-popup" style="background:#4682B4;">⚡ Panteão</button>`;
+            }
+
+            // --- TORRE DOS SÁBIOS ---
             else if (nome === "Torre dos Sábios") {
-                // Botão para ver a foto externa (se existir)
-                if (arquivo) {
-                    botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Exterior</button>`;
-                }
-                // Botão Bloqueado para o interior
+                if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Exterior</button>`;
                 botoes += `<button onclick="verImagemEstatica('bloqueado.jpg')" class="btn-popup" style="background:#483D8B;">🔮 Acessar Interior</button>`;
             }
 
-            // --- LÓGICA PADRÃO PARA O RESTO ---
+            // --- PADRÃO ---
             else {
-                if (tipo === 'mapa') {
-                    botoes = `<button onclick="abrirMapaProvincia('${arquivo}')" class="btn-popup">Explorar Província</button>`;
-                } else if (tipo === 'imagem') {
-                    botoes = `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup">Ver Foto</button>`;
-                } else {
-                    botoes = `<span style="color:#aaa; font-style:italic;">Sem detalhes.</span>`;
-                }
+                if (tipo === 'mapa') botoes = `<button onclick="abrirMapaProvincia('${arquivo}')" class="btn-popup">Explorar Província</button>`;
+                else if (tipo === 'imagem') botoes = `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup">Ver Foto</button>`;
+                else botoes = `<span style="color:#aaa; font-style:italic;">Sem detalhes.</span>`;
             }
 
             let conteudoPopup = `<div style="text-align:center;"><b>${nome}</b>`;
-            if (descricao) {
-                conteudoPopup += `<br><small style="color:#ccc;">${descricao}</small>`;
-            }
+            if (descricao) conteudoPopup += `<br><small style="color:#ccc;">${descricao}</small>`;
             conteudoPopup += `<div style="margin-top: 12px;">${botoes}</div></div>`;
-
             m.bindPopup(conteudoPopup);
         }
 
-        // PONTOS
+        // PONTOS (MANTIVE SEUS PONTOS ORIGINAIS)
         criarPonto([824, 2330], "Deserto","A Origem do Mundo", "Deserto.jpg", 'mapa');
         criarPonto([3850, 3580], "Hukmal'tep", "O Inverno Absoluto","Hukmal_tep.jpg", 'mapa');
         criarPonto([2902, 5464], "Blat'khyr", "O Berço da Magia", "Blat_khyr.jpg", 'mapa');
@@ -1100,15 +1262,9 @@ function verImagemEstatica(arquivo) {
         criarPonto([1356, 3284], "Alcova","O Lar dos Piratas", "Alcova.jpg", 'mapa');
         criarPonto([2250, 4258], "Espinha do Gigante", "As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
         criarPonto([2142, 4378], "Espinha do Gigante","As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
-        
-        // CAPITAL IMPERIAL
         criarPonto([2370, 3767], "Capital Imperial", "A Casa do Império", "Capital.png", 'imagem');
-
         criarPonto([1648, 4438], "Cidade Sagrada", "Cidade Santa.png", 'imagem');
-        
-        // TORRE DOS SÁBIOS (Agora com o botão especial)
         criarPonto([2862, 2890], "Torre dos Sábios", "Torre dos Sabios.png", 'imagem');
-        
         criarPonto([1188, 5574], "Ilha Paradisíaca", "ilha 2.png", 'imagem');
         criarPonto([1830, 2322], "Vilarejo", "cidade da raça lá.png", 'imagem');
         criarPonto([2114, 3854], "Vilarejo", "vilarejo.png", 'imagem');
@@ -1129,7 +1285,6 @@ function verImagemEstatica(arquivo) {
         criarPonto([2070, 3642], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         criarPonto([3912, 1780], "Inverno Desolado", null, 'none', true);
     }
-
     // Inicialização
     carregarMapaPrincipal();
     </script>
