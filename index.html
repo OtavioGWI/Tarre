@@ -48,6 +48,25 @@
         background: #000;
     }
 
+    /* Estilo para os links dentro do histórico */
+    .link-historia {
+        color: #ffd700; /* Amarelo Ouro */
+        text-decoration: underline;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+    .link-historia:hover {
+        color: #fff; /* Fica branco ao passar o mouse */
+        text-shadow: 0 0 5px #ffd700;
+    }
+    .texto-capitulo {
+        font-size: 16px;
+        line-height: 1.6;
+        text-align: justify;
+        white-space: pre-wrap; /* Mantém parágrafos do texto */
+    }
+
     #seta-menu { display: none; }
     #lista-botoes-provincia { display: block; }
 
@@ -415,10 +434,41 @@
                 foto: "Drai.png",           // Se não tiver foto, coloque null ou apague a linha foto
                 desc: "Morto. Feiticeira xenófoba obcecada pelos espíritos da floresta. Vê outras raças como pragas e executa assassinatos em massa para 'purificar' a natureza, servindo a uma visão distorcida do equilíbrio." 
             }
+        ],
+        
+        // --- NOVO: HISTÓRICO ---
+        historico: [
+            {
+                titulo: "Capítulo 0: O Chamado",
+                texto: `
+                A jornada começou com um sonho misterioso, onde o <span class="link-historia" onclick="verImagemHistoria('Serafim.png', 0)">Serafim da Ordem</span> revelou o retorno de uma força de destruição. Em troca de salvarem o mundo, ele prometeu realizar seus desejos e os guiou até a <span class="link-historia" onclick="verImagemHistoria('Capital.png', 0)">Capital Imperial</span>.
+                
+                Lá, o grupo se alistou no exército com a ajuda do amigável <span class="link-historia" onclick="verImagemHistoria('Will.png', 0)">Will</span> e adotou o nome "Os Pandemônios". Para provar seu valor, enfrentaram os testes rigorosos da Comandante <span class="link-historia" onclick="verImagemHistoria('Valentina.png', 0)">Valentina</span>, que incluíram enigmas e uma batalha brutal contra um <span class="link-historia" onclick="verImagemHistoria('Gorila.png', 0)">Gorila</span> feroz.
+                
+                Na primeira missão, sob a supervisão da arrogante Mestra <span class="link-historia" onclick="verImagemHistoria('Carla.png', 0)">Carla</span>, foram capturados pelo infame Capitão <span class="link-historia" onclick="verImagemHistoria('Kalamar.png', 0)">Kalamar</span>. Ameaçados, tiveram que explorar uma masmorra antiga repleta de enigmas e tecnologia esquecida.
+                
+                O clímax foi o confronto contra um <span class="link-historia" onclick="verImagemHistoria('Kraken.png', 0)">Kraken</span> colossal. Após derrotarem a besta e recuperarem uma bússola mágica, a ilha foi destruída, e o grupo escapou por pouco graças à intervenção heróica de Will.`
+            },
+            {
+                titulo: "Capítulo 1: Desconhecido",
+                texto: `Aventura em progresso...`
+            },
+            {
+                titulo: "Capítulo 2: Desconhecido",
+                texto: `Aventura em progresso...`
+            },
+            {
+                titulo: "Capítulo 3: Desconhecido",
+                texto: `Aventura em progresso...`
+            },
+            {
+                titulo: "Capítulo 4: Desconhecido",
+                texto: `Aventura em progresso...`
+            }
         ]
     };
 
-// --- FUNÇÃO MENU CAPITAL (ATUALIZADA COM CLIQUE NA FOTO) ---
+// --- FUNÇÃO MENU CAPITAL (ATUALIZADA) ---
     function menuCapital(tipo) {
         const modal = document.getElementById('modal-capital');
         const container = document.getElementById('conteudo-menu-capital');
@@ -426,22 +476,34 @@
         modal.style.display = 'flex';
         container.innerHTML = "";
 
+        // SELEÇÃO DO TIPO DE MENU
+        if (tipo === 'historico') {
+            titulo.innerText = "📜 Histórico de Aventuras";
+            dadosCapital.historico.forEach((cap, index) => {
+                container.innerHTML += `
+                    <div class="item-menu" onclick="lerCapitulo(${index})" style="cursor: pointer; align-items: center;">
+                        <div class="foto-placeholder" style="width: 50px; height: 50px; font-size: 20px;">📖</div>
+                        <div class="texto-item">
+                            <h4 style="margin-top: 10px;">${cap.titulo}</h4>
+                            <p style="font-size: 12px; color: #aaa;">Clique para ler</p>
+                        </div>
+                    </div>`;
+            });
+            return; // Para a função aqui se for histórico
+        }
+
+        // LÓGICA ORIGINAL PARA ESQUADRÃO E PROCURADOS
         const lista = (tipo === 'esquadrao') ? dadosCapital.esquadrao : dadosCapital.procurados;
         titulo.innerText = (tipo === 'esquadrao') ? "🛡️ Os Pandemônios" : "☠️ Cartazes de Procurados";
 
         lista.forEach(item => {
-            // AQUI ESTÁ A MUDANÇA: Adicionei onclick e style
             let htmlImagem = item.foto 
                 ? `<img src="${item.foto}" class="foto-lista" onclick="verImagemPersonagem('${item.foto}')" style="cursor: zoom-in;" title="Clique para ampliar">` 
                 : `<div class="foto-placeholder">${tipo === 'esquadrao' ? 'RETRATO' : 'WANTED'}</div>`;
 
-            let htmlSubtitulo = "";
-            
-            if (tipo === 'esquadrao') {
-                htmlSubtitulo = `<span class="classe-char">${item.classe} • ${item.raca || 'Desconhecido'}</span>`;
-            } else {
-                htmlSubtitulo = `<span class="recompensa">💰 ${item.recompensa}</span>`;
-            }
+            let htmlSubtitulo = (tipo === 'esquadrao')
+                ? `<span class="classe-char">${item.classe} • ${item.raca || 'Desconhecido'}</span>`
+                : `<span class="recompensa">💰 ${item.recompensa}</span>`;
 
             container.innerHTML += `
                 <div class="item-menu">
@@ -453,6 +515,52 @@
                     </div>
                 </div>`;
         });
+    }
+
+    // --- NOVA: LER O CAPÍTULO ---
+    function lerCapitulo(index) {
+        const container = document.getElementById('conteudo-menu-capital');
+        const cap = dadosCapital.historico[index];
+        
+        // Botão de Voltar para a lista de capítulos
+        let html = `<button onclick="menuCapital('historico')" class="btn-popup" style="margin-bottom: 15px; background: #444;">⬅ Voltar à Lista</button>`;
+        
+        html += `<h3 style="color: #ffdead; border-bottom: 1px dashed #555; padding-bottom: 10px;">${cap.titulo}</h3>`;
+        html += `<div class="texto-capitulo">${cap.texto}</div>`;
+        
+        container.innerHTML = html;
+    }
+
+    // --- NOVA: VER IMAGEM DENTRO DO HISTÓRICO (COM MEMÓRIA) ---
+    function verImagemHistoria(arquivo, capituloIndex) {
+        // Esconde tudo
+        document.getElementById('modal-capital').style.display = 'none';
+        document.getElementById('map-container').style.display = 'none';
+        document.getElementById('menu-provincias').style.display = 'none';
+
+        // Mostra imagem
+        const containerImg = document.getElementById('provincia-container');
+        containerImg.style.display = 'flex'; 
+        document.getElementById('img-provincia').src = arquivo;
+
+        // Cria botão VOLTAR AO TEXTO
+        const btnVoltar = document.createElement('button');
+        btnVoltar.innerHTML = "⬅ Voltar ao Texto";
+        btnVoltar.className = "btn-popup";
+        btnVoltar.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
+        
+        btnVoltar.onclick = function() {
+            containerImg.style.display = 'none';
+            document.getElementById('map-container').style.display = 'block';
+            document.getElementById('modal-capital').style.display = 'flex';
+            
+            // O TRUQUE: Reabre exatamente o capítulo que estava lendo
+            lerCapitulo(capituloIndex);
+        };
+
+        const btnAntigo = containerImg.querySelector('button');
+        if (btnAntigo) containerImg.removeChild(btnAntigo);
+        containerImg.insertBefore(btnVoltar, containerImg.firstChild);
     }
 
     // --- NOVA FUNÇÃO PARA AMPLIAR FOTO DO PERSONAGEM ---
@@ -785,14 +893,16 @@ function verImagemEstatica(arquivo) {
             const m = L.marker(coord, { icon: grande ? iconG : iconP, opacity: 0 }).addTo(map);
             let botoes = "";
 
-            // --- LÓGICA ESPECIAL PARA A CAPITAL ---
+// --- LÓGICA ESPECIAL PARA A CAPITAL ---
             if (nome === "Capital Imperial") {
                 if (arquivo) {
                     botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Cidade</button>`;
                 }
                 botoes += `<button onclick="menuCapital('esquadrao')" class="btn-popup" style="background:#2c3e50; margin-bottom:5px;">🛡️ Ver Esquadrão</button>`;
-                botoes += `<button onclick="menuCapital('procurados')" class="btn-popup" style="background:#8b0000;">☠️ Procurados</button>`;
-            } 
+                botoes += `<button onclick="menuCapital('procurados')" class="btn-popup" style="background:#8b0000; margin-bottom:5px;">☠️ Procurados</button>`;
+                // NOVO BOTÃO AQUI:
+                botoes += `<button onclick="menuCapital('historico')" class="btn-popup" style="background:#5e2f0d;">📜 Histórico</button>`;
+            }
             // --- LÓGICA PADRÃO ---
             else {
                 if (tipo === 'mapa') {
