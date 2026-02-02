@@ -131,6 +131,42 @@
     .modal-conteudo strong { color: #ffdead; }
     .fechar-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
 
+
+    /* Estilo para a lista de boatos */
+    .lista-boatos {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .boato-item {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid #444;
+        padding: 10px;
+        border-radius: 5px;
+        display: flex;
+        align-items: flex-start;
+    }
+    .boato-numero {
+        font-weight: bold;
+        color: #cd853f;
+        margin-right: 10px;
+        min-width: 30px;
+    }
+    .boato-texto {
+        font-style: italic;
+        color: #aaa;
+    }
+    /* Estilo quando o boato é descoberto */
+    .boato-descoberto {
+        border-color: #ffd700;
+        background: rgba(139, 69, 19, 0.2);
+    }
+    .boato-descoberto .boato-texto {
+        color: #ffdead;
+        font-style: normal;
+        font-weight: 500;
+    }
+
     /* --- AJUSTES PARA CELULAR --- */
     @media only screen and (max-width: 600px) {
         #menu-provincias {
@@ -339,6 +375,20 @@
     };
 
 // --- DADOS DA CAPITAL (COM FOTOS) ---
+// 1. Cria 100 boatos vazios automaticamente
+    const listaBoatos = Array.from({ length: 100 }, (_, i) => ({
+        id: i + 1,
+        texto: "Boato ainda não ouvido...",
+        descoberto: false
+    }));
+
+    // 2. Define o Boato 100 (O único conhecido agora)
+    // Nota: Como array começa no 0, o boato 100 fica na posição 99
+    listaBoatos[99] = {
+        id: 100,
+        texto: "Dizem que existe um 101º boato que revela o segredo para se tornar um deus, mas ninguém nunca o ouviu. E dizem que tudo o que você ouviu até agora pode ser uma mentira inventada para te manter longe da verdade.",
+        descoberto: true
+    };
     const dadosCapital = {
         esquadrao: [
             // Coloque o nome EXATO do arquivo da imagem que está na pasta
@@ -465,10 +515,11 @@
                 titulo: "Capítulo 4: Desconhecido",
                 texto: `Aventura em progresso...`
             }
-        ]
+        ],
+        boatos: listaBoatos
     };
 
-// --- FUNÇÃO MENU CAPITAL (ATUALIZADA) ---
+// --- FUNÇÃO MENU CAPITAL (ATUALIZADA COM BOATOS) ---
     function menuCapital(tipo) {
         const modal = document.getElementById('modal-capital');
         const container = document.getElementById('conteudo-menu-capital');
@@ -476,7 +527,30 @@
         modal.style.display = 'flex';
         container.innerHTML = "";
 
-        // SELEÇÃO DO TIPO DE MENU
+        // --- ABA BOATOS ---
+        if (tipo === 'boatos') {
+            titulo.innerText = "🗣️ Boatos da Capital (1/100)"; // Você pode atualizar esse contador manualmente ou via código
+            
+            let html = `<div class="lista-boatos">`;
+            
+            dadosCapital.boatos.forEach(boato => {
+                // Define classe e texto baseado se foi descoberto ou não
+                const classeExtra = boato.descoberto ? 'boato-descoberto' : '';
+                const textoFinal = boato.descoberto ? boato.texto : "??????????????????";
+                
+                html += `
+                    <div class="boato-item ${classeExtra}">
+                        <span class="boato-numero">#${boato.id}</span>
+                        <span class="boato-texto">"${textoFinal}"</span>
+                    </div>`;
+            });
+            
+            html += `</div>`;
+            container.innerHTML = html;
+            return;
+        }
+
+        // --- ABA HISTÓRICO ---
         if (tipo === 'historico') {
             titulo.innerText = "📜 Histórico de Aventuras";
             dadosCapital.historico.forEach((cap, index) => {
@@ -489,10 +563,10 @@
                         </div>
                     </div>`;
             });
-            return; // Para a função aqui se for histórico
+            return;
         }
 
-        // LÓGICA ORIGINAL PARA ESQUADRÃO E PROCURADOS
+        // --- ABA ESQUADRÃO E PROCURADOS (PADRÃO) ---
         const lista = (tipo === 'esquadrao') ? dadosCapital.esquadrao : dadosCapital.procurados;
         titulo.innerText = (tipo === 'esquadrao') ? "🛡️ Os Pandemônios" : "☠️ Cartazes de Procurados";
 
@@ -531,19 +605,16 @@
         container.innerHTML = html;
     }
 
-    // --- NOVA: VER IMAGEM DENTRO DO HISTÓRICO (COM MEMÓRIA) ---
+// --- FUNÇÃO PARA VER IMAGEM NO HISTÓRICO (CORRIGIDA) ---
     function verImagemHistoria(arquivo, capituloIndex) {
-        // Esconde tudo
         document.getElementById('modal-capital').style.display = 'none';
         document.getElementById('map-container').style.display = 'none';
-        document.getElementById('menu-provincias').style.display = 'none';
+        document.getElementById('menu-provincias').style.display = 'none'; // Esconde menu
 
-        // Mostra imagem
         const containerImg = document.getElementById('provincia-container');
         containerImg.style.display = 'flex'; 
         document.getElementById('img-provincia').src = arquivo;
 
-        // Cria botão VOLTAR AO TEXTO
         const btnVoltar = document.createElement('button');
         btnVoltar.innerHTML = "⬅ Voltar ao Texto";
         btnVoltar.className = "btn-popup";
@@ -552,9 +623,13 @@
         btnVoltar.onclick = function() {
             containerImg.style.display = 'none';
             document.getElementById('map-container').style.display = 'block';
-            document.getElementById('modal-capital').style.display = 'flex';
             
-            // O TRUQUE: Reabre exatamente o capítulo que estava lendo
+            // --- CORREÇÃO: Restaura o menu se estiver no continente ---
+            if (mapaAtualAtivo === 'continente') {
+                document.getElementById('menu-provincias').style.display = 'block';
+            }
+
+            document.getElementById('modal-capital').style.display = 'flex';
             lerCapitulo(capituloIndex);
         };
 
@@ -564,35 +639,33 @@
     }
 
     // --- NOVA FUNÇÃO PARA AMPLIAR FOTO DO PERSONAGEM ---
+// --- FUNÇÃO PARA AMPLIAR FOTO DO PERSONAGEM (CORRIGIDA) ---
     function verImagemPersonagem(arquivo) {
-        // 1. Esconde o menu atual (Modal Capital)
         document.getElementById('modal-capital').style.display = 'none';
-        
-        // 2. Esconde o mapa
         document.getElementById('map-container').style.display = 'none';
-        document.getElementById('menu-provincias').style.display = 'none';
+        document.getElementById('menu-provincias').style.display = 'none'; // Esconde menu
 
-        // 3. Mostra o container de imagem (usando o mesmo das províncias)
         const containerImg = document.getElementById('provincia-container');
         containerImg.style.display = 'flex'; 
         document.getElementById('img-provincia').src = arquivo;
 
-        // 4. Cria um botão de voltar ESPECIAL que reabre o menu
         const btnVoltar = document.createElement('button');
         btnVoltar.innerHTML = "⬅ Voltar ao Menu";
         btnVoltar.className = "btn-popup";
         btnVoltar.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
         
         btnVoltar.onclick = function() {
-            // Fecha a imagem
             containerImg.style.display = 'none';
-            // Mostra o mapa de fundo
             document.getElementById('map-container').style.display = 'block';
-            // REABRE O MENU DA CAPITAL
+            
+            // --- CORREÇÃO: Restaura o menu se estiver no continente ---
+            if (mapaAtualAtivo === 'continente') {
+                document.getElementById('menu-provincias').style.display = 'block';
+            }
+
             document.getElementById('modal-capital').style.display = 'flex';
         };
 
-        // Limpa botão antigo e põe o novo
         const btnAntigo = containerImg.querySelector('button');
         if (btnAntigo) containerImg.removeChild(btnAntigo);
         containerImg.insertBefore(btnVoltar, containerImg.firstChild);
@@ -900,8 +973,9 @@ function verImagemEstatica(arquivo) {
                 }
                 botoes += `<button onclick="menuCapital('esquadrao')" class="btn-popup" style="background:#2c3e50; margin-bottom:5px;">🛡️ Ver Esquadrão</button>`;
                 botoes += `<button onclick="menuCapital('procurados')" class="btn-popup" style="background:#8b0000; margin-bottom:5px;">☠️ Procurados</button>`;
-                // NOVO BOTÃO AQUI:
-                botoes += `<button onclick="menuCapital('historico')" class="btn-popup" style="background:#5e2f0d;">📜 Histórico</button>`;
+                botoes += `<button onclick="menuCapital('historico')" class="btn-popup" style="background:#5e2f0d; margin-bottom:5px;">📜 Histórico</button>`;
+                // NOVO BOTÃO:
+                botoes += `<button onclick="menuCapital('boatos')" class="btn-popup" style="background:#4b0082;">🗣️ Boatos</button>`;
             }
             // --- LÓGICA PADRÃO ---
             else {
