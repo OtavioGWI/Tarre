@@ -284,7 +284,7 @@
             
             <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
             <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">COSMOLOGIA</div>
-            <button class="botao-provincia" onclick="abrirModalSenha('portal', 'bloqueado.jpg', 'imagem')" style="color: #aeb6bf;">🌌 Outros Planos</button>
+            <button class="botao-provincia" onclick="abrirModalSenha('portal', 'Planos.jpg', 'mapa')" style="color: #aeb6bf;">🌌 Outros Planos</button>
 
             <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
             <button id="btn-coords-menu" class="botao-provincia" onclick="alternarCoordenadas()" style="color: #aaa;">📍 Coords: OFF</button>
@@ -318,10 +318,11 @@
     const configContinental = { arquivo: 'Mapa teste.png', largura: 7680, altura: 4320, minZoom: -2.0, maxZoom: 3 };
     const configProvincia = { largura: 2048, altura: 1536, minZoom: -1.0, maxZoom: 2 };
     
-    // --- VARIÁVEIS GLOBAIS ---
+// --- VARIÁVEIS GLOBAIS ---
     let map; 
     let mapaAtualAtivo = 'continente';
-    let modoCoordenadas = false; // Variável global importante
+    let planoSelecionado = null; // <--- NOVA VARIÁVEL
+    let modoCoordenadas = false;
 
     // --- FUNÇÕES DE NAVEGAÇÃO E SISTEMA ---
 
@@ -398,6 +399,7 @@
     // 3. Carrega o mapa principal (Continente)
     function carregarMapaPrincipal() {
         mapaAtualAtivo = 'continente';
+        planoSelecionado = null;
         document.getElementById('map-container').style.display = 'block';
         document.getElementById('provincia-container').style.display = 'none';
         document.getElementById('menu-provincias').style.display = 'block';
@@ -602,6 +604,35 @@ function alternarCoordenadas() {
     // ... (O resto do seu código: dadosProvincias, dadosCapital, etc. continua igual abaixo)
 
     // --- 5. BANCO DE DADOS (TEXTOS COMPLETOS RESTAURADOS) ---
+
+    // --- DADOS DOS PLANOS E FUNÇÃO ---
+
+    function verDetalhesPlano(chave) {
+        const dados = textosPlanos[chave];
+        document.getElementById('titulo-provincia').innerHTML = dados.titulo;
+        document.getElementById('texto-provincia').innerHTML = dados.texto;
+        document.getElementById('modal-info').style.display = 'flex';
+    }
+
+    const textosPlanos = {
+        'divino': {
+            titulo: "O Plano Divino",
+            texto: "<p><strong>A Luz Eterna:</strong> Onde residem as divindades da ordem. O tempo é um eterno 'agora'.</p><hr><p>1. Portão Dourado<br>2. Jardins Elísios<br>3. Trono de Cristal</p>"
+        },
+        'demoniaco': {
+            titulo: "O Plano Demoníaco",
+            texto: "<p><strong>O Abismo:</strong> Reino de caos e sofrimento.</p><hr><p>1. Lama de Sangue<br>2. Cidadela de Ferro<br>3. Poço Sem Fundo</p>"
+        },
+        'espiritual': {
+            titulo: "O Plano Espiritual",
+            texto: "<p><strong>O Fluxo:</strong> O rio de mana e almas.</p><hr><p>1. O Véu<br>2. Biblioteca dos Sonhos<br>3. Mar de Almas</p>"
+        },
+        'mortal': {
+            titulo: "O Plano Mortal (Arton)",
+            texto: "<p><strong>O Equilíbrio:</strong> O mundo material onde a vida acontece.</p>"
+        }
+    };
+
     const dadosProvincias = {
         'Hukmal_tep.jpg': {
             titulo: "Hukmal'tep - O Inverno Absoluto",
@@ -661,8 +692,51 @@ function alternarCoordenadas() {
     'Mar.jpg': {
         titulo: "O Mar Profundo",
         descricao: "<p><strong>🌊 Descrição:</strong> Uma vastidão azul e perigosa, acessível apenas para aqueles que conhecem os segredos das marés.</p>"
+    }, 
+'Planos.jpg': {
+        titulo: "A Grande Roda Cosmológica",
+        descricao: `
+            <p><strong>🌌 O Nexus:</strong> O ponto de convergência absoluto entre todas as realidades. É daqui que as almas partem para seus destinos finais ou retornam para suas origens.</p>
+            <p>Este é o centro da existência, onde os véus entre os mundos são mais finos e a própria realidade parece vibrar com a energia dos portais.</p>
+        `
     },
-    
+    'Plano Espiritual.png': {
+        titulo: "🍃 O Plano Espiritual",
+        descricao: `
+            <p><strong>Lei do Mundo:</strong> O tempo aqui é uma ilusão; dias podem passar como segundos. A própria essência do plano é inebriante, e viajantes devem testar sua vontade constantemente, pois o desejo de permanecer para sempre é uma armadilha doce e perigosa.</p>
+            <hr>
+            <p><strong>1º Andar: Éden</strong><br>Um paraíso de luz eterna onde a noite nunca cai. Habitado por fadas e espíritos elementais, oferece frutas e conforto em abundância. É a distração perfeita para quem esquece seu propósito.</p>
+            <p><strong>2º Andar: Naitimére</strong><br>O reflexo sombrio. Um reino de noite perpétua que distorce a realidade para manifestar seus pesadelos mais profundos. A sanidade é o recurso mais escasso aqui.</p>
+            <p><strong>3º Andar: Animalia</strong><br>Lar de Bestas Primordiais dotadas de fala e intelecto. A regra da caça é brutal: "aquele que tira uma vida, assume sua forma", transformando caçadores em presas.</p>
+            <p><strong>4º Andar: Fungi</strong><br>Uma floresta alienígena de cogumelos colossais. Esporos flutuam no ar com efeitos que variam da cura milagrosa à alucinação mortal. É o território de gigantes silenciosos.</p>
+            <p><strong>5º Andar: O Vegetal</strong><br>O coração verde onde Ents e Dríades guardam a vida. A flora é tão vibrante que consome a carne; visitantes sentem sua pele enrijecer e folhas brotarem se ficarem tempo demais.</p>
+            <p><strong>6º Andar: Draconfelt</strong><br>O berço dos Dragões. Uma terra de biomas extremos e majestosos. A grandiosidade do ambiente cobra um preço, drenando lentamente a energia vital daqueles que não pertencem a este lugar.</p>
+        `
+    },
+    'Plano Divino.png': {
+        titulo: "☀️ O Plano Divino",
+        descricao: `
+            <p><strong>Lei do Mundo:</strong> Um santuário de pureza absoluta. Maldições são anuladas instantaneamente e poderes das trevas definham. Os Anjos, guardiões deste reino, são incapazes de mentir, embora sejam mestres na arte da verdade incompleta.</p>
+            <hr>
+            <p><strong>1º Andar: Olimpo</strong><br>O cume da criação. Morada exclusiva das divindades maiores. O ar vibra com poder divino e a entrada é restrita apenas aos próprios deuses ou convidados de honra excepcional.</p>
+            <p><strong>2º Andar: Angeheim</strong><br>A Cidadela da Verdade. A atmosfera impõe uma pressão física sobre a falsidade; é impossível proferir uma mentira enquanto se respira o ar deste lugar.</p>
+            <p><strong>3º Andar: Sovengarde</strong><br>O eterno campo de batalha. O destino daqueles que caíram bravamente em combate. Aqui, ferimentos mortais cicatrizam ao amanhecer, permitindo que a glória da luta recomece.</p>
+            <p><strong>4º Andar: Révem</strong><br>O descanso final das almas benevolentes. A paz é tão absoluta que se torna perigosa: a bondade do ambiente força uma purificação espiritual, podendo apagar a personalidade original do visitante.</p>
+            <p><strong>5º Andar: Cosmos</strong><br>O vazio iluminado. O lar das Estrelas e entidades cósmicas. Caminhar por aqui é tocar o tecido do universo, e os dignos podem receber bênçãos estelares.</p>
+        `
+    },
+    'Plano Demoníaco.png': {
+        titulo: "🔥 O Plano Demoníaco",
+        descricao: `
+            <p><strong>Lei do Mundo:</strong> Um abismo que fortalece a magia negra e as artes profanas. A atmosfera é tóxica para a alma; a exposição prolongada convida maldições terríveis a se instalarem no corpo do viajante.</p>
+            <hr>
+            <p><strong>1º Andar: O Abismo</strong><br>Um labirinto de crepúsculo eterno e névoa densa. As luzes brilham com metade da força e as sombras parecem ter vida própria. Perder o caminho aqui é fatalmente fácil.</p>
+            <p><strong>2º Andar: Gehenna</strong><br>O Deserto da Desolação. Dunas infinitas feitas das cinzas de almas. O vento drena a energia física e mental, levando os viajantes à exaustão e à depressão profunda.</p>
+            <p><strong>3º Andar: O Cárcere</strong><br>A prisão eterna de rocha e ferro estéril. Magias de transporte e comunicação são anuladas. É um lugar de silêncio, repleto de armadilhas para garantir que nada escape.</p>
+            <p><strong>4º Andar: Inferno</strong><br>O epicentro da dor, cortado por rios de lava e sangue. A maldade do ambiente é contagiosa, tentando ativamente corromper o coração dos visitantes e torná-los naquilo que desprezam.</p>
+            <p><strong>5º Andar: Diabolos</strong><br>O Ninho. Uma rede claustrofóbica de túneis orgânicos e fétidos. A exposição prolongada inicia uma metamorfose grotesca, transformando o vivo em mais uma larva da colmeia.</p>
+        `
+    },
     // ... outros mapas
         'default': { 
             titulo: "Região Desconhecida", 
@@ -1107,12 +1181,41 @@ deuses: [
     // TRUQUE: Isso garante que se o HTML chamar 'fecharModalInfo', ele usa a nova função
     window.fecharModalInfo = fecharModais;
 
+// --- VARIÁVEL DE CONTROLE ---
+    let selecaoAtual = null; // Guarda qual plano foi clicado por último
+
+    // --- FUNÇÃO DE DETALHES (INTELIGENTE) ---
     function abrirModalInfo() {
-        const dados = dadosProvincias[mapaAtualAtivo] || dadosProvincias['default'];
-        document.getElementById('titulo-provincia').innerHTML = dados.titulo;
-        document.getElementById('texto-provincia').innerHTML = dados.descricao;
-        document.getElementById('modal-info').style.display = 'flex';
+        let dados;
+
+        // 1. Se estiver no mapa dos Planos E tiver clicado em um marcador (Divino, Mortal, etc)
+        if (mapaAtualAtivo === 'Planos.jpg' && selecaoAtual) {
+            dados = textosPlanos[selecaoAtual]; 
+        } 
+        // 2. Se estiver no mapa dos Planos mas não clicou em nada (Mostra resumo geral)
+        else if (mapaAtualAtivo === 'Planos.jpg') {
+            dados = dadosProvincias['Planos.jpg'];
+        }
+        // 3. Comportamento padrão para os outros mapas (Hukmal'tep, Deserto, etc)
+        else {
+            dados = dadosProvincias[mapaAtualAtivo] || dadosProvincias['default'];
+        }
+
+        // Abre o modal com os dados certos
+        if (dados) {
+            document.getElementById('titulo-provincia').innerHTML = dados.titulo;
+            document.getElementById('texto-provincia').innerHTML = dados.texto || dados.descricao;
+            document.getElementById('modal-info').style.display = 'flex';
+        }
     }
+
+
+// --- CONFIGURAÇÕES DE TAMANHO ---
+    // 1. O Mapa Geral dos Planos (O Nexus)
+    const configPlanos = { largura: 741, altura: 1024, minZoom: -1.0, maxZoom: 3 }; 
+    
+    // 2. Os Mapas Individuais (Divino, Demoníaco, Espiritual)
+    const configSubPlanos = { largura: 1024, altura: 1536, minZoom: -1.0, maxZoom: 3 }; 
 
     function abrirMapaProvincia(arquivo) {
         mapaAtualAtivo = arquivo;
@@ -1120,7 +1223,17 @@ deuses: [
         document.getElementById('map-container').style.display = 'block';
         document.getElementById('provincia-container').style.display = 'none';
 
-        inicializarMapa(arquivo, configProvincia.largura, configProvincia.altura, configProvincia.minZoom, configProvincia.maxZoom);
+        // LÓGICA INTELIGENTE DE TAMANHO
+        let cfg = configProvincia; // Padrão (2048x1536)
+        
+        if (arquivo === 'Planos.jpg') {
+            cfg = configPlanos; // Usa 741x1024
+        } 
+        else if (arquivo === 'Plano Divino.png' || arquivo === 'Plano Demoníaco.png' || arquivo === 'Plano Espiritual.png') {
+            cfg = configSubPlanos; // Usa 1024x1536
+        }
+
+        inicializarMapa(arquivo, cfg.largura, cfg.altura, cfg.minZoom, cfg.maxZoom);
 
         // Botão Voltar (Topo Esquerdo)
         const BotaoVoltarControl = L.Control.extend({
@@ -1128,11 +1241,22 @@ deuses: [
             onAdd: function() {
                 const btn = L.DomUtil.create('button', 'leaflet-control-button-voltar');
                 btn.innerHTML = "⬅ Voltar ao Continente";
+                
+                // Se estiver dentro de um sub-plano, o botão deve voltar para o Nexus, não pro continente
+                if (arquivo === 'Plano Divino.png' || arquivo === 'Plano Demoníaco.png' || arquivo === 'Plano Espiritual.png') {
+                    btn.innerHTML = "⬅ Voltar ao Nexus";
+                    btn.onclick = function(e) {
+                        L.DomEvent.stopPropagation(e);
+                        abrirMapaProvincia('Planos.jpg'); // Volta pro Nexus
+                    };
+                } else {
+                    btn.onclick = function(e) {
+                        L.DomEvent.stopPropagation(e);
+                        carregarMapaPrincipal(); // Volta pro Continente
+                    };
+                }
+                
                 btn.style.cssText = "white-space:nowrap; padding:12px 18px; background:#8b4513; color:white; border:2px solid #5e2f0d; border-radius:5px; cursor:pointer; font-weight:bold; font-size:14px; z-index:9999;";
-                btn.onclick = function(e) {
-                    L.DomEvent.stopPropagation(e);
-                    carregarMapaPrincipal();
-                };
                 return btn;
             }
         });
@@ -1181,27 +1305,25 @@ function verImagemEstatica(arquivo) {
         else abrirMapaProvincia(mapaAtualAtivo);
     }
 
-    // --- 6. MARCADORES LOCAIS ---
-    function adicionarMarcadoresLocais(nomeDoMapa) {
-        const iconP = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [50, 50], iconAnchor: [25, 25], popupAnchor: [0, -25]});
-        const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [100, 100], iconAnchor: [50, 50], popupAnchor: [0, -50]});
+ // --- 6. MARCADORES LOCAIS (FUNÇÃO COMPLETA ATUALIZADA) ---
+function adicionarMarcadoresLocais(nomeDoMapa) {
+    // Ícones padrão
+    const iconP = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [50, 50], iconAnchor: [25, 25], popupAnchor: [0, -25]});
+    const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [100, 100], iconAnchor: [50, 50], popupAnchor: [0, -50]});
 
-// Função interna para criar os pontos (ATUALIZADA)
-        function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoExtra = null) {
-            const m = L.marker(coord, {icon: grande ? iconG : iconP, opacity: 0}).addTo(map);
-            let popupHtml = `<div style="text-align:center;"><b>${nome}</b><br><small>${info}</small>`;
-            
-            if (foto) {
-                popupHtml += `<div style="margin-top: 10px;"><button onclick="verImagemEstatica('${foto}')" class="btn-popup">Ver Foto</button></div>`;
-            }
-            // NOVO: Adiciona botão extra se existir
-            if (botaoExtra) {
-                popupHtml += `<div style="margin-top: 5px;">${botaoExtra}</div>`;
-            }
-            
-            popupHtml += `</div>`;
-            m.bindPopup(popupHtml);
+    // --- FUNÇÃO INTERNA PADRÃO (Para mapas normais) ---
+    function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoExtra = null) {
+        const m = L.marker(coord, {icon: grande ? iconG : iconP, opacity: 0}).addTo(map);
+        let popupHtml = `<div style="text-align:center;"><b>${nome}</b><br><small>${info}</small>`;
+        if (foto) {
+            popupHtml += `<div style="margin-top: 10px;"><button onclick="verImagemEstatica('${foto}')" class="btn-popup">Ver Foto</button></div>`;
         }
+        if (botaoExtra) {
+            popupHtml += `<div style="margin-top: 5px;">${botaoExtra}</div>`;
+        }
+        popupHtml += `</div>`;
+        m.bindPopup(popupHtml);
+    }
 
         if (nomeDoMapa === 'Hukmal_tep.jpg') {
             criarPontoLocal([1396, 780], "Capital de Hukmal'tep", "Felista", "Cópia de capital de hukmal_tep.png", true);
@@ -1387,6 +1509,72 @@ if (nomeDoMapa === 'Mar.jpg') {
         
         
         }
+if (nomeDoMapa === 'Planos.jpg') {
+        selecaoAtual = null; // Reseta seleção
+
+        // Ícone Gigante
+        const iconMega = L.icon({
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', 
+            iconSize: [120, 120], iconAnchor: [60, 120], popupAnchor: [0, -100]
+        });
+
+        // Função Especial para o Nexus (Agora abre MAPAS e tem descrição)
+        function criarPontoNexus(coord, nome, descricao, chaveTexto, arquivoMapa) {
+            const m = L.marker(coord, {icon: iconMega, opacity: 0}).addTo(map); 
+            
+            // MUDANÇA AQUI: O botão agora chama 'abrirMapaProvincia' em vez de 'verImagemEstatica'
+            let botoes = "";
+            if (arquivoMapa) {
+                botoes = `<button onclick="abrirMapaProvincia('${arquivoMapa}')" class="btn-popup" style="width: 100%; background: #483D8B;">🗺️ Entrar no Plano</button>`;
+            }
+
+            // Popup com descrição de volta
+            m.bindPopup(`<div style="text-align:center; width: 180px;"><b>${nome}</b><br><small style="color:#ccc;">${descricao}</small><div style="margin-top:10px;">${botoes}</div></div>`);
+
+            m.on('click', function() { selecaoAtual = chaveTexto; });
+        }
+
+        // --- PONTOS DO NEXUS ---
+        // Divino -> Abre o mapa "Plano Divino.png"
+        criarPontoNexus([806, 214], "Plano Divino", "A morada da luz eterna.", "divino", "Plano Divino.png");
+        criarPontoNexus([590, 214], "Plano Divino", "A morada da luz eterna.", "divino", "Plano Divino.png");
+
+        // Demoníaco -> Abre o mapa "Plano Demoníaco.png"
+        criarPontoNexus([254, 193], "Plano Demoníaco", "O abismo do caos.", "demoniaco", "Plano Demoníaco.png");
+        criarPontoNexus([92, 202], "Plano Demoníaco", "O abismo do caos.", "demoniaco", "Plano Demoníaco.png");
+
+        // Espiritual -> Abre o mapa "Plano Espiritual.png"
+        criarPontoNexus([763, 544], "Plano Espiritual", "O fluxo de mana e almas.", "espiritual", "Plano Espiritual.png");
+        criarPontoNexus([616, 556], "Plano Espiritual", "O fluxo de mana e almas.", "espiritual", "Plano Espiritual.png");
+
+        // Mortal -> Volta pro Continente (Mantive o botão verde diferente)
+        const m = L.marker([246, 558], {icon: iconMega, opacity: 0}).addTo(map);
+        const btnVoltar = `<button onclick="carregarMapaPrincipal()" class="btn-popup" style="background: #2E8B57; width: 100%;">🌍 Voltar ao Continente</button>`;
+        m.bindPopup(`<div style="text-align:center; width: 180px;"><b>Plano Mortal</b><br><small style="color:#ccc;">O mundo material de Arton.</small><div style="margin-top:10px;">${btnVoltar}</div></div>`);
+        m.on('click', function() { selecaoAtual = 'mortal'; });
+        
+    }
+
+    // --- 2. OS NOVOS MAPAS DOS PLANOS (Botão para voltar ao Nexus) ---
+    
+    // Configuração do botão de voltar para o Nexus
+    const btnVoltarNexus = `<button onclick="abrirMapaProvincia('Planos.jpg')" class="btn-popup" style="background: #aeb6bf; color: black;">↩ Voltar ao Nexus</button>`;
+
+    if (nomeDoMapa === 'Plano Divino.png') {
+        // Coloquei num canto genérico, ajuste a coordenada [Y, X] depois
+        criarPontoLocal([100, 100], "Saída do Plano", "Portal de volta para a Grande Roda.", null, true, btnVoltarNexus);
+        // Adicione aqui os pontos internos do Plano Divino...
+    }
+
+    if (nomeDoMapa === 'Plano Demoníaco.png') {
+        criarPontoLocal([100, 100], "Saída do Abismo", "Portal de volta para a Grande Roda.", null, true, btnVoltarNexus);
+        // Adicione aqui os pontos internos do Plano Demoníaco...
+    }
+
+    if (nomeDoMapa === 'Plano Espiritual.png') {
+        criarPontoLocal([100, 100], "Saída do Fluxo", "Portal de volta para a Grande Roda.", null, true, btnVoltarNexus);
+        // Adicione aqui os pontos internos do Plano Espiritual...
+    }
     }
 
 // --- 7. MARCADORES DO CONTINENTE ---
@@ -1416,24 +1604,27 @@ if (nomeDoMapa === 'Mar.jpg') {
                 botoes += `<button onclick="menuCapital('procurados')" class="btn-popup" style="background:#8b0000; margin-bottom:5px;">☠️ Procurados</button>`;
                 botoes += `<button onclick="menuCapital('historico')" class="btn-popup" style="background:#5e2f0d; margin-bottom:5px;">📜 Histórico</button>`;
                 botoes += `<button onclick="menuCapital('boatos')" class="btn-popup" style="background:#4b0082; margin-bottom:5px;">🗣️ Boatos</button>`;
-                // NOVO: BANCO
                 botoes += `<button onclick="menuCapital('banco')" class="btn-popup" style="background:#DAA520; color: black;">🏦 Banco Imperial</button>`;
             }
             
-            // --- CIDADE SAGRADA (CONTINENTE) ---
+            // --- CIDADE SAGRADA ---
             else if (nome === "Cidade Sagrada") {
                 if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Cidade</button>`;
-                // NOVO: PANTEÃO
                 botoes += `<button onclick="menuDeuses()" class="btn-popup" style="background:#4682B4;">⚡ Panteão</button>`;
             }
 
-// --- TORRE DOS SÁBIOS ---
+            // --- TORRE DOS SÁBIOS ---
             else if (nome === "Torre dos Sábios") {
-                if (arquivo) {
-                    botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Exterior</button>`;
-                }
-                // ATUALIZADO: Pede senha "fofoca", se acertar abre "bloqueado.jpg"
+                if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Exterior</button>`;
+                // Senha: "fofoca"
                 botoes += `<button onclick="abrirModalSenha('fofoca', 'bloqueado.jpg', 'imagem')" class="btn-popup" style="background:#483D8B;">🔮 Acessar Interior</button>`;
+            }
+
+            // --- ILHA PARADISÍACA (NOVO) ---
+            else if (nome === "Ilha Paradisíaca") {
+                if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Ilha</button>`;
+                // Botão Direto para Bloqueado (Sem senha)
+                botoes += `<button onclick="verImagemEstatica('bloqueado.jpg')" class="btn-popup" style="background:#FF8C00;">📦 Importação</button>`;
             }
 
             // --- PADRÃO ---
@@ -1449,7 +1640,7 @@ if (nomeDoMapa === 'Mar.jpg') {
             m.bindPopup(conteudoPopup);
         }
 
-        // PONTOS (MANTIVE SEUS PONTOS ORIGINAIS)
+        // PONTOS
         criarPonto([824, 2330], "Deserto","A Origem do Mundo", "Deserto.jpg", 'mapa');
         criarPonto([3850, 3580], "Hukmal'tep", "O Inverno Absoluto","Hukmal_tep.jpg", 'mapa');
         criarPonto([2902, 5464], "Blat'khyr", "O Berço da Magia", "Blat_khyr.jpg", 'mapa');
@@ -1457,10 +1648,12 @@ if (nomeDoMapa === 'Mar.jpg') {
         criarPonto([1356, 3284], "Alcova","O Lar dos Piratas", "Alcova.jpg", 'mapa');
         criarPonto([2250, 4258], "Espinha do Gigante", "As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
         criarPonto([2142, 4378], "Espinha do Gigante","As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
+        
         criarPonto([2370, 3767], "Capital Imperial", "A Casa do Império", "Capital.png", 'imagem');
         criarPonto([1648, 4438], "Cidade Sagrada", "Cidade Santa.png", 'imagem');
         criarPonto([2862, 2890], "Torre dos Sábios", "Torre dos Sabios.png", 'imagem');
-        criarPonto([1188, 5574], "Ilha Paradisíaca", "ilha 2.png", 'imagem');
+        criarPonto([1188, 5574], "Ilha Paradisíaca", "ilha 2.png", 'imagem'); // PONTO DA ILHA
+        
         criarPonto([1830, 2322], "Vilarejo", "cidade da raça lá.png", 'imagem');
         criarPonto([2114, 3854], "Vilarejo", "vilarejo.png", 'imagem');
         criarPonto([2142, 3254], "Vilarejo", "vilarejo 2.jpg", 'imagem');
