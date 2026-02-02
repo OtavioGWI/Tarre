@@ -309,7 +309,9 @@
             <button class="btn-popup" onclick="verificarSenha()" style="background: #2E8B57; font-size: 16px; margin-right: 10px;">🔓 Tentar</button>
             <button class="btn-popup" onclick="fecharModalSenha()" style="background: #8b0000; font-size: 16px;">❌ Cancelar</button>
             
-            <p id="msg-erro-senha" style="color: #ff4444; display: none; font-size: 14px; margin-top: 10px;">Senha incorreta. A barreira permanece.</p>
+            <p id="msg-erro-senha" style="color: #ff4444; display: none; font-size: 14px; margin-top: 10px;">
+                Senha incorreta. Por favor AGUARDE descobrirem a senha.
+            </p>
         </div>
     </div>
 
@@ -419,68 +421,63 @@
 
     // --- FUNÇÕES DOS BOTÕES EXTRAS (Agora fora de qualquer outra função) ---
 
-// --- VARIÁVEIS PARA O SISTEMA DE SENHA (CORRIGIDO) ---
+// --- SISTEMA DE SENHA (ÚNICO E CORRIGIDO) ---
     let senhaCorretaAtual = "";
-    let destinoAposSenha = ""; // Substitui o antigo 'mapaDestinoAtual'
-    let tipoAcaoSenha = "mapa"; // Variável nova para controlar se abre mapa ou foto
+    let destinoAposSenha = ""; 
+    let tipoAcaoSenha = "mapa"; 
 
-    // 1. Abre a janela de senha
+    // 1. Abre o modal e configura o que vai acontecer
     function abrirModalSenha(senha, destino, tipo = 'mapa') {
         senhaCorretaAtual = senha;
-        destinoAposSenha = destino; // Salva o destino na variável certa
-        tipoAcaoSenha = tipo;       // Salva o tipo de ação
+        destinoAposSenha = destino;
+        tipoAcaoSenha = tipo;
         
-        // Limpa o campo e esconde erro anterior
-        document.getElementById('input-senha-rpg').value = "";
-        document.getElementById('msg-erro-senha').style.display = 'none';
+        const modal = document.getElementById('modal-senha');
+        const input = document.getElementById('input-senha-rpg');
+        const msg = document.getElementById('msg-erro-senha');
+
+        // Limpa estados anteriores
+        input.value = "";
+        input.disabled = false;
+        msg.style.display = 'none';
+        modal.style.display = 'flex';
         
-        // Mostra o modal
-        document.getElementById('modal-senha').style.display = 'flex';
-        
-        // Foca no input para digitar direto
-        document.getElementById('input-senha-rpg').focus();
+        // Foca no campo automaticamente
+        setTimeout(() => input.focus(), 50); 
     }
 
-    // 2. Verifica a senha
+    // 2. Verifica se a senha está certa
     function verificarSenha() {
         const input = document.getElementById('input-senha-rpg');
-        const msgArea = document.getElementById('msg-erro-senha');
+        const msg = document.getElementById('msg-erro-senha');
         
-        // Verifica a senha (ignora maiúsculas/minúsculas)
-        if (input.value && input.value.toLowerCase() === senhaCorretaAtual.toLowerCase()) {
-            
+        // Compara ignorando maiúsculas/minúsculas
+        if (input.value.toLowerCase() === senhaCorretaAtual.toLowerCase()) {
             // SUCESSO
-            msgArea.style.display = 'block';
-            msgArea.style.color = '#2ecc71'; 
-            msgArea.innerHTML = "✨ Acesso concedido!";
-            
+            msg.style.display = 'block';
+            msg.style.color = '#2ecc71'; 
+            msg.innerHTML = "✨ Acesso concedido!";
             input.disabled = true;
 
-            // Espera 1.5s e executa a ação
+            // Espera um pouco e executa a ação (abrir mapa ou foto)
             setTimeout(() => {
-                document.getElementById('modal-senha').style.display = 'none';
-                
-                // Reseta visual
-                input.value = "";
+                fecharModalSenha();
                 input.disabled = false;
-                msgArea.style.display = 'none';
-                msgArea.style.color = '#ff4444'; 
                 
-                // DECIDE A AÇÃO (MAPA OU IMAGEM) USANDO A VARIÁVEL CERTA
                 if (tipoAcaoSenha === 'imagem') {
                     verImagemEstatica(destinoAposSenha);
                 } else {
                     abrirMapaProvincia(destinoAposSenha);
                 }
-
-            }, 1500);
+            }, 1200);
 
         } else {
-            // ERRO
-            msgArea.style.display = 'block';
-            msgArea.style.color = '#ff4444';
-            msgArea.innerHTML = "Senha incorreta. Por favor AGUARDE descobrirem essa área.";
+            // ERRO (MENSAGEM QUE VOCÊ PEDIU)
+            msg.style.display = 'block';
+            msg.style.color = '#ff4444';
+            msg.innerHTML = "Senha incorreta. Por favor AGUARDE descobrirem a senha.";
             
+            // Efeito visual de erro no input
             input.style.borderColor = "red";
             setTimeout(() => input.style.borderColor = "#8b4513", 500);
             input.select(); 
@@ -492,88 +489,13 @@
         document.getElementById('modal-senha').style.display = 'none';
     }
 
-    // 4. Atalho Enter
-    const inputSenha = document.getElementById('input-senha-rpg');
-    if (inputSenha) {
-        inputSenha.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                verificarSenha();
-            }
+    // 4. Atalho para o botão ENTER
+    const inputPass = document.getElementById('input-senha-rpg');
+    if (inputPass) {
+        inputPass.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") verificarSenha();
         });
     }
-    // 1. Abre a janela bonita (Agora aceita o tipo de ação)
-    function abrirModalSenha(senha, destino, tipo = 'mapa') {
-        senhaCorretaAtual = senha;
-        destinoAposSenha = destino;
-        tipoAcaoSenha = tipo;
-        
-        // Limpa o campo e esconde erro anterior
-        document.getElementById('input-senha-rpg').value = "";
-        document.getElementById('msg-erro-senha').style.display = 'none';
-        
-        // Mostra o modal
-        document.getElementById('modal-senha').style.display = 'flex';
-        
-        // Foca no input para digitar direto
-        document.getElementById('input-senha-rpg').focus();
-    }
-
-    // --- FUNÇÃO DE VERIFICAÇÃO (ATUALIZADA) ---
-    function verificarSenha() {
-        const input = document.getElementById('input-senha-rpg');
-        const msgArea = document.getElementById('msg-erro-senha');
-        
-        // Verifica a senha (ignora maiúsculas/minúsculas)
-        if (input.value && input.value.toLowerCase() === senhaCorretaAtual.toLowerCase()) {
-            
-            // 1. Mostra mensagem de SUCESSO
-            msgArea.style.display = 'block';
-            msgArea.style.color = '#2ecc71'; 
-            msgArea.innerHTML = "✨ Acesso concedido!"; // Mensagem genérica
-            
-            input.disabled = true;
-
-            // 3. Espera 1.5 segundos e executa a ação correta
-            setTimeout(() => {
-                document.getElementById('modal-senha').style.display = 'none';
-                
-                input.value = "";
-                input.disabled = false;
-                msgArea.style.display = 'none';
-                msgArea.style.color = '#ff4444'; 
-                
-                // LÓGICA NOVA: Decide se abre mapa ou imagem
-                if (tipoAcaoSenha === 'imagem') {
-                    verImagemEstatica(destinoAposSenha);
-                } else {
-                    abrirMapaProvincia(destinoAposSenha);
-                }
-
-            }, 1500);
-
-        } else {
-            // Erro
-            msgArea.style.display = 'block';
-            msgArea.style.color = '#ff4444';
-            msgArea.innerHTML = "Senha incorreta. Por favor AGUARDE vocês descobrirem a senha.";
-            
-            input.style.borderColor = "red";
-            setTimeout(() => input.style.borderColor = "#8b4513", 500);
-            input.select(); 
-        }
-    }
-
-    // 3. Fecha sem fazer nada
-    function fecharModalSenha() {
-        document.getElementById('modal-senha').style.display = 'none';
-    }
-
-    // 4. (Opcional) Permitir apertar ENTER para enviar
-    document.getElementById('input-senha-rpg').addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            verificarSenha();
-        }
-    });
 function alternarCoordenadas() {
         modoCoordenadas = !modoCoordenadas; // Inverte o valor
         
@@ -606,15 +528,6 @@ function alternarCoordenadas() {
     // ... (O resto do seu código: dadosProvincias, dadosCapital, etc. continua igual abaixo)
 
     // --- 5. BANCO DE DADOS (TEXTOS COMPLETOS RESTAURADOS) ---
-
-    // --- DADOS DOS PLANOS E FUNÇÃO ---
-
-    function verDetalhesPlano(chave) {
-        const dados = textosPlanos[chave];
-        document.getElementById('titulo-provincia').innerHTML = dados.titulo;
-        document.getElementById('texto-provincia').innerHTML = dados.texto;
-        document.getElementById('modal-info').style.display = 'flex';
-    }
 
     const textosPlanos = {
         'divino': {
@@ -1302,11 +1215,6 @@ function verImagemEstatica(arquivo) {
         container.insertBefore(btnVoltarImg, container.firstChild);
     }
 
-    function voltarParaMapa() {
-        if (mapaAtualAtivo === 'continente') carregarMapaPrincipal();
-        else abrirMapaProvincia(mapaAtualAtivo);
-    }
-
  // --- 6. MARCADORES LOCAIS (FUNÇÃO COMPLETA ATUALIZADA) ---
 function adicionarMarcadoresLocais(nomeDoMapa) {
     // Ícones padrão
@@ -1699,7 +1607,7 @@ if (nomeDoMapa === 'Planos.jpg') {
         criarPonto([1536, 3634], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         criarPonto([2070, 3642], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         
-        criarPonto([3912, 1780], "Inverno Desolado", null, 'none', true);
+        criarPonto([3912, 1780], "Inverno Desolado", "O inverno está chegando...", 'none', true);
     }
     // Inicialização
     carregarMapaPrincipal();
