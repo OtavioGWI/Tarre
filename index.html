@@ -275,14 +275,16 @@
 <div id="menu-provincias">
         <h3 onclick="alternarMenuMobile()">Menu Principal <span id="seta-menu">▼</span></h3>
         <div id="lista-botoes-provincia">
+            
+            <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">PROVÍNCIAS</div>
+
             <button class="botao-provincia" onclick="abrirMapaProvincia('Hukmal_tep.jpg')">Hukmal'tep</button>
             <button class="botao-provincia" onclick="abrirMapaProvincia('Blat_khyr.jpg')">Blat'khyr</button>
             <button class="botao-provincia" onclick="abrirMapaProvincia('Deserto.jpg')">Deserto</button>
             <button class="botao-provincia" onclick="abrirMapaProvincia('Lago.jpg')">Lago</button>
             <button class="botao-provincia" onclick="abrirMapaProvincia('Alcova.jpg')">Alcova</button>
-            <button class="botao-provincia" onclick="abrirMapaProvincia('Espinha do Gigante.jpg')">Espinha do Gigante</button>
-            
             <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
+            
             <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">COSMOLOGIA</div>
             <button class="botao-provincia" onclick="abrirModalSenha('portal', 'Planos.jpg', 'mapa')" style="color: #aeb6bf;">🌌 Outros Planos</button>
 
@@ -1358,12 +1360,22 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
         }
 
         if (nomeDoMapa === 'Blat_khyr.jpg') {
-           // ATUALIZADO: Pede senha "poder", se acertar abre "bloqueado.jpg"
+            // --- PONTO DA ESCOLA DE MAGIA (JÁ EXISTIA) ---
             const btnEscola = `<button onclick="abrirModalSenha('poder', 'bloqueado.jpg', 'imagem')" class="btn-popup" style="background:#800080;">🎓 Escola de Magia</button>`;
             criarPontoLocal([382, 1359], "Capital de Blat'khyr", "Elfos", "cidade magica.png", true, btnEscola);
+            
+            // --- OUTROS PONTOS ---
             criarPontoLocal([986, 1239], "Vilarejo", "Desconhecido");
             criarPontoLocal([1091, 606], "Vilarejo", "Desconhecido");
-            criarPontoLocal([1463, 1151], "Vilarejo", "Desconhecido");
+
+            // --- NOVO: PONTO DAS BRUXAS [1463, 1151] ---
+            // 1. Cria o botão com a senha "Bruxas" que abre a imagem "Vila bruxa.png"
+            const btnBruxas = `<button onclick="abrirModalSenha('Bruxas', 'Vila bruxa.png', 'imagem')" class="btn-popup" style="background: #2E8B57; margin-top: 5px;">🔍 Descobrir</button>`;
+            
+            // 2. Cria o ponto passando o botão
+            criarPontoLocal([1463, 1151], "Vilarejo", "Desconhecido", null, true, btnBruxas);
+
+            // --- RESTANTE DOS PONTOS DE BLAT'KHYR ---
             criarPontoLocal([491, 371], "Cidade", "Elfos", "Cidade portuária 4.png", true);
             criarPontoLocal([741, 963], "Cidade", "Elfos", "Cidade portuária.png", true);
             criarPontoLocal([621, 1760], "Cidade", "Elfos", "Cidade portuária 2.png", true);
@@ -1616,15 +1628,27 @@ if (nomeDoMapa === 'Planos.jpg') {
             // --- TORRE DOS SÁBIOS ---
             else if (nome === "Torre dos Sábios") {
                 if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Exterior</button>`;
-                // Senha: "fofoca"
                 botoes += `<button onclick="abrirModalSenha('fofoca', 'bloqueado.jpg', 'imagem')" class="btn-popup" style="background:#483D8B;">🔮 Acessar Interior</button>`;
             }
 
-            // --- ILHA PARADISÍACA (NOVO) ---
+            // --- ILHA PARADISÍACA ---
             else if (nome === "Ilha Paradisíaca") {
                 if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Ilha</button>`;
-                // Botão Direto para Bloqueado (Sem senha)
                 botoes += `<button onclick="verImagemEstatica('bloqueado.jpg')" class="btn-popup" style="background:#FF8C00;">📦 Importação</button>`;
+            }
+
+            // --- PÂNTANO (ATUALIZADO) ---
+            else if (nome === "Pântano") {
+                if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Local</button>`;
+                // Senha: Seita (Botão verde padrão)
+                botoes += `<button onclick="abrirModalSenha('Seita', 'bloqueado.jpg', 'imagem')" class="btn-popup" style="background:#2E8B57;">🔍 Descobrir</button>`;
+            }
+
+            // --- FLORESTA DOS SONHOS (ATUALIZADO) ---
+            else if (nome === "Floresta dos Sonhos") {
+                if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Local</button>`;
+                // Senha: perdido (Botão verde padrão)
+                botoes += `<button onclick="abrirModalSenha('perdido', 'bloqueado.jpg', 'imagem')" class="btn-popup" style="background:#2E8B57;">🔍 Descobrir</button>`;
             }
 
             // --- PADRÃO ---
@@ -1652,25 +1676,29 @@ if (nomeDoMapa === 'Planos.jpg') {
         criarPonto([2370, 3767], "Capital Imperial", "A Casa do Império", "Capital.png", 'imagem');
         criarPonto([1648, 4438], "Cidade Sagrada", "Cidade Santa.png", 'imagem');
         criarPonto([2862, 2890], "Torre dos Sábios", "Torre dos Sabios.png", 'imagem');
-        criarPonto([1188, 5574], "Ilha Paradisíaca", "ilha 2.png", 'imagem'); // PONTO DA ILHA
+        criarPonto([1188, 5574], "Ilha Paradisíaca", "ilha 2.png", 'imagem');
         
         criarPonto([1830, 2322], "Vilarejo", "cidade da raça lá.png", 'imagem');
         criarPonto([2114, 3854], "Vilarejo", "vilarejo.png", 'imagem');
         criarPonto([2142, 3254], "Vilarejo", "vilarejo 2.jpg", 'imagem');
         criarPonto([1758, 4620], "Vilarejo", "vilarejo 3.jpg", 'imagem');
+        
         criarPonto([2252, 2880], "Pântano", "pantano.png", 'imagem');
         criarPonto([2138, 2890], "Pântano", "pantano.png", 'imagem');
         criarPonto([2228, 3032], "Pântano", "pantano.png", 'imagem');
         criarPonto([2220, 2656], "Pântano", "pantano.png", 'imagem');
+        
         criarPonto([2232, 3936], "Vilarejo", null, 'none');
         criarPonto([2300, 3400], "Vilarejo", null, 'none');
         criarPonto([1830, 4354], "Vilarejo", null, 'none');
         criarPonto([1630, 3054], "Vilarejo", null, 'none');
         criarPonto([2464, 4974], "Ilha de Blat'khyr", "Cadê?", "Ilha.png", 'imagem');
+        
         criarPonto([1838, 3526], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         criarPonto([1750, 3320], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         criarPonto([1536, 3634], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         criarPonto([2070, 3642], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
+        
         criarPonto([3912, 1780], "Inverno Desolado", null, 'none', true);
     }
     // Inicialização
