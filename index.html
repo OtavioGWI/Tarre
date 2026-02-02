@@ -270,7 +270,7 @@
 
     // --- FUNÇÕES DE NAVEGAÇÃO E SISTEMA ---
 
-    // 1. Inicializa o mapa (Limpa e cria novo)
+// --- 2. INICIALIZAÇÃO DO MAPA (COM BOTÃO PERSISTENTE) ---
     function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
         if (map) { map.remove(); } 
 
@@ -284,26 +284,45 @@
             maxZoom: maxZoom,
             maxBounds: limitesNavegacao, 
             maxBoundsViscosity: 0.5,     
-            tap: false 
+            tap: false,
+            zoomControl: false // Opcional: Se quiser mover o zoom, avise
         });
+
+        // Adiciona o Zoom num lugar padrão (já que removemos acima para testar, se sumir o zoom apague a linha zoomControl: false)
+        L.control.zoom({ position: 'topleft' }).addTo(map);
 
         L.imageOverlay(arquivo, limitesImagem).addTo(map);
         map.fitBounds(limitesImagem);
         
-        // LÓGICA DO CLIQUE PARA COORDENADAS
+        // --- 1. LÓGICA DO CLIQUE ---
         map.on('click', function(e) {
             if (modoCoordenadas) {
                 const y = e.latlng.lat.toFixed(0);
                 const x = e.latlng.lng.toFixed(0);
-                
-                L.popup()
-                    .setLatLng(e.latlng)
-                    .setContent(`Coordenadas: [${y}, ${x}]`)
-                    .openOn(map);
-                
+                L.popup().setLatLng(e.latlng).setContent(`Coordenadas: [${y}, ${x}]`).openOn(map);
                 console.log(`[${y}, ${x}]`); 
             }
         });
+
+        // --- 2. BOTÃO FLUTUANTE NO MAPA ---
+        const CoordsControl = L.Control.extend({
+            options: { position: 'bottomright' }, // Canto inferior direito
+            onAdd: function() {
+                const btn = L.DomUtil.create('button', '');
+                btn.id = 'btn-coords-mapa'; // ID para a gente achar ele depois
+                btn.style.cssText = "padding:8px 12px; border-radius:5px; cursor:pointer; font-weight:bold; font-size:12px; margin-right: 10px; margin-bottom: 10px;";
+                
+                // Define a cor inicial baseada no estado atual
+                atualizarVisualBotao(btn);
+
+                btn.onclick = function(e) {
+                    L.DomEvent.stopPropagation(e); // Não clica no mapa
+                    alternarCoordenadas();
+                };
+                return btn;
+            }
+        });
+        map.addControl(new CoordsControl());
     }
 
     // 2. Alterna menu no celular
@@ -347,25 +366,32 @@
         verImagemEstatica('bloqueado.jpg');
     }
 
-    function alternarCoordenadas() {
-        modoCoordenadas = !modoCoordenadas; // Inverte (ligado/desligado)
+function alternarCoordenadas() {
+        modoCoordenadas = !modoCoordenadas; // Inverte o valor
         
-        const btn = document.getElementById('btn-coords-menu');
+        // Atualiza o botão do Menu Lateral (se existir)
+        const btnMenu = document.getElementById('btn-coords-menu');
+        atualizarVisualBotao(btnMenu);
+
+        // Atualiza o botão Flutuante do Mapa (se existir)
+        const btnMapa = document.getElementById('btn-coords-mapa');
+        atualizarVisualBotao(btnMapa);
+    }
+
+    // Função auxiliar para mudar a cor dos botões
+    function atualizarVisualBotao(btn) {
+        if (!btn) return;
         
-        if (btn) {
-            if (modoCoordenadas) {
-                // Visual quando está LIGADO (Verde)
-                btn.innerHTML = "📍 Coords: ON";
-                btn.style.background = "#27ae60"; 
-                btn.style.color = "white";
-                btn.style.border = "1px solid #2ecc71";
-            } else {
-                // Visual quando está DESLIGADO (Cinza/Transparente)
-                btn.innerHTML = "📍 Coords: OFF";
-                btn.style.background = "transparent"; 
-                btn.style.color = "#aaa";
-                btn.style.border = "1px solid #444";
-            }
+        if (modoCoordenadas) {
+            btn.innerHTML = "📍 Coords: ON";
+            btn.style.background = "#27ae60"; 
+            btn.style.color = "white";
+            btn.style.border = "1px solid #2ecc71";
+        } else {
+            btn.innerHTML = "📍 Coords: OFF";
+            btn.style.background = "rgba(0,0,0,0.7)"; 
+            btn.style.color = "#aaa";
+            btn.style.border = "1px solid #444";
         }
     }
 
