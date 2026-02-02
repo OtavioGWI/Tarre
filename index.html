@@ -233,8 +233,8 @@
         </div>
     </div>
 
-    <div id="menu-provincias">
-        <h3 onclick="alternarMenuMobile()">Províncias <span id="seta-menu">▼</span></h3>
+<div id="menu-provincias">
+        <h3 onclick="alternarMenuMobile()">Menu Principal <span id="seta-menu">▼</span></h3>
         <div id="lista-botoes-provincia">
             <button class="botao-provincia" onclick="abrirMapaProvincia('Hukmal_tep.jpg')">Hukmal'tep</button>
             <button class="botao-provincia" onclick="abrirMapaProvincia('Blat_khyr.jpg')">Blat'khyr</button>
@@ -242,6 +242,13 @@
             <button class="botao-provincia" onclick="abrirMapaProvincia('Lago.jpg')">Lago</button>
             <button class="botao-provincia" onclick="abrirMapaProvincia('Alcova.jpg')">Alcova</button>
             <button class="botao-provincia" onclick="abrirMapaProvincia('Espinha do Gigante.jpg')">Espinha do Gigante</button>
+            
+            <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
+            <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">COSMOLOGIA</div>
+            <button class="botao-provincia" onclick="abrirPlanos()" style="color: #aeb6bf;">🌌 Outros Planos</button>
+
+            <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
+            <button id="btn-coords-menu" class="botao-provincia" onclick="alternarCoordenadas()" style="color: #aaa;">📍 Coords: OFF</button>
         </div>
     </div>
 
@@ -252,13 +259,18 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-   // --- 1. CONFIGURAÇÕES TÉCNICAS ---
+// --- 1. CONFIGURAÇÕES TÉCNICAS ---
     const configContinental = { arquivo: 'Mapa teste.png', largura: 7680, altura: 4320, minZoom: -2.0, maxZoom: 3 };
     const configProvincia = { largura: 2048, altura: 1536, minZoom: -1.0, maxZoom: 2 };
+    
+    // --- VARIÁVEIS GLOBAIS ---
     let map; 
     let mapaAtualAtivo = 'continente';
+    let modoCoordenadas = false; // Variável global importante
 
-    // --- 2. INICIALIZAÇÃO DO MAPA ---
+    // --- FUNÇÕES DE NAVEGAÇÃO E SISTEMA ---
+
+    // 1. Inicializa o mapa (Limpa e cria novo)
     function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
         if (map) { map.remove(); } 
 
@@ -277,9 +289,24 @@
 
         L.imageOverlay(arquivo, limitesImagem).addTo(map);
         map.fitBounds(limitesImagem);
+        
+        // LÓGICA DO CLIQUE PARA COORDENADAS
+        map.on('click', function(e) {
+            if (modoCoordenadas) {
+                const y = e.latlng.lat.toFixed(0);
+                const x = e.latlng.lng.toFixed(0);
+                
+                L.popup()
+                    .setLatLng(e.latlng)
+                    .setContent(`Coordenadas: [${y}, ${x}]`)
+                    .openOn(map);
+                
+                console.log(`[${y}, ${x}]`); 
+            }
+        });
     }
 
-    // --- 3. LÓGICA DO MENU CELULAR ---
+    // 2. Alterna menu no celular
     function alternarMenuMobile() {
         if (window.innerWidth > 600) return;
         const lista = document.getElementById('lista-botoes-provincia');
@@ -294,7 +321,7 @@
         }
     }
 
-    // --- 4. NAVEGAÇÃO ---
+    // 3. Carrega o mapa principal (Continente)
     function carregarMapaPrincipal() {
         mapaAtualAtivo = 'continente';
         document.getElementById('map-container').style.display = 'block';
@@ -310,7 +337,39 @@
 
         inicializarMapa(configContinental.arquivo, configContinental.largura, configContinental.altura, configContinental.minZoom, configContinental.maxZoom);
         adicionarMarcadoresPrincipais();
+    } // <--- AQUI FECHA A FUNÇÃO carregarMapaPrincipal (Isso estava faltando no seu código anterior)
+
+    // --- FUNÇÕES DOS BOTÕES EXTRAS (Agora fora de qualquer outra função) ---
+
+    function abrirPlanos() {
+        // Tenta abrir uma imagem chamada 'bloqueado.jpg'. 
+        // Se você não tiver essa imagem na pasta, vai ficar uma tela cinza vazia.
+        verImagemEstatica('bloqueado.jpg');
     }
+
+    function alternarCoordenadas() {
+        modoCoordenadas = !modoCoordenadas; // Inverte (ligado/desligado)
+        
+        const btn = document.getElementById('btn-coords-menu');
+        
+        if (btn) {
+            if (modoCoordenadas) {
+                // Visual quando está LIGADO (Verde)
+                btn.innerHTML = "📍 Coords: ON";
+                btn.style.background = "#27ae60"; 
+                btn.style.color = "white";
+                btn.style.border = "1px solid #2ecc71";
+            } else {
+                // Visual quando está DESLIGADO (Cinza/Transparente)
+                btn.innerHTML = "📍 Coords: OFF";
+                btn.style.background = "transparent"; 
+                btn.style.color = "#aaa";
+                btn.style.border = "1px solid #444";
+            }
+        }
+    }
+
+    // ... (O resto do seu código: dadosProvincias, dadosCapital, etc. continua igual abaixo)
 
     // --- 5. BANCO DE DADOS (TEXTOS COMPLETOS RESTAURADOS) ---
     const dadosProvincias = {
@@ -945,7 +1004,7 @@ function verImagemEstatica(arquivo) {
         }
     }
 
-    // --- 7. MARCADORES DO CONTINENTE ---
+// --- 7. MARCADORES DO CONTINENTE ---
     function adicionarMarcadoresPrincipais() {
         const iconP = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [80, 80], iconAnchor: [40, 40], popupAnchor: [0, -40]});
         const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [120, 120], iconAnchor: [60, 60], popupAnchor: [0, -60]});
@@ -966,7 +1025,7 @@ function verImagemEstatica(arquivo) {
             const m = L.marker(coord, { icon: grande ? iconG : iconP, opacity: 0 }).addTo(map);
             let botoes = "";
 
-// --- LÓGICA ESPECIAL PARA A CAPITAL ---
+            // --- LÓGICA ESPECIAL PARA A CAPITAL ---
             if (nome === "Capital Imperial") {
                 if (arquivo) {
                     botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Cidade</button>`;
@@ -974,17 +1033,27 @@ function verImagemEstatica(arquivo) {
                 botoes += `<button onclick="menuCapital('esquadrao')" class="btn-popup" style="background:#2c3e50; margin-bottom:5px;">🛡️ Ver Esquadrão</button>`;
                 botoes += `<button onclick="menuCapital('procurados')" class="btn-popup" style="background:#8b0000; margin-bottom:5px;">☠️ Procurados</button>`;
                 botoes += `<button onclick="menuCapital('historico')" class="btn-popup" style="background:#5e2f0d; margin-bottom:5px;">📜 Histórico</button>`;
-                // NOVO BOTÃO:
                 botoes += `<button onclick="menuCapital('boatos')" class="btn-popup" style="background:#4b0082;">🗣️ Boatos</button>`;
             }
-            // --- LÓGICA PADRÃO ---
+            
+            // --- LÓGICA ESPECIAL PARA A TORRE DOS SÁBIOS (NOVO) ---
+            else if (nome === "Torre dos Sábios") {
+                // Botão para ver a foto externa (se existir)
+                if (arquivo) {
+                    botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Exterior</button>`;
+                }
+                // Botão Bloqueado para o interior
+                botoes += `<button onclick="verImagemEstatica('bloqueado.jpg')" class="btn-popup" style="background:#483D8B;">🔮 Acessar Interior</button>`;
+            }
+
+            // --- LÓGICA PADRÃO PARA O RESTO ---
             else {
                 if (tipo === 'mapa') {
                     botoes = `<button onclick="abrirMapaProvincia('${arquivo}')" class="btn-popup">Explorar Província</button>`;
                 } else if (tipo === 'imagem') {
                     botoes = `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup">Ver Foto</button>`;
                 } else {
-                    botoes = `<span style="color:#aaa; font-style:italic;">Sem detalhes visuais.</span>`;
+                    botoes = `<span style="color:#aaa; font-style:italic;">Sem detalhes.</span>`;
                 }
             }
 
@@ -1006,11 +1075,14 @@ function verImagemEstatica(arquivo) {
         criarPonto([2250, 4258], "Espinha do Gigante", "As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
         criarPonto([2142, 4378], "Espinha do Gigante","As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
         
-        // CAPITAL IMPERIAL (Agora com o menu especial)
+        // CAPITAL IMPERIAL
         criarPonto([2370, 3767], "Capital Imperial", "A Casa do Império", "Capital.png", 'imagem');
 
         criarPonto([1648, 4438], "Cidade Sagrada", "Cidade Santa.png", 'imagem');
+        
+        // TORRE DOS SÁBIOS (Agora com o botão especial)
         criarPonto([2862, 2890], "Torre dos Sábios", "Torre dos Sabios.png", 'imagem');
+        
         criarPonto([1188, 5574], "Ilha Paradisíaca", "ilha 2.png", 'imagem');
         criarPonto([1830, 2322], "Vilarejo", "cidade da raça lá.png", 'imagem');
         criarPonto([2114, 3854], "Vilarejo", "vilarejo.png", 'imagem');
