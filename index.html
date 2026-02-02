@@ -284,7 +284,7 @@
             
             <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
             <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">COSMOLOGIA</div>
-            <button class="botao-provincia" onclick="abrirPlanos()" style="color: #aeb6bf;">🌌 Outros Planos</button>
+            <button class="botao-provincia" onclick="abrirModalSenha('portal', 'bloqueado.jpg', 'imagem')" style="color: #aeb6bf;">🌌 Outros Planos</button>
 
             <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
             <button id="btn-coords-menu" class="botao-provincia" onclick="alternarCoordenadas()" style="color: #aaa;">📍 Coords: OFF</button>
@@ -415,19 +415,16 @@
 
     // --- FUNÇÕES DOS BOTÕES EXTRAS (Agora fora de qualquer outra função) ---
 
-    function abrirPlanos() {
-        // Tenta abrir uma imagem chamada 'bloqueado.jpg'. 
-        // Se você não tiver essa imagem na pasta, vai ficar uma tela cinza vazia.
-        verImagemEstatica('bloqueado.jpg');
-    }
-// --- VARIÁVEIS PARA O SISTEMA DE SENHA ---
+// --- VARIÁVEIS PARA O SISTEMA DE SENHA (CORRIGIDO) ---
     let senhaCorretaAtual = "";
-    let mapaDestinoAtual = "";
+    let destinoAposSenha = ""; // Substitui o antigo 'mapaDestinoAtual'
+    let tipoAcaoSenha = "mapa"; // Variável nova para controlar se abre mapa ou foto
 
-    // 1. Abre a janela bonita
-    function abrirModalSenha(senha, destino) {
+    // 1. Abre a janela de senha
+    function abrirModalSenha(senha, destino, tipo = 'mapa') {
         senhaCorretaAtual = senha;
-        mapaDestinoAtual = destino;
+        destinoAposSenha = destino; // Salva o destino na variável certa
+        tipoAcaoSenha = tipo;       // Salva o tipo de ação
         
         // Limpa o campo e esconde erro anterior
         document.getElementById('input-senha-rpg').value = "";
@@ -440,7 +437,7 @@
         document.getElementById('input-senha-rpg').focus();
     }
 
-// --- FUNÇÃO DE VERIFICAÇÃO (SEM POPUPS DO NAVEGADOR) ---
+    // 2. Verifica a senha
     function verificarSenha() {
         const input = document.getElementById('input-senha-rpg');
         const msgArea = document.getElementById('msg-erro-senha');
@@ -448,40 +445,116 @@
         // Verifica a senha (ignora maiúsculas/minúsculas)
         if (input.value && input.value.toLowerCase() === senhaCorretaAtual.toLowerCase()) {
             
-            // 1. Mostra mensagem de SUCESSO (Verde) dentro da janela
+            // SUCESSO
             msgArea.style.display = 'block';
-            msgArea.style.color = '#2ecc71'; // Verde brilhante
-            msgArea.innerHTML = "✨ As águas se abrem... Acesso concedido!";
+            msgArea.style.color = '#2ecc71'; 
+            msgArea.innerHTML = "✨ Acesso concedido!";
             
-            // 2. Trava o campo para não digitar mais nada
             input.disabled = true;
 
-            // 3. Espera 1.5 segundos para lerem a mensagem e troca o mapa
+            // Espera 1.5s e executa a ação
             setTimeout(() => {
-                // Fecha o modal
                 document.getElementById('modal-senha').style.display = 'none';
                 
-                // Reseta a janela para a próxima vez
+                // Reseta visual
                 input.value = "";
                 input.disabled = false;
                 msgArea.style.display = 'none';
-                msgArea.style.color = '#ff4444'; // Volta para vermelho (padrão de erro)
+                msgArea.style.color = '#ff4444'; 
                 
-                // VAI PARA O NOVO MAPA
-                abrirMapaProvincia(mapaDestinoAtual);
+                // DECIDE A AÇÃO (MAPA OU IMAGEM) USANDO A VARIÁVEL CERTA
+                if (tipoAcaoSenha === 'imagem') {
+                    verImagemEstatica(destinoAposSenha);
+                } else {
+                    abrirMapaProvincia(destinoAposSenha);
+                }
+
             }, 1500);
 
         } else {
-            // 1. Mostra mensagem de ERRO (Vermelho)
+            // ERRO
             msgArea.style.display = 'block';
             msgArea.style.color = '#ff4444';
-            msgArea.innerHTML = "A senha está incorreta. Espere descobrir a senha. PARA DE TENTAR ALEATORIAMENTE, obrigado!";
+            msgArea.innerHTML = "Senha incorreta. Por favor AGUARDE descobrirem essa área.";
             
-            // 2. Efeito visual de erro (Borda vermelha pisca)
             input.style.borderColor = "red";
             setTimeout(() => input.style.borderColor = "#8b4513", 500);
+            input.select(); 
+        }
+    }
+
+    // 3. Fecha o modal
+    function fecharModalSenha() {
+        document.getElementById('modal-senha').style.display = 'none';
+    }
+
+    // 4. Atalho Enter
+    const inputSenha = document.getElementById('input-senha-rpg');
+    if (inputSenha) {
+        inputSenha.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                verificarSenha();
+            }
+        });
+    }
+    // 1. Abre a janela bonita (Agora aceita o tipo de ação)
+    function abrirModalSenha(senha, destino, tipo = 'mapa') {
+        senhaCorretaAtual = senha;
+        destinoAposSenha = destino;
+        tipoAcaoSenha = tipo;
+        
+        // Limpa o campo e esconde erro anterior
+        document.getElementById('input-senha-rpg').value = "";
+        document.getElementById('msg-erro-senha').style.display = 'none';
+        
+        // Mostra o modal
+        document.getElementById('modal-senha').style.display = 'flex';
+        
+        // Foca no input para digitar direto
+        document.getElementById('input-senha-rpg').focus();
+    }
+
+    // --- FUNÇÃO DE VERIFICAÇÃO (ATUALIZADA) ---
+    function verificarSenha() {
+        const input = document.getElementById('input-senha-rpg');
+        const msgArea = document.getElementById('msg-erro-senha');
+        
+        // Verifica a senha (ignora maiúsculas/minúsculas)
+        if (input.value && input.value.toLowerCase() === senhaCorretaAtual.toLowerCase()) {
             
-            // Foca e seleciona o texto para digitar de novo rápido
+            // 1. Mostra mensagem de SUCESSO
+            msgArea.style.display = 'block';
+            msgArea.style.color = '#2ecc71'; 
+            msgArea.innerHTML = "✨ Acesso concedido!"; // Mensagem genérica
+            
+            input.disabled = true;
+
+            // 3. Espera 1.5 segundos e executa a ação correta
+            setTimeout(() => {
+                document.getElementById('modal-senha').style.display = 'none';
+                
+                input.value = "";
+                input.disabled = false;
+                msgArea.style.display = 'none';
+                msgArea.style.color = '#ff4444'; 
+                
+                // LÓGICA NOVA: Decide se abre mapa ou imagem
+                if (tipoAcaoSenha === 'imagem') {
+                    verImagemEstatica(destinoAposSenha);
+                } else {
+                    abrirMapaProvincia(destinoAposSenha);
+                }
+
+            }, 1500);
+
+        } else {
+            // Erro
+            msgArea.style.display = 'block';
+            msgArea.style.color = '#ff4444';
+            msgArea.innerHTML = "Senha incorreta. Por favor AGUARDE vocês descobrirem a senha.";
+            
+            input.style.borderColor = "red";
+            setTimeout(() => input.style.borderColor = "#8b4513", 500);
             input.select(); 
         }
     }
@@ -1163,7 +1236,8 @@ function verImagemEstatica(arquivo) {
         }
 
         if (nomeDoMapa === 'Blat_khyr.jpg') {
-           const btnEscola = `<button onclick="verImagemEstatica('bloqueado.jpg')" class="btn-popup" style="background:#800080;">🎓 Escola de Magia</button>`;
+           // ATUALIZADO: Pede senha "poder", se acertar abre "bloqueado.jpg"
+            const btnEscola = `<button onclick="abrirModalSenha('poder', 'bloqueado.jpg', 'imagem')" class="btn-popup" style="background:#800080;">🎓 Escola de Magia</button>`;
             criarPontoLocal([382, 1359], "Capital de Blat'khyr", "Elfos", "cidade magica.png", true, btnEscola);
             criarPontoLocal([986, 1239], "Vilarejo", "Desconhecido");
             criarPontoLocal([1091, 606], "Vilarejo", "Desconhecido");
@@ -1240,7 +1314,8 @@ function verImagemEstatica(arquivo) {
             criarPontoLocal([1366, 1578], "Cidade Sagrada", "Igreja dos 12 Deuses", "Cidade Santa.png", true, btnPanteao);
             criarPontoLocal([1336, 1740], "Cidade Sagrada", "Igreja dos 12 Deuses", "Cidade Santa.png", true, btnPanteao);
             criarPontoLocal([446, 1336], "Vilarejo", "Dinastia Xogum");
-            criarPontoLocal( [180, 912], "Cidade", "Dinastia Xogum", "cidade lago 1.png", true); //imagem com porto
+            const btnNinja = `<button onclick="abrirModalSenha('ninja', 'bloqueado.jpg', 'imagem')" class="btn-popup" style="background: #2E8B57; border: 1px solid #555; margin-top: 5px;">🔍 Descobrir</button>`;
+            criarPontoLocal([180, 912], "Cidade", "Dinastia Xogum", "cidade lago 1.png", true, btnNinja);
             criarPontoLocal([898, 1908], "Cidade", "Dinastia Kemono", "capital do lago.png", true); 
             criarPontoLocal([726, 1366], "Cidade", "Dinastia Kemono", "cidade lago 2.png", true); //imagem beira do lago
             criarPontoLocal([948, 1672], "Vilarejo", "Dinastia Kemono");
@@ -1352,10 +1427,13 @@ if (nomeDoMapa === 'Mar.jpg') {
                 botoes += `<button onclick="menuDeuses()" class="btn-popup" style="background:#4682B4;">⚡ Panteão</button>`;
             }
 
-            // --- TORRE DOS SÁBIOS ---
+// --- TORRE DOS SÁBIOS ---
             else if (nome === "Torre dos Sábios") {
-                if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Exterior</button>`;
-                botoes += `<button onclick="verImagemEstatica('bloqueado.jpg')" class="btn-popup" style="background:#483D8B;">🔮 Acessar Interior</button>`;
+                if (arquivo) {
+                    botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Exterior</button>`;
+                }
+                // ATUALIZADO: Pede senha "fofoca", se acertar abre "bloqueado.jpg"
+                botoes += `<button onclick="abrirModalSenha('fofoca', 'bloqueado.jpg', 'imagem')" class="btn-popup" style="background:#483D8B;">🔮 Acessar Interior</button>`;
             }
 
             // --- PADRÃO ---
