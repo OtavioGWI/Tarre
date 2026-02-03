@@ -126,18 +126,6 @@
         padding-left: 18px; /* Efeito de deslize */
         color: #fff;
     }
-/* Classe que mantém o botão verde e ignora o brilho marrom quando ativo */
-.btn-ferramenta-ativa {
-    background-color: #27ae60 !important;
-    color: white !important;
-    border-color: #2ecc71 !important;
-}
-
-/* Mantém verde mesmo com o mouse em cima */
-.btn-ferramenta-ativa:hover {
-    background-color: #2ecc71 !important;
-    padding-left: 15px;
-}
 
     /* --- VOLTANDO O ESTILO ORIGINAL DO MENU --- */
     .botao-provincia {
@@ -148,12 +136,45 @@
         text-align: left; cursor: pointer;
         transition: 0.3s;
     }
-/* O menu lateral não muda mais de cor ao passar o mouse, apenas o texto realça */
-    .botao-provincia:hover {
-        color: white !important;
-        padding-left: 15px; /* Mantém apenas o leve deslize */
-        background: transparent !important; /* Força o fundo a continuar transparente */
-    }
+
+
+/* 2. Regra para travar os botões de ferramentas (Coords e Medir) */
+/* Isso remove o brilho marrom e o deslize apenas deles */
+#btn-coords-menu:hover, #btn-coords-prov:hover,
+#btn-medidor:hover, #btn-medidor-prov:hover {
+    background: transparent !important;
+    border-color: #444 !important;
+    color: #ddd !important;
+    padding-left: 10px !important;
+}
+
+/* 1. Efeito de brilho marrom APENAS para botões normais (Províncias e Voltar) */
+.botao-provincia:hover {
+    background: #8b4513 !important;
+    color: white !important;
+    border-color: #46362f !important;
+}
+
+/* 2. Trava os botões de Ferramentas para NÃO brilharem nem deslizarem quando estão OFF */
+#btn-coords-menu:hover, #btn-coords-prov:hover,
+#btn-medidor:hover, #btn-medidor-prov:hover {
+    background: transparent !important;
+    border-color: #444 !important;
+    color: #ddd !important;
+    padding-left: 10px !important; /* Trava o deslize */
+}
+
+/* 3. PRIORIDADE TOTAL: Se estiver ON, fica verde e ignora qualquer outro hover ou cor */
+.btn-ferramenta-ativa, 
+.btn-ferramenta-ativa:hover,
+#btn-coords-menu.btn-ferramenta-ativa:hover, #btn-coords-prov.btn-ferramenta-ativa:hover,
+#btn-medidor.btn-ferramenta-ativa:hover, #btn-medidor-prov.btn-ferramenta-ativa:hover {
+    background-color: #27ae60 !important;
+    color: white !important;
+    border-color: #2ecc71 !important;
+    padding-left: 10px !important; /* Mantém parado mesmo verde */
+}
+
     /* CONTAINER DA FOTO ESTÁTICA */
     #provincia-container {
         display: none;
@@ -687,24 +708,19 @@ function alternarCoordenadas() {
 
     // Função auxiliar para mudar a cor dos botões
 function atualizarVisualBotao() {
-    const botoes = [
-        document.getElementById('btn-coords-menu'), 
-        document.getElementById('btn-coords-prov')
-    ];
+    const botoes = [document.getElementById('btn-coords-menu'), document.getElementById('btn-coords-prov')];
 
     botoes.forEach(btn => {
-        if (btn) {
-            if (modoCoordenadas) {
-                btn.innerHTML = "📍 Coords: ON";
-                btn.classList.add('btn-ferramenta-ativa');
-            } else {
-                btn.innerHTML = "📍 Coords: OFF";
-                btn.classList.remove('btn-ferramenta-ativa');
-            }
+        if (!btn) return;
+        if (modoCoordenadas) {
+            btn.innerHTML = "📍 Coords: ON";
+            btn.classList.add('btn-ferramenta-ativa');
+        } else {
+            btn.innerHTML = "📍 Coords: OFF";
+            btn.classList.remove('btn-ferramenta-ativa');
         }
     });
 }
-
     // ... (O resto do seu código: dadosProvincias, dadosCapital, etc. continua igual abaixo)
 
     // --- 5. BANCO DE DADOS (TEXTOS COMPLETOS RESTAURADOS) ---
@@ -1882,22 +1898,16 @@ if (nomeDoMapa === 'Planos.jpg') {
 
     // Função para controlar os botões (Menu e Mapa)
 function atualizarBotaoMedidor(estado) {
-    // Procura os dois botões (do menu principal e do menu da província)
-    const botoes = [
-        document.getElementById('btn-medidor'), 
-        document.getElementById('btn-medidor-prov')
-    ];
-    
+    const botoes = [document.getElementById('btn-medidor'), document.getElementById('btn-medidor-prov')];
     let texto = (estado === 'medindo') ? "🏁 Finalizar Rota" : "📏 Calculadora de Viagem";
 
     botoes.forEach(btn => {
-        if (btn) {
-            btn.innerHTML = texto;
-            if (estado === 'medindo') {
-                btn.classList.add('btn-ferramenta-ativa');
-            } else {
-                btn.classList.remove('btn-ferramenta-ativa');
-            }
+        if (!btn) return;
+        btn.innerHTML = texto;
+        if (estado === 'medindo') {
+            btn.classList.add('btn-ferramenta-ativa');
+        } else {
+            btn.classList.remove('btn-ferramenta-ativa');
         }
     });
 }
