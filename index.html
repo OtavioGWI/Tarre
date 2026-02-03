@@ -70,6 +70,31 @@
     #seta-menu { display: none; }
     #lista-botoes-provincia { display: block; }
 
+/* --- ESTILO DOS BOTÕES DOS POPUPS --- */
+    .botao-estiloso {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 6px;
+        padding: 10px 12px;
+        background: rgba(30, 30, 30, 0.95); 
+        color: #e0e0e0;
+        border: none;
+        border-left: 4px solid #555; /* A cor muda no JS */
+        text-align: left;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .botao-estiloso:hover {
+        background: #444;
+        padding-left: 18px; /* Efeito de deslize */
+        color: #fff;
+    }
+
+    /* --- VOLTANDO O ESTILO ORIGINAL DO MENU --- */
     .botao-provincia {
         display: block; width: 100%;
         padding: 10px; margin: 5px 0;
@@ -303,11 +328,11 @@
         
         <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">PROVÍNCIAS</div>
 
-        <button class="botao-provincia" onclick="abrirMapaProvincia('Hukmal_tep.jpg')">Hukmal'tep</button>
-        <button class="botao-provincia" onclick="abrirMapaProvincia('Blat_khyr.jpg')">Blat'khyr</button>
-        <button class="botao-provincia" onclick="abrirMapaProvincia('Deserto.jpg')">Deserto</button>
-        <button class="botao-provincia" onclick="abrirMapaProvincia('Lago.jpg')">Lago</button>
-        <button class="botao-provincia" onclick="abrirMapaProvincia('Alcova.jpg')">Alcova</button>
+            <button class="botao-provincia" onclick="abrirMapaProvincia('Hukmal_tep.jpg')">❄️ Hukmal'tep</button>
+            <button class="botao-provincia" onclick="abrirMapaProvincia('Blat_khyr.jpg')">🍂 Blat'khyr</button>
+            <button class="botao-provincia" onclick="abrirMapaProvincia('Deserto.jpg')">🏜️ Deserto</button>
+            <button class="botao-provincia" onclick="abrirMapaProvincia('Lago.jpg')">⛩️ Lago</button>
+            <button class="botao-provincia" onclick="abrirMapaProvincia('Alcova.jpg')">🏴‍☠️ Alcova</button>
         
         <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
         
@@ -366,6 +391,11 @@
     let planoSelecionado = null; 
     let modoCoordenadas = false;
     let fatorEscala = 0.23;
+
+// Função para gerar o HTML do botão elegante
+    function criarBtn(texto, acao, corBarra) {
+        return `<button onclick="${acao}" class="botao-estiloso" style="border-left-color: ${corBarra};">${texto}</button>`;
+    }
 
     // --- VARIÁVEIS DA CALCULADORA ---
     // AQUI ESTAVA O ERRO: Faltava criar o grupoRota
@@ -1434,17 +1464,15 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
     const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [100, 100], iconAnchor: [50, 50], popupAnchor: [0, -50]});
 
     // --- FUNÇÃO INTERNA PADRÃO (Para mapas normais) ---
-    function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoExtra = null) {
+function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoExtra = null) {
         const m = L.marker(coord, {icon: grande ? iconG : iconP, opacity: 0}).addTo(map);
-        let popupHtml = `<div style="text-align:center;"><b>${nome}</b><br><small>${info}</small>`;
-        if (foto) {
-            popupHtml += `<div style="margin-top: 10px;"><button onclick="verImagemEstatica('${foto}')" class="btn-popup">Ver Foto</button></div>`;
-        }
-        if (botaoExtra) {
-            popupHtml += `<div style="margin-top: 5px;">${botaoExtra}</div>`;
-        }
-        popupHtml += `</div>`;
-        m.bindPopup(popupHtml);
+        let htmlBotoes = `<div style="margin-top: 8px; display:flex; flex-direction:column;">`;
+        
+        if (foto) htmlBotoes += criarBtn("📸 Ver Foto", `verImagemEstatica('${foto}')`, "#5F9EA0");
+        if (botaoExtra) htmlBotoes += botaoExtra; // Mantém botões manuais como Escola de Magia
+        
+        htmlBotoes += `</div>`;
+        m.bindPopup(`<div style="text-align:center;"><b>${nome}</b><br><small style="color:#ccc;">${info}</small>${htmlBotoes}</div>`);
     }
 
         if (nomeDoMapa === 'Hukmal_tep.jpg') {
@@ -1481,7 +1509,7 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
 
         if (nomeDoMapa === 'Blat_khyr.jpg') {
             // --- PONTO DA ESCOLA DE MAGIA (JÁ EXISTIA) ---
-            const btnEscola = `<button onclick="abrirModalSenha('poder', 'bloqueado.jpg', 'imagem')" class="btn-popup" style="background:#800080;">🎓 Escola de Magia</button>`;
+            const btnEscola = criarBtn("🎓 Escola de Magia", "abrirModalSenha('poder', 'bloqueado.jpg', 'imagem')", "#800080");
             criarPontoLocal([382, 1359], "Capital de Blat'khyr", "Elfos", "cidade magica.png", true, btnEscola);
             
             // --- OUTROS PONTOS ---
@@ -1490,7 +1518,7 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
 
             // --- NOVO: PONTO DAS BRUXAS [1463, 1151] ---
             // 1. Cria o botão com a senha "Bruxas" que abre a imagem "Vila bruxa.png"
-            const btnBruxas = `<button onclick="abrirModalSenha('Bruxas', 'Vila bruxa.png', 'imagem')" class="btn-popup" style="background: #2E8B57; margin-top: 5px;">🔍 Descobrir</button>`;
+            const btnBruxas = criarBtn("🔍 Descobrir", "abrirModalSenha('Bruxas', 'Vila bruxa.png', 'imagem')", "#2E8B57");
             
             // 2. Cria o ponto passando o botão
             criarPontoLocal([1463, 1151], "Vilarejo", "Desconhecido", null, true, btnBruxas);
@@ -1564,11 +1592,11 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
         }
          if (nomeDoMapa === 'Lago.jpg') {
             criarPontoLocal([970, 1152], "Templo do Lago", "Guardiões do Templo", "Templo do lago.png", true);
-            const btnPanteao = `<button onclick="menuDeuses()" class="btn-popup" style="background:#4682B4;">⚡ Panteão</button>`;
+            const btnPanteao = criarBtn("⚡ Panteão", "menuDeuses()", "#4682B4");
             criarPontoLocal([1366, 1578], "Cidade Sagrada", "Igreja dos 12 Deuses", "Cidade Santa.png", true, btnPanteao);
             criarPontoLocal([1336, 1740], "Cidade Sagrada", "Igreja dos 12 Deuses", "Cidade Santa.png", true, btnPanteao);
             criarPontoLocal([446, 1336], "Vilarejo", "Dinastia Xogum");
-            const btnNinja = `<button onclick="abrirModalSenha('ninja', 'bloqueado.jpg', 'imagem')" class="btn-popup" style="background: #2E8B57; border: 1px solid #555; margin-top: 5px;">🔍 Descobrir</button>`;
+            const btnNinja = criarBtn("🔍 Descobrir", "abrirModalSenha('ninja', 'bloqueado.jpg', 'imagem')", "#2E8B57");
             criarPontoLocal([180, 912], "Cidade", "Dinastia Xogum", "cidade lago 1.png", true, btnNinja);
             criarPontoLocal([898, 1908], "Cidade", "Dinastia Kemono", "capital do lago.png", true); 
             criarPontoLocal([726, 1366], "Cidade", "Dinastia Kemono", "cidade lago 2.png", true); //imagem beira do lago
@@ -1612,7 +1640,7 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
             criarPontoLocal(  [333, 1571], "Cidade", "Desconhecido");
             criarPontoLocal( [291, 1628], "Cidade", "Desconhecido");
             criarPontoLocal( [1311, 391], "Cidade", "Desconhecido", "Cidade alcova.jpg", true);
-            const btnDescobrir = `<button onclick="abrirModalSenha('mar', 'Mar.jpg')" class="btn-popup" style="background: #2E8B57; margin-top: 5px;">🔍 Descobrir</button>`;
+            const btnDescobrir = criarBtn("🔍 Descobrir", "abrirModalSenha('mar', 'Mar.jpg')", "#2E8B57");
             criarPontoLocal([1052, 540], "Cidade", "Desconhecido", "Alcova.png", true, btnDescobrir);
             criarPontoLocal( [1131, 688], "Cidade", "Desconhecido", "Alcova 2.png", true);
             criarPontoLocal( [1189, 1455], "Cidade", "Desconhecido", "Alcova 3.png", true);
@@ -1627,7 +1655,7 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
         }
 if (nomeDoMapa === 'Mar.jpg') {
 
-            const btnSubir = `<button onclick="abrirMapaProvincia('Alcova.jpg')" class="btn-popup" style="background: #4682B4;">⬆️ Subir</button>`;
+            const btnSubir = criarBtn("⬆️ Subir", "abrirMapaProvincia('Alcova.jpg')", "#4682B4");
             criarPontoLocal([962, 444], "Túneis", "Passagem de volta para a superfície.", null, true, btnSubir);
             criarPontoLocal([772, 264], "Túneis", "Passagem de volta para a superfície.", null, true, btnSubir);
             criarPontoLocal([720, 948], "Túneis", "Passagem de volta para a superfície.", null, true, btnSubir);
@@ -1651,16 +1679,16 @@ if (nomeDoMapa === 'Planos.jpg') {
         });
 
         // Função Especial para o Nexus (Agora abre MAPAS e tem descrição)
+// Função Especial para o Nexus (Atualizada para o novo estilo)
         function criarPontoNexus(coord, nome, descricao, chaveTexto, arquivoMapa) {
             const m = L.marker(coord, {icon: iconMega, opacity: 0}).addTo(map); 
-            
-            // MUDANÇA AQUI: O botão agora chama 'abrirMapaProvincia' em vez de 'verImagemEstatica'
+
             let botoes = "";
             if (arquivoMapa) {
-                botoes = `<button onclick="abrirMapaProvincia('${arquivoMapa}')" class="btn-popup" style="width: 100%; background: #483D8B;">🗺️ Entrar no Plano</button>`;
+                // Usamos a função criarBtn para o fundo preto com barra roxa (#483D8B)
+                botoes = criarBtn("🗺️ Entrar no Plano", `abrirMapaProvincia('${arquivoMapa}')`, "#483D8B");
             }
 
-            // Popup com descrição de volta
             m.bindPopup(`<div style="text-align:center; width: 180px;"><b>${nome}</b><br><small style="color:#ccc;">${descricao}</small><div style="margin-top:10px;">${botoes}</div></div>`);
 
             m.on('click', function() { selecaoAtual = chaveTexto; });
@@ -1681,7 +1709,9 @@ if (nomeDoMapa === 'Planos.jpg') {
 
         // Mortal -> Volta pro Continente (Mantive o botão verde diferente)
         const m = L.marker([246, 558], {icon: iconMega, opacity: 0}).addTo(map);
-        const btnVoltar = `<button onclick="carregarMapaPrincipal()" class="btn-popup" style="background: #2E8B57; width: 100%;">🌍 Voltar ao Continente</button>`;
+        
+        const btnVoltar = criarBtn("🌍 Voltar ao Continente", "carregarMapaPrincipal()", "#2E8B57");
+       // const btnVoltar = `<button onclick="carregarMapaPrincipal()" class="btn-popup" style="background: #2E8B57; width: 100%;">🌍 Voltar ao Continente</button>`;
         m.bindPopup(`<div style="text-align:center; width: 180px;"><b>Plano Mortal</b><br><small style="color:#ccc;">O mundo material de Arton.</small><div style="margin-top:10px;">${btnVoltar}</div></div>`);
         m.on('click', function() { selecaoAtual = 'mortal'; });
         
@@ -1715,11 +1745,7 @@ if (nomeDoMapa === 'Planos.jpg') {
         const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [120, 120], iconAnchor: [60, 60], popupAnchor: [0, -60]});
 
         function criarPonto(coord, nome, arg3, arg4, arg5) {
-            let descricao = "";
-            let arquivo = "";
-            let tipo = "";
-            let grande = false;
-
+            let descricao = "", arquivo = "", tipo = "", grande = false;
             if (arg3 && (arg3.includes('.png') || arg3.includes('.jpg') || arg3.includes('.webp') || arg3 === null)) {
                 arquivo = arg3; tipo = arg4; grande = arg5 || false;
             } else {
@@ -1727,110 +1753,52 @@ if (nomeDoMapa === 'Planos.jpg') {
             }
 
             const m = L.marker(coord, { icon: grande ? iconG : iconP, opacity: 0 }).addTo(map);
-            let botoes = "";
+            let botoes = `<div style="margin-top:10px; display:flex; flex-direction:column;">`;
 
-            // --- CAPITAL IMPERIAL (Design Minimalista & Elegante) ---
+            // --- LÓGICA ESPECIAL PARA A CAPITAL ---
             if (nome === "Capital Imperial") {
-                
-                // Estilo padrão para todos os botões (Limpo, sem bordas pesadas)
-                const estiloBase = `
-                    display: flex; 
-                    align-items: center;
-                    width: 100%; 
-                    margin-bottom: 6px; 
-                    padding: 10px 12px; 
-                    background: rgba(40, 40, 40, 0.95); 
-                    color: #e0e0e0; 
-                    border: none; 
-                    border-left: 4px solid #555; /* A cor muda aqui */
-                    text-align: left; 
-                    font-size: 14px; 
-                    cursor: pointer;
-                    transition: all 0.2s;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                `;
-
-                // Função auxiliar para gerar o botão com a cor certa na barra lateral
-                function criarBtn(texto, acao, corBarra) {
-                    // O onmouseover muda a cor do fundo levemente para dar feedback visual
-                    return `<button onclick="${acao}" 
-                            class="btn-popup" 
-                            style="${estiloBase} border-left-color: ${corBarra};"
-                            onmouseover="this.style.background='#3d3d3d'; this.style.paddingLeft='15px'" 
-                            onmouseout="this.style.background='rgba(40, 40, 40, 0.95)'; this.style.paddingLeft='12px'">
-                            ${texto}
-                            </button>`;
-                }
-
-                // Título discreto
-                botoes += `<div style="margin-top:10px; display:flex; flex-direction:column;">`;
-
-                // Botões organizados por cor de categoria
-                // Dourado/Amarelo = Lore Importante & Dinheiro
                 botoes += criarBtn("⚜️ <b>Heróis Lendários</b>", "menuCapital('lendas')", "#DAA520");
                 botoes += criarBtn("🏦 Banco Imperial", "menuCapital('banco')", "#ffd700");
-
-                // Azul = Informações Oficiais / Campanha
                 botoes += criarBtn("🛡️ Esquadrão", "menuCapital('esquadrao')", "#4682B4");
                 botoes += criarBtn("📸 Ver Cidade", `verImagemEstatica('${arquivo}')`, "#5F9EA0");
-
-                // Roxo/Vermelho = Informações de Mundo / Perigo
                 botoes += criarBtn("📜 Histórico", "menuCapital('historico')", "#9370DB");
                 botoes += criarBtn("☠️ Procurados", "menuCapital('procurados')", "#8b0000");
                 botoes += criarBtn("🗣️ Boatos", "menuCapital('boatos')", "#800080");
-                
-                // Verde = Natureza/Monstros
                 botoes += criarBtn("📖 Bestiário", "menuCapital('bestiario')", "#2E8B57");
-
-                botoes += `</div>`;
-            }
-            
+            } 
             // --- CIDADE SAGRADA ---
             else if (nome === "Cidade Sagrada") {
-                if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Cidade</button>`;
-                botoes += `<button onclick="menuDeuses()" class="btn-popup" style="background:#4682B4;">⚡ Panteão</button>`;
+                if (arquivo) botoes += criarBtn("📸 Ver Cidade", `verImagemEstatica('${arquivo}')`, "#5F9EA0");
+                botoes += criarBtn("⚡ Panteão", "menuDeuses()", "#4682B4");
             }
-
             // --- TORRE DOS SÁBIOS ---
             else if (nome === "Torre dos Sábios") {
-                if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Exterior</button>`;
-                botoes += `<button onclick="abrirModalSenha('fofoca', 'bloqueado.jpg', 'imagem')" class="btn-popup" style="background:#483D8B;">🔮 Acessar Interior</button>`;
+                if (arquivo) botoes += criarBtn("📸 Ver Exterior", `verImagemEstatica('${arquivo}')`, "#5F9EA0");
+                botoes += criarBtn("🔮 Acessar Interior", `abrirModalSenha('fofoca', 'bloqueado.jpg', 'imagem')`, "#9370DB");
             }
-
-            // --- ILHA PARADISÍACA ---
             else if (nome === "Ilha Paradisíaca") {
-                if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Ilha</button>`;
-                botoes += `<button onclick="verImagemEstatica('bloqueado.jpg')" class="btn-popup" style="background:#FF8C00;">📦 Importação</button>`;
-            }
-
-            // --- PÂNTANO (ATUALIZADO) ---
-            else if (nome === "Pântano") {
-                if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Local</button>`;
-                // Senha: Seita (Botão verde padrão)
-                botoes += `<button onclick="abrirModalSenha('Seita', 'bloqueado.jpg', 'imagem')" class="btn-popup" style="background:#2E8B57;">🔍 Descobrir</button>`;
-            }
-
-            // --- FLORESTA DOS SONHOS (ATUALIZADO) ---
-            else if (nome === "Floresta dos Sonhos") {
-                if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Local</button>`;
-                // Senha: perdido (Botão verde padrão)
-                botoes += `<button onclick="abrirModalSenha('perdido', 'bloqueado.jpg', 'imagem')" class="btn-popup" style="background:#2E8B57;">🔍 Descobrir</button>`;
-            }
-
-            // --- PADRÃO ---
+    if (arquivo) botoes += criarBtn("📸 Ver Ilha", `verImagemEstatica('${arquivo}')`, "#5F9EA0");
+    // Adicionando a Importação com o estilo novo
+    botoes += criarBtn("📦 Importação", "verImagemEstatica('bloqueado.jpg')", "#FF8C00");
+}
+            // --- PONTOS GENÉRICOS (VILAREJOS / PROVÍNCIAS) ---
             else {
-                if (tipo === 'mapa') botoes = `<button onclick="abrirMapaProvincia('${arquivo}')" class="btn-popup">Explorar Província</button>`;
-                else if (tipo === 'imagem') botoes = `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup">Ver Foto</button>`;
-                else botoes = `<span style="color:#aaa; font-style:italic;">Sem detalhes.</span>`;
+                if (arquivo) {
+                    if (tipo === 'mapa') botoes += criarBtn("🗺️ Explorar Província", `abrirMapaProvincia('${arquivo}')`, "#8b4513");
+                    else if (tipo === 'imagem') botoes += criarBtn("📸 Ver Foto", `verImagemEstatica('${arquivo}')`, "#5F9EA0");
+                }
+                
+                if (nome === "Pântano" || nome === "Floresta dos Sonhos") {
+                    let senha = (nome === "Pântano") ? "Seita" : "perdido";
+                    botoes += criarBtn("🔍 Descobrir", `abrirModalSenha('${senha}', 'bloqueado.jpg', 'imagem')`, "#2E8B57");
+                }
             }
 
-            let conteudoPopup = `<div style="text-align:center;"><b>${nome}</b>`;
-            if (descricao) conteudoPopup += `<br><small style="color:#ccc;">${descricao}</small>`;
-            conteudoPopup += `<div style="margin-top: 12px;">${botoes}</div></div>`;
-            m.bindPopup(conteudoPopup);
+            botoes += `</div>`;
+            m.bindPopup(`<div style="text-align:center;"><b>${nome}</b><br><small style="color:#ccc;">${descricao}</small>${botoes}</div>`);
         }
 
-        // PONTOS
+// PONTOS
         criarPonto([824, 2330], "Deserto","A Origem do Mundo", "Deserto.jpg", 'mapa');
         criarPonto([3850, 3580], "Hukmal'tep", "O Inverno Absoluto","Hukmal_tep.jpg", 'mapa');
         criarPonto([2902, 5464], "Blat'khyr", "O Berço da Magia", "Blat_khyr.jpg", 'mapa');
@@ -1854,10 +1822,10 @@ if (nomeDoMapa === 'Planos.jpg') {
         criarPonto([2228, 3032], "Pântano", "pantano.png", 'imagem');
         criarPonto([2220, 2656], "Pântano", "pantano.png", 'imagem');
         
-        criarPonto([2232, 3936], "Vilarejo", null, 'none');
-        criarPonto([2300, 3400], "Vilarejo", null, 'none');
-        criarPonto([1830, 4354], "Vilarejo", null, 'none');
-        criarPonto([1630, 3054], "Vilarejo", null, 'none');
+        criarPonto([2232, 3936], "Vilarejo", "Sem detalhes", 'none');
+        criarPonto([2300, 3400], "Vilarejo", "Sem detalhes", 'none');
+        criarPonto([1830, 4354], "Vilarejo", "Sem detalhes", 'none');
+        criarPonto([1630, 3054], "Vilarejo", "Sem detalhes", 'none');
         criarPonto([2464, 4974], "Ilha de Blat'khyr", "Cadê?", "Ilha.png", 'imagem');
         
         criarPonto([1838, 3526], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
