@@ -482,18 +482,20 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
     L.imageOverlay(arquivo, limitesImagem).addTo(map);
     map.fitBounds(limitesImagem);
     
-    // --- LÓGICA DO CLIQUE UNIFICADA ---
+    // --- LÓGICA DO CLIQUE CORRIGIDA (PERSISTÊNCIA TOTAL) ---
     map.on('click', function(e) {
-        // 1. Se estiver medindo rota
         if (medindo) {
             processarCliqueMedicao(e.latlng);
             return;
         }
 
-        // 2. Se o modo Coordenadas estiver ligado
         if (modoCoordenadas) {
-            // Remove o marcador anterior para colocar o novo
-            if (marcadorTempCoords) map.removeLayer(marcadorTempCoords);
+            // Se já existe um ponto, remove ele para colocar o novo
+            if (marcadorTempCoords) {
+                // Removemos o listener temporariamente para a remoção manual não bugar a lógica
+                marcadorTempCoords.off('popupclose'); 
+                map.removeLayer(marcadorTempCoords);
+            }
 
             const y = e.latlng.lat.toFixed(0);
             const x = e.latlng.lng.toFixed(0);
@@ -501,37 +503,46 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
             // Cria o marcador com o emoji 📍
             marcadorTempCoords = L.marker(e.latlng, { 
                 icon: iconCoords,
-                zIndexOffset: 1000 // Garante que fique acima de outros ícones
+                zIndexOffset: 1000 
             }).addTo(map);
             
-            // Abre o popup
-            marcadorTempCoords.bindPopup(`<b>📍 Coordenadas</b><br>[${y}, ${x}]`).openPopup();
+            // CONFIGURAÇÃO MÁGICA: closeOnClick e autoClose como FALSE
+            marcadorTempCoords.bindPopup(`<b>📍 Coordenadas</b><br>[${y}, ${x}]`, {
+                closeOnClick: false, // Não fecha se você clicar no mapa
+                autoClose: false     // Não fecha se você abrir outro popup (cidades, etc)
+            }).openPopup();
 
-            // SÓ remove se clicar no "X" do popup
+            // Agora ele SÓ vai sumir se clicar no 'X' do popup
             marcadorTempCoords.on('popupclose', function() {
-                if (marcadorTempCoords) {
-                    map.removeLayer(marcadorTempCoords);
-                    marcadorTempCoords = null;
-                }
+                map.removeLayer(marcadorTempCoords);
+                marcadorTempCoords = null;
             });
         }
     });
 }
 
     // 2. Alterna menu no celular
-    function alternarMenuMobile() {
-        if (window.innerWidth > 600) return;
-        const lista = document.getElementById('lista-botoes-provincia');
-        const seta = document.getElementById('seta-menu');
-        const estiloAtual = window.getComputedStyle(lista).display;
-        if (estiloAtual === 'none') {
-            lista.style.display = 'block';
-            seta.innerHTML = '▲';
-        } else {
-            lista.style.display = 'none';
-            seta.innerHTML = '▼';
-        }
+function alternarMenuMobile() {
+    if (window.innerWidth > 600) return;
+    
+    // Identifica qual lista deve ser exibida baseada no mapa atual
+    const listaProv = document.getElementById('lista-botoes-provincia');
+    const listaFerramentas = document.getElementById('lista-ferramentas-regiao');
+    const seta = document.getElementById('seta-menu');
+    
+    // Define qual lista estamos manipulando agora
+    let listaAtiva = (mapaAtualAtivo === 'continente') ? listaProv : listaFerramentas;
+    
+    const estiloAtual = window.getComputedStyle(listaAtiva).display;
+    
+    if (estiloAtual === 'none') {
+        listaAtiva.style.display = 'block';
+        seta.innerHTML = '▲';
+    } else {
+        listaAtiva.style.display = 'none';
+        seta.innerHTML = '▼';
     }
+}
 
 // 3. Carrega o mapa principal (Continente)
     function carregarMapaPrincipal() {
@@ -562,6 +573,12 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
         if (marcadorTempCoords) { map.removeLayer(marcadorTempCoords); marcadorTempCoords = null; }
         inicializarMapa(configContinental.arquivo, configContinental.largura, configContinental.altura, configContinental.minZoom, configContinental.maxZoom);
         adicionarMarcadoresPrincipais();
+        // Adicione isso no FINAL da função abrirMapaProvincia e também no FINAL da carregarMapaPrincipal
+if (window.innerWidth <= 600) {
+    document.getElementById('lista-botoes-provincia').style.display = 'none';
+    document.getElementById('lista-ferramentas-regiao').style.display = 'none';
+    document.getElementById('seta-menu').innerHTML = '▼';
+}
     }
 
     // --- FUNÇÕES DOS BOTÕES EXTRAS (Agora fora de qualquer outra função) ---
@@ -1341,16 +1358,16 @@ deuses: [
         containerImg.insertBefore(btnVoltar, containerImg.firstChild);
     }
     // Nova função que apenas fecha a foto sem resetar o mapa
-    function fecharImagem() {
-        document.getElementById('provincia-container').style.display = 'none';
-        document.getElementById('map-container').style.display = 'block';
-        
-        // Se estiver no continente, garante que o menu aparece. 
-        // Se estiver em província, o menu continua escondido (como deve ser).
-        if (mapaAtualAtivo === 'continente') {
-            document.getElementById('menu-provincias').style.display = 'block';
-        }
-    }
+function fecharImagem() {
+    // Esconde o container da foto
+    document.getElementById('provincia-container').style.display = 'none';
+    
+    // Mostra o mapa novamente
+    document.getElementById('map-container').style.display = 'block';
+    
+    // MOSTRA O MENU NOVAMENTE (Sempre, seja no continente ou na província)
+    document.getElementById('menu-provincias').style.display = 'block';
+}
 
     function fecharModais() { 
         document.getElementById('modal-info').style.display = 'none';
@@ -1427,6 +1444,12 @@ function abrirMapaProvincia(arquivo) {
     if (marcadorTempCoords) { map.removeLayer(marcadorTempCoords); marcadorTempCoords = null; }
     adicionarMarcadoresLocais(arquivo);
     atualizarVisualBotao(document.getElementById('btn-coords-prov'));
+    // Adicione isso no FINAL da função abrirMapaProvincia e também no FINAL da carregarMapaPrincipal
+if (window.innerWidth <= 600) {
+    document.getElementById('lista-botoes-provincia').style.display = 'none';
+    document.getElementById('lista-ferramentas-regiao').style.display = 'none';
+    document.getElementById('seta-menu').innerHTML = '▼';
+}
 }
 
 function verImagemEstatica(arquivo) {
