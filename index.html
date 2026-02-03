@@ -383,7 +383,7 @@
         <button id="btn-coords-prov" class="botao-provincia" onclick="alternarCoordenadas()">📍 Coordenadas: OFF</button>
         <button id="btn-medidor-prov" class="botao-provincia" onclick="ativarMedidor()" style="color: #90EE90; border-color: #2E8B57;">📏 Medir Rota</button>
         <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
-        <button class="botao-provincia" onclick="carregarMapaPrincipal()" style="color: #ffdead; border-color: #ffdead;">⬅ Voltar ao Continente</button>
+        <button id="btn-voltar-dinamico" class="botao-provincia" onclick="carregarMapaPrincipal()" style="color: #ffdead; border-color: #ffdead;">⬅ Voltar ao Continente</button>
     </div>
 </div>
     <div id="provincia-container">
@@ -524,18 +524,14 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
     // 2. Alterna menu no celular
 function alternarMenuMobile() {
     if (window.innerWidth > 600) return;
-    
-    // Identifica qual lista deve ser exibida baseada no mapa atual
     const listaProv = document.getElementById('lista-botoes-provincia');
     const listaFerramentas = document.getElementById('lista-ferramentas-regiao');
     const seta = document.getElementById('seta-menu');
     
-    // Define qual lista estamos manipulando agora
+    // Identifica qual parte do menu está ativa para abrir/fechar
     let listaAtiva = (mapaAtualAtivo === 'continente') ? listaProv : listaFerramentas;
     
-    const estiloAtual = window.getComputedStyle(listaAtiva).display;
-    
-    if (estiloAtual === 'none') {
+    if (window.getComputedStyle(listaAtiva).display === 'none') {
         listaAtiva.style.display = 'block';
         seta.innerHTML = '▲';
     } else {
@@ -1450,6 +1446,20 @@ if (window.innerWidth <= 600) {
     document.getElementById('lista-ferramentas-regiao').style.display = 'none';
     document.getElementById('seta-menu').innerHTML = '▼';
 }
+// --- LÓGICA DO BOTÃO VOLTAR DINÂMICO ---
+    const btnVoltar = document.getElementById('btn-voltar-dinamico');
+    
+    // Se for um plano (mas não o próprio Nexus), volta para o Nexus
+    if (arquivo.includes('Plano') && arquivo !== 'Planos.jpg') {
+        btnVoltar.innerHTML = "⬅ Voltar ao Nexus";
+        btnVoltar.onclick = function() { abrirMapaProvincia('Planos.jpg'); };
+    } 
+    // Se for uma província normal ou o próprio Nexus, volta para o Continente
+    else {
+        btnVoltar.innerHTML = "⬅ Voltar ao Continente";
+        btnVoltar.onclick = function() { carregarMapaPrincipal(); };
+    }
+
 }
 
 function verImagemEstatica(arquivo) {
