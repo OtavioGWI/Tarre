@@ -1493,7 +1493,7 @@ function abrirMapaProvincia(arquivo) {
 }
 
 function verImagemEstatica(arquivo) {
-    if (!arquivo || arquivo === 'none' || arquivo === 'bloqueado.jpg') return;
+    if (!arquivo || arquivo === 'none') return;
 
     // 1. Fecha qualquer modal aberto (Info ou Capital) para não cobrir a foto
     fecharModais();
