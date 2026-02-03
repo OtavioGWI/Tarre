@@ -409,16 +409,17 @@
         <button id="btn-coords-menu" class="botao-provincia" onclick="alternarCoordenadas()" style="color: #aaa;">📍 Coords: OFF</button>
         <button id="btn-medidor" class="botao-provincia" onclick="ativarMedidor()" style="color: #90EE90; border-color: #2E8B57;">📏 Calculadora de Viagem</button>
     </div>
-
+    
     <div id="lista-ferramentas-regiao" style="display: none;">
+        <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
+        
         <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MENU DA REGIÃO</div>
         <button class="botao-provincia" onclick="abrirModalInfo()">📜 Detalhes da Região</button>
         <button id="btn-coords-prov" class="botao-provincia" onclick="alternarCoordenadas()">📍 Coordenadas: OFF</button>
-        <button id="btn-medidor-prov" class="botao-provincia" onclick="ativarMedidor()" style="color: #90EE90; border-color: #2E8B57;">📏 Medir Rota</button>
+        <button id="btn-medidor-prov" class="botao-provincia" onclick="ativarMedidor()">📏 Medir Rota</button>
         <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
         <button id="btn-voltar-dinamico" class="botao-provincia" onclick="carregarMapaPrincipal()" style="color: #ffdead; border-color: #ffdead;">⬅ Voltar ao Continente</button>
     </div>
-</div>
     <div id="provincia-container">
         <img id="img-provincia" src="">
     </div>
@@ -686,30 +687,27 @@ if (window.innerWidth <= 600) {
         });
     }
 function alternarCoordenadas() {
+    // Se for ligar as coordenadas e o medidor estiver ativo, mata o medidor primeiro
+    if (!modoCoordenadas && medindo) {
+        cancelarModoMedicao(); // Esta função já seta medindo = false e limpa o visual
+    }
+
     modoCoordenadas = !modoCoordenadas;
     
-    const btnMenu = document.getElementById('btn-coords-menu');
-    const btnProv = document.getElementById('btn-coords-prov');
     const container = document.getElementById('map-container');
-
-    atualizarVisualBotao(btnMenu);
-    atualizarVisualBotao(btnProv);
+    
+    // Atualiza o visual de TODOS os botões de coordenadas (Menu e Província)
+    atualizarVisualBotao();
 
     if (modoCoordenadas) {
-        // Ativa o modo fantasma para marcar o ponto sem clicar em cidades
         container.classList.add('mapa-intangivel');
     } else {
-        // Desativa o modo fantasma para você poder interagir com as cidades de novo
         container.classList.remove('mapa-intangivel');
-        
-        // REMOVEMOS a linha que apagava o marcador aqui!
     }
 }
-
     // Função auxiliar para mudar a cor dos botões
 function atualizarVisualBotao() {
     const botoes = [document.getElementById('btn-coords-menu'), document.getElementById('btn-coords-prov')];
-
     botoes.forEach(btn => {
         if (!btn) return;
         if (modoCoordenadas) {
@@ -1900,7 +1898,6 @@ if (nomeDoMapa === 'Planos.jpg') {
 function atualizarBotaoMedidor(estado) {
     const botoes = [document.getElementById('btn-medidor'), document.getElementById('btn-medidor-prov')];
     let texto = (estado === 'medindo') ? "🏁 Finalizar Rota" : "📏 Calculadora de Viagem";
-
     botoes.forEach(btn => {
         if (!btn) return;
         btn.innerHTML = texto;
@@ -1911,31 +1908,34 @@ function atualizarBotaoMedidor(estado) {
         }
     });
 }
-    function ativarMedidor() {
-        if (!medindo) {
-            // --- INICIAR MEDIÇÃO ---
-            medindo = true;
-            pontosRota = []; // Zera a memória da rota
-            grupoRota.addTo(map); // Adiciona o grupo ao mapa
-            grupoRota.clearLayers(); // Limpa desenhos anteriores (AQUI RESOLVE A PERSISTÊNCIA)
-            
-            // Ativa o "Modo Fantasma" (CSS) para clicar através das cidades
-            document.getElementById('map-container').classList.add('mapa-intangivel');
-            document.getElementById('map').classList.add('modo-medicao-ativo');
-            
-            atualizarBotaoMedidor('medindo');
-            
+function ativarMedidor() {
+    if (!medindo) {
+        // Se as coordenadas estiverem ON, mata elas primeiro
+        if (modoCoordenadas) {
+            modoCoordenadas = false;
+            document.getElementById('map-container').classList.remove('mapa-intangivel');
+            atualizarVisualBotao(); // Reseta os botões de coordenadas para OFF
+        }
+
+        medindo = true;
+        pontosRota = [];
+        grupoRota.addTo(map);
+        grupoRota.clearLayers();
+        
+        document.getElementById('map-container').classList.add('mapa-intangivel');
+        document.getElementById('map').classList.add('modo-medicao-ativo');
+        
+        atualizarBotaoMedidor('medindo'); // Deixa os botões de Medir verdes
+        
+    } else {
+        // Se já estava medindo, finaliza
+        if (pontosRota.length > 1) {
+            calcularResultados();
         } else {
-            // --- FINALIZAR E CALCULAR ---
-            // Só calcula se tiver pelo menos uma linha (2 pontos)
-            if (pontosRota.length > 1) {
-                calcularResultados();
-            } else {
-                // Se clicou em finalizar sem marcar nada, só cancela
-                cancelarModoMedicao();
-            }
+            cancelarModoMedicao();
         }
     }
+}
 
     // Sai do modo de medição e devolve os cliques para as cidades
     function cancelarModoMedicao() {
