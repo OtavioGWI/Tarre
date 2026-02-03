@@ -930,6 +930,70 @@ deuses: [
                 foto: "murloc.png", 
                 desc: "Caçam em bandos, gostam de lugares úmidos e fechados"
             }
+        ], 
+        // ... dentro de dadosCapital ...
+        
+        lendas: [
+            { 
+                nome: "A Bruxa", 
+                titulo: "A Guardiã Eterna", 
+                desc: "Protetora dos segredos arcanos. Sua vigilância constante impede que forças místicas ameacem o equilíbrio do mundo." 
+            },
+            { 
+                nome: "O Palhaço", 
+                titulo: "O Agente do Destino", 
+                desc: "Com táticas imprevisíveis, desestabilizou as fileiras inimigas, trazendo a vitória através da genialidade não convencional." 
+            },
+            { 
+                nome: "A Prodígio", 
+                titulo: "A Arquiteta do Amanhã", 
+                desc: "Mente brilhante que forjou as defesas do reino, provando que a engenhosidade humana pode alcançar o divino." 
+            },
+            { 
+                nome: "O Druida", 
+                titulo: "A Voz da Terra", 
+                desc: "Aquele que uniu a fúria da natureza à causa dos mortais, garantindo que o mundo lutasse ao nosso lado." 
+            },
+            { 
+                nome: "A Santa", 
+                titulo: "A Luz da Esperança", 
+                desc: "Sua fé inabalável foi o escudo que protegeu as almas inocentes durante as eras mais sombrias." 
+            },
+            { 
+                nome: "O Herói", 
+                titulo: "O Escudo da Honra", 
+                desc: "O líder inquebrável, cujo código moral e bravura inspiraram exércitos inteiros a nunca recuar." 
+            },
+            { 
+                nome: "O Sábio", 
+                titulo: "O Olho da Verdade", 
+                desc: "Detentor do conhecimento supremo, cujas estratégias foram traçadas com uma sabedoria além da compreensão mortal." 
+            },
+            { 
+                nome: "A Vidente", 
+                titulo: "A Tecelã do Tempo", 
+                desc: "Guiou o grupo através das infinitas possibilidades, garantindo o único futuro onde a luz prevaleceria." 
+            },
+            { 
+                nome: "A Feiticeira", 
+                titulo: "O Avatar do Poder", 
+                desc: "Uma força da natureza em forma humana, cuja magia devastadora foi a espada que quebrou as defesas demoníacas." 
+            },
+            { 
+                nome: "O Espadachim", 
+                titulo: "A Lâmina Perfeita", 
+                desc: "O guerreiro definitivo, cuja maestria marcial transcendeu os limites físicos para derrotar o mal." 
+            },
+            { 
+                nome: "O Bardo", 
+                titulo: "A Alma do Mundo", 
+                desc: "Suas canções não apenas registraram a história, mas acenderam a chama da coragem nos corações desesperados." 
+            },
+            { 
+                nome: "O Invocador", 
+                titulo: "O Mestre dos Planos", 
+                desc: "Convocou aliados de dimensões distantes, unindo universos diferentes em prol da salvação de Tarre." 
+            }
         ],
 
         boatos: listaBoatos 
@@ -937,7 +1001,7 @@ deuses: [
         
     };
 
-// --- FUNÇÃO MENU CAPITAL (CORRIGIDA COM ZOOM NO BESTIÁRIO) ---
+// --- FUNÇÃO MENU CAPITAL (ATUALIZADA) ---
     function menuCapital(tipo) {
         const modal = document.getElementById('modal-capital');
         const container = document.getElementById('conteudo-menu-capital');
@@ -945,29 +1009,39 @@ deuses: [
         modal.style.display = 'flex';
         container.innerHTML = "";
 
+        // --- ABA OS 12 LENDÁRIOS (TEXTO PURO) ---
+        if (tipo === 'lendas') {
+            titulo.innerText = "🏛️ Os 12 Heróis Lendários";
+            
+            container.innerHTML += `<p style="font-style:italic; color:#aaa; font-size:14px; text-align:center; margin-bottom:20px; border-bottom:1px solid #444; padding-bottom:10px;">"Aqueles que derrotaram o Primeiro Rei Demônio e forjaram a Era da Paz."</p>`;
+
+            dadosCapital.lendas.forEach(heroi => {
+                container.innerHTML += `
+                    <div class="item-menu">
+                        <div class="texto-item" style="width: 100%;">
+                            <h4 style="color:#ffd700; margin-bottom: 2px;">${heroi.nome}</h4>
+                            <span style="font-size:12px; font-weight:bold; color:#cd853f; text-transform:uppercase;">${heroi.titulo}</span>
+                            <p style="margin-top:5px; font-size:13px; color:#ccc;">${heroi.desc}</p>
+                        </div>
+                    </div>`;
+            });
+            return;
+        }
+
         // --- ABA BANCO ---
         if (tipo === 'banco') {
             titulo.innerText = "🏦 Banco Imperial";
             let html = `<h4 style="color:#ffdead; margin-top:0;">Pacotes de Serviços</h4>`;
-            
             html += `<table class="tabela-banco"><tr><th>Pacote</th><th>Custo</th><th>Benefícios</th></tr>`;
             dadosGerais.banco.forEach(item => {
                 html += `<tr><td>${item.nome}</td><td class="preco-banco">${item.custo}</td><td>${item.desc}</td></tr>`;
             });
             html += `</table>`;
-
-            html += `<h4 style="color:#ffdead; margin-top:20px;">Investimentos</h4>`;
-            html += `<ul style="color:#ccc; padding-left:20px;">`;
+            html += `<h4 style="color:#ffdead; margin-top:20px;">Investimentos</h4><ul style="color:#ccc; padding-left:20px;">`;
             dadosGerais.investimentos.forEach(inv => {
                 html += `<li><strong>${inv.nome}:</strong> ${inv.risco} (Mínimo ${inv.min})</li>`;
             });
-            html += `</ul>`;
-
-            html += `<div class="nota-banco">
-                * Garantia total sobre bens guardados.<br>
-                * Não existe upgrade de pacote (preço integral na troca).
-            </div>`;
-            
+            html += `</ul><div class="nota-banco">* Garantia total sobre bens guardados.<br>* Não existe upgrade de pacote (preço integral na troca).</div>`;
             container.innerHTML = html;
             return;
         }
@@ -993,35 +1067,27 @@ deuses: [
                 container.innerHTML += `
                     <div class="item-menu" onclick="lerCapitulo(${index})" style="cursor: pointer; align-items: center;">
                         <div class="foto-placeholder" style="width: 50px; height: 50px; font-size: 20px;">📖</div>
-                        <div class="texto-item">
-                            <h4 style="margin-top: 10px;">${cap.titulo}</h4>
-                            <p style="font-size: 12px; color: #aaa;">Clique para ler</p>
-                        </div>
+                        <div class="texto-item"><h4 style="margin-top: 10px;">${cap.titulo}</h4><p style="font-size: 12px; color: #aaa;">Clique para ler</p></div>
                     </div>`;
             });
             return;
         }
 
-        // --- ABA BESTIÁRIO (CORRIGIDO) ---
+        // --- ABA BESTIÁRIO ---
         if (tipo === 'bestiario') {
             titulo.innerText = "📖 Bestiário Conhecido";
             dadosCapital.bestiario.forEach(monstro => {
-                // AQUI ESTÁ A CORREÇÃO: Adicionado onclick e style cursor
                 let img = monstro.foto 
                     ? `<img src="${monstro.foto}" class="foto-lista" onclick="verImagemPersonagem('${monstro.foto}')" style="cursor: zoom-in;" title="Clique para ampliar">` 
                     : `<div class="foto-placeholder">?</div>`;
-                
                 container.innerHTML += `
-                    <div class="item-menu">
-                        ${img}
-                        <div class="texto-item">
-                            <h4 style="color:#ff4444;">${monstro.nome}</h4>
-                            <span style="font-size:12px;">Perigo: ${monstro.perigo}</span><br>
-                            <span style="font-size:12px; color:#aaa;">Fraqueza: ${monstro.fraqueza}</span>
-                            <p style="font-style:italic; margin-top:5px;">"${monstro.desc}"</p>
-                            <div style="margin-top:5px; font-size:11px; color:#ffd700;">Drop: ${monstro.drops}</div>
-                        </div>
-                    </div>`;
+                    <div class="item-menu">${img}<div class="texto-item">
+                        <h4 style="color:#ff4444;">${monstro.nome}</h4>
+                        <span style="font-size:12px;">Perigo: ${monstro.perigo}</span><br>
+                        <span style="font-size:12px; color:#aaa;">Fraqueza: ${monstro.fraqueza}</span>
+                        <p style="font-style:italic; margin-top:5px;">"${monstro.desc}"</p>
+                        <div style="margin-top:5px; font-size:11px; color:#ffd700;">Drop: ${monstro.drops}</div>
+                    </div></div>`;
             });
             return;
         }
@@ -1029,25 +1095,14 @@ deuses: [
         // --- ABA ESQUADRÃO E PROCURADOS (PADRÃO) ---
         const lista = (tipo === 'esquadrao') ? dadosCapital.esquadrao : dadosCapital.procurados;
         titulo.innerText = (tipo === 'esquadrao') ? "🛡️ Os Pandemônios" : "☠️ Cartazes de Procurados";
-
         lista.forEach(item => {
             let htmlImagem = item.foto 
                 ? `<img src="${item.foto}" class="foto-lista" onclick="verImagemPersonagem('${item.foto}')" style="cursor: zoom-in;" title="Clique para ampliar">` 
                 : `<div class="foto-placeholder">${tipo === 'esquadrao' ? 'RETRATO' : 'WANTED'}</div>`;
-
             let htmlSubtitulo = (tipo === 'esquadrao')
                 ? `<span class="classe-char">${item.classe} • ${item.raca || 'Desconhecido'}</span>`
                 : `<span class="recompensa">💰 ${item.recompensa}</span>`;
-
-            container.innerHTML += `
-                <div class="item-menu">
-                    ${htmlImagem}
-                    <div class="texto-item">
-                        <h4>${item.nome}</h4>
-                        ${htmlSubtitulo}
-                        <p>${item.desc}</p>
-                    </div>
-                </div>`;
+            container.innerHTML += `<div class="item-menu">${htmlImagem}<div class="texto-item"><h4>${item.nome}</h4>${htmlSubtitulo}<p>${item.desc}</p></div></div>`;
         });
     }
 
@@ -1674,15 +1729,60 @@ if (nomeDoMapa === 'Planos.jpg') {
             const m = L.marker(coord, { icon: grande ? iconG : iconP, opacity: 0 }).addTo(map);
             let botoes = "";
 
-            // --- CAPITAL IMPERIAL ---
+            // --- CAPITAL IMPERIAL (Design Minimalista & Elegante) ---
             if (nome === "Capital Imperial") {
-                if (arquivo) botoes += `<button onclick="verImagemEstatica('${arquivo}')" class="btn-popup" style="margin-bottom:5px;">📸 Ver Cidade</button>`;
-                botoes += `<button onclick="menuCapital('esquadrao')" class="btn-popup" style="background:#2c3e50; margin-bottom:5px;">🛡️ Ver Esquadrão</button>`;
-                botoes += `<button onclick="menuCapital('procurados')" class="btn-popup" style="background:#8b0000; margin-bottom:5px;">☠️ Procurados</button>`;
-                botoes += `<button onclick="menuCapital('historico')" class="btn-popup" style="background:#5e2f0d; margin-bottom:5px;">📜 Histórico</button>`;
-                botoes += `<button onclick="menuCapital('boatos')" class="btn-popup" style="background:#4b0082; margin-bottom:5px;">🗣️ Boatos</button>`;
-                botoes += `<button onclick="menuCapital('banco')" class="btn-popup" style="background:#DAA520; color: black;">🏦 Banco Imperial</button>`;
-                botoes += `<button onclick="menuCapital('bestiario')" class="btn-popup" style="background:#006400; margin-bottom:5px;">📖 Bestiário</button>`;
+                
+                // Estilo padrão para todos os botões (Limpo, sem bordas pesadas)
+                const estiloBase = `
+                    display: flex; 
+                    align-items: center;
+                    width: 100%; 
+                    margin-bottom: 6px; 
+                    padding: 10px 12px; 
+                    background: rgba(40, 40, 40, 0.95); 
+                    color: #e0e0e0; 
+                    border: none; 
+                    border-left: 4px solid #555; /* A cor muda aqui */
+                    text-align: left; 
+                    font-size: 14px; 
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                `;
+
+                // Função auxiliar para gerar o botão com a cor certa na barra lateral
+                function criarBtn(texto, acao, corBarra) {
+                    // O onmouseover muda a cor do fundo levemente para dar feedback visual
+                    return `<button onclick="${acao}" 
+                            class="btn-popup" 
+                            style="${estiloBase} border-left-color: ${corBarra};"
+                            onmouseover="this.style.background='#3d3d3d'; this.style.paddingLeft='15px'" 
+                            onmouseout="this.style.background='rgba(40, 40, 40, 0.95)'; this.style.paddingLeft='12px'">
+                            ${texto}
+                            </button>`;
+                }
+
+                // Título discreto
+                botoes += `<div style="margin-top:10px; display:flex; flex-direction:column;">`;
+
+                // Botões organizados por cor de categoria
+                // Dourado/Amarelo = Lore Importante & Dinheiro
+                botoes += criarBtn("⚜️ <b>Heróis Lendários</b>", "menuCapital('lendas')", "#DAA520");
+                botoes += criarBtn("🏦 Banco Imperial", "menuCapital('banco')", "#ffd700");
+
+                // Azul = Informações Oficiais / Campanha
+                botoes += criarBtn("🛡️ Esquadrão", "menuCapital('esquadrao')", "#4682B4");
+                botoes += criarBtn("📸 Ver Cidade", `verImagemEstatica('${arquivo}')`, "#5F9EA0");
+
+                // Roxo/Vermelho = Informações de Mundo / Perigo
+                botoes += criarBtn("📜 Histórico", "menuCapital('historico')", "#9370DB");
+                botoes += criarBtn("☠️ Procurados", "menuCapital('procurados')", "#8b0000");
+                botoes += criarBtn("🗣️ Boatos", "menuCapital('boatos')", "#800080");
+                
+                // Verde = Natureza/Monstros
+                botoes += criarBtn("📖 Bestiário", "menuCapital('bestiario')", "#2E8B57");
+
+                botoes += `</div>`;
             }
             
             // --- CIDADE SAGRADA ---
