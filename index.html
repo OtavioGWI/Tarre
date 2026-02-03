@@ -420,9 +420,11 @@
         <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
         <button id="btn-voltar-dinamico" class="botao-provincia" onclick="carregarMapaPrincipal()" style="color: #ffdead; border-color: #ffdead;">⬅ Voltar ao Continente</button>
     </div>
-    <div id="provincia-container">
-        <img id="img-provincia" src="">
-    </div>
+</div>
+
+<div id="provincia-container">
+    <img id="img-provincia" src="">
+</div>
 
 <div id="modal-senha" style="display: none; position: fixed; z-index: 6000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); align-items: center; justify-content: center;">
         <div class="modal-conteudo" style="width: 400px; text-align: center;">
@@ -1492,26 +1494,33 @@ if (window.innerWidth <= 600) {
 }
 
 function verImagemEstatica(arquivo) {
-        // Esconde o mapa (mas ele continua vivo no fundo)
-        document.getElementById('map-container').style.display = 'none';
-        document.getElementById('menu-provincias').style.display = 'none'; // Esconde menu pra não atrapalhar a foto
-        document.getElementById('provincia-container').style.display = 'flex'; 
-        document.getElementById('img-provincia').src = arquivo;
-        
-        const btnVoltarImg = document.createElement('button');
-        btnVoltarImg.innerHTML = "⬅ Voltar";
-        btnVoltarImg.className = "btn-popup";
-        // Ajustado para o topo
-        btnVoltarImg.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
-        
-        // AQUI ESTÁ A MUDANÇA MÁGICA:
-        btnVoltarImg.onclick = fecharImagem; 
-        
-        const container = document.getElementById('provincia-container');
-        const btnAntigo = container.querySelector('button');
-        if (btnAntigo) container.removeChild(btnAntigo);
-        container.insertBefore(btnVoltarImg, container.firstChild);
-    }
+    if (!arquivo || arquivo === 'none' || arquivo === 'bloqueado.jpg') return;
+
+    // 1. Fecha qualquer modal aberto (Info ou Capital) para não cobrir a foto
+    fecharModais();
+
+    // 2. Troca as visualizações
+    document.getElementById('map-container').style.display = 'none';
+    document.getElementById('menu-provincias').style.display = 'none';
+    const container = document.getElementById('provincia-container');
+    container.style.display = 'flex';
+
+    // 3. Define a imagem
+    const imgElement = document.getElementById('img-provincia');
+    imgElement.src = arquivo;
+
+    // 4. Gerencia o Botão Voltar (limpa o anterior e cria um novo)
+    const btnAntigo = container.querySelector('.btn-voltar-foto');
+    if (btnAntigo) btnAntigo.remove();
+
+    const btnVoltarImg = document.createElement('button');
+    btnVoltarImg.innerHTML = "⬅ Voltar";
+    btnVoltarImg.className = "btn-popup btn-voltar-foto";
+    btnVoltarImg.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
+    btnVoltarImg.onclick = fecharImagem;
+
+    container.insertBefore(btnVoltarImg, container.firstChild);
+}
 
  // --- 6. MARCADORES LOCAIS (FUNÇÃO COMPLETA ATUALIZADA) ---
 function adicionarMarcadoresLocais(nomeDoMapa) {
