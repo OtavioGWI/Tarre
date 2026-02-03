@@ -139,13 +139,6 @@
     padding-left: 15px;
 }
 
-/* Hover padrão para botões desligados */
-.botao-provincia:hover {
-    background: #8b4513 !important;
-    color: white !important;
-    border-color: #46362f !important;
-}
-
     /* --- VOLTANDO O ESTILO ORIGINAL DO MENU --- */
     .botao-provincia {
         display: block; width: 100%;
@@ -155,11 +148,11 @@
         text-align: left; cursor: pointer;
         transition: 0.3s;
     }
-
+/* O menu lateral não muda mais de cor ao passar o mouse, apenas o texto realça */
     .botao-provincia:hover {
-        background: #8b4513 !important; /* O !important garante que o brilho funcione */
         color: white !important;
-        border-color: #46362f !important;
+        padding-left: 15px; /* Mantém apenas o leve deslize */
+        background: transparent !important; /* Força o fundo a continuar transparente */
     }
     /* CONTAINER DA FOTO ESTÁTICA */
     #provincia-container {
@@ -693,16 +686,23 @@ function alternarCoordenadas() {
 }
 
     // Função auxiliar para mudar a cor dos botões
-function atualizarVisualBotao(btn) {
-    if (!btn) return;
-    
-    if (modoCoordenadas) {
-        btn.innerHTML = "📍 Coords: ON";
-        btn.classList.add('btn-ferramenta-ativa');
-    } else {
-        btn.innerHTML = "📍 Coords: OFF";
-        btn.classList.remove('btn-ferramenta-ativa');
-    }
+function atualizarVisualBotao() {
+    const botoes = [
+        document.getElementById('btn-coords-menu'), 
+        document.getElementById('btn-coords-prov')
+    ];
+
+    botoes.forEach(btn => {
+        if (btn) {
+            if (modoCoordenadas) {
+                btn.innerHTML = "📍 Coords: ON";
+                btn.classList.add('btn-ferramenta-ativa');
+            } else {
+                btn.innerHTML = "📍 Coords: OFF";
+                btn.classList.remove('btn-ferramenta-ativa');
+            }
+        }
+    });
 }
 
     // ... (O resto do seu código: dadosProvincias, dadosCapital, etc. continua igual abaixo)
@@ -1471,6 +1471,9 @@ if (window.innerWidth <= 600) {
         btnVoltar.innerHTML = "⬅ Voltar ao Continente";
         btnVoltar.onclick = function() { carregarMapaPrincipal(); };
     }
+    // Sincroniza o visual das ferramentas ao entrar na província
+    atualizarBotaoMedidor(medindo ? 'medindo' : 'iniciar');
+    atualizarVisualBotao();
 
 }
 
@@ -1688,8 +1691,8 @@ function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoEx
             criarPontoLocal(  [482, 1192], "Ilha dos Afogados", "Desconhecido", "lugar no mar.png", true);
             criarPontoLocal( [778, 1442], "Ilha Naval", "Marinha Imperial", "ilha naval.png", true);
             criarPontoLocal( [866, 1518], "Ilha Naval", "Marinha Imperial", "ilha naval.png", true);
-            criarPontoLocal( [134, 1355], "Templo do Fim do Mundo", "Desconhecido", "Templo do fim do mundo.png", true);
-          
+            const btnRuinas = criarBtn("🔍 Descobrir", "abrirModalSenha('12', 'Templo do fim do mundo.png', 'imagem')", "#2E8B57");
+            criarPontoLocal([134, 1355], "Ruínas", "Desconhecido", null, true, btnRuinas);
  
         }
 if (nomeDoMapa === 'Mar.jpg') {
@@ -1879,18 +1882,22 @@ if (nomeDoMapa === 'Planos.jpg') {
 
     // Função para controlar os botões (Menu e Mapa)
 function atualizarBotaoMedidor(estado) {
-    const btnMenu = document.getElementById('btn-medidor'); // Continente
-    const btnProv = document.getElementById('btn-medidor-prov'); // Província
+    // Procura os dois botões (do menu principal e do menu da província)
+    const botoes = [
+        document.getElementById('btn-medidor'), 
+        document.getElementById('btn-medidor-prov')
+    ];
     
     let texto = (estado === 'medindo') ? "🏁 Finalizar Rota" : "📏 Calculadora de Viagem";
 
-    [btnMenu, btnProv].forEach(btn => {
-        if (!btn) return;
-        btn.innerHTML = texto;
-        if (estado === 'medindo') {
-            btn.classList.add('btn-ferramenta-ativa');
-        } else {
-            btn.classList.remove('btn-ferramenta-ativa');
+    botoes.forEach(btn => {
+        if (btn) {
+            btn.innerHTML = texto;
+            if (estado === 'medindo') {
+                btn.classList.add('btn-ferramenta-ativa');
+            } else {
+                btn.classList.remove('btn-ferramenta-ativa');
+            }
         }
     });
 }
