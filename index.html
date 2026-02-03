@@ -38,6 +38,39 @@
         cursor: pointer;
     }
 
+/* Remove o fundo branco do ícone de emoji */
+.marcador-emoji {
+    background: none !important;
+    border: none !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Estilo para os botões que ficam FLUTUANDO sobre o mapa */
+.btn-mapa-estilo {
+    background: rgba(26, 26, 26, 0.95) !important;
+    color: #ddd !important;
+    border: 1px solid #444 !important;
+    border-left: 4px solid #555 !important; /* Barra lateral igual ao menu */
+    border-radius: 4px !important;
+    padding: 8px 12px !important;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    margin-bottom: 5px;
+    transition: 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    display: block;
+    width: 120px;
+    text-align: left;
+}
+
+.btn-mapa-estilo:hover {
+    background: #444 !important;
+    padding-left: 15px !important;
+}
+
     /* Adicione isso dentro da tag <style> */
     .foto-lista { 
         width: 80px; height: 110px; 
@@ -105,9 +138,10 @@
     }
 
     .botao-provincia:hover {
-        background: #8b4513; color: white; border-color: #a0522d;
+        background: #8b4513 !important; /* O !important garante que o brilho funcione */
+        color: white !important;
+        border-color: #46362f !important;
     }
-
     /* CONTAINER DA FOTO ESTÁTICA */
     #provincia-container {
         display: none;
@@ -324,28 +358,32 @@
 
 <div id="menu-provincias">
     <h3 onclick="alternarMenuMobile()">Menu Principal <span id="seta-menu">▼</span></h3>
+    
     <div id="lista-botoes-provincia">
-        
         <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">PROVÍNCIAS</div>
+        <button class="botao-provincia" onclick="abrirMapaProvincia('Hukmal_tep.jpg')">❄️ Hukmal'tep</button>
+        <button class="botao-provincia" onclick="abrirMapaProvincia('Blat_khyr.jpg')">🍂 Blat'khyr</button>
+        <button class="botao-provincia" onclick="abrirMapaProvincia('Deserto.jpg')">🏜️ Deserto</button>
+        <button class="botao-provincia" onclick="abrirMapaProvincia('Lago.jpg')">⛩️ Lago</button>
+        <button class="botao-provincia" onclick="abrirMapaProvincia('Alcova.jpg')">🏴‍☠️ Alcova</button>
 
-            <button class="botao-provincia" onclick="abrirMapaProvincia('Hukmal_tep.jpg')">❄️ Hukmal'tep</button>
-            <button class="botao-provincia" onclick="abrirMapaProvincia('Blat_khyr.jpg')">🍂 Blat'khyr</button>
-            <button class="botao-provincia" onclick="abrirMapaProvincia('Deserto.jpg')">🏜️ Deserto</button>
-            <button class="botao-provincia" onclick="abrirMapaProvincia('Lago.jpg')">⛩️ Lago</button>
-            <button class="botao-provincia" onclick="abrirMapaProvincia('Alcova.jpg')">🏴‍☠️ Alcova</button>
-        
         <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
-        
         <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">COSMOLOGIA</div>
         <button class="botao-provincia" onclick="abrirModalSenha('portal', 'Planos.jpg', 'mapa')" style="color: #aeb6bf;">🌌 Outros Planos</button>
 
         <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
-        
         <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">FERRAMENTAS</div>
-        
         <button id="btn-coords-menu" class="botao-provincia" onclick="alternarCoordenadas()" style="color: #aaa;">📍 Coords: OFF</button>
         <button id="btn-medidor" class="botao-provincia" onclick="ativarMedidor()" style="color: #90EE90; border-color: #2E8B57;">📏 Calculadora de Viagem</button>
+    </div>
 
+    <div id="lista-ferramentas-regiao" style="display: none;">
+        <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MENU DA REGIÃO</div>
+        <button class="botao-provincia" onclick="abrirModalInfo()">📜 Detalhes da Região</button>
+        <button id="btn-coords-prov" class="botao-provincia" onclick="alternarCoordenadas()">📍 Coordenadas: OFF</button>
+        <button id="btn-medidor-prov" class="botao-provincia" onclick="ativarMedidor()" style="color: #90EE90; border-color: #2E8B57;">📏 Medir Rota</button>
+        <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
+        <button class="botao-provincia" onclick="carregarMapaPrincipal()" style="color: #ffdead; border-color: #ffdead;">⬅ Voltar ao Continente</button>
     </div>
 </div>
     <div id="provincia-container">
@@ -390,8 +428,17 @@
     let mapaAtualAtivo = 'continente';
     let planoSelecionado = null; 
     let modoCoordenadas = false;
+    let marcadorTempCoords = null;
     let fatorEscala = 0.23;
-
+    
+// Ícone de Emoji para Coordenadas
+const iconCoords = L.divIcon({
+    html: '<div style="font-size: 24px; filter: drop-shadow(0 0 2px black);">📍</div>',
+    className: 'marcador-emoji',
+    iconSize: [30, 30],
+    iconAnchor: [15, 25],
+    popupAnchor: [0, -20] // <-- Sobe o popup em 20 pixels
+});
 // Função para gerar o HTML do botão elegante
     function criarBtn(texto, acao, corBarra) {
         return `<button onclick="${acao}" class="botao-estiloso" style="border-left-color: ${corBarra};">${texto}</button>`;
@@ -406,75 +453,70 @@
 
     // --- FUNÇÕES DE NAVEGAÇÃO E SISTEMA ---
 
-// --- 2. INICIALIZAÇÃO DO MAPA (COM BOTÃO PERSISTENTE) ---
-    function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
-        if (map) { map.remove(); } 
+function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
+    if (map) { map.remove(); } 
 
-        const limitesImagem = [[0, 0], [altura, largura]];
-        const padding = 1500; 
-        const limitesNavegacao = [[-padding, -padding], [altura + padding, largura + padding]];
-        
-        map = L.map('map', {
-            crs: L.CRS.Simple,
-            minZoom: minZoom,
-            maxZoom: maxZoom,
-            maxBounds: limitesNavegacao, 
-            maxBoundsViscosity: 0.5,     
-            tap: false,
-            zoomControl: false // Opcional: Se quiser mover o zoom, avise
-        });
+    const limitesImagem = [[0, 0], [altura, largura]];
+    const padding = 1500; 
+    const limitesNavegacao = [[-padding, -padding], [altura + padding, largura + padding]];
+    
+    map = L.map('map', {
+        crs: L.CRS.Simple,
+        minZoom: minZoom,
+        maxZoom: maxZoom,
+        maxBounds: limitesNavegacao, 
+        maxBoundsViscosity: 0.5,     
+        tap: false,
+        zoomControl: false 
+    });
 
-        // Adiciona atalho de teclado para desfazer ponto (CTRL + Z)
+    // Atalho de teclado para desfazer ponto (CTRL + Z)
     document.addEventListener("keydown", function(e) {
         if (medindo && e.ctrlKey && e.key === 'z') {
             desfazerUltimoPonto();
         }
     });
 
-        grupoRota.addTo(map);
-        // Adiciona o Zoom num lugar padrão (já que removemos acima para testar, se sumir o zoom apague a linha zoomControl: false)
-        L.control.zoom({ position: 'topleft' }).addTo(map);
+    grupoRota.addTo(map);
+    L.control.zoom({ position: 'topleft' }).addTo(map);
+    L.imageOverlay(arquivo, limitesImagem).addTo(map);
+    map.fitBounds(limitesImagem);
+    
+    // --- LÓGICA DO CLIQUE UNIFICADA ---
+    map.on('click', function(e) {
+        // 1. Se estiver medindo rota
+        if (medindo) {
+            processarCliqueMedicao(e.latlng);
+            return;
+        }
 
-        L.imageOverlay(arquivo, limitesImagem).addTo(map);
-        map.fitBounds(limitesImagem);
-        
-// --- 1. LÓGICA DO CLIQUE (ATUALIZADA) ---
-        map.on('click', function(e) {
-            // Se o medidor estiver ligado, processa a viagem
-            if (medindo) {
-                processarCliqueMedicao(e.latlng);
-                return; // Para por aqui
-            }
+        // 2. Se o modo Coordenadas estiver ligado
+        if (modoCoordenadas) {
+            // Remove o marcador anterior para colocar o novo
+            if (marcadorTempCoords) map.removeLayer(marcadorTempCoords);
 
-            // Se o modo Coordenadas estiver ligado
-            if (modoCoordenadas) {
-                const y = e.latlng.lat.toFixed(0);
-                const x = e.latlng.lng.toFixed(0);
-                L.popup().setLatLng(e.latlng).setContent(`Coordenadas: [${y}, ${x}]`).openOn(map);
-                console.log(`[${y}, ${x}]`); 
-            }
-        });
+            const y = e.latlng.lat.toFixed(0);
+            const x = e.latlng.lng.toFixed(0);
 
-        // --- 2. BOTÃO FLUTUANTE NO MAPA ---
-        const CoordsControl = L.Control.extend({
-            options: { position: 'bottomright' }, // Canto inferior direito
-            onAdd: function() {
-                const btn = L.DomUtil.create('button', '');
-                btn.id = 'btn-coords-mapa'; // ID para a gente achar ele depois
-                btn.style.cssText = "padding:8px 12px; border-radius:5px; cursor:pointer; font-weight:bold; font-size:12px; margin-right: 10px; margin-bottom: 10px;";
-                
-                // Define a cor inicial baseada no estado atual
-                atualizarVisualBotao(btn);
+            // Cria o marcador com o emoji 📍
+            marcadorTempCoords = L.marker(e.latlng, { 
+                icon: iconCoords,
+                zIndexOffset: 1000 // Garante que fique acima de outros ícones
+            }).addTo(map);
+            
+            // Abre o popup
+            marcadorTempCoords.bindPopup(`<b>📍 Coordenadas</b><br>[${y}, ${x}]`).openPopup();
 
-                btn.onclick = function(e) {
-                    L.DomEvent.stopPropagation(e); // Não clica no mapa
-                    alternarCoordenadas();
-                };
-                return btn;
-            }
-        });
-        map.addControl(new CoordsControl());
-    }
+            // SÓ remove se clicar no "X" do popup
+            marcadorTempCoords.on('popupclose', function() {
+                if (marcadorTempCoords) {
+                    map.removeLayer(marcadorTempCoords);
+                    marcadorTempCoords = null;
+                }
+            });
+        }
+    });
+}
 
     // 2. Alterna menu no celular
     function alternarMenuMobile() {
@@ -514,6 +556,10 @@
             document.getElementById('lista-botoes-provincia').style.display = 'block';
         }
 
+        document.getElementById('lista-botoes-provincia').style.display = 'block';
+        document.getElementById('lista-ferramentas-regiao').style.display = 'none';
+
+        if (marcadorTempCoords) { map.removeLayer(marcadorTempCoords); marcadorTempCoords = null; }
         inicializarMapa(configContinental.arquivo, configContinental.largura, configContinental.altura, configContinental.minZoom, configContinental.maxZoom);
         adicionarMarcadoresPrincipais();
     }
@@ -596,33 +642,43 @@
         });
     }
 function alternarCoordenadas() {
-        modoCoordenadas = !modoCoordenadas; // Inverte o valor
-        
-        // Atualiza o botão do Menu Lateral (se existir)
-        const btnMenu = document.getElementById('btn-coords-menu');
-        atualizarVisualBotao(btnMenu);
+    modoCoordenadas = !modoCoordenadas;
+    
+    const btnMenu = document.getElementById('btn-coords-menu');
+    const btnProv = document.getElementById('btn-coords-prov');
+    const container = document.getElementById('map-container');
 
-        // Atualiza o botão Flutuante do Mapa (se existir)
-        const btnMapa = document.getElementById('btn-coords-mapa');
-        atualizarVisualBotao(btnMapa);
+    atualizarVisualBotao(btnMenu);
+    atualizarVisualBotao(btnProv);
+
+    if (modoCoordenadas) {
+        // Ativa o modo fantasma para marcar o ponto sem clicar em cidades
+        container.classList.add('mapa-intangivel');
+    } else {
+        // Desativa o modo fantasma para você poder interagir com as cidades de novo
+        container.classList.remove('mapa-intangivel');
+        
+        // REMOVEMOS a linha que apagava o marcador aqui!
     }
+}
 
     // Função auxiliar para mudar a cor dos botões
-    function atualizarVisualBotao(btn) {
-        if (!btn) return;
-        
-        if (modoCoordenadas) {
-            btn.innerHTML = "📍 Coords: ON";
-            btn.style.background = "#27ae60"; 
-            btn.style.color = "white";
-            btn.style.border = "1px solid #2ecc71";
-        } else {
-            btn.innerHTML = "📍 Coords: OFF";
-            btn.style.background = "rgba(0,0,0,0.7)"; 
-            btn.style.color = "#aaa";
-            btn.style.border = "1px solid #444";
-        }
+function atualizarVisualBotao(btn) {
+    if (!btn) return;
+    
+    if (modoCoordenadas) {
+        btn.innerHTML = "📍 Coords: ON";
+        btn.style.background = "#27ae60"; // Verde quando ligado
+        btn.style.color = "white";
+        btn.style.borderColor = "#2ecc71";
+    } else {
+        btn.innerHTML = "📍 Coords: OFF";
+        // Removemos os estilos manuais para o CSS original assumir o controle
+        btn.style.background = ""; 
+        btn.style.color = ""; 
+        btn.style.borderColor = "";
     }
+}
 
     // ... (O resto do seu código: dadosProvincias, dadosCapital, etc. continua igual abaixo)
 
@@ -654,7 +710,7 @@ function alternarCoordenadas() {
                 <p><strong>📜 Panorama:</strong> Uma vastidão dominada por picos colossais e frio implacável. O vento uiva incessantemente entre os vales profundos, moldando uma paisagem onde apenas os mais resilientes prosperam sob o manto de neve eterna.</p>
                 <p><strong>👑 Governança:</strong> O poder é partilhado pelo <em>Conselho das Três Tribos</em> (Felistas, Malistas e Garra do Inverno). Não existe um soberano único, mas sim uma trégua armada e tensa entre os clãs.</p>
                 <p><strong>🧑‍🤝‍🧑 Habitantes:</strong> Predominantemente composta por Humanos adaptados ao clima severo, Anões das montanhas e Mestiços que buscam refúgio na isolação.</p>
-                <p><strong>⚔️ Tradições:</strong> Uma cultura que exalta a força bruta e o instinto de sobrevivência. A magia é encarada com profundo ceticismo e desconfiança; estudiosos e acadêmicos são raros e raramente bem-vindos.</p>
+                <p><strong>⚔️ Tradições:</strong> Uma cultura que exalta a força bruta e o instinto de sobrevivência. A magia é encarada com profundo ceticismo e desconfiança. Estudiosos e acadêmicos são raros e raramente bem-vindos.</p>
                 <p><strong>💎 Subsistência:</strong> A economia gira em torno do comércio de peles exóticas e subprodutos obtidos da caça de feras colossais que habitam a região.</p>
             `
         },
@@ -664,7 +720,7 @@ function alternarCoordenadas() {
                 <p><strong>📜 Panorama:</strong> Um reino onde a realidade é moldada pelo fluxo místico. A densidade de mana nesta província é tão alta que a própria fauna e flora sofreram mutações mágicas, criando cenários de beleza surreal e perigo arcano.</p>
                 <p><strong>👑 Governança:</strong> Embora exista uma linhagem real élfica cerimonial, a gestão administrativa e política reside nas mãos do <em>Conselho Élfico</em>, composto pelos mais experientes anciãos da raça.</p>
                 <p><strong>🧑‍🤝‍🧑 Habitantes:</strong> Uma população majoritariamente de Elfos e Humanos com afinidade mágica.</p>
-                <p><strong>⚔️ Tradições:</strong> A sociedade valoriza o intelecto, a elegância estética e a maestria arcana. Existe um forte sentimento de preservação cultural entre os Elfos, que muitas vezes evitam o contato próximo com outras raças para preservar o seu "potencial místico".</p>
+                <p><strong>⚔️ Tradições:</strong> A sociedade valoriza o intelecto, a elegância e a maestria arcana. Existe um forte sentimento de preservação cultural entre os Elfos, que muitas vezes evitam o contato próximo com outras raças para preservar o seu "potencial místico".</p>
                 <p><strong>💎 Subsistência:</strong> O epicentro do mercado arcano, focado na criação, encantamento e exportação de itens mágicos de altíssima qualidade.</p>
             `
         },
@@ -685,7 +741,7 @@ function alternarCoordenadas() {
                 <p><strong>👑 Governança:</strong> Uma oligarquia de disnastias que comandam as terras e que governam sob um rígido código de honra e lealdade ao trono imperial.</p>
                 <p><strong>🧑‍🤝‍🧑 Habitantes:</strong> Humanos e Mestiços.</p>
                 <p><strong>⚔️ Tradições:</strong> Os costumes são profundamente orientais, valorizando o respeito aos ancestrais, a cerimônia do chá e a disciplina das artes marciais e caligrafia. A harmonia e o equilíbrio espiritual são os pilares da sociedade.</p>
-                <p><strong>💎 Subsistência:</strong> O celeiro do império; produz grãos finos, seda de alta qualidade e pescados raros encontrados apenas nas profundezas do lago.</p>
+                <p><strong>💎 Subsistência:</strong> Produz grãos finos, seda de alta qualidade e pescados raros encontrados apenas nas profundezas do lago.</p>
             `
         },
         'Alcova.jpg': {
@@ -1341,99 +1397,37 @@ deuses: [
     const configSubPlanos = { largura: 1024, altura: 1536, minZoom: -1.0, maxZoom: 3 }; 
 
 function abrirMapaProvincia(arquivo) {
-        mapaAtualAtivo = arquivo;
-        
-        // --- LIMPEZA DE ROTA (ISSO ESTAVA FALTANDO) ---
-        if (medindo) cancelarModoMedicao();
-        grupoRota.clearLayers();
-        pontosRota = [];
-        // ----------------------------------------------
+    mapaAtualAtivo = arquivo;
+    
+    // --- LIMPEZA DE ROTA ---
+    if (medindo) cancelarModoMedicao();
+    grupoRota.clearLayers();
+    pontosRota = [];
 
-        // --- LÓGICA DE ESCALA ---
-        if (arquivo.includes('Planos.jpg')) { 
-             fatorEscala = 0.5; 
-        } else if (arquivo.includes('Plano')) { 
-             fatorEscala = 0.5;
-        } else {
-             fatorEscala = 0.13; // Escala regional
-        }
-
-        document.getElementById('menu-provincias').style.display = 'none';
-        document.getElementById('map-container').style.display = 'block';
-        document.getElementById('provincia-container').style.display = 'none';
-
-        // LÓGICA INTELIGENTE DE TAMANHO
-        let cfg = configProvincia; 
-        
-        if (arquivo === 'Planos.jpg') {
-            cfg = configPlanos; 
-        } 
-        else if (arquivo.includes('Plano') && arquivo !== 'Planos.jpg') {
-            cfg = configSubPlanos; 
-        }
-
-        inicializarMapa(arquivo, cfg.largura, cfg.altura, cfg.minZoom, cfg.maxZoom);
-
-        // --- BOTÕES DE CONTROLE DO MAPA ---
-
-        // 1. Botão Voltar (Topo Esquerdo)
-        const BotaoVoltarControl = L.Control.extend({
-            options: { position: 'topleft' },
-            onAdd: function() {
-                const btn = L.DomUtil.create('button', 'leaflet-control-button-voltar');
-                btn.innerHTML = "⬅ Voltar ao Continente";
-                
-                if (arquivo.includes('Plano') && arquivo !== 'Planos.jpg') {
-                    btn.innerHTML = "⬅ Voltar ao Nexus";
-                    btn.onclick = function(e) {
-                        L.DomEvent.stopPropagation(e);
-                        abrirMapaProvincia('Planos.jpg'); 
-                    };
-                } else {
-                    btn.onclick = function(e) {
-                        L.DomEvent.stopPropagation(e);
-                        carregarMapaPrincipal(); 
-                    };
-                }
-                
-                btn.style.cssText = "white-space:nowrap; padding:12px 18px; background:#8b4513; color:white; border:2px solid #5e2f0d; border-radius:5px; cursor:pointer; font-weight:bold; font-size:14px; z-index:9999;";
-                return btn;
-            }
-        });
-        map.addControl(new BotaoVoltarControl());
-
-        // 2. Botão Detalhes (Topo Direito)
-        const BotaoInfoControl = L.Control.extend({
-            options: { position: 'topright' },
-            onAdd: function() {
-                const btn = L.DomUtil.create('button', '');
-                btn.innerHTML = "📜 Detalhes";
-                btn.style.cssText = "white-space:nowrap; padding:10px 15px; background:#2c3e50; color:#cd853f; border:2px solid #cd853f; border-radius:5px; cursor:pointer; font-weight:bold;";
-                btn.onclick = abrirModalInfo;
-                return btn;
-            }
-        });
-        map.addControl(new BotaoInfoControl());
-
-        // 3. Botão Calculadora Flutuante (Topo Direito - Abaixo)
-        const BotaoMedirControl = L.Control.extend({
-            options: { position: 'topright' }, 
-            onAdd: function() {
-                const btn = L.DomUtil.create('button', '');
-                btn.id = 'btn-medidor-mapa'; 
-                btn.innerHTML = "📏 Medir";
-                btn.style.cssText = "white-space:nowrap; padding:8px 12px; background:rgba(0,0,0,0.8); color:#90EE90; border:1px solid #2E8B57; border-radius:5px; cursor:pointer; font-weight:bold; font-size:14px; margin-top: 5px;";
-                btn.onclick = function(e) {
-                    L.DomEvent.stopPropagation(e);
-                    ativarMedidor();
-                };
-                return btn;
-            }
-        });
-        map.addControl(new BotaoMedirControl());
-
-        adicionarMarcadoresLocais(arquivo);
+    // --- LÓGICA DE ESCALA ---
+    if (arquivo.includes('Planos.jpg') || arquivo.includes('Plano')) { 
+        fatorEscala = 0.5;
+    } else {
+        fatorEscala = 0.13; 
     }
+
+    // Configura o tamanho baseado no arquivo
+    let cfg = configProvincia; 
+    if (arquivo === 'Planos.jpg') cfg = configPlanos; 
+    else if (arquivo.includes('Plano')) cfg = configSubPlanos;
+
+    // Inicializa o mapa (A caixa preta #menu-provincias deve continuar display: block)
+    inicializarMapa(arquivo, cfg.largura, cfg.altura, cfg.minZoom, cfg.maxZoom);
+
+    // --- TROCA DE CONTEÚDO NO MENU LATERAL ---
+    // Esconde a lista de províncias e mostra as ferramentas da região
+    document.getElementById('lista-botoes-provincia').style.display = 'none';
+    document.getElementById('lista-ferramentas-regiao').style.display = 'block';
+
+    if (marcadorTempCoords) { map.removeLayer(marcadorTempCoords); marcadorTempCoords = null; }
+    adicionarMarcadoresLocais(arquivo);
+    atualizarVisualBotao(document.getElementById('btn-coords-prov'));
+}
 
 function verImagemEstatica(arquivo) {
         // Esconde o mapa (mas ele continua vivo no fundo)
