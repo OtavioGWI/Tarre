@@ -249,6 +249,31 @@
     .texto-item p { font-size: 14px; margin: 0; color: #ccc; }
     .recompensa { color: #ffd700; font-weight: bold; display: block; margin-bottom: 5px; }
     .classe-char { color: #cd853f; font-weight: bold; font-size: 12px; text-transform: uppercase; display: block; margin-bottom: 5px; }
+    
+/* --- ESTILO DA CALCULADORA --- */
+    .tabela-viagem { width: 100%; border-collapse: collapse; margin-top: 10px; color: #ddd; }
+    .tabela-viagem td, .tabela-viagem th { border: 1px solid #444; padding: 8px; text-align: left; }
+    .tabela-viagem th { background: #2c3e50; color: #ffd700; }
+    
+    .modo-medicao-ativo {
+        cursor: crosshair !important; /* Muda o mouse para uma cruz */
+    }
+    .destaque-gold { color: #ffd700; font-weight: bold; }
+    .destaque-silver { color: #c0c0c0; font-weight: bold; }
+    .destaque-bronze { color: #cd7f32; font-weight: bold; }
+
+    /* Quando ativo, desabilita cliques nos marcadores existentes para permitir traçar rota por cima */
+    .mapa-intangivel .leaflet-marker-icon,
+    .mapa-intangivel .leaflet-popup {
+        pointer-events: none !important;
+        opacity: 0.7; /* Fica meio transparente pra indicar que não pode clicar */
+    }
+    
+    /* Marcadores da própria rota (bolinhas vermelhas) devem continuar visíveis */
+    .marcador-rota {
+        pointer-events: none; /* Apenas visual */
+    }
+
     </style>
 </head>
 <body>
@@ -273,26 +298,31 @@
     </div>
 
 <div id="menu-provincias">
-        <h3 onclick="alternarMenuMobile()">Menu Principal <span id="seta-menu">▼</span></h3>
-        <div id="lista-botoes-provincia">
-            
-            <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">PROVÍNCIAS</div>
+    <h3 onclick="alternarMenuMobile()">Menu Principal <span id="seta-menu">▼</span></h3>
+    <div id="lista-botoes-provincia">
+        
+        <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">PROVÍNCIAS</div>
 
-            <button class="botao-provincia" onclick="abrirMapaProvincia('Hukmal_tep.jpg')">Hukmal'tep</button>
-            <button class="botao-provincia" onclick="abrirMapaProvincia('Blat_khyr.jpg')">Blat'khyr</button>
-            <button class="botao-provincia" onclick="abrirMapaProvincia('Deserto.jpg')">Deserto</button>
-            <button class="botao-provincia" onclick="abrirMapaProvincia('Lago.jpg')">Lago</button>
-            <button class="botao-provincia" onclick="abrirMapaProvincia('Alcova.jpg')">Alcova</button>
-            <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
-            
-            <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">COSMOLOGIA</div>
-            <button class="botao-provincia" onclick="abrirModalSenha('portal', 'Planos.jpg', 'mapa')" style="color: #aeb6bf;">🌌 Outros Planos</button>
+        <button class="botao-provincia" onclick="abrirMapaProvincia('Hukmal_tep.jpg')">Hukmal'tep</button>
+        <button class="botao-provincia" onclick="abrirMapaProvincia('Blat_khyr.jpg')">Blat'khyr</button>
+        <button class="botao-provincia" onclick="abrirMapaProvincia('Deserto.jpg')">Deserto</button>
+        <button class="botao-provincia" onclick="abrirMapaProvincia('Lago.jpg')">Lago</button>
+        <button class="botao-provincia" onclick="abrirMapaProvincia('Alcova.jpg')">Alcova</button>
+        
+        <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
+        
+        <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">COSMOLOGIA</div>
+        <button class="botao-provincia" onclick="abrirModalSenha('portal', 'Planos.jpg', 'mapa')" style="color: #aeb6bf;">🌌 Outros Planos</button>
 
-            <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
-            <button id="btn-coords-menu" class="botao-provincia" onclick="alternarCoordenadas()" style="color: #aaa;">📍 Coords: OFF</button>
-        </div>
+        <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
+        
+        <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">FERRAMENTAS</div>
+        
+        <button id="btn-coords-menu" class="botao-provincia" onclick="alternarCoordenadas()" style="color: #aaa;">📍 Coords: OFF</button>
+        <button id="btn-medidor" class="botao-provincia" onclick="ativarMedidor()" style="color: #90EE90; border-color: #2E8B57;">📏 Calculadora de Viagem</button>
+
     </div>
-
+</div>
     <div id="provincia-container">
         <img id="img-provincia" src="">
     </div>
@@ -315,6 +345,14 @@
         </div>
     </div>
 
+<div id="modal-viagem" style="display: none; position: fixed; z-index: 6000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); align-items: center; justify-content: center;">
+        <div class="modal-conteudo" style="max-width: 500px;">
+            <span class="fechar-modal" onclick="document.getElementById('modal-viagem').style.display='none'">&times;</span>
+            <h3 style="color: #90EE90;">📊 Relatório de Viagem</h3>
+            <div id="resultado-viagem"></div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
@@ -325,8 +363,16 @@
 // --- VARIÁVEIS GLOBAIS ---
     let map; 
     let mapaAtualAtivo = 'continente';
-    let planoSelecionado = null; // <--- NOVA VARIÁVEL
+    let planoSelecionado = null; 
     let modoCoordenadas = false;
+    let fatorEscala = 0.23;
+
+    // --- VARIÁVEIS DA CALCULADORA ---
+    // AQUI ESTAVA O ERRO: Faltava criar o grupoRota
+    const grupoRota = L.layerGroup(); 
+    
+    let medindo = false;
+    let pontosRota = [];
 
     // --- FUNÇÕES DE NAVEGAÇÃO E SISTEMA ---
 
@@ -348,14 +394,22 @@
             zoomControl: false // Opcional: Se quiser mover o zoom, avise
         });
 
+        grupoRota.addTo(map);
         // Adiciona o Zoom num lugar padrão (já que removemos acima para testar, se sumir o zoom apague a linha zoomControl: false)
         L.control.zoom({ position: 'topleft' }).addTo(map);
 
         L.imageOverlay(arquivo, limitesImagem).addTo(map);
         map.fitBounds(limitesImagem);
         
-        // --- 1. LÓGICA DO CLIQUE ---
+// --- 1. LÓGICA DO CLIQUE (ATUALIZADA) ---
         map.on('click', function(e) {
+            // Se o medidor estiver ligado, processa a viagem
+            if (medindo) {
+                processarCliqueMedicao(e.latlng);
+                return; // Para por aqui
+            }
+
+            // Se o modo Coordenadas estiver ligado
             if (modoCoordenadas) {
                 const y = e.latlng.lat.toFixed(0);
                 const x = e.latlng.lng.toFixed(0);
@@ -400,10 +454,18 @@
         }
     }
 
-    // 3. Carrega o mapa principal (Continente)
+// 3. Carrega o mapa principal (Continente)
     function carregarMapaPrincipal() {
         mapaAtualAtivo = 'continente';
+        fatorEscala = 0.23; // Escala do continente
         planoSelecionado = null;
+
+        // --- LIMPEZA DE ROTA (GARANTIA) ---
+        if (medindo) cancelarModoMedicao();
+        grupoRota.clearLayers();
+        pontosRota = [];
+        // ----------------------------------
+
         document.getElementById('map-container').style.display = 'block';
         document.getElementById('provincia-container').style.display = 'none';
         document.getElementById('menu-provincias').style.display = 'block';
@@ -417,7 +479,7 @@
 
         inicializarMapa(configContinental.arquivo, configContinental.largura, configContinental.altura, configContinental.minZoom, configContinental.maxZoom);
         adicionarMarcadoresPrincipais();
-    } // <--- AQUI FECHA A FUNÇÃO carregarMapaPrincipal (Isso estava faltando no seu código anterior)
+    }
 
     // --- FUNÇÕES DOS BOTÕES EXTRAS (Agora fora de qualquer outra função) ---
 
@@ -835,10 +897,40 @@ deuses: [
                 texto: `Aventura em progresso...`
             }
         ],
-        boatos: listaBoatos
+// ... dentro de dadosCapital ...
+        bestiario: [
+            { 
+                nome: "Gorila Gliador", 
+                perigo: "💀", 
+                fraqueza: "Não há", 
+                drops: "Pele de gorila", 
+                foto: "Gorila.png", // Coloque a foto se tiver
+                desc: "Uma besta territorial encontrada nas selvas do Coliseu. Usado para testar a força de gladiadores."
+            },
+            { 
+                nome: "Kraken", 
+                perigo: "💀💀💀💀💀💀", 
+                fraqueza: "Pedra gigante do Will", 
+                drops: "Tinta Mística, Tentáculo Gigante", 
+                foto: "Kraken.png", 
+                desc: "O terror dos mares. Foi derrotado, mas boatos dizem que era apenas um filhote."
+            },
+            { 
+                nome: "Murloc", 
+                perigo: "💀", 
+                fraqueza: "Fogo, Ataques físicos, Gente inteligente", 
+                drops: "Armas simples", 
+                foto: "murloc.png", 
+                desc: "Caçam em bandos, gostam de lugares úmidos e fechados"
+            }
+        ],
+
+        boatos: listaBoatos 
+
+        
     };
 
-// --- FUNÇÃO MENU CAPITAL (ATUALIZADA COM BANCO) ---
+// --- FUNÇÃO MENU CAPITAL (CORRIGIDA COM ZOOM NO BESTIÁRIO) ---
     function menuCapital(tipo) {
         const modal = document.getElementById('modal-capital');
         const container = document.getElementById('conteudo-menu-capital');
@@ -846,7 +938,7 @@ deuses: [
         modal.style.display = 'flex';
         container.innerHTML = "";
 
-        // --- ABA BANCO (NOVO) ---
+        // --- ABA BANCO ---
         if (tipo === 'banco') {
             titulo.innerText = "🏦 Banco Imperial";
             let html = `<h4 style="color:#ffdead; margin-top:0;">Pacotes de Serviços</h4>`;
@@ -903,7 +995,31 @@ deuses: [
             return;
         }
 
-        // --- ABA ESQUADRÃO E PROCURADOS ---
+        // --- ABA BESTIÁRIO (CORRIGIDO) ---
+        if (tipo === 'bestiario') {
+            titulo.innerText = "📖 Bestiário Conhecido";
+            dadosCapital.bestiario.forEach(monstro => {
+                // AQUI ESTÁ A CORREÇÃO: Adicionado onclick e style cursor
+                let img = monstro.foto 
+                    ? `<img src="${monstro.foto}" class="foto-lista" onclick="verImagemPersonagem('${monstro.foto}')" style="cursor: zoom-in;" title="Clique para ampliar">` 
+                    : `<div class="foto-placeholder">?</div>`;
+                
+                container.innerHTML += `
+                    <div class="item-menu">
+                        ${img}
+                        <div class="texto-item">
+                            <h4 style="color:#ff4444;">${monstro.nome}</h4>
+                            <span style="font-size:12px;">Perigo: ${monstro.perigo}</span><br>
+                            <span style="font-size:12px; color:#aaa;">Fraqueza: ${monstro.fraqueza}</span>
+                            <p style="font-style:italic; margin-top:5px;">"${monstro.desc}"</p>
+                            <div style="margin-top:5px; font-size:11px; color:#ffd700;">Drop: ${monstro.drops}</div>
+                        </div>
+                    </div>`;
+            });
+            return;
+        }
+
+        // --- ABA ESQUADRÃO E PROCURADOS (PADRÃO) ---
         const lista = (tipo === 'esquadrao') ? dadosCapital.esquadrao : dadosCapital.procurados;
         titulo.innerText = (tipo === 'esquadrao') ? "🛡️ Os Pandemônios" : "☠️ Cartazes de Procurados";
 
@@ -1132,42 +1248,59 @@ deuses: [
     // 2. Os Mapas Individuais (Divino, Demoníaco, Espiritual)
     const configSubPlanos = { largura: 1024, altura: 1536, minZoom: -1.0, maxZoom: 3 }; 
 
-    function abrirMapaProvincia(arquivo) {
+function abrirMapaProvincia(arquivo) {
         mapaAtualAtivo = arquivo;
+        
+        // --- LIMPEZA DE ROTA (ISSO ESTAVA FALTANDO) ---
+        if (medindo) cancelarModoMedicao();
+        grupoRota.clearLayers();
+        pontosRota = [];
+        // ----------------------------------------------
+
+        // --- LÓGICA DE ESCALA ---
+        if (arquivo.includes('Planos.jpg')) { 
+             fatorEscala = 0.5; 
+        } else if (arquivo.includes('Plano')) { 
+             fatorEscala = 0.5;
+        } else {
+             fatorEscala = 0.13; // Escala regional
+        }
+
         document.getElementById('menu-provincias').style.display = 'none';
         document.getElementById('map-container').style.display = 'block';
         document.getElementById('provincia-container').style.display = 'none';
 
         // LÓGICA INTELIGENTE DE TAMANHO
-        let cfg = configProvincia; // Padrão (2048x1536)
+        let cfg = configProvincia; 
         
         if (arquivo === 'Planos.jpg') {
-            cfg = configPlanos; // Usa 741x1024
+            cfg = configPlanos; 
         } 
-        else if (arquivo === 'Plano Divino.png' || arquivo === 'Plano Demoníaco.png' || arquivo === 'Plano Espiritual.png') {
-            cfg = configSubPlanos; // Usa 1024x1536
+        else if (arquivo.includes('Plano') && arquivo !== 'Planos.jpg') {
+            cfg = configSubPlanos; 
         }
 
         inicializarMapa(arquivo, cfg.largura, cfg.altura, cfg.minZoom, cfg.maxZoom);
 
-        // Botão Voltar (Topo Esquerdo)
+        // --- BOTÕES DE CONTROLE DO MAPA ---
+
+        // 1. Botão Voltar (Topo Esquerdo)
         const BotaoVoltarControl = L.Control.extend({
             options: { position: 'topleft' },
             onAdd: function() {
                 const btn = L.DomUtil.create('button', 'leaflet-control-button-voltar');
                 btn.innerHTML = "⬅ Voltar ao Continente";
                 
-                // Se estiver dentro de um sub-plano, o botão deve voltar para o Nexus, não pro continente
-                if (arquivo === 'Plano Divino.png' || arquivo === 'Plano Demoníaco.png' || arquivo === 'Plano Espiritual.png') {
+                if (arquivo.includes('Plano') && arquivo !== 'Planos.jpg') {
                     btn.innerHTML = "⬅ Voltar ao Nexus";
                     btn.onclick = function(e) {
                         L.DomEvent.stopPropagation(e);
-                        abrirMapaProvincia('Planos.jpg'); // Volta pro Nexus
+                        abrirMapaProvincia('Planos.jpg'); 
                     };
                 } else {
                     btn.onclick = function(e) {
                         L.DomEvent.stopPropagation(e);
-                        carregarMapaPrincipal(); // Volta pro Continente
+                        carregarMapaPrincipal(); 
                     };
                 }
                 
@@ -1177,7 +1310,7 @@ deuses: [
         });
         map.addControl(new BotaoVoltarControl());
 
-        // Botão Detalhes (Topo Direito)
+        // 2. Botão Detalhes (Topo Direito)
         const BotaoInfoControl = L.Control.extend({
             options: { position: 'topright' },
             onAdd: function() {
@@ -1189,6 +1322,23 @@ deuses: [
             }
         });
         map.addControl(new BotaoInfoControl());
+
+        // 3. Botão Calculadora Flutuante (Topo Direito - Abaixo)
+        const BotaoMedirControl = L.Control.extend({
+            options: { position: 'topright' }, 
+            onAdd: function() {
+                const btn = L.DomUtil.create('button', '');
+                btn.id = 'btn-medidor-mapa'; 
+                btn.innerHTML = "📏 Medir";
+                btn.style.cssText = "white-space:nowrap; padding:8px 12px; background:rgba(0,0,0,0.8); color:#90EE90; border:1px solid #2E8B57; border-radius:5px; cursor:pointer; font-weight:bold; font-size:14px; margin-top: 5px;";
+                btn.onclick = function(e) {
+                    L.DomEvent.stopPropagation(e);
+                    ativarMedidor();
+                };
+                return btn;
+            }
+        });
+        map.addControl(new BotaoMedirControl());
 
         adicionarMarcadoresLocais(arquivo);
     }
@@ -1525,6 +1675,7 @@ if (nomeDoMapa === 'Planos.jpg') {
                 botoes += `<button onclick="menuCapital('historico')" class="btn-popup" style="background:#5e2f0d; margin-bottom:5px;">📜 Histórico</button>`;
                 botoes += `<button onclick="menuCapital('boatos')" class="btn-popup" style="background:#4b0082; margin-bottom:5px;">🗣️ Boatos</button>`;
                 botoes += `<button onclick="menuCapital('banco')" class="btn-popup" style="background:#DAA520; color: black;">🏦 Banco Imperial</button>`;
+                botoes += `<button onclick="menuCapital('bestiario')" class="btn-popup" style="background:#006400; margin-bottom:5px;">📖 Bestiário</button>`;
             }
             
             // --- CIDADE SAGRADA ---
@@ -1608,6 +1759,157 @@ if (nomeDoMapa === 'Planos.jpg') {
         criarPonto([2070, 3642], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
         
         criarPonto([3912, 1780], "Inverno Desolado", "O inverno está chegando...", 'none', true);
+    }
+    
+
+
+    // Função para controlar os botões (Menu e Mapa)
+    function atualizarBotaoMedidor(estado) {
+        const btnMenu = document.getElementById('btn-medidor');
+        const btnMapa = document.getElementById('btn-medidor-mapa');
+        
+        let texto, cor, corTexto;
+
+        if (estado === 'iniciar') { // Estado Neutro
+            texto = "📏 Calculadora de Viagem";
+            cor = ""; // Padrão
+            corTexto = "#90EE90";
+        } 
+        else if (estado === 'medindo') { // Estado Ativo
+            texto = "🏁 Finalizar Rota"; // Clica aqui para calcular
+            cor = "#2E8B57"; // Verde
+            corTexto = "white";
+        }
+
+        if (btnMenu) {
+            btnMenu.innerHTML = texto;
+            btnMenu.style.background = cor;
+            btnMenu.style.color = corTexto;
+        }
+        if (btnMapa) {
+            btnMapa.innerHTML = estado === 'iniciar' ? "📏 Medir" : "🏁 Calcular";
+            btnMapa.style.background = cor || "rgba(0,0,0,0.8)";
+            btnMapa.style.color = corTexto;
+        }
+    }
+
+    function ativarMedidor() {
+        if (!medindo) {
+            // --- INICIAR MEDIÇÃO ---
+            medindo = true;
+            pontosRota = []; // Zera a memória da rota
+            grupoRota.addTo(map); // Adiciona o grupo ao mapa
+            grupoRota.clearLayers(); // Limpa desenhos anteriores (AQUI RESOLVE A PERSISTÊNCIA)
+            
+            // Ativa o "Modo Fantasma" (CSS) para clicar através das cidades
+            document.getElementById('map-container').classList.add('mapa-intangivel');
+            document.getElementById('map').classList.add('modo-medicao-ativo');
+            
+            atualizarBotaoMedidor('medindo');
+            
+        } else {
+            // --- FINALIZAR E CALCULAR ---
+            // Só calcula se tiver pelo menos uma linha (2 pontos)
+            if (pontosRota.length > 1) {
+                calcularResultados();
+            } else {
+                // Se clicou em finalizar sem marcar nada, só cancela
+                cancelarModoMedicao();
+            }
+        }
+    }
+
+    // Sai do modo de medição e devolve os cliques para as cidades
+    function cancelarModoMedicao() {
+        medindo = false;
+        document.getElementById('map-container').classList.remove('mapa-intangivel');
+        document.getElementById('map').classList.remove('modo-medicao-ativo');
+        atualizarBotaoMedidor('iniciar');
+    }
+
+    // Processa cada clique no mapa
+    function processarCliqueMedicao(latlng) {
+        // Adiciona coordenada à lista
+        pontosRota.push(latlng);
+
+        // Desenha uma bolinha (ponto)
+        const bolinha = L.circleMarker(latlng, {
+            radius: 4, color: 'white', fillColor: '#ff4444', fillOpacity: 1, className: 'marcador-rota'
+        }).addTo(grupoRota);
+
+        // Se tiver mais de 1 ponto, desenha a linha conectando o anterior ao atual
+        if (pontosRota.length > 1) {
+            const ultimoPonto = pontosRota[pontosRota.length - 2];
+            const linha = L.polyline([ultimoPonto, latlng], {
+                color: '#ff4444', weight: 3, dashArray: '5, 10'
+            }).addTo(grupoRota);
+        }
+    }
+
+function calcularResultados() {
+        let distanciaTotalPixels = 0;
+
+        // Soma a distância de todos os segmentos da rota
+        for (let i = 0; i < pontosRota.length - 1; i++) {
+            distanciaTotalPixels += map.distance(pontosRota[i], pontosRota[i+1]);
+        }
+
+        // --- CÁLCULOS ---
+        const distanciaReal = distanciaTotalPixels * fatorEscala;
+
+        // CALIBRAÇÃO DE TEMPO (CORRIGIDA)
+        // Usamos 30 km por dia (ritmo de marcha padrão de RPG)
+        // Antes estava 150 (que era baseado em pixels, por isso estava rápido demais)
+        const kmPorDiaPe = 30; 
+        
+        const diasPe = (distanciaReal / kmPorDiaPe).toFixed(1);
+        const diasMontariaLenta = (distanciaReal / (kmPorDiaPe * 1.5)).toFixed(1); // Mula
+        const diasMontariaNormal = (distanciaReal / (kmPorDiaPe * 2.0)).toFixed(1); // Cavalo
+        const diasMontariaRapida = (distanciaReal / (kmPorDiaPe * 4.0)).toFixed(1); // Voo
+
+        // --- ECONOMIA (CORRIGIDA - METADE DO PREÇO) ---
+        // 1 Gold = 100 Prata = 10000 Bronze
+        
+        // Taxa de Embarque: 2.5 Golds (Era 5)
+        const custoBase = 25000; 
+        
+        // Custo por KM: 2.5 Pratas (Era 5)
+        const custoPorKm = 250;  
+        
+        let custoTotalCobre = Math.floor(custoBase + (distanciaReal * custoPorKm));
+
+        // Conversão de Moedas
+        const golds = Math.floor(custoTotalCobre / 10000);
+        custoTotalCobre %= 10000;
+        const silvers = Math.floor(custoTotalCobre / 100);
+        const bronzes = custoTotalCobre % 100;
+
+        // Monta o HTML do Resultado
+        let html = `
+            <p><strong>Rota Total:</strong> ${Math.floor(distanciaReal)} km (aprox).</p>
+            <table class="tabela-viagem">
+                <tr><th>Método</th><th>Tempo Total</th></tr>
+                <tr><td>🚶 A Pé</td><td>${diasPe} dias</td></tr>
+                <tr><td>🐴 Mula/Burro (Montaria Lenta)</td><td>${diasMontariaLenta} dias</td></tr>
+                <tr><td>🐎 Cavalo (Montaria Normal)</td><td>${diasMontariaNormal} dias</td></tr>
+                <tr><td>⚡ Montaria Especial (Montaria Rápida)</td><td>${diasMontariaRapida} dias</td></tr>
+            </table>
+
+            <hr>
+            <h4 style="color: #87CEEB;">🔮 Transporte Imperial Seguro</h4>
+            <p>Taxa de risco e seguro inclusos.</p>
+            <p><strong>Valor Total:</strong><br>
+            <span class="destaque-gold">${golds} Ouro</span>, 
+            <span class="destaque-silver">${silvers} Prata</span>, 
+            <span class="destaque-bronze">${bronzes} Bronze</span>.
+            </p>
+        `;
+
+        document.getElementById('resultado-viagem').innerHTML = html;
+        document.getElementById('modal-viagem').style.display = 'flex';
+        
+        // Sai do modo de medição, mas MANTÉM O DESENHO na tela para verem
+        cancelarModoMedicao();
     }
     // Inicialização
     carregarMapaPrincipal();
