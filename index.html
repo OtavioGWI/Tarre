@@ -126,6 +126,25 @@
         padding-left: 18px; /* Efeito de deslize */
         color: #fff;
     }
+/* Classe que mantém o botão verde e ignora o brilho marrom quando ativo */
+.btn-ferramenta-ativa {
+    background-color: #27ae60 !important;
+    color: white !important;
+    border-color: #2ecc71 !important;
+}
+
+/* Mantém verde mesmo com o mouse em cima */
+.btn-ferramenta-ativa:hover {
+    background-color: #2ecc71 !important;
+    padding-left: 15px;
+}
+
+/* Hover padrão para botões desligados */
+.botao-provincia:hover {
+    background: #8b4513 !important;
+    color: white !important;
+    border-color: #46362f !important;
+}
 
     /* --- VOLTANDO O ESTILO ORIGINAL DO MENU --- */
     .botao-provincia {
@@ -419,6 +438,11 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
+
+        
+    document.addEventListener("keydown", (e) => {
+    if (medindo && e.ctrlKey && (e.key === 'z' || e.key === 'Z')) desfazerUltimoPonto();
+});
 // --- 1. CONFIGURAÇÕES TÉCNICAS ---
     const configContinental = { arquivo: 'Mapa teste.png', largura: 7680, altura: 4320, minZoom: -2.0, maxZoom: 3 };
     const configProvincia = { largura: 2048, altura: 1536, minZoom: -1.0, maxZoom: 2 };
@@ -468,13 +492,6 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
         maxBoundsViscosity: 0.5,     
         tap: false,
         zoomControl: false 
-    });
-
-    // Atalho de teclado para desfazer ponto (CTRL + Z)
-    document.addEventListener("keydown", function(e) {
-        if (medindo && e.ctrlKey && e.key === 'z') {
-            desfazerUltimoPonto();
-        }
     });
 
     grupoRota.addTo(map);
@@ -681,15 +698,10 @@ function atualizarVisualBotao(btn) {
     
     if (modoCoordenadas) {
         btn.innerHTML = "📍 Coords: ON";
-        btn.style.background = "#27ae60"; // Verde quando ligado
-        btn.style.color = "white";
-        btn.style.borderColor = "#2ecc71";
+        btn.classList.add('btn-ferramenta-ativa');
     } else {
         btn.innerHTML = "📍 Coords: OFF";
-        // Removemos os estilos manuais para o CSS original assumir o controle
-        btn.style.background = ""; 
-        btn.style.color = ""; 
-        btn.style.borderColor = "";
+        btn.classList.remove('btn-ferramenta-ativa');
     }
 }
 
@@ -1866,35 +1878,22 @@ if (nomeDoMapa === 'Planos.jpg') {
 
 
     // Função para controlar os botões (Menu e Mapa)
-    function atualizarBotaoMedidor(estado) {
-        const btnMenu = document.getElementById('btn-medidor');
-        const btnMapa = document.getElementById('btn-medidor-mapa');
-        
-        let texto, cor, corTexto;
+function atualizarBotaoMedidor(estado) {
+    const btnMenu = document.getElementById('btn-medidor'); // Continente
+    const btnProv = document.getElementById('btn-medidor-prov'); // Província
+    
+    let texto = (estado === 'medindo') ? "🏁 Finalizar Rota" : "📏 Calculadora de Viagem";
 
-        if (estado === 'iniciar') { // Estado Neutro
-            texto = "📏 Calculadora de Viagem";
-            cor = ""; // Padrão
-            corTexto = "#90EE90";
-        } 
-        else if (estado === 'medindo') { // Estado Ativo
-            texto = "🏁 Finalizar Rota"; // Clica aqui para calcular
-            cor = "#2E8B57"; // Verde
-            corTexto = "white";
+    [btnMenu, btnProv].forEach(btn => {
+        if (!btn) return;
+        btn.innerHTML = texto;
+        if (estado === 'medindo') {
+            btn.classList.add('btn-ferramenta-ativa');
+        } else {
+            btn.classList.remove('btn-ferramenta-ativa');
         }
-
-        if (btnMenu) {
-            btnMenu.innerHTML = texto;
-            btnMenu.style.background = cor;
-            btnMenu.style.color = corTexto;
-        }
-        if (btnMapa) {
-            btnMapa.innerHTML = estado === 'iniciar' ? "📏 Medir" : "🏁 Calcular";
-            btnMapa.style.background = cor || "rgba(0,0,0,0.8)";
-            btnMapa.style.color = corTexto;
-        }
-    }
-
+    });
+}
     function ativarMedidor() {
         if (!medindo) {
             // --- INICIAR MEDIÇÃO ---
