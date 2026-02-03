@@ -574,6 +574,29 @@ function alternarMenuMobile() {
     }
 }
 
+// Centraliza a lógica de visibilidade do menu para mobile/tablet
+function atualizarVisibilidadeMenuMobile() {
+    const listaProv = document.getElementById('lista-botoes-provincia');
+    const listaFerramentas = document.getElementById('lista-ferramentas-regiao');
+    const seta = document.getElementById('seta-menu');
+
+    if (window.innerWidth <= 600) {
+        if (listaProv) listaProv.style.display = 'none';
+        if (listaFerramentas) listaFerramentas.style.display = 'none';
+        if (seta) seta.innerHTML = '▼';
+        return;
+    }
+
+    // Desktop/tablet: mostra a parte correta do menu dependendo do mapa ativo
+    if (mapaAtualAtivo === 'continente') {
+        if (listaProv) listaProv.style.display = 'block';
+        if (listaFerramentas) listaFerramentas.style.display = 'none';
+    } else {
+        if (listaProv) listaProv.style.display = 'none';
+        if (listaFerramentas) listaFerramentas.style.display = 'block';
+    }
+}
+
 // 3. Carrega o mapa principal (Continente)
     function carregarMapaPrincipal() {
         mapaAtualAtivo = 'continente';
@@ -589,26 +612,14 @@ function alternarMenuMobile() {
         document.getElementById('map-container').style.display = 'block';
         document.getElementById('provincia-container').style.display = 'none';
         document.getElementById('menu-provincias').style.display = 'block';
-        
-        if (window.innerWidth <= 600) {
-            document.getElementById('lista-botoes-provincia').style.display = 'none';
-            document.getElementById('seta-menu').innerHTML = '▼';
-        } else {
-            document.getElementById('lista-botoes-provincia').style.display = 'block';
-        }
 
-        document.getElementById('lista-botoes-provincia').style.display = 'block';
-        document.getElementById('lista-ferramentas-regiao').style.display = 'none';
+        // Ajusta visibilidade do menu dependendo do tamanho da tela
+        atualizarVisibilidadeMenuMobile();
 
         if (marcadorTempCoords) { map.removeLayer(marcadorTempCoords); marcadorTempCoords = null; }
         inicializarMapa(configContinental.arquivo, configContinental.largura, configContinental.altura, configContinental.minZoom, configContinental.maxZoom);
         adicionarMarcadoresPrincipais();
-        // Adicione isso no FINAL da função abrirMapaProvincia e também no FINAL da carregarMapaPrincipal
-if (window.innerWidth <= 600) {
-    document.getElementById('lista-botoes-provincia').style.display = 'none';
-    document.getElementById('lista-ferramentas-regiao').style.display = 'none';
-    document.getElementById('seta-menu').innerHTML = '▼';
-}
+        // Visibilidade de menu mobile já foi aplicada via helper
     }
 
     // --- FUNÇÕES DOS BOTÕES EXTRAS (Agora fora de qualquer outra função) ---
@@ -1298,17 +1309,10 @@ deuses: [
         btnVoltar.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
         
         btnVoltar.onclick = function() {
-            containerImg.style.display = 'none';
-            document.getElementById('map-container').style.display = 'block';
-            
-            // Restaura menu lateral se estiver no continente
-            if (mapaAtualAtivo === 'continente') {
-                document.getElementById('menu-provincias').style.display = 'block';
-            }
-
+            restaurarMapaMenu({ restoreMenuIfContinent: true });
             // Reabre o modal já carregando os deuses
             document.getElementById('modal-capital').style.display = 'flex';
-            menuDeuses(); 
+            menuDeuses();
         };
 
         const btnAntigo = containerImg.querySelector('button');
@@ -1332,14 +1336,7 @@ deuses: [
         btnVoltar.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
         
         btnVoltar.onclick = function() {
-            containerImg.style.display = 'none';
-            document.getElementById('map-container').style.display = 'block';
-            
-            // --- CORREÇÃO: Restaura o menu se estiver no continente ---
-            if (mapaAtualAtivo === 'continente') {
-                document.getElementById('menu-provincias').style.display = 'block';
-            }
-
+            restaurarMapaMenu({ restoreMenuIfContinent: true });
             document.getElementById('modal-capital').style.display = 'flex';
             lerCapitulo(capituloIndex);
         };
@@ -1366,14 +1363,7 @@ deuses: [
         btnVoltar.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
         
         btnVoltar.onclick = function() {
-            containerImg.style.display = 'none';
-            document.getElementById('map-container').style.display = 'block';
-            
-            // --- CORREÇÃO: Restaura o menu se estiver no continente ---
-            if (mapaAtualAtivo === 'continente') {
-                document.getElementById('menu-provincias').style.display = 'block';
-            }
-
+            restaurarMapaMenu({ restoreMenuIfContinent: true });
             document.getElementById('modal-capital').style.display = 'flex';
         };
 
@@ -1382,16 +1372,28 @@ deuses: [
         containerImg.insertBefore(btnVoltar, containerImg.firstChild);
     }
     // Nova função que apenas fecha a foto sem resetar o mapa
-function fecharImagem() {
-    // Esconde o container da foto
-    document.getElementById('provincia-container').style.display = 'none';
-    
-    // Mostra o mapa novamente
-    document.getElementById('map-container').style.display = 'block';
-    
-    // MOSTRA O MENU NOVAMENTE (Sempre, seja no continente ou na província)
-    document.getElementById('menu-provincias').style.display = 'block';
-}
+    // Centraliza restauração da visualização (mapa + menu)
+    function restaurarMapaMenu(options = {}) {
+        const container = document.getElementById('provincia-container');
+        const mapa = document.getElementById('map-container');
+        const menu = document.getElementById('menu-provincias');
+
+        if (container) container.style.display = 'none';
+        if (mapa) mapa.style.display = 'block';
+
+        if (options.restoreMenuIfContinent) {
+            if (mapaAtualAtivo === 'continente') {
+                if (menu) menu.style.display = 'block';
+            }
+        } else {
+            if (menu) menu.style.display = 'block';
+        }
+    }
+
+    function fecharImagem() {
+        // Por padrão mostra o menu (comportamento antigo)
+        restaurarMapaMenu();
+    }
 
     function fecharModais() { 
         document.getElementById('modal-info').style.display = 'none';
@@ -1467,13 +1469,10 @@ function abrirMapaProvincia(arquivo) {
 
     if (marcadorTempCoords) { map.removeLayer(marcadorTempCoords); marcadorTempCoords = null; }
     adicionarMarcadoresLocais(arquivo);
-    atualizarVisualBotao(document.getElementById('btn-coords-prov'));
-    // Adicione isso no FINAL da função abrirMapaProvincia e também no FINAL da carregarMapaPrincipal
-if (window.innerWidth <= 600) {
-    document.getElementById('lista-botoes-provincia').style.display = 'none';
-    document.getElementById('lista-ferramentas-regiao').style.display = 'none';
-    document.getElementById('seta-menu').innerHTML = '▼';
-}
+    atualizarVisualBotao();
+
+    // Ajusta visibilidade do menu dependendo do tamanho da tela
+    atualizarVisibilidadeMenuMobile();
 // --- LÓGICA DO BOTÃO VOLTAR DINÂMICO ---
     const btnVoltar = document.getElementById('btn-voltar-dinamico');
     
