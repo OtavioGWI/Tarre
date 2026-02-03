@@ -394,6 +394,13 @@
             zoomControl: false // Opcional: Se quiser mover o zoom, avise
         });
 
+        // Adiciona atalho de teclado para desfazer ponto (CTRL + Z)
+    document.addEventListener("keydown", function(e) {
+        if (medindo && e.ctrlKey && e.key === 'z') {
+            desfazerUltimoPonto();
+        }
+    });
+
         grupoRota.addTo(map);
         // Adiciona o Zoom num lugar padrão (já que removemos acima para testar, se sumir o zoom apague a linha zoomControl: false)
         L.control.zoom({ position: 'topleft' }).addTo(map);
@@ -1910,6 +1917,22 @@ function calcularResultados() {
         
         // Sai do modo de medição, mas MANTÉM O DESENHO na tela para verem
         cancelarModoMedicao();
+    }
+    function desfazerUltimoPonto() {
+        if (pontosRota.length > 0) {
+            // Remove a última coordenada da memória
+            pontosRota.pop();
+            
+            // Remove o último desenho (bolinha ou linha)
+            // O Leaflet adiciona camadas em ordem, então remover a última funciona visualmente
+            const camadas = grupoRota.getLayers();
+            if (camadas.length > 0) {
+                grupoRota.removeLayer(camadas[camadas.length - 1]); // Remove a bolinha
+                if (camadas.length > 1) { // Se tinha linha ligando, remove ela também
+                     grupoRota.removeLayer(camadas[camadas.length - 2]); 
+                }
+            }
+        }
     }
     // Inicialização
     carregarMapaPrincipal();
