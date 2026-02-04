@@ -484,50 +484,59 @@
     float: right;
 }
 
-/* --- ESTILO DOS CARDS DA BIBLIOTECA --- */
-.biblio-nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 15px; }
+/* --- VISUAL DO BESTIÁRIO (BORDAS E TAGS) --- */
+.item-bestiario { 
+    border: 2px solid #ff4444 !important; 
+    background: rgba(255, 0, 0, 0.1) !important;
+    padding: 15px; margin-bottom: 12px; border-radius: 8px; display: flex;
+}
+.tag-perigo { color: #ff4444; font-weight: bold; font-size: 16px; margin-left: 5px; }
+.tag-info { font-size: 12px; color: #aaa; display: block; margin-top: 4px; }
+.tag-titulo-info { color: #cd853f; font-weight: bold; }
 
-/* Card menor e quadrado para Raças e Navegação */
+/* --- ATRIBUTOS (CAIXINHAS ORIGINAIS) --- */
+.grid-atributos { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 15px; }
+.card-atributo { 
+    background: rgba(255, 255, 255, 0.05); border: 1px solid #555; 
+    padding: 12px; border-radius: 8px; text-align: center; 
+}
+.card-atributo strong { display: block; color: #ffd700; font-size: 15px; margin-bottom: 3px; }
+.card-atributo span { font-size: 12px; color: #ccc; }
+
+/* --- CARDS DA BIBLIOTECA (QUADRADOS) --- */
+.biblio-nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
 .rpg-card-small {
     background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
-    border: 1px solid #555; border-radius: 6px; padding: 15px;
+    border: 1px solid #555; border-radius: 8px; padding: 12px;
     cursor: pointer; text-align: center; transition: 0.3s;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-.rpg-card-small:hover { border-color: #ffd700; background: rgba(139, 69, 19, 0.4); transform: scale(1.02); }
-.rpg-card-small strong { font-size: 13px; color: #ffdead; }
+.rpg-card-small:hover { border-color: #ffd700; background: rgba(139, 69, 19, 0.4); transform: scale(1.05); }
+.rpg-card-small span { font-size: 24px; margin-bottom: 5px; }
+.rpg-card-small strong { font-size: 10px; color: #ffdead; text-transform: uppercase; }
 
-/* Box de Detalhes e Descrições */
-.detalhe-box {
-    background: rgba(0, 0, 0, 0.3); border: 1px solid #8b4513;
-    padding: 20px; border-radius: 8px; margin-top: 15px; animation: fadeIn 0.3s ease;
+/* --- MAGIAS E HABILIDADES --- */
+.spell-level { color: #ffd700; font-size: 14px; text-transform: uppercase; margin: 15px 0 5px 0; border-left: 3px solid #ffd700; padding-left: 8px; }
+.spell-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; margin-bottom: 6px; font-size: 13px; border-left: 2px solid #555; }
+
+/* --- CARDS DA BIBLIOTECA (QUADRADOS) --- */
+.biblio-nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
+
+.rpg-card-small {
+    background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
+    border: 1px solid #555; border-radius: 8px; padding: 12px;
+    cursor: pointer; text-align: center; transition: 0.3s;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-.detalhe-box h3 { color: #ffd700; margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 8px; }
+.rpg-card-small:hover { border-color: #ffd700; background: rgba(139, 69, 19, 0.4); transform: scale(1.05); }
+.rpg-card-small span { font-size: 24px; margin-bottom: 5px; }
+.rpg-card-small strong { font-size: 11px; color: #ffdead; text-transform: uppercase; }
 
-/* Ajuste Atributos */
-.grid-atributos { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
-.card-atrib { background: rgba(255,255,255,0.05); border: 1px solid #444; padding: 8px; border-radius: 4px; text-align: center; }
-.card-atrib strong { display: block; color: #ffd700; font-size: 13px; }
-.card-atrib span { font-size: 11px; color: #aaa; }
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* Efeito para os Emojis das Classes */
-.rpg-card-small span { 
-    font-size: 28px; 
-    margin-bottom: 8px; 
-    filter: drop-shadow(0 0 5px rgba(255,215,0,0.3));
-}
-
-/* Melhoria no texto de detalhe */
-.detalhe-box p { 
-    font-size: 14px; 
-    line-height: 1.6; 
-    color: #ddd; 
-    background: rgba(255,255,255,0.05); 
-    padding: 15px; 
-    border-radius: 5px;
-}
+/* --- ESTILO MAGIAS --- */
+.spell-section { border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; }
+.spell-level { color: #ffd700; font-size: 14px; text-transform: uppercase; margin: 10px 0 5px 0; border-left: 3px solid #ffd700; padding-left: 8px; }
+.spell-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 4px; margin-bottom: 5px; font-size: 13px; }
+.spell-name { color: #87ceeb; font-weight: bold; }
 
     </style>
 </head>
@@ -1650,84 +1659,95 @@ function menuCapital(tipo) {
     const modal = document.getElementById('modal-capital');
     const container = document.getElementById('conteudo-menu-capital');
     const titulo = document.getElementById('titulo-menu-capital');
-    
     modal.style.display = 'flex';
     container.innerHTML = "";
-    if (tipo !== 'hub') { menuAtualAberto = tipo; }
+    if (tipo !== 'hub') menuAtualAberto = tipo;
 
-    // --- HUB CENTRAL REORGANIZADO ---
     if (tipo === 'hub') {
         menuAtualAberto = 'hub';
-        titulo.innerText = "🏛️ Centro Administrativo Imperial";
+        titulo.innerText = "🏛️ Centro Administrativo";
         container.innerHTML = `
-            <div style="display: grid; gap: 25px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-                
+            <div style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
                 <section>
                     <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">📜 HISTÓRICO</div>
                     ${criarBtn("📖 Missões", "menuCapital('historico')", "#9370DB")}
-                    ${criarBtn("📖 Bestiário Imperial", "menuCapital('bestiario')", "#2E8B57")}
-                    ${criarBtn("🗣️ Boatos Conhecidos", "menuCapital('boatos')", "#800080")}
+                    ${criarBtn("📖 Bestiário", "menuCapital('bestiario')", "#2E8B57")}
+                    ${criarBtn("🗣️ Boatos", "menuCapital('boatos')", "#800080")}
                 </section>
-                
                 <section>
                     <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">👥 PESSOAS & LENDAS</div>
                     ${criarBtn("🛡️ Esquadrão", "menuCapital('esquadrao')", "#4682B4")}
                     ${criarBtn("⚜️ Heróis Lendários", "menuCapital('lendas')", "#DAA520")}
-                    ${criarBtn("☠️ Cartazes de Procurados", "menuCapital('procurados')", "#8b0000")}
+                    ${criarBtn("☠️ Procurados", "menuCapital('procurados')", "#8b0000")}
                 </section>
-
                 <section>
                     <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">ℹ️ INFORMAÇÕES</div>
-                    ${criarBtn("📚 Biblioteca Imperial", "abrirBiblioteca()", "#483D8B")}
+                    ${criarBtn("📚 Biblioteca", "abrirBiblioteca()", "#483D8B")}
                     ${criarBtn("🏦 Banco Imperial", "menuCapital('banco')", "#ffd700")}
                     ${criarBtn("📸 Ver Cidade", "verImagemEstatica('Capital.png', () => { restaurarMapaMenu(); menuCapital('hub'); })", "#5F9EA0")}
                 </section>
-            </div>
-        `;
+            </div>`;
         return;
     }
 
-    const btnVoltarHub = `<button onclick="menuCapital('hub')" class="btn-popup" style="margin-bottom: 15px; background: #444; width: 100%;">⬅ Voltar ao Painel Imperial</button>`;
+    const btnVoltar = `<button onclick="menuCapital('hub')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar ao Painel</button>`;
 
-    // --- RE-IMPLEMENTAÇÃO DAS ABAS (BANCO, BOATOS, ETC) ---
-    if (tipo === 'banco') {
+    if (tipo === 'bestiario') {
+        titulo.innerText = "📖 Bestiário Conhecido";
+        container.innerHTML = btnVoltar;
+        dadosCapital.bestiario.forEach(m => {
+            let img = m.foto ? `<img src="${m.foto}" class="foto-lista" onclick="verImagemPersonagem('${m.foto}')">` : `<div class="foto-placeholder">?</div>`;
+            container.innerHTML += `
+                <div class="item-bestiario">
+                    ${img}
+                    <div class="texto-item">
+                        <h4>${m.nome} <span class="tag-perigo">${m.perigo}</span></h4>
+                        <span class="tag-info"><span class="tag-titulo-info">Fraqueza:</span> ${m.fraqueza}</span>
+                        <span class="tag-info"><span class="tag-titulo-info">Drops:</span> ${m.drops}</span>
+                        <p style="margin-top:8px;">${m.desc}</p>
+                    </div>
+                </div>`;
+        });
+    } else if (tipo === 'procurados') {
+        titulo.innerText = "☠️ Cartazes de Procurados";
+        container.innerHTML = btnVoltar;
+        dadosCapital.procurados.forEach(p => {
+            let img = p.foto ? `<img src="${p.foto}" class="foto-lista" onclick="verImagemPersonagem('${p.foto}')">` : `<div class="foto-placeholder">WANTED</div>`;
+            container.innerHTML += `<div class="item-menu">${img}<div class="texto-item"><h4>${p.nome}</h4><span class="recompensa">💰 ${p.recompensa}</span><p>${p.desc}</p></div></div>`;
+        });
+    } else if (tipo === 'esquadrao') {
+        titulo.innerText = "🛡️ Esquadrão";
+        container.innerHTML = btnVoltar;
+        dadosCapital.esquadrao.forEach(e => {
+            let img = e.foto ? `<img src="${e.foto}" class="foto-lista" onclick="verImagemPersonagem('${e.foto}')">` : `<div class="foto-placeholder">RETRATO</div>`;
+            container.innerHTML += `<div class="item-menu">${img}<div class="texto-item"><h4>${e.nome}</h4><span class="classe-char">${e.raca} • ${e.classe}</span><p>${e.desc}</p></div></div>`;
+        });
+    } else if (tipo === 'lendas') {
+        titulo.innerText = "🏛️ Heróis Lendários";
+        container.innerHTML = btnVoltar + `<p style="text-align:center; color:#aaa; font-style:italic;">"Bravos membros da campanha que derrotou o primeiro Rei Demônio"</p>`;
+        dadosCapital.lendas.forEach(h => {
+            container.innerHTML += `<div class="item-menu"><div class="texto-item" style="width:100%;"><h4>${h.nome}</h4><span class="classe-char">${h.titulo}</span><p>${h.desc}</p></div></div>`;
+        });
+    } else if (tipo === 'banco') {
         titulo.innerText = "🏦 Banco Imperial";
-        let html = btnVoltarHub + `<h4 style="color:#ffdead; margin-top:0;">Pacotes de Serviços</h4><table class="tabela-banco"><tr><th>Pacote</th><th>Custo</th><th>Benefícios</th></tr>`;
-        dadosGerais.banco.forEach(item => { html += `<tr><td>${item.nome}</td><td class="preco-banco">${item.custo}</td><td>${item.desc}</td></tr>`; });
-        html += `</table><h4 style="color:#ffdead; margin-top:20px;">Investimentos</h4><ul style="color:#ccc; padding-left:20px;">`;
+        let html = btnVoltar + `<table class="tabela-banco"><tr><th>Pacote</th><th>Custo</th><th>Benefícios</th></tr>`;
+        dadosGerais.banco.forEach(i => { html += `<tr><td>${i.nome}</td><td class="preco-banco">${i.custo}</td><td>${i.desc}</td></tr>`; });
+        html += `</table><h4 style="color:#ffdead; margin-top:20px;">Investimentos</h4><ul style="color:#ccc;">`;
         dadosGerais.investimentos.forEach(inv => { html += `<li><strong>${inv.nome}:</strong> ${inv.risco} (Min ${inv.min})</li>`; });
-        container.innerHTML = html + `</ul><div class="nota-banco">* Garantia total sobre bens guardados.</div>`;
-    }
-    else if (tipo === 'boatos') {
-        titulo.innerText = "🗣️ Boatos da Capital";
-        container.innerHTML = btnVoltarHub + `<div class="lista-boatos">`;
-        dadosCapital.boatos.forEach(boato => {
-            const txt = boato.descoberto ? boato.texto : "??????????????????";
-            container.innerHTML += `<div class="boato-item ${boato.descoberto ? 'boato-descoberto' : ''}"><span class="boato-numero">#${boato.id}</span><span class="boato-texto">"${txt}"</span></div>`;
+        container.innerHTML = html + `</ul>`;
+    } else if (tipo === 'boatos') {
+        titulo.innerText = "🗣️ Boatos";
+        container.innerHTML = btnVoltar + `<div class="lista-boatos">`;
+        dadosCapital.boatos.forEach(b => {
+            const txt = b.descoberto ? b.texto : "??????????";
+            container.innerHTML += `<div class="boato-item ${b.descoberto ? 'boato-descoberto' : ''}"><span class="boato-numero">#${b.id}</span><span class="boato-texto">"${txt}"</span></div>`;
         });
         container.innerHTML += `</div>`;
-    }
-    else if (tipo === 'historico') {
+    } else if (tipo === 'historico') {
         titulo.innerText = "📜 Missões & Relatos";
-        container.innerHTML = btnVoltarHub;
-        dadosCapital.historico.forEach((cap, index) => {
-            container.innerHTML += `<div class="item-menu" onclick="lerCapitulo(${index})" style="cursor: pointer; align-items: center;"><div class="foto-placeholder" style="width: 40px; height: 40px;">📖</div><div class="texto-item"><h4>${cap.titulo}</h4></div></div>`;
-        });
-    }
-    else if (tipo === 'lendas') {
-        titulo.innerText = "🏛️ Heróis Lendários";
-        container.innerHTML = btnVoltarHub + `<p style="text-align:center; color:#aaa; font-style:italic;">"Os que forjaram Tarre."</p>`;
-        dadosCapital.lendas.forEach(heroi => {
-            container.innerHTML += `<div class="item-menu"><div class="texto-item" style="width:100%;"><h4>${heroi.nome}</h4><span class="classe-char">${heroi.titulo}</span><p>${heroi.desc}</p></div></div>`;
-        });
-    }
-    else if (tipo === 'bestiario' || tipo === 'esquadrao' || tipo === 'procurados') {
-        titulo.innerText = tipo === 'bestiario' ? "📖 Bestiário" : (tipo === 'esquadrao' ? "🛡️ Esquadrão" : "☠️ Procurados");
-        container.innerHTML = btnVoltarHub;
-        const lista = tipo === 'bestiario' ? dadosCapital.bestiario : (tipo === 'esquadrao' ? dadosCapital.esquadrao : dadosCapital.procurados);
-        lista.forEach(item => {
-            let img = item.foto ? `<img src="${item.foto}" class="foto-lista" onclick="verImagemPersonagem('${item.foto}')" style="cursor: zoom-in;">` : `<div class="foto-placeholder">?</div>`;
-            container.innerHTML += `<div class="item-menu">${img}<div class="texto-item"><h4>${item.nome}</h4><p>${item.desc || ""}</p></div></div>`;
+        container.innerHTML = btnVoltar;
+        dadosCapital.historico.forEach((cap, idx) => {
+            container.innerHTML += `<div class="item-menu" onclick="lerCapitulo(${idx})" style="cursor:pointer;"><div class="foto-placeholder" style="width:40px; height:40px;">📖</div><div class="texto-item"><h4>${cap.titulo}</h4></div></div>`;
         });
     }
 }
@@ -1828,62 +1848,252 @@ const arvoreClasses = {
 };
 
 
-// --- MENU PRINCIPAL DA BIBLIOTECA ---
 function abrirBiblioteca() {
     const container = document.getElementById('conteudo-menu-capital');
     document.getElementById('titulo-menu-capital').innerText = "📚 Biblioteca";
-    
     container.innerHTML = `
         <button onclick="menuCapital('hub')" class="btn-popup" style="margin-bottom: 15px; background: #444; width: 100%;">⬅ Voltar ao Painel Imperial</button>
         <div class="biblio-nav">
             <div class="rpg-card-small" onclick="biblioRacas('menu')"><span>🧬</span><strong>Raças</strong></div>
             <div class="rpg-card-small" onclick="biblioClasses('t1')"><span>⚔️</span><strong>Classes</strong></div>
             <div class="rpg-card-small" onclick="biblioAtributos()"><span>📊</span><strong>Atributos</strong></div>
-        </div>
-    `;
+            <div class="rpg-card-small" onclick="biblioMagias('menu')"><span>✨</span><strong>Magias & Hab.</strong></div>
+        </div>`;
 }
 
-// --- NAVEGAÇÃO DE RAÇAS (Cards Pequenos) ---
+// --- RAÇAS COM DETALHES DE BÔNUS E HABILIDADES ---
+// --- SISTEMA DE RAÇAS (DETALHADO E EM CARDS) ---
 function biblioRacas(view) {
     const container = document.getElementById('conteudo-menu-capital');
-    const d = {
-        "Humanos": "A maior parte da população de Tarre. São bons em se adaptar aos diversos climas e possuem resistência alta.",
-        "Anões": "Vistos como corajosos e teimosos, além de artesãos proficientes em muitas áreas.",
-        "Elfo Alto": "Evoluídos magicamente, possuem costumes extremistas sobre herança de sangue; má fama com outras raças.",
-        "Elfo Negro": "Prodígios em magia elemental; temidos como máquinas de destruição ambulantes.",
-        "Elfo da Floresta": "Conexão espiritual profunda. Vivem livres e possuem afinidade com animais e plantas.",
-        "Meio anjo": "Sangue humano e angelical. Alto poder mágico e alto valor comercial (não têm asas).",
-        "Bestiais": "Mistura de humanos com traços animais. Alta capacidade física, mas sofrem grande preconceito.",
-        "Machinas": "Ciborgues raros com tecnologia humana e mecânica misturada. Não são vistos há séculos.",
-        "Orc": "Alta capacidade física, mas intelecto reduzido e péssimos com magia.",
-        "Meio demônio": "Sangue humano e demoníaco. Alto poder mágico, mas reputação ruim pela origem do nascimento.",
-        "Asura": "Raça antiga, inteligente e quase extinta. Humanoides de 1m que lembram ratos sem pelo."
+    
+    // Banco de Dados Completo das Raças
+    const dadosRacas = {
+        "Humanos": {
+            emoji: "👨",
+            desc: "A maior parte da população de Tarre é humana, são bons em se adaptar aos diversos climas e possuem resistência alta.",
+            bonus: "<b>Atributos:</b> +1 em dois atributos à escolha, +1 Carisma",
+            hab: "<b>Ambição:</b> Uma vez por dia, pode escolher um teste de atributo e rolar o dado novamente, ficando com o melhor resultado."
+        },
+        "Anões": {
+            emoji: "⚒️",
+            desc: "Vistos como corajosos e teimosos, além de artesãos proficientes em muitas áreas.",
+            bonus: "<b>Atributos:</b> +2 Constituição, +1 Força, -1 Destreza",
+            hab: "<b>Pele de aço:</b> Uma vez por dia, reduz o dano de um ataque pela metade."
+        },
+        "Elfo Alto": {
+            emoji: "✨",
+            desc: "Elfos evoluídos em quesitos mágicos, são conhecidos por seus costumes extremistas em relação à herança de sangue, não possuem uma imagem muito boa com as outras raças.",
+            bonus: "<b>Atributos:</b> +2 Sabedoria, +1 Mana, -1 Carisma",
+            hab: "<b>Meditação:</b> Uma vez por dia, recupera 1d4 + Nível de Mana instantaneamente."
+        },
+        "Elfo Negro": {
+            emoji: "🌑",
+            desc: "Prodígios no uso de magia elementares, muitos possuem medo dos elfos negros por pensarem neles como máquinas de destruição ambulantes.",
+            bonus: "<b>Atributos:</b> +2 Inteligência, +1 Mana, -1 Precisão",
+            hab: "<b>Vontade Ardente:</b> Uma vez por dia, pode usar um ataque em área de chamas que causa 2d6*Nível + 1d4*Nível por 2 turnos."
+        },
+        "Elfo da Floresta": {
+            emoji: "🍃",
+            desc: "Como todos os outros elfos, são descendentes de espíritos, mas possuem uma conexão maior com esse lado espiritual, geralmente vivem livre pelas florestas do mundo sem interagir muito com outras raças. Possuem afinidade com os animais e plantas.",
+            bonus: "<b>Atributos:</b> +2 Inteligência, +1 Mana, -1 Força",
+            hab: "<b>Conversa Natural:</b> Uma vez por dia, pode-se comunicar com elementos da natureza por um curto período (quanto maior o nível maior o tempo)."
+        },
+        "Meio anjo": {
+            emoji: "👼",
+            desc: "Carregam sangue humano misturado com sangue angelical, possuem alto poder mágico além de um elevado preço no mercado de escravos. (Não possuem asas)",
+            bonus: "<b>Atributos:</b> +1 Sabedoria, +1 Mana, +1 Força, -1 Carisma",
+            hab: "<b>Aura Protetora:</b> Uma vez por dia, pode usar seu sangue para purificar a si mesmo ou a um aliado, removendo estados negativos (Queimando, Doente, Veneno) e curando ¼ da vida."
+        },
+        "Meio demônio": {
+            emoji: "😈",
+            desc: "Carregam sangue humano e demoníaco, possuem alto poder mágico além de um elevado preço no mercado de escravos. Essa raça possui uma reputação ruim, pois, na grande maioria das vezes, não é um nascimento desejado.",
+            bonus: "<b>Atributos:</b> +1 Inteligência, +1 Força, -1 Carisma",
+            hab: "<b>Fúria Demoníaca:</b> Entra em fúria por (n+1) turnos (+2 Força/Destreza, -2 Inteligência/Sabedoria/Precisão). Risco de atacar aliados."
+        },
+        "Bestiais / Mestiços": {
+            emoji: "🐾",
+            desc: "Uma raça envolta de preconceitos, apesar de terem alta capacidade física, são vistos como animais selvagens. São uma mistura de humanos com atributos de animais (caudas, chifres, orelhas, patas).",
+            bonus: "<b>Atributos:</b> +2 Força, +1 Destreza, -1 Carisma",
+            hab: "<b>Metamorfose Selvagem:</b> Uma vez por dia, transforma-se no seu animal de origem por (n+1) turnos. Ganha vantagem em testes físicos e ataque de mordida/garra."
+        },
+        "Machinas": {
+            emoji: "🤖",
+            desc: "Uma raça antiga, nenhum machina é visto há centenas de anos, não se sabe muito sobre essa raça. É uma mistura de humano com máquinas (tipo um ciborgue).",
+            bonus: "<b>Atributos:</b> +2 Mana, +1 Sabedoria, -1 Força",
+            hab: "<b>Análise de Matéria:</b> Uma vez por dia, pode analisar qualquer objeto ou pessoa para descobrir propriedades mágicas, fraquezas ou utilidades escondidas."
+        },
+        "Orc": {
+            emoji: "👹",
+            desc: "Possuem alta capacidade física, mas tem capacidade intelectual diminuta e péssimos com magia.",
+            bonus: "<b>Atributos:</b> +3 Força e -1 Inteligência",
+            hab: "<b>Último Esforço:</b> Se sua vida cair para 0, você pode realizar um ataque imediato com +4 de bônus no dano antes de cair inconsciente."
+        },
+        "Asura": {
+            emoji: "🐭",
+            desc: "Uma raça antiga e quase extinta de um povo muito inteligente. Seres humanoides de quase 1 metro de altura que parecem um rato sem pelo.",
+            bonus: "<b>Atributos:</b> +3 Inteligência e -1 Força",
+            hab: "<b>Rede de Conhecimento:</b> Acessa a consciência coletiva para descobrir uma informação histórica, fraqueza de monstro ou solução de puzzle."
+        }
     };
 
     if (view === 'menu') {
+        document.getElementById('titulo-menu-capital').innerText = "🧬 Raças";
         container.innerHTML = `<button onclick="abrirBiblioteca()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
         <div class="biblio-nav">
             <div class="rpg-card-small" onclick="biblioRacas('Humanos')"><span>👨</span><strong>Humanos</strong></div>
             <div class="rpg-card-small" onclick="biblioRacas('Anões')"><span>⚒️</span><strong>Anões</strong></div>
-            <div class="rpg-card-small" onclick="biblioRacas('elfos')"><span>🧝</span><strong>Elfos</strong></div>
-            <div class="rpg-card-small" onclick="biblioRacas('Meio anjo')"><span>😇</span><strong>Meio anjo</strong></div>
-            <div class="rpg-card-small" onclick="biblioRacas('Bestiais')"><span>🐾</span><strong>Bestiais</strong></div>
+            <div class="rpg-card-small" onclick="biblioRacas('elfos')" style="border-style:dashed; border-color:#2e8b57;"><span>🧝</span><strong>Elfos</strong></div>
+            <div class="rpg-card-small" onclick="biblioRacas('Meio anjo')"><span>👼</span><strong>M. Anjo</strong></div>
+            <div class="rpg-card-small" onclick="biblioRacas('Bestiais / Mestiços')"><span>🐾</span><strong>Bestiais</strong></div>
             <div class="rpg-card-small" onclick="biblioRacas('Machinas')"><span>🤖</span><strong>Machinas</strong></div>
             <div class="rpg-card-small" onclick="biblioRacas('Orc')"><span>👹</span><strong>Orc</strong></div>
             <div class="rpg-card-small" onclick="biblioRacas('Meio demônio')"><span>😈</span><strong>M. Demônio</strong></div>
             <div class="rpg-card-small" onclick="biblioRacas('Asura')"><span>🐭</span><strong>Asura</strong></div>
         </div>`;
-    } else if (view === 'elfos') {
+    } 
+    else if (view === 'elfos') {
+        document.getElementById('titulo-menu-capital').innerText = "🧝 Grupo: Elfos";
         container.innerHTML = `<button onclick="biblioRacas('menu')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
         <div class="biblio-nav">
             <div class="rpg-card-small" onclick="biblioRacas('Elfo Alto')"><span>✨</span><strong>Elfo Alto</strong></div>
             <div class="rpg-card-small" onclick="biblioRacas('Elfo Negro')"><span>🌑</span><strong>Elfo Negro</strong></div>
             <div class="rpg-card-small" onclick="biblioRacas('Elfo da Floresta')"><span>🍃</span><strong>Elfo Floresta</strong></div>
         </div>`;
-    } else {
-        container.innerHTML = `<button onclick="biblioRacas('${view.includes('Elfo') ? 'elfos' : 'menu'}')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
-        <div class="detalhe-box"><h3>🧬 ${view}</h3><p>${d[view]}</p></div>`;
+    } 
+    else {
+        // TELA DE DETALHE FINAL
+        const r = dadosRacas[view];
+        document.getElementById('titulo-menu-capital').innerText = view;
+        const voltarPara = view.includes('Elfo') ? 'elfos' : 'menu';
+
+        container.innerHTML = `<button onclick="biblioRacas('${voltarPara}')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
+        <div class="detalhe-box">
+            <h3>${r.emoji} ${view}</h3>
+            <p>${r.desc}</p>
+            <hr style="border:0; border-top:1px solid #555; margin:15px 0;">
+            <p style="color:#ffd700;">${r.bonus}</p>
+            <p style="color:#90EE90;">${r.hab}</p>
+        </div>`;
     }
+}
+
+// --- MAGIAS E HABILIDADES (DRILL-DOWN POR CLASSE) ---
+function biblioMagias(view) {
+    const container = document.getElementById('conteudo-menu-capital');
+    if (view === 'menu') {
+        container.innerHTML = `<button onclick="abrirBiblioteca()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
+        <div class="biblio-nav">
+            <div class="rpg-card-small" onclick="biblioMagias('Mago')"><span>🔥</span><strong>Mago</strong></div>
+            <div class="rpg-card-small" onclick="biblioMagias('Curandeiro')"><span>💖</span><strong>Curandeiro</strong></div>
+            <div class="rpg-card-small" onclick="biblioMagias('Guerreiro')"><span>🛡️</span><strong>Guerreiro</strong></div>
+            <div class="rpg-card-small" onclick="biblioMagias('Caçador')"><span>🏹</span><strong>Caçador</strong></div>
+        </div>`;
+    } else {
+        container.innerHTML = `<button onclick="biblioMagias('menu')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
+        <div id="lista-magias-classe"></div>`;
+        renderizarMagias(view);
+    }
+}
+
+function renderizarMagias(classe) {
+    const div = document.getElementById('lista-magias-classe');
+    const term = (classe === 'Guerreiro' || classe === 'Caçador') ? "Habilidades" : "Magias";
+    let html = `<h3 style="color:#ffd700; text-align:center; border-bottom:1px solid #444; padding-bottom:10px;">${term} de ${classe}</h3>`;
+
+    if (classe === 'Mago') {
+        html += `
+            <div class="spell-level">✨ Habilidades Passivas</div>
+            <div class="spell-item"><b>Eco de Mana:</b> Sempre que conjurar uma magia de Nível 1+ e tirar dano máximo, recupera 1 Mana instantaneamente.</div>
+            <div class="spell-item"><b>Resistência Mágica:</b> Recebe redução permanente de -2 em qualquer dano de origem mágica.</div>
+            <div class="spell-item"><b>Conhecimento das Eras:</b> Ganha +3 em todos os testes de História, Arcanismo e Investigação.</div>
+
+            <div class="spell-level">🌟 Nível 0 (0 Mana)</div>
+            <div class="spell-item"><b>Luz:</b> Cria uma fonte de luz.</div>
+            <div class="spell-item"><b>Prestidigitação:</b> Realiza pequenos truques e efeitos menores.</div>
+            <div class="spell-item"><b>Globos de Luz:</b> Cria esferas luminosas para iluminar o caminho.</div>
+            <div class="spell-item"><b>Detectar Magia Menor:</b> Sente a presença de magias fracas no ambiente.</div>
+            <div class="spell-item"><b>Chama Contínua:</b> Cria uma pequena chama (1d4 de dano) e aplica o estado queimando.</div>
+            <div class="spell-item"><b>Sentir Aura:</b> Permite sentir a aura e a mana do alvo.</div>
+            <div class="spell-item"><b>Ilusão Menor:</b> Cria uma ilusão pequena de imagem ou som.</div>
+            <div class="spell-item"><b>Mão Arcana:</b> Mão mágica flutuante que manipula objetos a curta distância.</div>
+
+            <div class="spell-level">🔶 Nível 1 (1 Mana)</div>
+            <div class="spell-item"><b>Raio Pequeno:</b> Causa 2d4 de dano.</div>
+            <div class="spell-item"><b>Bola de Fogo Menor:</b> Causa 1d6 de dano e aplica o estado queimando.</div>
+            <div class="spell-item"><b>Espirro Ácido:</b> Lança um jato que causa 2d4 de dano perfurante.</div>
+            <div class="spell-item"><b>Raio Adoecente:</b> Causa 1d6 de dano e adoece o alvo por 2 turnos.</div>
+            <div class="spell-item"><b>Teia:</b> Cria uma teia que prende os adversários.</div>
+            <div class="spell-item"><b>Concentração:</b> Melhora o próximo ataque do usuário em +2d6.</div>
+            <div class="spell-item"><b>Proteção contra Lâminas:</b> Escudo que diminui danos de lâminas em 3 por 2 turnos.</div>
+
+            <div class="spell-level">🔷 Nível 2 (2 Mana)</div>
+            <div class="spell-item"><b>Raio Congelante:</b> Causa 2d4 de dano e congela o inimigo por 1d2 turnos.</div>
+            <div class="spell-item"><b>Míssil Arcano:</b> Três projéteis de energia que nunca erram, causando 1d4 cada.</div>
+            <div class="spell-item"><b>Escudo de Mana:</b> Barreira que absorve 3d6 de dano por 1d2 turnos.</div>`;
+    } 
+    else if (classe === 'Curandeiro') {
+        html += `
+            <div class="spell-level">🙏 Habilidades Passivas</div>
+            <div class="spell-item"><b>Aura de Tranquilidade:</b> Aliados (3m) recebem +2 contra estados "Aterrorizado", "Adoecido" ou venenos.</div>
+            <div class="spell-item"><b>Ajuda aos Necessitados:</b> Curas em aliados com menos de metade da vida recuperam +3 de vida adicional.</div>
+            <div class="spell-item"><b>Olhar Clínico:</b> Enxerga o HP (%) e identifica condições negativas instantaneamente sem testes.</div>
+
+            <div class="spell-level">🌟 Nível 0 (0 Mana)</div>
+            <div class="spell-item"><b>Luz:</b> Cria luz.</div>
+            <div class="spell-item"><b>Quebrar Maldição Menor:</b> Remove maldições fracas.</div>
+            <div class="spell-item"><b>Bênção de Força:</b> Melhora os atributos do alvo em +1 Força por 1d4 turnos.</div>
+            <div class="spell-item"><b>Cura Menor:</b> Cura 1d6 de vida de um alvo.</div>
+            <div class="spell-item"><b>Detectar Magia Menor:</b> Sente a presença de magias fracas no ambiente.</div>
+
+            <div class="spell-level">💚 Nível 1 (1 Mana)</div>
+            <div class="spell-item"><b>Curar Ferimentos:</b> Cura aliados visíveis em 2d4 de vida.</div>
+            <div class="spell-item"><b>Regeneração:</b> O alvo recupera 1d4 de vida por round (3 rounds).</div>
+            <div class="spell-item"><b>Tiro de Luz:</b> Atira um projétil de luz que causa 2d4 de dano.</div>
+            <div class="spell-item"><b>Solo Sagrado:</b> Cura ferimentos de aliados em área pequena em 1d6 de vida.</div>
+            <div class="spell-item"><b>Palavra de Cura:</b> Cura ferimentos de aliados a curta distância em 2d6 de vida.</div>
+
+            <div class="spell-level">💠 Nível 2 (2 Mana)</div>
+            <div class="spell-item"><b>Fechar Ferimentos:</b> Cura ferimentos de aliados visíveis em 2d6 de vida.</div>
+            <div class="spell-item"><b>Escudo Sagrado:</b> Concede escudo reduzindo 2 de dano e dando 2d4 de vida extra pelo combate.</div>
+            <div class="spell-item"><b>Círculo de Luz:</b> Área que ilumina, afasta mortos-vivos e cura 1d6 de vida por 1d4 turnos.</div>
+            <div class="spell-item"><b>Bênção Intermediária:</b> Melhora atributos de um alvo em +2 por 1d4 turnos.</div>`;
+    }
+    else if (classe === 'Guerreiro') {
+        html += `
+            <div class="spell-level">⚔️ Habilidades Passivas</div>
+            <div class="spell-item"><b>Força de Vontade:</b> Com menos de metade da vida, recebe +2 em testes de resistência física.</div>
+            <div class="spell-item"><b>Empolgação:</b> A partir do seu 3º turno em combate, ganha +2 em força.</div>
+            <div class="spell-item"><b>Casca Grossa:</b> Recebe uma redução permanente de -1 em todo dano físico recebido.</div>
+            <div class="spell-item"><b>Mártir:</b> Pode absorver 2 de dano de um aliado (5m) para si mesmo automaticamente.</div>
+
+            <div class="spell-level">🛡️ Habilidades Ativas (5 Usos por Dia)</div>
+            <div class="spell-item"><b>Corte Perfurante:</b> Estocada que causa o dano da arma e ignora 2 de armadura física.</div>
+            <div class="spell-item"><b>Grito de Desafio:</b> Rugido que força inimigos próximos a focar ataques no Guerreiro.</div>
+            <div class="spell-item"><b>Postura Defensiva:</b> Reduz todo dano físico em 4 até o próximo turno, mas fica imóvel.</div>
+            <div class="spell-item"><b>Corte Meteoro:</b> Corte em longa distância causando o dano da arma.</div>
+            <div class="spell-item"><b>Investida Impactante:</b> Ombrada (1d6) com teste de resistência: chance de empurrar e atordoar.</div>
+            <div class="spell-item"><b>Fôlego Renovado:</b> Respira fundo e recupera 1d8 de vida no combate.</div>
+            <div class="spell-item"><b>Impacto Sísmico:</b> Bate arma/escudo no chão, forçando inimigos pequenos ao redor a recuar.</div>
+            <div class="spell-item"><b>Desarmar:</b> Teste de Força para fazer a arma do inimigo voar para longe.</div>`;
+    }
+    else if (classe === 'Caçador') {
+        html += `
+            <div class="spell-level">🌿 Habilidades Passivas</div>
+            <div class="spell-item"><b>Rastrear:</b> Vantagem em testes de percepção para pegadas, cheiros ou sons.</div>
+            <div class="spell-item"><b>Armadilheiro:</b> Vantagem em testes para detectar ou montar armadilhas.</div>
+            <div class="spell-item"><b>Camuflagem:</b> Ganha +2 em testes para se esconder.</div>
+            <div class="spell-item"><b>Sobrevivente:</b> Imune a penalidades de terrenos difíceis e recebe -2 dano de climas extremos.</div>
+            <div class="spell-item"><b>Sentido de Perigo:</b> +2 em Iniciativa e nunca pode ser surpreendido enquanto acordado.</div>
+
+            <div class="spell-level">🏹 Habilidades Ativas (5 Usos por Dia)</div>
+            <div class="spell-item"><b>Tiro Triplo:</b> Três disparos rápidos. Cada acerto (teste de Precisão) causa 1d6.</div>
+            <div class="spell-item"><b>Foco do Predador:</b> Mira intensa; próximo ataque ignora distância e ganha +3 na Precisão.</div>
+            <div class="spell-item"><b>Salto Acrobático:</b> Move-se metade do deslocamento sem sofrer ataques e ganha +2 Destreza no turno.</div>
+            <div class="spell-item"><b>Bomba de Fumaça:</b> Produz 2 bombas que criam cortina de fumaça em área mediana (1 turno).</div>
+            <div class="spell-item"><b>Tiro Marcador:</b> Marca o alvo para que o próximo ataque cause +2d4 de dano.</div>`;
+    }
+
+    div.innerHTML = html;
 }
 
 // --- ATRIBUTOS (Texto resumido e Tabela ordenada) ---
@@ -1891,22 +2101,22 @@ function biblioAtributos() {
     const container = document.getElementById('conteudo-menu-capital');
     container.innerHTML = `<button onclick="abrirBiblioteca()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
         <div class="grid-atributos">
-            <div class="card-atrib"><strong>💪 Força</strong><span>Físico</span></div>
-            <div class="card-atrib"><strong>📖 Sabedoria</strong><span>Conhecimentos</span></div>
-            <div class="card-atrib"><strong>✨ Mana</strong><span>MP</span></div>
-            <div class="card-atrib"><strong>⚡ Destreza</strong><span>Agilidade</span></div>
-            <div class="card-atrib"><strong>🛡️ Const.</strong><span>Vida</span></div>
-            <div class="card-atrib"><strong>🧠 Intelig.</strong><span>Intelecto</span></div>
-            <div class="card-atrib"><strong>🎯 Precisão</strong><span>Acerto</span></div>
-            <div class="card-atrib"><strong>🗣️ Carisma</strong><span>Lábia</span></div>
+            <div class="card-atributo"><strong>💪 Força</strong><span>Físico</span></div>
+            <div class="card-atributo"><strong>📖 Sabedoria</strong><span>Conhecimento</span></div>
+            <div class="card-atributo"><strong>🧠 Intelig.</strong><span>Mental</span></div>
+            <div class="card-atributo"><strong>✨ Mana</strong><span>Quantidade</span></div>
+            <div class="card-atributo"><strong>⚡ Destreza</strong><span>Agilidade</span></div>
+            <div class="card-atributo"><strong>🛡️ Const.</strong><span>Vida</span></div>
+            <div class="card-atributo"><strong>🎯 Precisão</strong><span>Precisão</span></div>
+            <div class="card-atributo"><strong>🗣️ Carisma</strong><span>Persuasão</span></div>
         </div>
-        <h4 style="color:#ffd700; margin-top:20px;">🎲 Bônus de Dados (Corrigido)</h4>
-        <table class="tabela-banco" style="font-size:13px;">
+        <h4 style="color:#ffd700; margin-top:20px; text-align:center;">🎲 Tabela de Bônus</h4>
+        <table class="tabela-banco" style="font-size:12px; width: 100%;">
             <tr><th>Pontos</th><th>Bônus</th><th>Pontos</th><th>Bônus</th></tr>
-            <tr><td>0</td><td>-2</td><td>4 - 5</td><td>+2</td></tr>
-            <tr><td>1</td><td>-1</td><td>6 - 7</td><td>+3</td></tr>
-            <tr><td>2</td><td>0</td><td>8-9-10</td><td>+4</td></tr>
-            <tr><td>3</td><td>+1</td><td>11+</td><td>+5 (Máx)</td></tr>
+            <tr><td>0</td><td style="color:#ff4444;">-2</td><td>4 - 5</td><td style="color:#2ecc71;">+2</td></tr>
+            <tr><td>1</td><td style="color:#ff7777;">-1</td><td>6 - 7</td><td style="color:#2ecc71;">+3</td></tr>
+            <tr><td>2</td><td>0</td><td>8-9-10</td><td style="color:#ffd700;">+4</td></tr>
+            <tr><td>3</td><td style="color:#90EE90;">+1</td><td>11+</td><td style="color:#ffd700;">+5</td></tr>
         </table>`;
 }
 
