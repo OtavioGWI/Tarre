@@ -1264,21 +1264,24 @@ deuses: [
 function verImagemDeus(arquivo) {
     verImagemEstatica(arquivo, function() {
         restaurarMapaMenu();
-        menuDeuses();
+        menuDeuses(); // Volta para a grade de deuses
     });
 }
 
 function verImagemPersonagem(arquivo) {
     verImagemEstatica(arquivo, function() {
         restaurarMapaMenu();
-        if (menuAtualAberto) menuCapital(menuAtualAberto);
+        if (menuAtualAberto) {
+            menuCapital(menuAtualAberto); // Volta para a aba que estava (Bestiário, Esquadrão, etc)
+        }
     });
 }
 
 function verImagemHistoria(arquivo, capituloIndex) {
     verImagemEstatica(arquivo, function() {
-        restaurarMapaMenu();
-        lerCapitulo(capituloIndex);
+        restaurarMapaMenu(); // Volta o mapa e menu
+        document.getElementById('modal-capital').style.display = 'flex'; // Reabre o fundo preto
+        lerCapitulo(capituloIndex); // Abre exatamente o texto de onde você saiu
     });
 }
     // Nova função que apenas fecha a foto sem resetar o mapa
@@ -1397,17 +1400,17 @@ function abrirMapaProvincia(arquivo) {
 function verImagemEstatica(arquivo, callbackVoltar = null) {
     if (!arquivo || arquivo === 'none') return;
 
+    // 1. Fecha modais para não ficarem "por cima" da imagem de forma invisível
     fecharModais();
 
+    // 2. Prepara a tela da imagem
     document.getElementById('map-container').style.display = 'none';
     document.getElementById('menu-provincias').style.display = 'none';
     const container = document.getElementById('provincia-container');
     container.style.display = 'flex';
+    document.getElementById('img-provincia').src = arquivo;
 
-    const imgElement = document.getElementById('img-provincia');
-    imgElement.src = arquivo;
-
-    // Limpa botões de voltar antigos
+    // 3. Gerencia o Botão Voltar
     const btnAntigo = container.querySelector('.btn-voltar-foto');
     if (btnAntigo) btnAntigo.remove();
 
@@ -1416,8 +1419,14 @@ function verImagemEstatica(arquivo, callbackVoltar = null) {
     btnVoltarImg.className = "btn-popup btn-voltar-foto";
     btnVoltarImg.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4001; padding: 10px 20px;";
     
-    // Se não passarmos um retorno específico, usa o padrão (restaurarMapaMenu)
-    btnVoltarImg.onclick = callbackVoltar ? callbackVoltar : restaurarMapaMenu;
+    // LÓGICA MÁGICA: Se houver um callback, usa ele. Se não, usa o fecharImagem padrão.
+    btnVoltarImg.onclick = function() {
+        if (callbackVoltar) {
+            callbackVoltar();
+        } else {
+            fecharImagem();
+        }
+    };
 
     container.insertBefore(btnVoltarImg, container.firstChild);
 }
