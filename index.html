@@ -519,35 +519,21 @@
     }
 }
 
-.rpg-card-small {
-    background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
-    border: 1px solid #555; border-radius: 8px; padding: 12px;
-    cursor: pointer; text-align: center; transition: 0.3s;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-}
-.rpg-card-small:hover { border-color: #ffd700; background: rgba(139, 69, 19, 0.4); transform: scale(1.05); }
-.rpg-card-small span { font-size: 24px; margin-bottom: 5px; }
-.rpg-card-small strong { font-size: 10px; color: #ffdead; text-transform: uppercase; }
+    .rpg-card-small {
+        background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
+        border: 1px solid #555; border-radius: 8px; padding: 12px;
+        cursor: pointer; text-align: center; transition: 0.3s;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .rpg-card-small:hover { border-color: #ffd700; background: rgba(139, 69, 19, 0.4); transform: scale(1.05); }
+    .rpg-card-small span { font-size: 24px; margin-bottom: 5px; }
+    .rpg-card-small strong { font-size: 11px; color: #ffdead; text-transform: uppercase; }
 
-/* --- MAGIAS E HABILIDADES --- */
-.spell-level { color: #ffd700; font-size: 14px; text-transform: uppercase; margin: 15px 0 5px 0; border-left: 3px solid #ffd700; padding-left: 8px; }
-.spell-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; margin-bottom: 6px; font-size: 13px; border-left: 2px solid #555; }
-
-.rpg-card-small {
-    background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
-    border: 1px solid #555; border-radius: 8px; padding: 12px;
-    cursor: pointer; text-align: center; transition: 0.3s;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-}
-.rpg-card-small:hover { border-color: #ffd700; background: rgba(139, 69, 19, 0.4); transform: scale(1.05); }
-.rpg-card-small span { font-size: 24px; margin-bottom: 5px; }
-.rpg-card-small strong { font-size: 11px; color: #ffdead; text-transform: uppercase; }
-
-/* --- ESTILO MAGIAS --- */
-.spell-section { border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; }
-.spell-level { color: #ffd700; font-size: 14px; text-transform: uppercase; margin: 10px 0 5px 0; border-left: 3px solid #ffd700; padding-left: 8px; }
-.spell-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 4px; margin-bottom: 5px; font-size: 13px; }
-.spell-name { color: #87ceeb; font-weight: bold; }
+    /* --- MAGIAS E HABILIDADES --- */
+    .spell-section { border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; }
+    .spell-level { color: #ffd700; font-size: 14px; text-transform: uppercase; margin: 10px 0 5px 0; border-left: 3px solid #ffd700; padding-left: 8px; }
+    .spell-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 4px; margin-bottom: 5px; font-size: 13px; }
+    .spell-name { color: #87ceeb; font-weight: bold; }
 
     </style>
 </head>
@@ -711,48 +697,11 @@ function abrirMenuTorre() {
 function subirAndar() {
     if (andarMaximoLiberado < 12) {
         andarMaximoLiberado++;
-        abrirMenuTorre(); // Atualiza a interface da torre imediatamente
-    } else {
-        alert("O topo da torre já foi alcançado!");
-    }
-}
-
-// Função que faz a mágica acontecer
-function subirAndar() {
-    if (andarMaximoLiberado < 12) {
-        andarMaximoLiberado++;
-        abrirMenuTorre(); // Atualiza a tela na hora
+        abrirMenuTorre(); // Atualiza a interface da torre
         alert("A névoa se dissipou! O " + andarMaximoLiberado + "º andar agora está acessível.");
     } else {
         alert("A torre já está totalmente desbloqueada!");
     }
-}
-
-// Função para você, Mestre, usar no console quando quiser que eles subam
-function subirAndar() {
-    if (andarMaximoLiberado < 12) {
-        andarMaximoLiberado++;
-        abrirMenuTorre();
-        console.log("Os Pandemônios subiram para o andar " + andarMaximoLiberado);
-    }
-}
-
-function detalharAndar(num) {
-    const andar = dadosTorre.find(a => a.andar === num);
-    const container = document.getElementById('conteudo-menu-capital');
-    
-    container.innerHTML = `
-        <button onclick="abrirMenuTorre()" class="btn-popup" style="margin-bottom:20px; background:#444;">⬅ Voltar aos Andares</button>
-        <div style="text-align:center; padding: 20px; border: 2px solid ${andar.cor}; border-radius: 10px; background: rgba(0,0,0,0.3);">
-            <h2 style="color:${andar.cor}; margin-top:0;">${andar.titulo}</h2>
-            <h3 style="color:#fff;">${andar.nome}</h3>
-            <hr style="border:0; border-top:1px solid #444;">
-            <p style="font-size:18px; line-height:1.6;">${andar.desc}</p>
-            <div style="margin-top:20px; padding:10px; background:rgba(255,255,255,0.05);">
-                <strong>👥 Aprendizes no andar:</strong> ${andar.aprendizes}
-            </div>
-        </div>
-    `;
 }
 
 function detalharAndar(num) {
@@ -804,16 +753,31 @@ const iconCoords = L.divIcon({
     popupAnchor: [0, -20]
 });
 
-/**
- * HELPER - Gera HTML de botão com barra colorida à esquerda
- * Usado em popups para consistent styling
- * @param {string} texto - Texto do botão (com emojis)
- * @param {string} acao - onclick action (ex: "abrirMapaProvincia('arquivo.jpg')")
- * @param {string} corBarra - Cor hex da barra esquerda (ex: "#5F9EA0")
- */
-    function criarBtn(texto, acao, corBarra) {
-        return `<button onclick="${acao}" class="botao-estiloso" style="border-left-color: ${corBarra};">${texto}</button>`;
-    }
+// Helper para criar ícones de marcador com tamanhos reutilizáveis
+function createMarkerIcon(size) {
+    return L.icon({
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        iconSize: size,
+        iconAnchor: [Math.round(size[0] / 2), Math.round(size[1] / 2)],
+        popupAnchor: [0, -Math.round(size[1] / 2)]
+    });
+}
+
+const ICON_50 = createMarkerIcon([50, 50]);
+const ICON_100 = createMarkerIcon([100, 100]);
+const ICON_80 = createMarkerIcon([80, 80]);
+const ICON_120 = createMarkerIcon([120, 120]);
+const ICON_MEGA = L.icon({
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    iconSize: [120, 120],
+    iconAnchor: [60, 120],
+    popupAnchor: [0, -100]
+});
+
+// Cria botão estilizado com barra colorida lateral
+function criarBtn(texto, acao, corBarra = '#8b4513') {
+    return `<button onclick="${acao}" class="botao-estiloso" style="border-left-color: ${corBarra};">${texto}</button>`;
+}
 
 /**
  * LAYER GROUP PARA ROTA
@@ -823,99 +787,11 @@ const iconCoords = L.divIcon({
     const grupoRota = L.layerGroup(); 
      
     
-    let medindo = false;
-    let pontosRota = [];
+    let medindo = false;                  // Modo de cálculo de rotas ativo
+    let pontosRota = [];                  // Coordenadas dos pontos da rota
 
 
-    const bancoClasses = {
-    "Feiticeiro": {
-        desc: "Habilidades de controle e utilidade, adaptando-se a diversas situações.",
-        t2: {
-            "Invocador": { 
-                desc: "Usa magias místicas para invocar criaturas que lutam ao seu lado.",
-                t3: { 
-                    "Mestre Invocador": "Invoca criaturas mais poderosas por mais tempo, podendo realizar rituais de dias.",
-                    "Espiritualista": "Conexão com o mundo espiritual, invocando espíritos poderosos para ataques ou defesas rápidas."
-                }
-            },
-            "Bruxo": { 
-                desc: "Usa magia negra para enfraquecer, envenenar e amaldiçoar oponentes.",
-                t3: { 
-                    "Necromante": "Faz com que criaturas mortas voltem à vida para ajudar como desejar.",
-                    "Demonologista": "Ligação com o mundo inferior para rituais e feitiços demoníacos intensos."
-                }
-            },
-            "Feiticeiro Temporal": {
-                desc: "Usa poderes estranhos para controlar o tempo ao seu redor (não volta no tempo).",
-                t3: {
-                    "Temporalista": "Maximiza seus poderes temporais ao limite.",
-                    "Dimensionalista": "Controla o espaço, criando fendas dimensionais e alterando a matéria."
-                }
-            }
-        }
-    },
-    "Mago": {
-        desc: "Habilidades de ataque massivo, sem deixar de lado truques importantes.",
-        t2: {
-            "Elementalista": {
-                desc: "Extrai o poder da natureza usando magias dos elementos.",
-                t3: { 
-                    "Mestre do Fogo": "Extrai o poder puro do fogo e seus derivados.",
-                    "Mestre do Ar": "Extrai o poder puro do ar e seus derivados.",
-                    "Mestre da Água": "Extrai o poder puro da água e seus derivados.",
-                    "Mestre da Terra": "Extrai o poder puro da terra e seus derivados."
-                }
-            },
-            "Mago Arcano": {
-                desc: "Manipula a magia pura através do conhecimento e força mental.",
-                t3: { "Rúnico": "Usa escritas antigas para feitiços complexos e poderosos." }
-            },
-            "Mago de Combate": {
-                desc: "Especialista em combates mágicos corpo a corpo e média distância.",
-                t3: { "Mago de Combate Especializado": "Escolhe uma arma ou estilo de luta para criar técnicas especiais." }
-            }
-        }
-    },
-    "Guerreiro": {
-        desc: "Usa espadas e escudos para causar grande dano e suportar ataques.",
-        t2: {
-            "Paladino": {
-                desc: "Recebe o dom mágico de um deus sem abandonar as técnicas de esgrima.",
-                t3: { 
-                    "Anjo": "Ganha a graça divina total, tornando-se quase um anjo verdadeiro com energia divina.",
-                    "Monge": "Abandona seu deus mas segue o caminho da bondade, ganhando resistência e poderes elementais."
-                }
-            },
-            "Cavaleiro das Trevas": {
-                desc: "Torna-se um cavaleiro sombrio que ganha poder quanto mais mata.",
-                t3: { 
-                    "Cavaleiro Demoníaco": "Adquire poderes de entidades superiores com acesso a magias perdidas do submundo.",
-                    "Berserker": "Focado em dano extremo e resistência, ganha poder ao receber e causar dano."
-                }
-            },
-            "Guerreiro Arcano": {
-                desc: "Combina magia arcana com habilidades de esgrima.",
-                t3: { "Veterano": "Mestre em todos os tipos de armas, podendo melhorá-las e realizar feitiços extras." }
-            }
-        }
-    },
-    "Caçador": {
-        desc: "Versátil, usa arcos, facas e conhecimentos da natureza para emboscadas.",
-        t2: {
-            "Arqueiro": { desc: "Foca no arco, combinando magia e precisão técnica.", t3: { "Sniper": "Visão melhorada para distâncias extremas.", "Atirador de Elite": "Invoca armas de fogo antigas.", "Mestre Arqueiro": "Flechas variadas para qualquer situação." } },
-            "Assassino": { desc: "Usa adagas e venenos para permanecer oculto.", t3: { "Ceifador": "Maneja correntes e foices para um deus.", "Sombra": "Nível elevado de ocultação e assassinato." } },
-            "Druida": { desc: "Domina plantas e animais com magias de natureza e cura.", t3: { "Druida (reencarnado)": "Torna-se um com a natureza, ganhando poderes místicos selvagens." } }
-        }
-    },
-    "Curandeiro": {
-        desc: "Essencial para combates, usa poderes divinos para curar e abençoar.",
-        t2: {
-            "Sacerdote": { desc: "Iluminação divina para curar aliados e destruir mortos-vivos.", t3: { "Anjo": "Ascensão divina total.", "Vampiro": "Amaldiçoado pela noite, precisa de sangue para sobreviver." } },
-            "Encantador": { desc: "Mestre em buffs, debuffs e encantamento de itens utilitários.", t3: { "Mestre Encantador": "Modifica magias e cria itens mágicos complexos." } },
-            "Bardo": { desc: "Habilidades musicais de cura e utilidade.", t3: { "Estrela": "Controle total do som e fala mágica cósmica." } }
-        }
-    }
-};
+    
 
     // --- FUNÇÕES DE NAVEGAÇÃO E SISTEMA ---
 
@@ -951,13 +827,7 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
     L.imageOverlay(arquivo, limitesImagem).addTo(map);
     map.fitBounds(limitesImagem);
     
-    /**
-     * LISTENER DE CLIQUE NO MAPA
-     * Prioridade: medição > coordenadas > marcadores
-     * Se medindo: adiciona ponto à rota
-     * Se modo coordenadas: exibe popup com [Y, X] e fecha ao clicar X
-     * Senão: deixa Leaflet processar (marcadores têm seus próprios listeners)
-     */
+    // Listener: prioriza medição > coordenadas > marcadores
     map.on('click', function(e) {
         if (medindo) {
             processarCliqueMedicao(e.latlng);
@@ -1080,25 +950,17 @@ function atualizarVisibilidadeMenuMobile() {
  * Alternar Menu (mobile), Coordenadas, Medidor de Rota
  */
 
-/**
- * SISTEMA DE SENHAS - Proteção para áreas ocultas
- * Senhas conhecidas: 'portal' (Planos), 'fofoca' (Torre), 'Seita' (Pântano), 'ninja' (Lago), etc
- * Comparação case-insensitive
- * Fluxo: abrirModalSenha -> verifica -> sucesso/erro -> executa ação ou mostra erro
- */
-    let senhaCorretaAtual = "";
-    let destinoAposSenha = ""; 
-    let tipoAcaoSenha = "mapa";
-/**
- * Abre modal de proteção por senha
- * @param {string} senha - Senha correta (aceita maiúscula/minúscula)
- * @param {string} destino - Arquivo a carregar após sucesso
- * @param {string} tipo - 'mapa' ou 'imagem' (define ação após sucesso)
- */
-    function abrirModalSenha(senha, destino, tipo = 'mapa') {
-        senhaCorretaAtual = senha;
-        destinoAposSenha = destino;
-        tipoAcaoSenha = tipo;
+// Estado global para senhas (case-insensitive)
+const senhaConfig = {
+    correta: '',
+    destino: '',
+    tipo: 'mapa'
+};
+// Abre modal de proteção por senha
+function abrirModalSenha(senha, destino, tipo = 'mapa') {
+        senhaConfig.correta = senha;
+        senhaConfig.destino = destino;
+        senhaConfig.tipo = tipo;
         
         const modal = document.getElementById('modal-senha');
         const input = document.getElementById('input-senha-rpg');
@@ -1114,16 +976,12 @@ function atualizarVisibilidadeMenuMobile() {
         setTimeout(() => input.focus(), 50); 
     }
 
-/**
- * Valida entrada da senha contra a senha correta
- * Sucesso: exibe mensagem verde, aguarda 1.2s, executa ação (abrirMapaProvincia ou verImagemEstatica)
- * Erro: mostra mensagem padrão "AGUARDE descobrirem a senha", destaca input em vermelho
- */
+// Verifica senha e executa ação se correta
 function verificarSenha() {
     const input = document.getElementById('input-senha-rpg');
     const msg = document.getElementById('msg-erro-senha');
     
-    if (input.value.toLowerCase() === (senhaCorretaAtual || "").toLowerCase()) {
+    if (input.value.toLowerCase() === (senhaConfig.correta || "").toLowerCase()) {
         msg.style.display = 'block';
         msg.style.color = '#2ecc71'; 
         msg.innerHTML = "✨ Acesso concedido!";
@@ -1133,14 +991,12 @@ function verificarSenha() {
             fecharModalSenha();
             input.disabled = false;
             
-            // Lógica para executar função, imagem ou carregar mapa
-            if (tipoAcaoSenha === 'imagem') {
-                verImagemEstatica(destinoAposSenha);
-            } else if (tipoAcaoSenha === 'funcao') {
-                // Executa o comando de código (ex: abrirMenuTorre)
-                new Function(destinoAposSenha)(); 
+            if (senhaConfig.tipo === 'imagem') {
+                verImagemEstatica(senhaConfig.destino);
+            } else if (senhaConfig.tipo === 'funcao') {
+                new Function(senhaConfig.destino)(); 
             } else {
-                abrirMapaProvincia(destinoAposSenha);
+                abrirMapaProvincia(senhaConfig.destino);
             }
         }, 1200);
     } else {
@@ -1152,38 +1008,19 @@ function verificarSenha() {
         input.select(); 
     }
 }
-/**
- * Fecha o modal de senha sem verificação
- * Reseta estado para próximo uso
- */
-    function fecharModalSenha() {
+// Fecha modal de senha
+function fecharModalSenha() {
         document.getElementById('modal-senha').style.display = 'none';
     }
 
-    // Atalho de teclado: ENTER executa verificação (melhora UX)
+    // Atalho: Enter envia senha
     const inputPass = document.getElementById('input-senha-rpg');
-    if (inputPass) {
-        inputPass.addEventListener("keypress", function(e) {
-            if (e.key === "Enter") verificarSenha();
-        });
-    }
-/**
- * Ativa/desativa modo de coordenadas
- * Ao ativar: cliques mostram [Y, X] em popup persistente (fecha com X do popup)
- * Conflita com: modeMedicao (desativa medidor se ativar coords)
- * Muda visual do botão para indicar estado
- */
+    if (inputPass) inputPass.addEventListener("keypress", e => e.key === "Enter" && verificarSenha());
+// Ativa/desativa modo de coordenadas
 function alternarCoordenadas() {
-    // Se for ligar as coordenadas e o medidor estiver ativo, mata o medidor primeiro
-    if (!modoCoordenadas && medindo) {
-        cancelarModoMedicao(); // Esta função já seta medindo = false e limpa o visual
-    }
-
+    if (!modoCoordenadas && medindo) cancelarModoMedicao();
     modoCoordenadas = !modoCoordenadas;
-    
     const container = document.getElementById('map-container');
-    
-    // Atualiza o visual de TODOS os botões de coordenadas (Menu e Província)
     atualizarVisualBotao();
 
     if (modoCoordenadas) {
@@ -1192,22 +1029,13 @@ function alternarCoordenadas() {
         container.classList.remove('mapa-intangivel');
     }
 }
-/**
- * Sincroniza visual dos botões de coordenadas (Menu + Região)
- * Aplica classe 'btn-ferramenta-ativa' (verde) quando coords estão ON
- * Atualiza texto: "Coords: ON" ou "Coords: OFF"
- */
+// Sincroniza visual dos botões de coordenadas
 function atualizarVisualBotao() {
     const botoes = [document.getElementById('btn-coords-menu'), document.getElementById('btn-coords-prov')];
     botoes.forEach(btn => {
         if (!btn) return;
-        if (modoCoordenadas) {
-            btn.innerHTML = "📍 Coords: ON";
-            btn.classList.add('btn-ferramenta-ativa');
-        } else {
-            btn.innerHTML = "📍 Coords: OFF";
-            btn.classList.remove('btn-ferramenta-ativa');
-        }
+        btn.innerHTML = modoCoordenadas ? "📍 Coords: ON" : "📍 Coords: OFF";
+        modoCoordenadas ? btn.classList.add('btn-ferramenta-ativa') : btn.classList.remove('btn-ferramenta-ativa');
     });
 }
     // ... (O resto do seu código: dadosProvincias, dadosCapital, etc. continua igual abaixo)
@@ -1805,61 +1633,8 @@ function menuDeuses() {
         html += `</div>`;
         container.innerHTML = html;
     }
-    // --- ESTRUTURA DE DADOS DAS CLASSES (HIERARQUIA) ---
-// Edite as descrições aqui. O sistema monta o menu sozinho baseado nisso.
-const arvoreClasses = {
-    "Feiticeiro": {
-        desc: "Dominadores da magia bruta, focados em controle de campo e utilidade arcana.",
-        icone: "🔮",
-        proximoNivel: {
-            "Invocador": { 
-                desc: "Especialista em conjurar criaturas e espíritos de outros planos para lutar ao seu lado.",
-                proximoNivel: { 
-                    "Mestre Invocador": { desc: "Pode invocar múltiplas criaturas ou bestas colossais." },
-                    "Espiritualista": { desc: "Foca em espíritos utilitários e buffs para o grupo." }
-                }
-            },
-            "Bruxo": { 
-                desc: "Utiliza artes proibidas e pactos sombrios para debilitar inimigos.",
-                proximoNivel: { 
-                    "Necromante": { desc: "Reanima mortos e manipula energia vital." },
-                    "Demonologista": { desc: "Pactos diretos com demônios para poder destrutivo." }
-                }
-            }
-            // Adicione Feiticeiro Temporal aqui se quiser
-        }
-    },
-    "Mago": {
-        desc: "Estudiosos dedicados ao poder destrutivo dos elementos e da magia pura.",
-        icone: "🔥",
-        proximoNivel: {
-            "Elementalista": {
-                desc: "Foca na manipulação dos quatro elementos básicos para ataque.",
-                proximoNivel: {
-                    "Mestre do Fogo/Ar/Água/Terra": { desc: "Especialização máxima em um único elemento." }
-                }
-            },
-            "Mago Arcano": {
-                desc: "Usa magia pura não elementar e manipulação de energia.",
-                proximoNivel: {
-                     "Rúnico": { desc: "Usa runas antigas para preparar magias poderosas." }
-                }
-            }
-        }
-    },
-    "Guerreiro": {
-        desc: "Mestres do combate corpo a corpo, linha de frente e proteção.",
-        icone: "⚔️",
-        proximoNivel: {
-            "Paladino": { desc: "Guerreiro sagrado que usa fé para proteger e curar.", proximoNivel: { "Anjo": {desc:"..."}, "Monge": {desc:"..."} } },
-            "Cavaleiro das Trevas": { desc: "Usa a própria vitalidade e ódio para aumentar o dano.", proximoNivel: { "Berserker": {desc:"..."}, "Cavaleiro Demoníaco": {desc:"..."} } }
-        }
-    }
-    // Adicione Caçador e Curandeiro seguindo a mesma lógica...
-};
-
-
-function abrirBiblioteca() {
+    // abrirBiblioteca continues below
+    function abrirBiblioteca() {
     const container = document.getElementById('conteudo-menu-capital');
     document.getElementById('titulo-menu-capital').innerText = "📚 Biblioteca";
     container.innerHTML = `
@@ -2403,19 +2178,13 @@ function verImagemHistoria(arquivo, capituloIndex) {
         }
     }
 
-/**
- * Fecha TODOS os modais ativos (info, capital, senha, viagem)
- * Chamado antes de exibir novo modal para evitar sobreposição
- * Não reseta menu-provincias (navegacião independente)
- * window.fecharModalInfo apontado para essa função garante compatibilidade com onclick HTML
- */
+// Fecha todos os modais ativos
 function fecharModais() { 
-        document.getElementById('modal-info').style.display = 'none';
-        document.getElementById('modal-capital').style.display = 'none';
-    }
-    
-    // TRUQUE: Isso garante que se o HTML chamar 'fecharModalInfo', ele usa a nova função
-    window.fecharModalInfo = fecharModais;
+    document.getElementById('modal-info').style.display = 'none';
+    document.getElementById('modal-capital').style.display = 'none';
+}
+
+window.fecharModalInfo = fecharModais; // Compatibilidade com onclick
 
 /**
  * Abre modal de detalhes com conteúdo inteligente baseado no mapa atual
@@ -2591,8 +2360,8 @@ function verImagemEstatica(arquivo, callbackVoltar = null) {
  */
 function adicionarMarcadoresLocais(nomeDoMapa) {
     // Ícones padrão Leaflet com tamanhos variáveis (normal: 50px, grande: 100px)
-    const iconP = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [50, 50], iconAnchor: [25, 25], popupAnchor: [0, -25]});
-    const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [100, 100], iconAnchor: [50, 50], popupAnchor: [0, -50]});
+    const iconP = ICON_50;
+    const iconG = ICON_100;
 
     // Helper interno: cria marcador padrão com foto clicável
 function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoExtra = null) {
@@ -2804,10 +2573,7 @@ if (nomeDoMapa === 'Planos.jpg') {
         selecaoAtual = null; // Reseta seleção
 
         // Ícone Gigante
-        const iconMega = L.icon({
-            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', 
-            iconSize: [120, 120], iconAnchor: [60, 120], popupAnchor: [0, -100]
-        });
+        const iconMega = ICON_MEGA;
 
         // Função Especial para o Nexus (Agora abre MAPAS e tem descrição)
 // Função Especial para o Nexus (Atualizada para o novo estilo)
@@ -2892,8 +2658,8 @@ if (nomeDoMapa === 'Planos.jpg') {
  *   Tipo 3: criarPonto([y,x], "Nome", null, 'none', true) -> apenas placeholder
  */
     function adicionarMarcadoresPrincipais() {
-        const iconP = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [80, 80], iconAnchor: [40, 40], popupAnchor: [0, -40]});
-        const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [120, 120], iconAnchor: [60, 60], popupAnchor: [0, -60]});
+        const iconP = ICON_80;
+        const iconG = ICON_120;
 
         function criarPonto(coord, nome, arg3, arg4, arg5) {
             let descricao = "", arquivo = "", tipo = "", grande = false;
@@ -3001,13 +2767,7 @@ function atualizarBotaoMedidor(estado) {
         }
     });
 }
-/**
- * Ativa/desativa modo de medição de rotas
- * Ao ativar: desabilita cliques em marcadores, ativa modo crosshair
- * Ao desativar (com 2+ pontos): abre calculadora com resultados
- * Ao desativar (com < 2 pontos): cancela silenciosamente
- * Conflita com: modoCoordenadas (desativa coords se ativar medidor)
- */
+// Ativa/desativa medição de rotas e calcula resultados
 function ativarMedidor() {
     if (!medindo) {
         // Se as coordenadas estiverem ON, mata elas primeiro
@@ -3037,25 +2797,16 @@ function ativarMedidor() {
     }
 }
 
-/**
- * Cancela o modo de medição mantendo a rota visual no mapa
- * Remove classes CSS de intangibilidade e crosshair
- * Reseta botão para estado inicial (não verde)
- */
-    function cancelarModoMedicao() {
+// Cancela medição sem remover visual da rota
+function cancelarModoMedicao() {
         medindo = false;
         document.getElementById('map-container').classList.remove('mapa-intangivel');
         document.getElementById('map').classList.remove('modo-medicao-ativo');
         atualizarBotaoMedidor('iniciar');
     }
 
-/**
- * Processa cada clique do usuário enquanto está em modo de medição
- * Adiciona ponto à rota e desenha linha conectando ao anterior
- * Ctrl+Z remove o último ponto
- * @param {object} latlng - Coordenada [lat, lng] do clique
- */
-    function processarCliqueMedicao(latlng) {
+// Processa clique para adicionar ponto à rota (Ctrl+Z para desfazer)
+function processarCliqueMedicao(latlng) {
         // Adiciona coordenada à lista
         pontosRota.push(latlng);
 
@@ -3083,7 +2834,7 @@ function ativarMedidor() {
 function calcularResultados() {
         let distanciaTotalPixels = 0;
 
-        // Soma a distância de todos os segmentos da rota
+        // Soma distância de todos os segmentos
         for (let i = 0; i < pontosRota.length - 1; i++) {
             distanciaTotalPixels += map.distance(pontosRota[i], pontosRota[i+1]);
         }
@@ -3091,9 +2842,7 @@ function calcularResultados() {
         // --- CÁLCULOS ---
         const distanciaReal = distanciaTotalPixels * fatorEscala;
 
-        // CALIBRAÇÃO DE TEMPO (CORRIGIDA)
-        // Usamos 30 km por dia (ritmo de marcha padrão de RPG)
-        // Antes estava 150 (que era baseado em pixels, por isso estava rápido demais)
+        // CALIBRAÇÃO: 30 km/dia é ritmo padrão de marcha RPG
         const kmPorDiaPe = 30; 
         
         const diasPe = (distanciaReal / kmPorDiaPe).toFixed(1);
@@ -3101,14 +2850,7 @@ function calcularResultados() {
         const diasMontariaNormal = (distanciaReal / (kmPorDiaPe * 2.0)).toFixed(1); // Cavalo
         const diasMontariaRapida = (distanciaReal / (kmPorDiaPe * 4.0)).toFixed(1); // Voo
 
-        // --- ECONOMIA (CORRIGIDA - METADE DO PREÇO) ---
-        // 1 Gold = 100 Prata = 10000 Bronze
-        
-        // Taxa de Embarque: 2.5 Golds (Era 5)
-        const custoBase = 25000; 
-        
-        // Custo por KM: 2.5 Pratas (Era 5)
-        const custoPorKm = 250;  
+        // ECONOMIA: 2.5 Ouro taxa + 2.5 Prata/km (1 Ouro = 100 Prata = 10000 Bronze)  
         
         let custoTotalCobre = Math.floor(custoBase + (distanciaReal * custoPorKm));
 
