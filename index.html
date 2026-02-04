@@ -407,6 +407,82 @@
     .marcador-rota {
         pointer-events: none; /* Apenas visual */
     }
+    /* Container dos andares */
+.torre-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+}
+
+/* Estilo de cada andar */
+.andar-item {
+    background: rgba(40, 40, 40, 0.9);
+    border: 1px solid #444;
+    border-left: 5px solid #555; /* Cor padrão */
+    padding: 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.andar-item:hover {
+    transform: scale(1.02) translateX(10px);
+    background: rgba(60, 60, 60, 1);
+}
+
+.andar-numero {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 30px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.05);
+}
+
+.andar-titulo { font-weight: bold; color: #ffdead; display: block; }
+.andar-sage { font-size: 13px; color: #aaa; }
+
+/* Container da Torre com Scroll Suave */
+.torre-wrapper {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 10px;
+    perspective: 1000px; /* Efeito de profundidade */
+}
+
+/* Efeito de Névoa para Andares Bloqueados */
+.andar-bloqueado {
+    filter: blur(4px) grayscale(1);
+    opacity: 0.5;
+    pointer-events: none; /* Não clica */
+    cursor: not-allowed;
+}
+
+/* Andar Atual (Onde eles podem interagir) */
+.andar-atual {
+    border-left: 8px solid #ffd700 !important;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    animation: pulsoMagico 2s infinite ease-in-out;
+}
+
+@keyframes pulsoMagico {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.01); box-shadow: 0 0 25px rgba(255, 215, 0, 0.5); }
+    100% { transform: scale(1); }
+}
+
+/* Badge de Aprendizes */
+.aprendiz-tag {
+    background: rgba(255,255,255,0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    float: right;
+}
 
     </style>
 </head>
@@ -509,10 +585,132 @@
  * Estado global: mapaAtualAtivo (qual mapa está carregado), menuAtualAberto (qual menu está visível)
  */
 
+// Variável de controle: qual o andar máximo que o grupo já liberou?
+
+
+const dadosTorre = [
+    { andar: 12, titulo: "O Primeiro Sábio", nome: "Aurelius, o Eterno", desc: "O pilar da sabedoria e fundador da ordem.", cor: "#ffd700", aprendizes: 1 },
+    { andar: 11, titulo: "O Sábio do Espaço", nome: "Void-Walker", desc: "Mestre das dimensões e portais.", cor: "#8a2be2", aprendizes: 3 },
+    { andar: 10, titulo: "O Sábio do Tempo", nome: "Chronos", desc: "Aquele que observa o fluxo do destino.", cor: "#40e0d0", aprendizes: 2 },
+    { andar: 9,  titulo: "O Sábio Arcano", nome: "Malygos", desc: "A própria personificação da mana pura.", cor: "#1e90ff", aprendizes: 15 },
+    { andar: 8,  titulo: "O Sábio das Trevas", nome: "Umbra", desc: "Estudioso do que reside no abismo.", cor: "#4b0082", aprendizes: 5 },
+    { andar: 7,  titulo: "O Sábio das Chamas", nome: "Ignis", desc: "O calor da criação e da destruição.", cor: "#ff4500", aprendizes: 8 },
+    { andar: 6,  titulo: "O Sábio do Gelo", nome: "Frost-Beard", desc: "A paciência e o silêncio do zero absoluto.", cor: "#00ffff", aprendizes: 6 },
+    { andar: 5,  titulo: "O Sábio das Armas", nome: "Kensei", desc: "A filosofia através do fio da espada.", cor: "#708090", aprendizes: 20 },
+    { andar: 4,  titulo: "O Sábio da Alquimia", nome: "Paracelsus", desc: "Transmutação da matéria e da alma.", cor: "#32cd32", aprendizes: 12 },
+    { andar: 3,  titulo: "O Sábio Tolo", nome: "Jester", desc: "A sabedoria encontrada na loucura e no riso.", cor: "#ba55d3", aprendizes: 0 },
+    { andar: 2,  titulo: "O Sábio", nome: "Novatus", desc: "O guardião da porta e mestre dos iniciados.", cor: "#cd853f", aprendizes: 50 },
+    { andar: 1,  titulo: "A Sábia das Fofocas", nome: "Madame Murmur", desc: "Nada acontece em Tarre sem que ela saiba. Ela troca segredos por informações valiosas.", cor: "#ff69b4", aprendizes: 40 }
+];
         
     document.addEventListener("keydown", (e) => {
     if (medindo && e.ctrlKey && (e.key === 'z' || e.key === 'Z')) desfazerUltimoPonto();
 });
+
+let andarMaximoLiberado = 1; // Inicia apenas com o 1º andar (Sábia das Fofocas)
+
+function abrirMenuTorre() {
+    const modal = document.getElementById('modal-capital');
+    const container = document.getElementById('conteudo-menu-capital');
+    const titulo = document.getElementById('titulo-menu-capital');
+    
+    modal.style.display = 'flex';
+    titulo.innerText = "🗼 Ascensão à Torre dos Sábios";
+    
+    container.innerHTML = `
+        <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+            <p style="color:#ffd700; margin:0; font-size: 14px;">Andar Máximo Desbloqueado: <strong>${andarMaximoLiberado}º</strong></p>
+        </div>
+        <div class="torre-wrapper">
+            <div class="torre-container">
+                ${dadosTorre.map(f => {
+                    const bloqueado = f.andar > andarMaximoLiberado;
+                    const classeAndar = bloqueado ? 'andar-bloqueado' : (f.andar === andarMaximoLiberado ? 'andar-item andar-atual' : 'andar-item');
+                    const iconeStatus = bloqueado ? '🔒' : '✨';
+                    
+                    return `
+                        <div class="${classeAndar}" style="border-left-color: ${f.cor}" ${!bloqueado ? `onclick="detalharAndar(${f.andar})"` : ''}>
+                            <span class="andar-numero">${f.andar}º</span>
+                            <span class="andar-titulo">${iconeStatus} ${f.titulo}</span>
+                            <span class="andar-sage">${bloqueado ? "Sábio Oculto pela Névoa" : f.nome}</span>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; text-align: center; border-top: 1px dashed #444; padding-top: 10px;">
+            <button onclick="subirAndar()" style="background: rgba(139, 69, 19, 0.3); border: 1px solid #8b4513; color: #cd853f; font-size: 11px; cursor: pointer; padding: 5px 15px; border-radius: 4px;">
+                ⚙️ MESTRE: Desbloquear Próximo Andar
+            </button>
+        </div>
+    `;
+}
+
+function subirAndar() {
+    if (andarMaximoLiberado < 12) {
+        andarMaximoLiberado++;
+        abrirMenuTorre(); // Atualiza a interface da torre imediatamente
+    } else {
+        alert("O topo da torre já foi alcançado!");
+    }
+}
+
+// Função que faz a mágica acontecer
+function subirAndar() {
+    if (andarMaximoLiberado < 12) {
+        andarMaximoLiberado++;
+        abrirMenuTorre(); // Atualiza a tela na hora
+        alert("A névoa se dissipou! O " + andarMaximoLiberado + "º andar agora está acessível.");
+    } else {
+        alert("A torre já está totalmente desbloqueada!");
+    }
+}
+
+// Função para você, Mestre, usar no console quando quiser que eles subam
+function subirAndar() {
+    if (andarMaximoLiberado < 12) {
+        andarMaximoLiberado++;
+        abrirMenuTorre();
+        console.log("Os Pandemônios subiram para o andar " + andarMaximoLiberado);
+    }
+}
+
+function detalharAndar(num) {
+    const andar = dadosTorre.find(a => a.andar === num);
+    const container = document.getElementById('conteudo-menu-capital');
+    
+    container.innerHTML = `
+        <button onclick="abrirMenuTorre()" class="btn-popup" style="margin-bottom:20px; background:#444;">⬅ Voltar aos Andares</button>
+        <div style="text-align:center; padding: 20px; border: 2px solid ${andar.cor}; border-radius: 10px; background: rgba(0,0,0,0.3);">
+            <h2 style="color:${andar.cor}; margin-top:0;">${andar.titulo}</h2>
+            <h3 style="color:#fff;">${andar.nome}</h3>
+            <hr style="border:0; border-top:1px solid #444;">
+            <p style="font-size:18px; line-height:1.6;">${andar.desc}</p>
+            <div style="margin-top:20px; padding:10px; background:rgba(255,255,255,0.05);">
+                <strong>👥 Aprendizes no andar:</strong> ${andar.aprendizes}
+            </div>
+        </div>
+    `;
+}
+
+function detalharAndar(num) {
+    const andar = dadosTorre.find(a => a.andar === num);
+    const container = document.getElementById('conteudo-menu-capital');
+    
+    container.innerHTML = `
+        <button onclick="abrirMenuTorre()" class="btn-popup" style="margin-bottom:20px; background:#444;">⬅ Voltar aos Andares</button>
+        <div style="text-align:center; padding: 20px; border: 2px solid ${andar.cor}; border-radius: 10px; background: rgba(0,0,0,0.3);">
+            <h2 style="color:${andar.cor}; margin-top:0;">${andar.titulo}</h2>
+            <h3 style="color:#fff;">${andar.nome}</h3>
+            <hr style="border:0; border-top:1px solid #444;">
+            <p style="font-size:18px; line-height:1.6;">${andar.desc}</p>
+            <div style="margin-top:20px; padding:10px; background:rgba(255,255,255,0.05);">
+                <strong>👥 Aprendizes no andar:</strong> ${andar.aprendizes}
+            </div>
+        </div>
+    `;
+}
 
 /**
  * CONFIGURAÇÕES DE MAPA
@@ -769,43 +967,39 @@ function atualizarVisibilidadeMenuMobile() {
  * Sucesso: exibe mensagem verde, aguarda 1.2s, executa ação (abrirMapaProvincia ou verImagemEstatica)
  * Erro: mostra mensagem padrão "AGUARDE descobrirem a senha", destaca input em vermelho
  */
-    function verificarSenha() {
-        const input = document.getElementById('input-senha-rpg');
-        const msg = document.getElementById('msg-erro-senha');
-        
-        // Compara ignorando maiúsculas/minúsculas
-        if (input.value.toLowerCase() === senhaCorretaAtual.toLowerCase()) {
-            // SUCESSO
-            msg.style.display = 'block';
-            msg.style.color = '#2ecc71'; 
-            msg.innerHTML = "✨ Acesso concedido!";
-            input.disabled = true;
+function verificarSenha() {
+    const input = document.getElementById('input-senha-rpg');
+    const msg = document.getElementById('msg-erro-senha');
+    
+    if (input.value.toLowerCase() === (senhaCorretaAtual || "").toLowerCase()) {
+        msg.style.display = 'block';
+        msg.style.color = '#2ecc71'; 
+        msg.innerHTML = "✨ Acesso concedido!";
+        input.disabled = true;
 
-            // Espera um pouco e executa a ação (abrir mapa ou foto)
-            setTimeout(() => {
-                fecharModalSenha();
-                input.disabled = false;
-                
-                if (tipoAcaoSenha === 'imagem') {
-                    verImagemEstatica(destinoAposSenha);
-                } else {
-                    abrirMapaProvincia(destinoAposSenha);
-                }
-            }, 1200);
-
-        } else {
-            // ERRO (MENSAGEM QUE VOCÊ PEDIU)
-            msg.style.display = 'block';
-            msg.style.color = '#ff4444';
-            msg.innerHTML = "Senha incorreta. Por favor AGUARDE descobrirem a senha.";
+        setTimeout(() => {
+            fecharModalSenha();
+            input.disabled = false;
             
-            // Efeito visual de erro no input
-            input.style.borderColor = "red";
-            setTimeout(() => input.style.borderColor = "#8b4513", 500);
-            input.select(); 
-        }
+            // Lógica para executar função, imagem ou carregar mapa
+            if (tipoAcaoSenha === 'imagem') {
+                verImagemEstatica(destinoAposSenha);
+            } else if (tipoAcaoSenha === 'funcao') {
+                // Executa o comando de código (ex: abrirMenuTorre)
+                new Function(destinoAposSenha)(); 
+            } else {
+                abrirMapaProvincia(destinoAposSenha);
+            }
+        }, 1200);
+    } else {
+        msg.style.display = 'block';
+        msg.style.color = '#ff4444';
+        msg.innerHTML = "Senha incorreta. Por favor AGUARDE descobrirem a senha.";
+        input.style.borderColor = "red";
+        setTimeout(() => input.style.borderColor = "#8b4513", 500);
+        input.select(); 
     }
-
+}
 /**
  * Fecha o modal de senha sem verificação
  * Reseta estado para próximo uso
@@ -1401,7 +1595,7 @@ function menuCapital(tipo) {
             container.innerHTML += `<div class="item-menu" onclick="lerCapitulo(${index})" style="cursor: pointer; align-items: center;"><div class="foto-placeholder" style="width: 40px; height: 40px;">📖</div><div class="texto-item"><h4>${cap.titulo}</h4></div></div>`;
         });
     }
-    else if (tipo === 'bestiario' || tipo === 'esquadrao' || tipo === 'procurados' || tipo === 'lendas') {
+    else if (tipo === 'bestiario' || tipo === 'esquadrao' || tipo === 'procurados') {
         titulo.innerText = (tipo === 'bestiario') ? "📖 Bestiário" : (tipo === 'esquadrao' ? "🛡️ Esquadrão" : (tipo === 'lendas' ? "⚜️ Heróis" : "☠️ Procurados"));
         container.innerHTML = btnVoltarHub;
         const lista = (tipo === 'bestiario') ? dadosCapital.bestiario : (tipo === 'esquadrao' ? dadosCapital.esquadrao : (tipo === 'lendas' ? dadosCapital.lendas : dadosCapital.procurados));
@@ -1409,6 +1603,26 @@ function menuCapital(tipo) {
             let img = item.foto ? `<img src="${item.foto}" class="foto-lista" onclick="verImagemPersonagem('${item.foto}')" style="cursor: zoom-in;">` : `<div class="foto-placeholder">?</div>`;
             container.innerHTML += `<div class="item-menu">${img}<div class="texto-item"><h4>${item.nome}</h4><p>${item.desc || item.titulo || ""}</p></div></div>`;
         });
+    }
+    if (tipo === 'lendas') {
+        titulo.innerText = "🏛️ Os 12 Heróis Lendários";
+        // Botão de voltar e texto de introdução
+        container.innerHTML = btnVoltarHub + `
+            <p style="font-style:italic; color:#aaa; font-size:14px; text-align:center; margin-bottom:20px; border-bottom:1px solid #444; padding-bottom:10px;">
+                "Aqueles que derrotaram o Primeiro Rei Demônio e forjaram a Era da Paz."
+            </p>`;
+
+        dadosCapital.lendas.forEach(heroi => {
+            container.innerHTML += `
+                <div class="item-menu" style="padding: 15px 0;">
+                    <div class="texto-item" style="width: 100%;">
+                        <h4 style="color:#ffd700; margin-bottom: 2px;">${heroi.nome}</h4>
+                        <span style="font-size:12px; font-weight:bold; color:#cd853f; text-transform:uppercase;">${heroi.titulo}</span>
+                        <p style="margin-top:5px; font-size:13px; color:#ccc;">${heroi.desc}</p>
+                    </div>
+                </div>`;
+        });
+        return;
     }
 }
 
@@ -2054,9 +2268,10 @@ if (nomeDoMapa === 'Planos.jpg') {
                 botoes += criarBtn("⚡ Panteão", "menuDeuses()", "#4682B4");
             }
             // --- TORRE DOS SÁBIOS ---
+
             else if (nome === "Torre dos Sábios") {
                 if (arquivo) botoes += criarBtn("📸 Ver Exterior", `verImagemEstatica('${arquivo}')`, "#5F9EA0");
-                botoes += criarBtn("🔮 Acessar Interior", `abrirModalSenha('fofoca', 'bloqueado.jpg', 'imagem')`, "#9370DB");
+                botoes += criarBtn("🔮 Acessar Interior", `abrirModalSenha('fofoca', 'abrirMenuTorre()', 'funcao')`, "#9370DB");
             }
             else if (nome === "Ilha Paradisíaca") {
     if (arquivo) botoes += criarBtn("📸 Ver Ilha", `verImagemEstatica('${arquivo}')`, "#5F9EA0");
