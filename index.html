@@ -1,3 +1,66 @@
+<!--
+   ═══════════════════════════════════════════════════════════════════════════════════════
+   MAPA RPG INTERATIVO 8K
+   ═══════════════════════════════════════════════════════════════════════════════════════
+   
+   Autor: Otávio Gums Willrich
+   Data: 2026-02-03
+   Versão: 1.0 - Full Documentation & Bug Fixes
+   
+   ───────────────────────────────────────────────────────────────────────────────────────
+   VISÃO GERAL DO PROJETO:
+   ───────────────────────────────────────────────────────────────────────────────────────
+   - Single-file HTML5/JS RPG explorer com mapa interativo usando Leaflet.js
+   - Mapa continental 8K (7680x4320px) com 5 províncias exploráveis
+   - Sistema cosmológico com 3 planos extras (Divino, Demoníaco, Espiritual)
+   - Múltiplos subsistemas: banco, bestiário, squad, rumors, pantheon, lore
+   
+   ───────────────────────────────────────────────────────────────────────────────────────
+   ARQUITETURA:
+   ───────────────────────────────────────────────────────────────────────────────────────
+   1. MAPA (Leaflet.js CRS.Simple)
+      - Não usa lat/lng, mas coordenadas pixel [Y, X]
+      - Dois níveis: Continental (7680x4320) -> Províncias/Planos (2048x1536)
+      - Zoom dinâmico: -2.0 a 3.0 continental, -1.0 a 2.0 províncias
+      
+   2. SISTEMA DE NAVEGAÇÃO
+      - Estado rastreado via: mapaAtualAtivo, menuAtualAberto, modoCoordenadas, medindo
+      - Callback pattern para voltar entre telas (verImagemEstatica)
+      - Modais sobrepostas (info, capital, senha, viagem)
+      
+   3. DADOS EMBARCADOS (3 objetos globais)
+      - dadosProvincias: Descrições de 5 regiões
+      - dadosGerais: Banco (6 packages), Pantheon (12 deuses), Investimentos
+      - dadosCapital: Squad (6 PCs), Procurados (8), Bestiário, Boatos (100), Lore (5 caps), Heróis (12)
+      
+   4. SUBSISTEMAS
+      - Medidor de Rota: Calcula distância (km) -> tempo (dias) -> custo (ouro/prata/bronze)
+      - Sistema de Coordenadas: Clique exibe [Y, X] com popup persistente
+      - Proteção por Senha: 'portal', 'fofoca', 'Seita', 'ninja' permitem exploração
+      - Imagem Viewer: Fullscreen com botão de voltar customizável via callback
+      
+   ───────────────────────────────────────────────────────────────────────────────────────
+   SCALE FACTORS (mapa continente = baseline):
+   ───────────────────────────────────────────────────────────────────────────────────────
+   - Continental: 1 px = 0.23 km (escala 1:23)
+   - Províncias: 1 px = 0.13 km (escala 1:13)
+   - Planos: 1 px = 0.5 km (escala 1:50, mais "mágico")
+   
+   ───────────────────────────────────────────────────────────────────────────────────────
+   TEMPO E ECONOMIA:
+   - Velocidade base: 30 km/dia a pé
+   - Montarias: 1.5x mula, 2x cavalo, 4x especial
+   - Custo imperial: 2.5 ouro taxa + 2.5 prata/km
+   - Conversão: 1 ouro = 100 prata = 10000 bronze
+   
+   FLUXOS PRINCIPAIS:
+   1. Continente (Mapa teste.png) -> Clica Província -> abrirMapaProvincia()
+   2. Dentro Província -> Clica Localidade -> popup com ações -> verImagemEstatica()
+   3. Voltando de imagem -> callback restaura mapa + reabre menu anterior
+   4. Cosmologia: Clica "Outros Planos" -> modalSenha -> Planos.jpg -> criarPontoNexus()
+   
+   ═══════════════════════════════════════════════════════════════════════════════════════
+-->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -144,10 +207,10 @@
     /* CONTAINER DA FOTO ESTÁTICA */
     #provincia-container {
         display: none;
-        background: #4F686E; 
+        background: #1a1a1a; /* Fundo escuro fica melhor para fotos */
         height: 100vh; width: 100vw; 
         position: fixed; top: 0; left: 0;
-        z-index: 3000;
+        z-index: 9000; /* Garante que fique na frente do mapa e dos menus */
         flex-direction: column;
         align-items: center; justify-content: center;
     }
@@ -159,6 +222,14 @@
         border: 2px solid #333;
     }
 
+    #provincia-container img {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn { 
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+} 
     /* POPUPS E BOTÕES */
     .leaflet-popup-content-wrapper { background: #2c2c2c; color: #fff; font-size: 14px; }
     .leaflet-popup-tip { background: #2c2c2c; }
@@ -427,45 +498,87 @@
 
     <script>
 
+/**
+ * RPG INTERATIVO - MAPA 8K COM LEAFLET
+ * ==========================================
+ * Aplicativo web de exploração de mundo RPG com mapa continental 7680x4320px
+ * Suporta: navegação entre províncias, sistema de combate cosmológico (múltiplos planos),
+ * banco imperial, bestiário, histórico de aventuras, senhas, cálculo de rotas
+ * 
+ * Fluxo principal: carregarMapaPrincipal() -> adicionar marcadores -> clique = abrirMapaProvincia/verImagem
+ * Estado global: mapaAtualAtivo (qual mapa está carregado), menuAtualAberto (qual menu está visível)
+ */
+
         
     document.addEventListener("keydown", (e) => {
     if (medindo && e.ctrlKey && (e.key === 'z' || e.key === 'Z')) desfazerUltimoPonto();
 });
-// --- 1. CONFIGURAÇÕES TÉCNICAS ---
+
+/**
+ * CONFIGURAÇÕES DE MAPA
+ * Cada mapa tem tamanho e zoom diferentes
+ */
     const configContinental = { arquivo: 'Mapa teste.png', largura: 7680, altura: 4320, minZoom: -2.0, maxZoom: 3 };
     const configProvincia = { largura: 2048, altura: 1536, minZoom: -1.0, maxZoom: 2 };
     
-// --- VARIÁVEIS GLOBAIS ---
+/**
+ * VARIÁVEIS GLOBAIS - Estado da aplicação
+ * Rastreiam qual mapa/menu está ativo e qual ferramenta está habilitada
+ */
     let map; 
-    let mapaAtualAtivo = 'continente';
-    let modoCoordenadas = false;
-    let marcadorTempCoords = null;
-    let fatorEscala = 0.23;
-    let menuAtualAberto = null; // Rastreia qual menu/aba está aberta
-    let selecaoAtual = null; // Guarda qual plano foi clicado por último
+    let mapaAtualAtivo = 'continente';     // 'continente', 'Hukmal_tep.jpg', 'Planos.jpg', etc
+    let modoCoordenadas = false;           // true = cliques mostram coordenadas
+    let marcadorTempCoords = null;         // Armazena popup de coordenadas atual
+    let fatorEscala = 0.23;                // Varia por mapa: 0.23 continental, 0.13 províncias, 0.5 planos
+    let menuAtualAberto = null;            // 'banco', 'bestiario', 'esquadrao', 'deuses', etc (essencial para voltar)
+    let selecaoAtual = null;               // Rastreia qual região foi clicada (para planos)
     
-// Ícone de Emoji para Coordenadas
+/**
+ * ÍCONE CUSTOMIZADO - Marcador de coordenadas
+ * Emoji 📍 com sombra preta para visibilidade
+ */
 const iconCoords = L.divIcon({
     html: '<div style="font-size: 24px; filter: drop-shadow(0 0 2px black);">📍</div>',
     className: 'marcador-emoji',
     iconSize: [30, 30],
     iconAnchor: [15, 25],
-    popupAnchor: [0, -20] // <-- Sobe o popup em 20 pixels
+    popupAnchor: [0, -20]
 });
-// Função para gerar o HTML do botão elegante
+
+/**
+ * HELPER - Gera HTML de botão com barra colorida à esquerda
+ * Usado em popups para consistent styling
+ * @param {string} texto - Texto do botão (com emojis)
+ * @param {string} acao - onclick action (ex: "abrirMapaProvincia('arquivo.jpg')")
+ * @param {string} corBarra - Cor hex da barra esquerda (ex: "#5F9EA0")
+ */
     function criarBtn(texto, acao, corBarra) {
         return `<button onclick="${acao}" class="botao-estiloso" style="border-left-color: ${corBarra};">${texto}</button>`;
     }
 
-    // --- VARIÁVEIS DA CALCULADORA ---
-    // AQUI ESTAVA O ERRO: Faltava criar o grupoRota
+/**
+ * LAYER GROUP PARA ROTA
+ * Armazena visual da rota (bolinhas e linhas de conexão)
+ * Deve ser criado ANTES de inicializarMapa()
+ */
     const grupoRota = L.layerGroup(); 
+     
     
     let medindo = false;
     let pontosRota = [];
 
     // --- FUNÇÕES DE NAVEGAÇÃO E SISTEMA ---
 
+/**
+ * Inicializa o mapa Leaflet com CRS.Simple (pixel coordinates, não lat/lng)
+ * Define limites de navegação, carrega imagem de fundo, inicializa camadas
+ * CRÍTICO: grupoRota deve estar criado ANTES dessa função
+ * @param {string} arquivo - Caminho do arquivo PNG (ex: 'Mapa teste.png')
+ * @param {number} largura - Largura em pixels
+ * @param {number} altura - Altura em pixels  
+ * @param {number} minZoom - Zoom mínimo (geralmente -2.0 para continental)
+ * @param {number} maxZoom - Zoom máximo (geralmente 3)
+ */
 function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
     if (map) { map.remove(); } 
 
@@ -488,7 +601,13 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
     L.imageOverlay(arquivo, limitesImagem).addTo(map);
     map.fitBounds(limitesImagem);
     
-    // --- LÓGICA DO CLIQUE CORRIGIDA (PERSISTÊNCIA TOTAL) ---
+    /**
+     * LISTENER DE CLIQUE NO MAPA
+     * Prioridade: medição > coordenadas > marcadores
+     * Se medindo: adiciona ponto à rota
+     * Se modo coordenadas: exibe popup com [Y, X] e fecha ao clicar X
+     * Senão: deixa Leaflet processar (marcadores têm seus próprios listeners)
+     */
     map.on('click', function(e) {
         if (medindo) {
             processarCliqueMedicao(e.latlng);
@@ -527,7 +646,11 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
     });
 }
 
-    // 2. Alterna menu no celular
+/**
+ * Alterna visibilidade do menu no mobile (< 600px)
+ * Mostra/esconde a lista de províncias ou ferramentas conforme clique
+ * Chamada por: onclick em h3 do menu
+ */
 function alternarMenuMobile() {
     if (window.innerWidth > 600) return;
     const listaProv = document.getElementById('lista-botoes-provincia');
@@ -546,7 +669,12 @@ function alternarMenuMobile() {
     }
 }
 
-// Centraliza a lógica de visibilidade do menu para mobile/tablet
+/**
+ * Sincroniza visibilidade do menu conforme tamanho da tela
+ * Desktop: mostra províncias OU ferramentas (depend do mapa)
+ * Mobile (< 600px): esconde ambos por padrão (podem ser expandidos)
+ * Chamada por: abrirMapaProvincia(), carregarMapaPrincipal(), window.resize
+ */
 function atualizarVisibilidadeMenuMobile() {
     const listaProv = document.getElementById('lista-botoes-provincia');
     const listaFerramentas = document.getElementById('lista-ferramentas-regiao');
@@ -569,16 +697,20 @@ function atualizarVisibilidadeMenuMobile() {
     }
 }
 
-// 3. Carrega o mapa principal (Continente)
+/**
+ * Carrega o mapa do continente (vista inicial do jogo)
+ * Limpa rotas, marcadores temporários, reseta estado global
+ * Adiciona marcadores das 5 províncias principais + locais especiais
+ * Chamada por: inicialização e botão voltar do mapa
+ */
     function carregarMapaPrincipal() {
         mapaAtualAtivo = 'continente';
         fatorEscala = 0.23; // Escala do continente
 
-        // --- LIMPEZA DE ROTA (GARANTIA) ---
+        // Limpeza: Remove rota anterior e cancela modo de medição se ativo
         if (medindo) cancelarModoMedicao();
         grupoRota.clearLayers();
         pontosRota = [];
-        // ----------------------------------
 
         document.getElementById('map-container').style.display = 'block';
         document.getElementById('provincia-container').style.display = 'none';
@@ -593,14 +725,26 @@ function atualizarVisibilidadeMenuMobile() {
         // Visibilidade de menu mobile já foi aplicada via helper
     }
 
-    // --- FUNÇÕES DOS BOTÕES EXTRAS (Agora fora de qualquer outra função) ---
+/**
+ * FUNÇÕES DOS BOTÕES EXTRAS - Menu Principal e Regional
+ * Alternar Menu (mobile), Coordenadas, Medidor de Rota
+ */
 
-// --- SISTEMA DE SENHA (ÚNICO E CORRIGIDO) ---
+/**
+ * SISTEMA DE SENHAS - Proteção para áreas ocultas
+ * Senhas conhecidas: 'portal' (Planos), 'fofoca' (Torre), 'Seita' (Pântano), 'ninja' (Lago), etc
+ * Comparação case-insensitive
+ * Fluxo: abrirModalSenha -> verifica -> sucesso/erro -> executa ação ou mostra erro
+ */
     let senhaCorretaAtual = "";
     let destinoAposSenha = ""; 
-    let tipoAcaoSenha = "mapa"; 
-
-    // 1. Abre o modal e configura o que vai acontecer
+    let tipoAcaoSenha = "mapa";
+/**
+ * Abre modal de proteção por senha
+ * @param {string} senha - Senha correta (aceita maiúscula/minúscula)
+ * @param {string} destino - Arquivo a carregar após sucesso
+ * @param {string} tipo - 'mapa' ou 'imagem' (define ação após sucesso)
+ */
     function abrirModalSenha(senha, destino, tipo = 'mapa') {
         senhaCorretaAtual = senha;
         destinoAposSenha = destino;
@@ -620,7 +764,11 @@ function atualizarVisibilidadeMenuMobile() {
         setTimeout(() => input.focus(), 50); 
     }
 
-    // 2. Verifica se a senha está certa
+/**
+ * Valida entrada da senha contra a senha correta
+ * Sucesso: exibe mensagem verde, aguarda 1.2s, executa ação (abrirMapaProvincia ou verImagemEstatica)
+ * Erro: mostra mensagem padrão "AGUARDE descobrirem a senha", destaca input em vermelho
+ */
     function verificarSenha() {
         const input = document.getElementById('input-senha-rpg');
         const msg = document.getElementById('msg-erro-senha');
@@ -658,18 +806,27 @@ function atualizarVisibilidadeMenuMobile() {
         }
     }
 
-    // 3. Fecha o modal
+/**
+ * Fecha o modal de senha sem verificação
+ * Reseta estado para próximo uso
+ */
     function fecharModalSenha() {
         document.getElementById('modal-senha').style.display = 'none';
     }
 
-    // 4. Atalho para o botão ENTER
+    // Atalho de teclado: ENTER executa verificação (melhora UX)
     const inputPass = document.getElementById('input-senha-rpg');
     if (inputPass) {
         inputPass.addEventListener("keypress", function(e) {
             if (e.key === "Enter") verificarSenha();
         });
     }
+/**
+ * Ativa/desativa modo de coordenadas
+ * Ao ativar: cliques mostram [Y, X] em popup persistente (fecha com X do popup)
+ * Conflita com: modeMedicao (desativa medidor se ativar coords)
+ * Muda visual do botão para indicar estado
+ */
 function alternarCoordenadas() {
     // Se for ligar as coordenadas e o medidor estiver ativo, mata o medidor primeiro
     if (!modoCoordenadas && medindo) {
@@ -689,7 +846,11 @@ function alternarCoordenadas() {
         container.classList.remove('mapa-intangivel');
     }
 }
-    // Função auxiliar para mudar a cor dos botões
+/**
+ * Sincroniza visual dos botões de coordenadas (Menu + Região)
+ * Aplica classe 'btn-ferramenta-ativa' (verde) quando coords estão ON
+ * Atualiza texto: "Coords: ON" ou "Coords: OFF"
+ */
 function atualizarVisualBotao() {
     const botoes = [document.getElementById('btn-coords-menu'), document.getElementById('btn-coords-prov')];
     botoes.forEach(btn => {
@@ -838,6 +999,34 @@ function atualizarVisualBotao() {
         }
     };
 
+/**
+ * ESTRUTURA DE DADOS PRINCIPAL
+ * Três objetos globais mantêm TODO conteúdo do jogo (sem banco de dados externo)
+ * 
+ * 1. dadosProvincias: Descrições textuais de 5 regiões principais
+ *    Exemplo: dadosProvincias['Hukmal_tep.jpg'] = { titulo: "...", descricao: "..." }
+ * 
+ * 2. dadosGerais: Banco, investimentos, panteão de 12 deuses
+ *    Usado por: menuCapital('banco'), menuDeuses()
+ * 
+ * 3. dadosCapital: Conteúdo da capital (squad, criminosos, bestiário, etc)
+ *    - esquadrao: 6 personagens jogáveis
+ *    - procurados: 8 criminosos com recompensas
+ *    - bestiario: Criaturas encontradas com fraquezas/drops
+ *    - boatos: 100 boatos, apenas 1 descoberto
+ *    - historico: 5 capítulos de lore com imagens embarcadas
+ *    - lendas: 12 heróis lendários
+ * 
+ * SISTEMA DE FOTOS:
+ *   - Todos os nomes de foto devem ser EXATOS (case-sensitive)
+ *   - Fotos são PNGs/JPGs no workspace root
+ *   - Se null, exibe placeholder genérico
+ * 
+ * BOATOS: Sistema simples de descoberta
+ *   - Lista[0..98]: Não descobertos, texto mascarado com \"??\"
+ *   - Lista[99]: Boato 100, único descoberto no início
+ */
+
 // --- DADOS DA CAPITAL (COM FOTOS) ---
 // 1. Cria 100 boatos vazios automaticamente
     const listaBoatos = Array.from({ length: 100 }, (_, i) => ({
@@ -854,7 +1043,10 @@ function atualizarVisualBotao() {
         descoberto: true
     };
 
-    // --- DADOS GERAIS (BANCO E DEUSES) ---
+/**
+ * DADOS GERAIS - Banco Imperial e Pantheon
+ * Informações de investimentos, pacotes de seguro, e 12 deuses principais
+ */
     const dadosGerais = {
         banco: [
             { nome: "Pacote Econômico", custo: "2 Golds", desc: "Poder enterrar em um canto e o gerente finge que não viu." },
@@ -868,9 +1060,8 @@ function atualizarVisualBotao() {
             { nome: "Tesouro Imperial", risco: "Baixo Risco", min: "5g" },
             { nome: "Ações do Império", risco: "Alto Risco", min: "5g" }
         ],
-// Dentro de const dadosGerais = { ...
-    
-deuses: [
+        // Panteão: 12 deuses principais com domínios
+        deuses: [
         { nome: "Pelor", titulo: "Sol, Luz e Fogo", raca: "Anjos", foto: "Pelor.png" },
         { nome: "Aqua", titulo: "Água e Serenidade", raca: "Halflings", foto: "Aqua.png" },
         { nome: "Celeste", titulo: "Espaço", raca: "Estrelas", foto: "Celeste.png" },
@@ -1110,16 +1301,34 @@ deuses: [
         
     };
 
-// --- FUNÇÃO MENU CAPITAL (ATUALIZADA) ---
-    function menuCapital(tipo) {
-        menuAtualAberto = tipo; // Rastreia qual menu está aberto
+/**
+ * Exibe menus contextuais da Capital Imperial com diferentes abas
+ * Tipos disponíveis: 'lendas', 'banco', 'boatos', 'historico', 'bestiario', 'esquadrao', 'procurados'
+ * Rastreia qual menu está aberto em menuAtualAberto para voltar corretamente de fotos
+ * @param {string} tipo - Tipo de menu a exibir
+ */
+    /**
+ * MENU CAPITAL - Sistema de abas dinâmico para 7 tipos de conteúdo
+ * Atualiza menuAtualAberto = tipo para sincronizar back buttons de imagens
+ * Tipos suportados:
+ *   'lendas'     - 5 capítulos históricos com imagens embutidas
+ *   'banco'      - 6 pacotes de investimento + cálculos de retorno
+ *   'historico'  - Cronologia com descrição de épocas
+ *   'bestiario'  - Criatura do bestiario com foto/desc/ataques
+ *   'esquadrao'  - 6 PCs com classe/raca/lore/foto
+ *   'procurados' - 8 criminosos procurados com recompensas
+ *   'boatos'     - 100 rumores (apenas 1 descoberto no início)
+ * Back buttons de imagens retornam a menuCapital(tipo) via callback
+ */
+function menuCapital(tipo) {
+        menuAtualAberto = tipo; // Rastreia qual menu está aberto (essencial para navegação de fotos)
         const modal = document.getElementById('modal-capital');
         const container = document.getElementById('conteudo-menu-capital');
         const titulo = document.getElementById('titulo-menu-capital');
         modal.style.display = 'flex';
         container.innerHTML = "";
 
-        // --- ABA OS 12 LENDÁRIOS (TEXTO PURO) ---
+        // Aba: Os 12 Heróis Lendários (histórico imutável)
         if (tipo === 'lendas') {
             titulo.innerText = "🏛️ Os 12 Heróis Lendários";
             
@@ -1138,7 +1347,7 @@ deuses: [
             return;
         }
 
-        // --- ABA BANCO ---
+        // Aba: Banco Imperial (6 pacotes de seguro + investimentos)
         if (tipo === 'banco') {
             titulo.innerText = "🏦 Banco Imperial";
             let html = `<h4 style="color:#ffdead; margin-top:0;">Pacotes de Serviços</h4>`;
@@ -1156,7 +1365,7 @@ deuses: [
             return;
         }
 
-        // --- ABA BOATOS ---
+        // Aba: Boatos da Capital (100 total, apenas 1 descoberto)
         if (tipo === 'boatos') {
             titulo.innerText = "🗣️ Boatos da Capital (1/100)";
             let html = `<div class="lista-boatos">`;
@@ -1170,7 +1379,7 @@ deuses: [
             return;
         }
 
-        // --- ABA HISTÓRICO ---
+        // Aba: Histórico de Aventuras (5 capítulos com imagens embarcadas)
         if (tipo === 'historico') {
             titulo.innerText = "📜 Histórico de Aventuras";
             dadosCapital.historico.forEach((cap, index) => {
@@ -1183,7 +1392,7 @@ deuses: [
             return;
         }
 
-        // --- ABA BESTIÁRIO ---
+        // Aba: Bestiário Conhecido (criaturas encontradas com photos)
         if (tipo === 'bestiario') {
             titulo.innerText = "📖 Bestiário Conhecido";
             dadosCapital.bestiario.forEach(monstro => {
@@ -1202,7 +1411,8 @@ deuses: [
             return;
         }
 
-        // --- ABA ESQUADRÃO E PROCURADOS (PADRÃO) ---
+        // Aba: Esquadrão (PCs) e Procurados (Criminosos)
+        // Mesmo HTML, dados diferentes conforme tipo
         const lista = (tipo === 'esquadrao') ? dadosCapital.esquadrao : dadosCapital.procurados;
         titulo.innerText = (tipo === 'esquadrao') ? "🛡️ Os Pandemônios" : "☠️ Cartazes de Procurados";
         lista.forEach(item => {
@@ -1216,9 +1426,19 @@ deuses: [
         });
     }
 
-// --- FUNÇÃO: MENU DO PANTEÃO (ATUALIZADA) ---
-    function menuDeuses() {
-        menuAtualAberto = 'deuses'; // Rastreia que o panteão está aberto
+/**
+ * Exibe a grade de 12 deuses do panteão com seus títulos e domínios
+ * Cada deus é clicável para ver sua imagem em fullscreen
+ * Rastreia que menuAtualAberto = 'deuses' para navegação de voltar
+ */
+    /**
+ * Exibe grid de 12 deuses do panteao com dominios
+ * Clique em deus: verImagemDeus(nome, foto, dominio)
+ * Atualiza menuAtualAberto = 'deuses' para back button voltar corretamente
+ * Grid responsivo: 3 colunas (desktop), 2 (tablet), 1 (mobile)
+ */
+function menuDeuses() {
+        menuAtualAberto = 'deuses'; // Rastreia que o panteão está aberto (usado por verImagemDeus)
         const modal = document.getElementById('modal-capital');
         const container = document.getElementById('conteudo-menu-capital');
         const titulo = document.getElementById('titulo-menu-capital');
@@ -1247,7 +1467,12 @@ deuses: [
         container.innerHTML = html;
     }
 
-    // --- NOVA: LER O CAPÍTULO ---
+/**
+ * Exibe o conteúdo completo de um capítulo do histórico
+ * Inclui botão para voltar à lista de capítulos
+ * Fotos dentro do texto são clicáveis (onclick verImagemHistoria)
+ * @param {number} index - Índice do capítulo em dadosCapital.historico
+ */
     function lerCapitulo(index) {
         const container = document.getElementById('conteudo-menu-capital');
         const cap = dadosCapital.historico[index];
@@ -1261,31 +1486,53 @@ deuses: [
         container.innerHTML = html;
     }
 
+/**
+ * Exibe foto do deus em fullscreen e volta para o panteão ao clicar voltar
+ * Chamada por: onclick em cada deus na grade de menuDeuses()
+ * @param {string} arquivo - Nome do arquivo PNG do deus
+ */
 function verImagemDeus(arquivo) {
     verImagemEstatica(arquivo, function() {
-        restaurarMapaMenu();
-        menuDeuses(); // Volta para a grade de deuses
+        restaurarMapaMenu(); // Volta mapa e menu
+        menuDeuses(); // Reabre a grade de deuses
     });
 }
 
+/**
+ * Exibe foto de personagem/criatura em fullscreen
+ * Volta para o menu específico que estava aberto (rastreado em menuAtualAberto)
+ * Funciona para: bestiário, esquadrão, procurados
+ * @param {string} arquivo - Nome do arquivo PNG da foto
+ */
 function verImagemPersonagem(arquivo) {
     verImagemEstatica(arquivo, function() {
-        restaurarMapaMenu();
+        restaurarMapaMenu(); // Volta mapa e menu
         if (menuAtualAberto) {
-            menuCapital(menuAtualAberto); // Volta para a aba que estava (Bestiário, Esquadrão, etc)
+            menuCapital(menuAtualAberto); // Volta para a aba específica (Bestiário, Esquadrão, etc)
         }
     });
 }
 
+/**
+ * Exibe foto linkada dentro de um capítulo do histórico em fullscreen
+ * Volta para o mesmo capítulo após fechar a imagem
+ * Fotos são embarcadas no texto com onclick="verImagemHistoria('arquivo.png', index)"
+ * @param {string} arquivo - Nome do arquivo PNG da foto
+ * @param {number} capituloIndex - Índice do capítulo para voltar para ele
+ */
 function verImagemHistoria(arquivo, capituloIndex) {
     verImagemEstatica(arquivo, function() {
-        restaurarMapaMenu(); // Volta o mapa e menu
-        document.getElementById('modal-capital').style.display = 'flex'; // Reabre o fundo preto
-        lerCapitulo(capituloIndex); // Abre exatamente o texto de onde você saiu
+        restaurarMapaMenu(); // Volta mapa e menu
+        document.getElementById('modal-capital').style.display = 'flex'; // Reabre o overlay
+        lerCapitulo(capituloIndex); // Volta para o texto exato do capítulo
     });
 }
-    // Nova função que apenas fecha a foto sem resetar o mapa
-    // Centraliza restauração da visualização (mapa + menu)
+/**
+ * Centraliza a restauração visual após fechar visualização de imagem fullscreen
+ * Oculta o container de imagem e reexibe o mapa + menu
+ * @param {object} options - { restoreMenuIfContinent: bool } - Se true, só mostra menu no continente
+ * Usado por: verImagemPersonagem, verImagemHistoria, verImagemDeus, etc
+ */
     function restaurarMapaMenu(options = {}) {
         const container = document.getElementById('provincia-container');
         const mapa = document.getElementById('map-container');
@@ -1303,7 +1550,13 @@ function verImagemHistoria(arquivo, capituloIndex) {
         }
     }
 
-    function fecharModais() { 
+/**
+ * Fecha TODOS os modais ativos (info, capital, senha, viagem)
+ * Chamado antes de exibir novo modal para evitar sobreposição
+ * Não reseta menu-provincias (navegacião independente)
+ * window.fecharModalInfo apontado para essa função garante compatibilidade com onclick HTML
+ */
+function fecharModais() { 
         document.getElementById('modal-info').style.display = 'none';
         document.getElementById('modal-capital').style.display = 'none';
     }
@@ -1311,7 +1564,12 @@ function verImagemHistoria(arquivo, capituloIndex) {
     // TRUQUE: Isso garante que se o HTML chamar 'fecharModalInfo', ele usa a nova função
     window.fecharModalInfo = fecharModais;
 
-    // --- FUNÇÃO DE DETALHES (INTELIGENTE) ---
+/**
+ * Abre modal de detalhes com conteúdo inteligente baseado no mapa atual
+ * - Se em Planos.jpg e clicou em marcador: mostra descrição do plano (divino, demoníaco, etc)
+ * - Se em Planos.jpg sem clique: mostra resumo geral do Nexus
+ * - Se em outra província: mostra descricao de dadosProvincias
+ */
     function abrirModalInfo() {
         let dados;
 
@@ -1337,13 +1595,23 @@ function verImagemHistoria(arquivo, capituloIndex) {
     }
 
 
-// --- CONFIGURAÇÕES DE TAMANHO ---
-    // 1. O Mapa Geral dos Planos (O Nexus)
+/**
+ * CONFIGURAÇÕES DE SUBMAPAS - Planos e Regiões Especiais
+ * Define tamanho (pixels) e zoom para cada mapa cosmológico
+ */
+    // O Mapa Geral dos Planos (O Nexus central)
     const configPlanos = { largura: 741, altura: 1024, minZoom: -1.0, maxZoom: 3 }; 
     
-    // 2. Os Mapas Individuais (Divino, Demoníaco, Espiritual)
+    // Os Mapas Individuais dos Planos (Divino, Demoníaco, Espiritual)
     const configSubPlanos = { largura: 1024, altura: 1536, minZoom: -1.0, maxZoom: 3 }; 
 
+/**
+ * Carrega um novo mapa (província ou plano) com seus marcadores específicos
+ * Ajusta automaticamente: escala, tamanho, botão de voltar dinâmico
+ * Limpa rota anterior e coordenadas para evitar persistência
+ * Atualiza menu lateral conforme o tipo de mapa
+ * @param {string} arquivo - Nome do arquivo PNG (ex: 'Lago.jpg', 'Plano Divino.png')
+ */
 function abrirMapaProvincia(arquivo) {
     mapaAtualAtivo = arquivo;
     
@@ -1352,7 +1620,8 @@ function abrirMapaProvincia(arquivo) {
     grupoRota.clearLayers();
     pontosRota = [];
 
-    // --- LÓGICA DE ESCALA ---
+    // Ajusta escala conforme tipo de mapa
+    // Planos (cosmologia): 0.5 km/px | Províncias: 0.13 km/px | Continental: 0.23 km/px
     if (arquivo.includes('Planos.jpg') || arquivo.includes('Plano')) { 
         fatorEscala = 0.5;
     } else {
@@ -1367,7 +1636,7 @@ function abrirMapaProvincia(arquivo) {
     // Inicializa o mapa (A caixa preta #menu-provincias deve continuar display: block)
     inicializarMapa(arquivo, cfg.largura, cfg.altura, cfg.minZoom, cfg.maxZoom);
 
-    // --- TROCA DE CONTEÚDO NO MENU LATERAL ---
+    // Atualiza menu lateral: esconde 'Províncias', mostra 'Menu da Região'
     // Esconde a lista de províncias e mostra as ferramentas da região
     document.getElementById('lista-botoes-provincia').style.display = 'none';
     document.getElementById('lista-ferramentas-regiao').style.display = 'block';
@@ -1378,7 +1647,7 @@ function abrirMapaProvincia(arquivo) {
 
     // Ajusta visibilidade do menu dependendo do tamanho da tela
     atualizarVisibilidadeMenuMobile();
-// --- LÓGICA DO BOTÃO VOLTAR DINÂMICO ---
+// Botão de voltar está dinamicamente vinculado a carregarMapaPrincipal() via #btn-voltar-dinamico
     const btnVoltar = document.getElementById('btn-voltar-dinamico');
     
     // Se for um plano (mas não o próprio Nexus), volta para o Nexus
@@ -1397,53 +1666,88 @@ function abrirMapaProvincia(arquivo) {
 
 }
 
+/**
+ * Exibe uma imagem em tela cheia com botão de voltar customizável
+ * @param {string} arquivo - Caminho/nome do arquivo de imagem
+ * @param {function} callbackVoltar - Função executada ao clicar "Voltar"
+ * Usado por: verImagemPersonagem(), verImagemHistoria(), verImagemDeus()
+ */
 function verImagemEstatica(arquivo, callbackVoltar = null) {
     if (!arquivo || arquivo === 'none') return;
 
-    // 1. Fecha modais para não ficarem "por cima" da imagem de forma invisível
+    // 1. FECHA POPUPS DO MAPA (Evita que o clique do marcador bloqueie a tela)
+    if (map) map.closePopup();
+
+    // 2. Fecha modais de texto
     fecharModais();
 
-    // 2. Prepara a tela da imagem
+    // 3. Prepara a tela
     document.getElementById('map-container').style.display = 'none';
     document.getElementById('menu-provincias').style.display = 'none';
+    
     const container = document.getElementById('provincia-container');
     container.style.display = 'flex';
     document.getElementById('img-provincia').src = arquivo;
 
-    // 3. Gerencia o Botão Voltar
+    // 4. Gerencia o Botão Voltar (Limpeza e Criação)
     const btnAntigo = container.querySelector('.btn-voltar-foto');
     if (btnAntigo) btnAntigo.remove();
 
     const btnVoltarImg = document.createElement('button');
     btnVoltarImg.innerHTML = "⬅ Voltar";
     btnVoltarImg.className = "btn-popup btn-voltar-foto";
-    btnVoltarImg.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4001; padding: 10px 20px;";
     
-    // LÓGICA MÁGICA: Se houver um callback, usa ele. Se não, usa o fecharImagem padrão.
-    btnVoltarImg.onclick = function() {
+    // Z-INDEX altíssimo garante visibilidade do botão acima da imagem
+    // pointer-events: auto essencial para mobile (event propagation)
+    btnVoltarImg.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 9999; padding: 12px 24px; cursor: pointer; pointer-events: auto; background-color: #8b4513; color: white; border-radius: 5px;";
+    
+    btnVoltarImg.onclick = function(e) {
+        e.stopPropagation(); // Impede que o clique "vaze" para a imagem atrás
         if (callbackVoltar) {
             callbackVoltar();
         } else {
-            fecharImagem();
+            restaurarMapaMenu();
         }
     };
 
-    container.insertBefore(btnVoltarImg, container.firstChild);
+    // appendChild coloca botão como ÚLTIMO filho -> fica visível na frente
+    container.appendChild(btnVoltarImg);
 }
 
- // --- 6. MARCADORES LOCAIS (FUNÇÃO COMPLETA ATUALIZADA) ---
+ /**
+ * Adiciona todos os marcadores (cidades, vilarejos, ruínas, etc) de um mapa específico
+ * POLIMÓRFICO: Cada tipo de mapa (província, plano, etc) tem sua própria lógica
+ * 
+ * Mapas principais com lógica especial:
+ *   'Hukmal_tep.jpg' - 5 cidades + Portão de Entrada (botão especial para Capital)
+ *   'Blat_khyr.jpg'  - Cidades floresta + Escola de Magia (senha 'fofoca')
+ *   'Deserto.jpg'    - Localidades deserto + Mina do Leste
+ *   'Lago.jpg'       - Vilarejos lacustres + senha 'ninja'
+ *   'Alcova.jpg'     - Pirata/submundo + Taverna da Lama
+ *   'Planos.jpg'     - Nexus central + 3 planos (Divino, Demoníaco, Espiritual)
+ * 
+ * Submapas de planos (quando nomeDoMapa = 'Plano_Divino.jpg', etc):
+ *   - 5-6 regiões temáticas com descrições atmosféricas
+ *   - Botão "Retornar ao Nexus" leva de volta a Planos.jpg
+ * 
+ * FLUXO DE CLIQUE:
+ *   1. Usuário clica marcador -> popup com título + descrição + botões
+ *   2. Clica botão "Ver Foto" ou especial -> fullscreen image
+ *   3. Back button no fullscreen -> restaura mapa + reabre popup (se suportado)
+ * @param {string} nomeDoMapa - Nome do arquivo PNG a popular com marcadores
+ */
 function adicionarMarcadoresLocais(nomeDoMapa) {
-    // Ícones padrão
+    // Ícones padrão Leaflet com tamanhos variáveis (normal: 50px, grande: 100px)
     const iconP = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [50, 50], iconAnchor: [25, 25], popupAnchor: [0, -25]});
     const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [100, 100], iconAnchor: [50, 50], popupAnchor: [0, -50]});
 
-    // --- FUNÇÃO INTERNA PADRÃO (Para mapas normais) ---
+    // Helper interno: cria marcador padrão com foto clicável
 function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoExtra = null) {
         const m = L.marker(coord, {icon: grande ? iconG : iconP, opacity: 0}).addTo(map);
         let htmlBotoes = `<div style="margin-top: 8px; display:flex; flex-direction:column;">`;
         
         if (foto) htmlBotoes += criarBtn("📸 Ver Foto", `verImagemEstatica('${foto}')`, "#5F9EA0");
-        if (botaoExtra) htmlBotoes += botaoExtra; // Mantém botões manuais como Escola de Magia
+        if (botaoExtra) htmlBotoes += botaoExtra; // Para botões customizados (ex: Escola de Magia)
         
         htmlBotoes += `</div>`;
         m.bindPopup(`<div style="text-align:center;"><b>${nome}</b><br><small style="color:#ccc;">${info}</small>${htmlBotoes}</div>`);
@@ -1714,6 +2018,26 @@ if (nomeDoMapa === 'Planos.jpg') {
     }
 
 // --- 7. MARCADORES DO CONTINENTE ---
+/**
+ * ADICIONA MARCADORES DO MAPA CONTINENTAL
+ * 5 Províncias + 3 Locais Especiais (Capital, Cidade Sagrada, Torre)
+ * 
+ * Fluxo de clique:
+ *   - Província (ex: Hukmal_tep) -> abrirMapaProvincia(arquivo)
+ *   - Capital Imperial -> popup com 8 botões (lendas, banco, esquadrão, etc)
+ *   - Cidade Sagrada -> popup com Panteão
+ *   - Torre dos Sábios -> senha 'fofoca' para acessar interior
+ * 
+ * Sistema de ícones:
+ *   - iconP: Normal (80x80)
+ *   - iconG: Grande/importante (120x120)
+ * 
+ * FUNÇÃO INTERNA: criarPonto()
+ *   Polimórfica, infere tipo de popup a partir dos argumentos
+ *   Tipo 1: criarPonto([y,x], "Nome", "desc", "arquivo.png", 'mapa')
+ *   Tipo 2: criarPonto([y,x], "Nome", "desc", "arquivo.png", 'imagem')
+ *   Tipo 3: criarPonto([y,x], "Nome", null, 'none', true) -> apenas placeholder
+ */
     function adicionarMarcadoresPrincipais() {
         const iconP = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [80, 80], iconAnchor: [40, 40], popupAnchor: [0, -40]});
         const iconG = L.icon({iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [120, 120], iconAnchor: [60, 60], popupAnchor: [0, -60]});
@@ -1731,7 +2055,7 @@ if (nomeDoMapa === 'Planos.jpg') {
 
             // --- LÓGICA ESPECIAL PARA A CAPITAL ---
             if (nome === "Capital Imperial") {
-                botoes += criarBtn("⚜️ <b>Heróis Lendários</b>", "menuCapital('lendas')", "#DAA520");
+                botoes += criarBtn("⚜️ Heróis Lendários", "menuCapital('lendas')", "#DAA520");
                 botoes += criarBtn("🏦 Banco Imperial", "menuCapital('banco')", "#ffd700");
                 botoes += criarBtn("🛡️ Esquadrão", "menuCapital('esquadrao')", "#4682B4");
                 botoes += criarBtn("📸 Ver Cidade", `verImagemEstatica('${arquivo}')`, "#5F9EA0");
@@ -1812,7 +2136,11 @@ if (nomeDoMapa === 'Planos.jpg') {
     
 
 
-    // Função para controlar os botões (Menu e Mapa)
+/**
+ * Atualiza visual dos botões de calculadora de viagem (Menu + Região)
+ * Muda texto e aplica classe 'btn-ferramenta-ativa' (verde) quando ativo
+ * @param {string} estado - 'medindo' ou 'iniciar'
+ */
 function atualizarBotaoMedidor(estado) {
     const botoes = [document.getElementById('btn-medidor'), document.getElementById('btn-medidor-prov')];
     let texto = (estado === 'medindo') ? "🏁 Finalizar Rota" : "📏 Calculadora de Viagem";
@@ -1826,6 +2154,13 @@ function atualizarBotaoMedidor(estado) {
         }
     });
 }
+/**
+ * Ativa/desativa modo de medição de rotas
+ * Ao ativar: desabilita cliques em marcadores, ativa modo crosshair
+ * Ao desativar (com 2+ pontos): abre calculadora com resultados
+ * Ao desativar (com < 2 pontos): cancela silenciosamente
+ * Conflita com: modoCoordenadas (desativa coords se ativar medidor)
+ */
 function ativarMedidor() {
     if (!medindo) {
         // Se as coordenadas estiverem ON, mata elas primeiro
@@ -1855,7 +2190,11 @@ function ativarMedidor() {
     }
 }
 
-    // Sai do modo de medição e devolve os cliques para as cidades
+/**
+ * Cancela o modo de medição mantendo a rota visual no mapa
+ * Remove classes CSS de intangibilidade e crosshair
+ * Reseta botão para estado inicial (não verde)
+ */
     function cancelarModoMedicao() {
         medindo = false;
         document.getElementById('map-container').classList.remove('mapa-intangivel');
@@ -1863,7 +2202,12 @@ function ativarMedidor() {
         atualizarBotaoMedidor('iniciar');
     }
 
-    // Processa cada clique no mapa
+/**
+ * Processa cada clique do usuário enquanto está em modo de medição
+ * Adiciona ponto à rota e desenha linha conectando ao anterior
+ * Ctrl+Z remove o último ponto
+ * @param {object} latlng - Coordenada [lat, lng] do clique
+ */
     function processarCliqueMedicao(latlng) {
         // Adiciona coordenada à lista
         pontosRota.push(latlng);
@@ -1882,6 +2226,13 @@ function ativarMedidor() {
         }
     }
 
+/**
+ * Calcula distância, tempo de viagem e custo de transporte imperial
+ * Usa fatorEscala (0.23 continental, 0.13 províncias, 0.5 planos)
+ * Tempo base: 30 km/dia a pé (padrão RPG), 1.5x mula, 2x cavalo, 4x especial
+ * Custo: 2.5g taxa + 2.5p por km (sistema: 1g=100p=10000b)
+ * Abre modal com tabela de resultados
+ */
 function calcularResultados() {
         let distanciaTotalPixels = 0;
 
@@ -1947,6 +2298,11 @@ function calcularResultados() {
         // Sai do modo de medição, mas MANTÉM O DESENHO na tela para verem
         cancelarModoMedicao();
     }
+/**
+ * Remove o último ponto e linha da rota durante medição
+ * Atalho: Ctrl+Z
+ * Mantém visualmente consistente (remove ponto e linha associada)
+ */
     function desfazerUltimoPonto() {
         if (pontosRota.length > 0) {
             // Remove a última coordenada da memória
