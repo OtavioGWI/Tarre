@@ -47,31 +47,7 @@
     align-items: center;
 }
 
-/* Estilo para os botões que ficam FLUTUANDO sobre o mapa */
-.btn-mapa-estilo {
-    background: rgba(26, 26, 26, 0.95) !important;
-    color: #ddd !important;
-    border: 1px solid #444 !important;
-    border-left: 4px solid #555 !important; /* Barra lateral igual ao menu */
-    border-radius: 4px !important;
-    padding: 8px 12px !important;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 12px;
-    margin-bottom: 5px;
-    transition: 0.3s;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    display: block;
-    width: 120px;
-    text-align: left;
-}
-
-.btn-mapa-estilo:hover {
-    background: #444 !important;
-    padding-left: 15px !important;
-}
-
-    /* Adicione isso dentro da tag <style> */
+    /* Estilo para foto na lista (bestiário, esquadrão, etc) */
     .foto-lista { 
         width: 80px; height: 110px; 
         object-fit: cover; /* Isso impede a foto de ficar esticada/deformada */
@@ -138,16 +114,6 @@
     }
 
 
-/* 2. Regra para travar os botões de ferramentas (Coords e Medir) */
-/* Isso remove o brilho marrom e o deslize apenas deles */
-#btn-coords-menu:hover, #btn-coords-prov:hover,
-#btn-medidor:hover, #btn-medidor-prov:hover {
-    background: transparent !important;
-    border-color: #444 !important;
-    color: #ddd !important;
-    padding-left: 10px !important;
-}
-
 /* 1. Efeito de brilho marrom APENAS para botões normais (Províncias e Voltar) */
 .botao-provincia:hover {
     background: #8b4513 !important;
@@ -161,7 +127,7 @@
     background: transparent !important;
     border-color: #444 !important;
     color: #ddd !important;
-    padding-left: 10px !important; /* Trava o deslize */
+    padding-left: 10px !important;
 }
 
 /* 3. PRIORIDADE TOTAL: Se estiver ON, fica verde e ignora qualquer outro hover ou cor */
@@ -472,10 +438,11 @@
 // --- VARIÁVEIS GLOBAIS ---
     let map; 
     let mapaAtualAtivo = 'continente';
-    let planoSelecionado = null; 
     let modoCoordenadas = false;
     let marcadorTempCoords = null;
     let fatorEscala = 0.23;
+    let menuAtualAberto = null; // Rastreia qual menu/aba está aberta
+    let selecaoAtual = null; // Guarda qual plano foi clicado por último
     
 // Ícone de Emoji para Coordenadas
 const iconCoords = L.divIcon({
@@ -606,7 +573,6 @@ function atualizarVisibilidadeMenuMobile() {
     function carregarMapaPrincipal() {
         mapaAtualAtivo = 'continente';
         fatorEscala = 0.23; // Escala do continente
-        planoSelecionado = null;
 
         // --- LIMPEZA DE ROTA (GARANTIA) ---
         if (medindo) cancelarModoMedicao();
@@ -1146,6 +1112,7 @@ deuses: [
 
 // --- FUNÇÃO MENU CAPITAL (ATUALIZADA) ---
     function menuCapital(tipo) {
+        menuAtualAberto = tipo; // Rastreia qual menu está aberto
         const modal = document.getElementById('modal-capital');
         const container = document.getElementById('conteudo-menu-capital');
         const titulo = document.getElementById('titulo-menu-capital');
@@ -1251,6 +1218,7 @@ deuses: [
 
 // --- FUNÇÃO: MENU DO PANTEÃO (ATUALIZADA) ---
     function menuDeuses() {
+        menuAtualAberto = 'deuses'; // Rastreia que o panteão está aberto
         const modal = document.getElementById('modal-capital');
         const container = document.getElementById('conteudo-menu-capital');
         const titulo = document.getElementById('titulo-menu-capital');
@@ -1293,89 +1261,26 @@ deuses: [
         container.innerHTML = html;
     }
 
-// --- FUNÇÃO PARA VER IMAGEM DOS DEUSES ---
-    function verImagemDeus(arquivo) {
-        if (!arquivo) return; // Se não tiver foto, não faz nada
+function verImagemDeus(arquivo) {
+    verImagemEstatica(arquivo, function() {
+        restaurarMapaMenu();
+        menuDeuses();
+    });
+}
 
-        // Esconde tudo
-        document.getElementById('modal-capital').style.display = 'none';
-        document.getElementById('map-container').style.display = 'none';
-        document.getElementById('menu-provincias').style.display = 'none';
+function verImagemPersonagem(arquivo) {
+    verImagemEstatica(arquivo, function() {
+        restaurarMapaMenu();
+        if (menuAtualAberto) menuCapital(menuAtualAberto);
+    });
+}
 
-        // Prepara visualização
-        const containerImg = document.getElementById('provincia-container');
-        containerImg.style.display = 'flex'; 
-        document.getElementById('img-provincia').src = arquivo;
-
-        // Botão voltar ESPECÍFICO para o menu de Deuses
-        const btnVoltar = document.createElement('button');
-        btnVoltar.innerHTML = "⬅ Voltar ao Panteão";
-        btnVoltar.className = "btn-popup";
-        btnVoltar.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
-        
-        btnVoltar.onclick = function() {
-            restaurarMapaMenu({ restoreMenuIfContinent: true });
-            // Reabre o modal já carregando os deuses
-            document.getElementById('modal-capital').style.display = 'flex';
-            menuDeuses();
-        };
-
-        const btnAntigo = containerImg.querySelector('button');
-        if (btnAntigo) containerImg.removeChild(btnAntigo);
-        containerImg.insertBefore(btnVoltar, containerImg.firstChild);
-    }
-
-// --- FUNÇÃO PARA VER IMAGEM NO HISTÓRICO (CORRIGIDA) ---
-    function verImagemHistoria(arquivo, capituloIndex) {
-        document.getElementById('modal-capital').style.display = 'none';
-        document.getElementById('map-container').style.display = 'none';
-        document.getElementById('menu-provincias').style.display = 'none'; // Esconde menu
-
-        const containerImg = document.getElementById('provincia-container');
-        containerImg.style.display = 'flex'; 
-        document.getElementById('img-provincia').src = arquivo;
-
-        const btnVoltar = document.createElement('button');
-        btnVoltar.innerHTML = "⬅ Voltar ao Texto";
-        btnVoltar.className = "btn-popup";
-        btnVoltar.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
-        
-        btnVoltar.onclick = function() {
-            restaurarMapaMenu({ restoreMenuIfContinent: true });
-            document.getElementById('modal-capital').style.display = 'flex';
-            lerCapitulo(capituloIndex);
-        };
-
-        const btnAntigo = containerImg.querySelector('button');
-        if (btnAntigo) containerImg.removeChild(btnAntigo);
-        containerImg.insertBefore(btnVoltar, containerImg.firstChild);
-    }
-
-    // --- NOVA FUNÇÃO PARA AMPLIAR FOTO DO PERSONAGEM ---
-// --- FUNÇÃO PARA AMPLIAR FOTO DO PERSONAGEM (CORRIGIDA) ---
-    function verImagemPersonagem(arquivo) {
-        document.getElementById('modal-capital').style.display = 'none';
-        document.getElementById('map-container').style.display = 'none';
-        document.getElementById('menu-provincias').style.display = 'none'; // Esconde menu
-
-        const containerImg = document.getElementById('provincia-container');
-        containerImg.style.display = 'flex'; 
-        document.getElementById('img-provincia').src = arquivo;
-
-        const btnVoltar = document.createElement('button');
-        btnVoltar.innerHTML = "⬅ Voltar ao Menu";
-        btnVoltar.className = "btn-popup";
-        btnVoltar.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
-        
-        btnVoltar.onclick = function() {
-            restaurarMapaMenu({ restoreMenuIfContinent: true });
-            document.getElementById('modal-capital').style.display = 'flex';
-        };
-
-        const btnAntigo = containerImg.querySelector('button');
-        if (btnAntigo) containerImg.removeChild(btnAntigo);
-        containerImg.insertBefore(btnVoltar, containerImg.firstChild);
-    }
+function verImagemHistoria(arquivo, capituloIndex) {
+    verImagemEstatica(arquivo, function() {
+        restaurarMapaMenu();
+        lerCapitulo(capituloIndex);
+    });
+}
     // Nova função que apenas fecha a foto sem resetar o mapa
     // Centraliza restauração da visualização (mapa + menu)
     function restaurarMapaMenu(options = {}) {
@@ -1395,11 +1300,6 @@ deuses: [
         }
     }
 
-    function fecharImagem() {
-        // Por padrão mostra o menu (comportamento antigo)
-        restaurarMapaMenu();
-    }
-
     function fecharModais() { 
         document.getElementById('modal-info').style.display = 'none';
         document.getElementById('modal-capital').style.display = 'none';
@@ -1407,9 +1307,6 @@ deuses: [
     
     // TRUQUE: Isso garante que se o HTML chamar 'fecharModalInfo', ele usa a nova função
     window.fecharModalInfo = fecharModais;
-
-// --- VARIÁVEL DE CONTROLE ---
-    let selecaoAtual = null; // Guarda qual plano foi clicado por último
 
     // --- FUNÇÃO DE DETALHES (INTELIGENTE) ---
     function abrirModalInfo() {
@@ -1497,31 +1394,30 @@ function abrirMapaProvincia(arquivo) {
 
 }
 
-function verImagemEstatica(arquivo) {
+function verImagemEstatica(arquivo, callbackVoltar = null) {
     if (!arquivo || arquivo === 'none') return;
 
-    // 1. Fecha qualquer modal aberto (Info ou Capital) para não cobrir a foto
     fecharModais();
 
-    // 2. Troca as visualizações
     document.getElementById('map-container').style.display = 'none';
     document.getElementById('menu-provincias').style.display = 'none';
     const container = document.getElementById('provincia-container');
     container.style.display = 'flex';
 
-    // 3. Define a imagem
     const imgElement = document.getElementById('img-provincia');
     imgElement.src = arquivo;
 
-    // 4. Gerencia o Botão Voltar (limpa o anterior e cria um novo)
+    // Limpa botões de voltar antigos
     const btnAntigo = container.querySelector('.btn-voltar-foto');
     if (btnAntigo) btnAntigo.remove();
 
     const btnVoltarImg = document.createElement('button');
     btnVoltarImg.innerHTML = "⬅ Voltar";
     btnVoltarImg.className = "btn-popup btn-voltar-foto";
-    btnVoltarImg.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4000; padding: 10px 20px;";
-    btnVoltarImg.onclick = fecharImagem;
+    btnVoltarImg.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 4001; padding: 10px 20px;";
+    
+    // Se não passarmos um retorno específico, usa o padrão (restaurarMapaMenu)
+    btnVoltarImg.onclick = callbackVoltar ? callbackVoltar : restaurarMapaMenu;
 
     container.insertBefore(btnVoltarImg, container.firstChild);
 }
