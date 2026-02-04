@@ -484,6 +484,51 @@
     float: right;
 }
 
+/* --- ESTILO DOS CARDS DA BIBLIOTECA --- */
+.biblio-nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 15px; }
+
+/* Card menor e quadrado para Raças e Navegação */
+.rpg-card-small {
+    background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
+    border: 1px solid #555; border-radius: 6px; padding: 15px;
+    cursor: pointer; text-align: center; transition: 0.3s;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.rpg-card-small:hover { border-color: #ffd700; background: rgba(139, 69, 19, 0.4); transform: scale(1.02); }
+.rpg-card-small strong { font-size: 13px; color: #ffdead; }
+
+/* Box de Detalhes e Descrições */
+.detalhe-box {
+    background: rgba(0, 0, 0, 0.3); border: 1px solid #8b4513;
+    padding: 20px; border-radius: 8px; margin-top: 15px; animation: fadeIn 0.3s ease;
+}
+.detalhe-box h3 { color: #ffd700; margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 8px; }
+
+/* Ajuste Atributos */
+.grid-atributos { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+.card-atrib { background: rgba(255,255,255,0.05); border: 1px solid #444; padding: 8px; border-radius: 4px; text-align: center; }
+.card-atrib strong { display: block; color: #ffd700; font-size: 13px; }
+.card-atrib span { font-size: 11px; color: #aaa; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Efeito para os Emojis das Classes */
+.rpg-card-small span { 
+    font-size: 28px; 
+    margin-bottom: 8px; 
+    filter: drop-shadow(0 0 5px rgba(255,215,0,0.3));
+}
+
+/* Melhoria no texto de detalhe */
+.detalhe-box p { 
+    font-size: 14px; 
+    line-height: 1.6; 
+    color: #ddd; 
+    background: rgba(255,255,255,0.05); 
+    padding: 15px; 
+    border-radius: 5px;
+}
+
     </style>
 </head>
 <body>
@@ -580,10 +625,6 @@
  * Aplicativo web de exploração de mundo RPG com mapa continental 7680x4320px
  * Suporta: navegação entre províncias, sistema de combate cosmológico (múltiplos planos),
  * banco imperial, bestiário, histórico de aventuras, senhas, cálculo de rotas
- * 
- * Fluxo principal: carregarMapaPrincipal() -> adicionar marcadores -> clique = abrirMapaProvincia/verImagem
- * Estado global: mapaAtualAtivo (qual mapa está carregado), menuAtualAberto (qual menu está visível)
- */
 
 // Variável de controle: qual o andar máximo que o grupo já liberou?
 
@@ -764,6 +805,97 @@ const iconCoords = L.divIcon({
     
     let medindo = false;
     let pontosRota = [];
+
+
+    const bancoClasses = {
+    "Feiticeiro": {
+        desc: "Habilidades de controle e utilidade, adaptando-se a diversas situações.",
+        t2: {
+            "Invocador": { 
+                desc: "Usa magias místicas para invocar criaturas que lutam ao seu lado.",
+                t3: { 
+                    "Mestre Invocador": "Invoca criaturas mais poderosas por mais tempo, podendo realizar rituais de dias.",
+                    "Espiritualista": "Conexão com o mundo espiritual, invocando espíritos poderosos para ataques ou defesas rápidas."
+                }
+            },
+            "Bruxo": { 
+                desc: "Usa magia negra para enfraquecer, envenenar e amaldiçoar oponentes.",
+                t3: { 
+                    "Necromante": "Faz com que criaturas mortas voltem à vida para ajudar como desejar.",
+                    "Demonologista": "Ligação com o mundo inferior para rituais e feitiços demoníacos intensos."
+                }
+            },
+            "Feiticeiro Temporal": {
+                desc: "Usa poderes estranhos para controlar o tempo ao seu redor (não volta no tempo).",
+                t3: {
+                    "Temporalista": "Maximiza seus poderes temporais ao limite.",
+                    "Dimensionalista": "Controla o espaço, criando fendas dimensionais e alterando a matéria."
+                }
+            }
+        }
+    },
+    "Mago": {
+        desc: "Habilidades de ataque massivo, sem deixar de lado truques importantes.",
+        t2: {
+            "Elementalista": {
+                desc: "Extrai o poder da natureza usando magias dos elementos.",
+                t3: { 
+                    "Mestre do Fogo": "Extrai o poder puro do fogo e seus derivados.",
+                    "Mestre do Ar": "Extrai o poder puro do ar e seus derivados.",
+                    "Mestre da Água": "Extrai o poder puro da água e seus derivados.",
+                    "Mestre da Terra": "Extrai o poder puro da terra e seus derivados."
+                }
+            },
+            "Mago Arcano": {
+                desc: "Manipula a magia pura através do conhecimento e força mental.",
+                t3: { "Rúnico": "Usa escritas antigas para feitiços complexos e poderosos." }
+            },
+            "Mago de Combate": {
+                desc: "Especialista em combates mágicos corpo a corpo e média distância.",
+                t3: { "Mago de Combate Especializado": "Escolhe uma arma ou estilo de luta para criar técnicas especiais." }
+            }
+        }
+    },
+    "Guerreiro": {
+        desc: "Usa espadas e escudos para causar grande dano e suportar ataques.",
+        t2: {
+            "Paladino": {
+                desc: "Recebe o dom mágico de um deus sem abandonar as técnicas de esgrima.",
+                t3: { 
+                    "Anjo": "Ganha a graça divina total, tornando-se quase um anjo verdadeiro com energia divina.",
+                    "Monge": "Abandona seu deus mas segue o caminho da bondade, ganhando resistência e poderes elementais."
+                }
+            },
+            "Cavaleiro das Trevas": {
+                desc: "Torna-se um cavaleiro sombrio que ganha poder quanto mais mata.",
+                t3: { 
+                    "Cavaleiro Demoníaco": "Adquire poderes de entidades superiores com acesso a magias perdidas do submundo.",
+                    "Berserker": "Focado em dano extremo e resistência, ganha poder ao receber e causar dano."
+                }
+            },
+            "Guerreiro Arcano": {
+                desc: "Combina magia arcana com habilidades de esgrima.",
+                t3: { "Veterano": "Mestre em todos os tipos de armas, podendo melhorá-las e realizar feitiços extras." }
+            }
+        }
+    },
+    "Caçador": {
+        desc: "Versátil, usa arcos, facas e conhecimentos da natureza para emboscadas.",
+        t2: {
+            "Arqueiro": { desc: "Foca no arco, combinando magia e precisão técnica.", t3: { "Sniper": "Visão melhorada para distâncias extremas.", "Atirador de Elite": "Invoca armas de fogo antigas.", "Mestre Arqueiro": "Flechas variadas para qualquer situação." } },
+            "Assassino": { desc: "Usa adagas e venenos para permanecer oculto.", t3: { "Ceifador": "Maneja correntes e foices para um deus.", "Sombra": "Nível elevado de ocultação e assassinato." } },
+            "Druida": { desc: "Domina plantas e animais com magias de natureza e cura.", t3: { "Druida (reencarnado)": "Torna-se um com a natureza, ganhando poderes místicos selvagens." } }
+        }
+    },
+    "Curandeiro": {
+        desc: "Essencial para combates, usa poderes divinos para curar e abençoar.",
+        t2: {
+            "Sacerdote": { desc: "Iluminação divina para curar aliados e destruir mortos-vivos.", t3: { "Anjo": "Ascensão divina total.", "Vampiro": "Amaldiçoado pela noite, precisa de sangue para sobreviver." } },
+            "Encantador": { desc: "Mestre em buffs, debuffs e encantamento de itens utilitários.", t3: { "Mestre Encantador": "Modifica magias e cria itens mágicos complexos." } },
+            "Bardo": { desc: "Habilidades musicais de cura e utilidade.", t3: { "Estrela": "Controle total do som e fala mágica cósmica." } }
+        }
+    }
+};
 
     // --- FUNÇÕES DE NAVEGAÇÃO E SISTEMA ---
 
@@ -1521,32 +1653,32 @@ function menuCapital(tipo) {
     
     modal.style.display = 'flex';
     container.innerHTML = "";
-    
-    // Salva qual aba está aberta para as fotos saberem para onde voltar
     if (tipo !== 'hub') { menuAtualAberto = tipo; }
 
-    // --- SEÇÃO: HUB CENTRAL (PAINEL IMPERIAL) ---
+    // --- HUB CENTRAL REORGANIZADO ---
     if (tipo === 'hub') {
         menuAtualAberto = 'hub';
         titulo.innerText = "🏛️ Centro Administrativo Imperial";
         container.innerHTML = `
             <div style="display: grid; gap: 25px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                
                 <section>
-                    <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">📚 CONHECIMENTOS</div>
-                    ${criarBtn("📜 Histórico de Missões", "menuCapital('historico')", "#9370DB")}
+                    <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">📜 HISTÓRICO</div>
+                    ${criarBtn("📖 Missões", "menuCapital('historico')", "#9370DB")}
                     ${criarBtn("📖 Bestiário Imperial", "menuCapital('bestiario')", "#2E8B57")}
                     ${criarBtn("🗣️ Boatos Conhecidos", "menuCapital('boatos')", "#800080")}
                 </section>
                 
                 <section>
-                    <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">👥 FIGURAS & LENDAS</div>
+                    <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">👥 PESSOAS & LENDAS</div>
                     ${criarBtn("🛡️ Esquadrão", "menuCapital('esquadrao')", "#4682B4")}
                     ${criarBtn("⚜️ Heróis Lendários", "menuCapital('lendas')", "#DAA520")}
                     ${criarBtn("☠️ Cartazes de Procurados", "menuCapital('procurados')", "#8b0000")}
                 </section>
 
                 <section>
-                    <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">🛠️ SERVIÇOS</div>
+                    <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">ℹ️ INFORMAÇÕES</div>
+                    ${criarBtn("📚 Biblioteca Imperial", "abrirBiblioteca()", "#483D8B")}
                     ${criarBtn("🏦 Banco Imperial", "menuCapital('banco')", "#ffd700")}
                     ${criarBtn("📸 Ver Cidade", "verImagemEstatica('Capital.png', () => { restaurarMapaMenu(); menuCapital('hub'); })", "#5F9EA0")}
                 </section>
@@ -1555,30 +1687,17 @@ function menuCapital(tipo) {
         return;
     }
 
-    // Botão de retorno ao Hub (usado em todas as sub-abas)
     const btnVoltarHub = `<button onclick="menuCapital('hub')" class="btn-popup" style="margin-bottom: 15px; background: #444; width: 100%;">⬅ Voltar ao Painel Imperial</button>`;
 
-    // --- SUB-ABA: BANCO (RESTAURADA CONFORME IMAGEM 5) ---
+    // --- RE-IMPLEMENTAÇÃO DAS ABAS (BANCO, BOATOS, ETC) ---
     if (tipo === 'banco') {
         titulo.innerText = "🏦 Banco Imperial";
-        let html = btnVoltarHub + `<h4 style="color:#ffdead; margin-top:0;">Pacotes de Serviços</h4>`;
-        html += `<table class="tabela-banco"><tr><th>Pacote</th><th>Custo</th><th>Benefícios</th></tr>`;
-        dadosGerais.banco.forEach(item => {
-            html += `<tr><td>${item.nome}</td><td class="preco-banco">${item.custo}</td><td>${item.desc}</td></tr>`;
-        });
-        html += `</table>`;
-        
-        // PARTE RESTAURADA: Investimentos e Notas
-        html += `<h4 style="color:#ffdead; margin-top:20px;">Investimentos</h4><ul style="color:#ccc; padding-left:20px;">`;
-        dadosGerais.investimentos.forEach(inv => {
-            html += `<li><strong>${inv.nome}:</strong> ${inv.risco} (Mínimo ${inv.min})</li>`;
-        });
-        html += `</ul><div class="nota-banco">* Garantia total sobre bens guardados.<br>* Não existe upgrade de pacote (preço integral na troca).</div>`;
-        
-        container.innerHTML = html;
+        let html = btnVoltarHub + `<h4 style="color:#ffdead; margin-top:0;">Pacotes de Serviços</h4><table class="tabela-banco"><tr><th>Pacote</th><th>Custo</th><th>Benefícios</th></tr>`;
+        dadosGerais.banco.forEach(item => { html += `<tr><td>${item.nome}</td><td class="preco-banco">${item.custo}</td><td>${item.desc}</td></tr>`; });
+        html += `</table><h4 style="color:#ffdead; margin-top:20px;">Investimentos</h4><ul style="color:#ccc; padding-left:20px;">`;
+        dadosGerais.investimentos.forEach(inv => { html += `<li><strong>${inv.nome}:</strong> ${inv.risco} (Min ${inv.min})</li>`; });
+        container.innerHTML = html + `</ul><div class="nota-banco">* Garantia total sobre bens guardados.</div>`;
     }
-
-    // --- OUTRAS SUB-ABAS (Com botão de voltar incluído) ---
     else if (tipo === 'boatos') {
         titulo.innerText = "🗣️ Boatos da Capital";
         container.innerHTML = btnVoltarHub + `<div class="lista-boatos">`;
@@ -1589,42 +1708,31 @@ function menuCapital(tipo) {
         container.innerHTML += `</div>`;
     }
     else if (tipo === 'historico') {
-        titulo.innerText = "📜 Histórico de Missões";
+        titulo.innerText = "📜 Missões & Relatos";
         container.innerHTML = btnVoltarHub;
         dadosCapital.historico.forEach((cap, index) => {
             container.innerHTML += `<div class="item-menu" onclick="lerCapitulo(${index})" style="cursor: pointer; align-items: center;"><div class="foto-placeholder" style="width: 40px; height: 40px;">📖</div><div class="texto-item"><h4>${cap.titulo}</h4></div></div>`;
         });
     }
+    else if (tipo === 'lendas') {
+        titulo.innerText = "🏛️ Heróis Lendários";
+        container.innerHTML = btnVoltarHub + `<p style="text-align:center; color:#aaa; font-style:italic;">"Os que forjaram Tarre."</p>`;
+        dadosCapital.lendas.forEach(heroi => {
+            container.innerHTML += `<div class="item-menu"><div class="texto-item" style="width:100%;"><h4>${heroi.nome}</h4><span class="classe-char">${heroi.titulo}</span><p>${heroi.desc}</p></div></div>`;
+        });
+    }
     else if (tipo === 'bestiario' || tipo === 'esquadrao' || tipo === 'procurados') {
-        titulo.innerText = (tipo === 'bestiario') ? "📖 Bestiário" : (tipo === 'esquadrao' ? "🛡️ Esquadrão" : (tipo === 'lendas' ? "⚜️ Heróis" : "☠️ Procurados"));
+        titulo.innerText = tipo === 'bestiario' ? "📖 Bestiário" : (tipo === 'esquadrao' ? "🛡️ Esquadrão" : "☠️ Procurados");
         container.innerHTML = btnVoltarHub;
-        const lista = (tipo === 'bestiario') ? dadosCapital.bestiario : (tipo === 'esquadrao' ? dadosCapital.esquadrao : (tipo === 'lendas' ? dadosCapital.lendas : dadosCapital.procurados));
+        const lista = tipo === 'bestiario' ? dadosCapital.bestiario : (tipo === 'esquadrao' ? dadosCapital.esquadrao : dadosCapital.procurados);
         lista.forEach(item => {
             let img = item.foto ? `<img src="${item.foto}" class="foto-lista" onclick="verImagemPersonagem('${item.foto}')" style="cursor: zoom-in;">` : `<div class="foto-placeholder">?</div>`;
-            container.innerHTML += `<div class="item-menu">${img}<div class="texto-item"><h4>${item.nome}</h4><p>${item.desc || item.titulo || ""}</p></div></div>`;
+            container.innerHTML += `<div class="item-menu">${img}<div class="texto-item"><h4>${item.nome}</h4><p>${item.desc || ""}</p></div></div>`;
         });
-    }
-    if (tipo === 'lendas') {
-        titulo.innerText = "🏛️ Os 12 Heróis Lendários";
-        // Botão de voltar e texto de introdução
-        container.innerHTML = btnVoltarHub + `
-            <p style="font-style:italic; color:#aaa; font-size:14px; text-align:center; margin-bottom:20px; border-bottom:1px solid #444; padding-bottom:10px;">
-                "Aqueles que derrotaram o Primeiro Rei Demônio e forjaram a Era da Paz."
-            </p>`;
-
-        dadosCapital.lendas.forEach(heroi => {
-            container.innerHTML += `
-                <div class="item-menu" style="padding: 15px 0;">
-                    <div class="texto-item" style="width: 100%;">
-                        <h4 style="color:#ffd700; margin-bottom: 2px;">${heroi.nome}</h4>
-                        <span style="font-size:12px; font-weight:bold; color:#cd853f; text-transform:uppercase;">${heroi.titulo}</span>
-                        <p style="margin-top:5px; font-size:13px; color:#ccc;">${heroi.desc}</p>
-                    </div>
-                </div>`;
-        });
-        return;
     }
 }
+
+
 
 /**
  * Exibe a grade de 12 deuses do panteão com seus títulos e domínios
@@ -1666,6 +1774,325 @@ function menuDeuses() {
         html += `</div>`;
         container.innerHTML = html;
     }
+    // --- ESTRUTURA DE DADOS DAS CLASSES (HIERARQUIA) ---
+// Edite as descrições aqui. O sistema monta o menu sozinho baseado nisso.
+const arvoreClasses = {
+    "Feiticeiro": {
+        desc: "Dominadores da magia bruta, focados em controle de campo e utilidade arcana.",
+        icone: "🔮",
+        proximoNivel: {
+            "Invocador": { 
+                desc: "Especialista em conjurar criaturas e espíritos de outros planos para lutar ao seu lado.",
+                proximoNivel: { 
+                    "Mestre Invocador": { desc: "Pode invocar múltiplas criaturas ou bestas colossais." },
+                    "Espiritualista": { desc: "Foca em espíritos utilitários e buffs para o grupo." }
+                }
+            },
+            "Bruxo": { 
+                desc: "Utiliza artes proibidas e pactos sombrios para debilitar inimigos.",
+                proximoNivel: { 
+                    "Necromante": { desc: "Reanima mortos e manipula energia vital." },
+                    "Demonologista": { desc: "Pactos diretos com demônios para poder destrutivo." }
+                }
+            }
+            // Adicione Feiticeiro Temporal aqui se quiser
+        }
+    },
+    "Mago": {
+        desc: "Estudiosos dedicados ao poder destrutivo dos elementos e da magia pura.",
+        icone: "🔥",
+        proximoNivel: {
+            "Elementalista": {
+                desc: "Foca na manipulação dos quatro elementos básicos para ataque.",
+                proximoNivel: {
+                    "Mestre do Fogo/Ar/Água/Terra": { desc: "Especialização máxima em um único elemento." }
+                }
+            },
+            "Mago Arcano": {
+                desc: "Usa magia pura não elementar e manipulação de energia.",
+                proximoNivel: {
+                     "Rúnico": { desc: "Usa runas antigas para preparar magias poderosas." }
+                }
+            }
+        }
+    },
+    "Guerreiro": {
+        desc: "Mestres do combate corpo a corpo, linha de frente e proteção.",
+        icone: "⚔️",
+        proximoNivel: {
+            "Paladino": { desc: "Guerreiro sagrado que usa fé para proteger e curar.", proximoNivel: { "Anjo": {desc:"..."}, "Monge": {desc:"..."} } },
+            "Cavaleiro das Trevas": { desc: "Usa a própria vitalidade e ódio para aumentar o dano.", proximoNivel: { "Berserker": {desc:"..."}, "Cavaleiro Demoníaco": {desc:"..."} } }
+        }
+    }
+    // Adicione Caçador e Curandeiro seguindo a mesma lógica...
+};
+
+
+// --- MENU PRINCIPAL DA BIBLIOTECA ---
+function abrirBiblioteca() {
+    const container = document.getElementById('conteudo-menu-capital');
+    document.getElementById('titulo-menu-capital').innerText = "📚 Biblioteca";
+    
+    container.innerHTML = `
+        <button onclick="menuCapital('hub')" class="btn-popup" style="margin-bottom: 15px; background: #444; width: 100%;">⬅ Voltar ao Painel Imperial</button>
+        <div class="biblio-nav">
+            <div class="rpg-card-small" onclick="biblioRacas('menu')"><span>🧬</span><strong>Raças</strong></div>
+            <div class="rpg-card-small" onclick="biblioClasses('t1')"><span>⚔️</span><strong>Classes</strong></div>
+            <div class="rpg-card-small" onclick="biblioAtributos()"><span>📊</span><strong>Atributos</strong></div>
+        </div>
+    `;
+}
+
+// --- NAVEGAÇÃO DE RAÇAS (Cards Pequenos) ---
+function biblioRacas(view) {
+    const container = document.getElementById('conteudo-menu-capital');
+    const d = {
+        "Humanos": "A maior parte da população de Tarre. São bons em se adaptar aos diversos climas e possuem resistência alta.",
+        "Anões": "Vistos como corajosos e teimosos, além de artesãos proficientes em muitas áreas.",
+        "Elfo Alto": "Evoluídos magicamente, possuem costumes extremistas sobre herança de sangue; má fama com outras raças.",
+        "Elfo Negro": "Prodígios em magia elemental; temidos como máquinas de destruição ambulantes.",
+        "Elfo da Floresta": "Conexão espiritual profunda. Vivem livres e possuem afinidade com animais e plantas.",
+        "Meio anjo": "Sangue humano e angelical. Alto poder mágico e alto valor comercial (não têm asas).",
+        "Bestiais": "Mistura de humanos com traços animais. Alta capacidade física, mas sofrem grande preconceito.",
+        "Machinas": "Ciborgues raros com tecnologia humana e mecânica misturada. Não são vistos há séculos.",
+        "Orc": "Alta capacidade física, mas intelecto reduzido e péssimos com magia.",
+        "Meio demônio": "Sangue humano e demoníaco. Alto poder mágico, mas reputação ruim pela origem do nascimento.",
+        "Asura": "Raça antiga, inteligente e quase extinta. Humanoides de 1m que lembram ratos sem pelo."
+    };
+
+    if (view === 'menu') {
+        container.innerHTML = `<button onclick="abrirBiblioteca()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
+        <div class="biblio-nav">
+            <div class="rpg-card-small" onclick="biblioRacas('Humanos')"><span>👨</span><strong>Humanos</strong></div>
+            <div class="rpg-card-small" onclick="biblioRacas('Anões')"><span>⚒️</span><strong>Anões</strong></div>
+            <div class="rpg-card-small" onclick="biblioRacas('elfos')"><span>🧝</span><strong>Elfos</strong></div>
+            <div class="rpg-card-small" onclick="biblioRacas('Meio anjo')"><span>😇</span><strong>Meio anjo</strong></div>
+            <div class="rpg-card-small" onclick="biblioRacas('Bestiais')"><span>🐾</span><strong>Bestiais</strong></div>
+            <div class="rpg-card-small" onclick="biblioRacas('Machinas')"><span>🤖</span><strong>Machinas</strong></div>
+            <div class="rpg-card-small" onclick="biblioRacas('Orc')"><span>👹</span><strong>Orc</strong></div>
+            <div class="rpg-card-small" onclick="biblioRacas('Meio demônio')"><span>😈</span><strong>M. Demônio</strong></div>
+            <div class="rpg-card-small" onclick="biblioRacas('Asura')"><span>🐭</span><strong>Asura</strong></div>
+        </div>`;
+    } else if (view === 'elfos') {
+        container.innerHTML = `<button onclick="biblioRacas('menu')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
+        <div class="biblio-nav">
+            <div class="rpg-card-small" onclick="biblioRacas('Elfo Alto')"><span>✨</span><strong>Elfo Alto</strong></div>
+            <div class="rpg-card-small" onclick="biblioRacas('Elfo Negro')"><span>🌑</span><strong>Elfo Negro</strong></div>
+            <div class="rpg-card-small" onclick="biblioRacas('Elfo da Floresta')"><span>🍃</span><strong>Elfo Floresta</strong></div>
+        </div>`;
+    } else {
+        container.innerHTML = `<button onclick="biblioRacas('${view.includes('Elfo') ? 'elfos' : 'menu'}')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
+        <div class="detalhe-box"><h3>🧬 ${view}</h3><p>${d[view]}</p></div>`;
+    }
+}
+
+// --- ATRIBUTOS (Texto resumido e Tabela ordenada) ---
+function biblioAtributos() {
+    const container = document.getElementById('conteudo-menu-capital');
+    container.innerHTML = `<button onclick="abrirBiblioteca()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
+        <div class="grid-atributos">
+            <div class="card-atrib"><strong>💪 Força</strong><span>Físico</span></div>
+            <div class="card-atrib"><strong>📖 Sabedoria</strong><span>Conhecimentos</span></div>
+            <div class="card-atrib"><strong>✨ Mana</strong><span>MP</span></div>
+            <div class="card-atrib"><strong>⚡ Destreza</strong><span>Agilidade</span></div>
+            <div class="card-atrib"><strong>🛡️ Const.</strong><span>Vida</span></div>
+            <div class="card-atrib"><strong>🧠 Intelig.</strong><span>Intelecto</span></div>
+            <div class="card-atrib"><strong>🎯 Precisão</strong><span>Acerto</span></div>
+            <div class="card-atrib"><strong>🗣️ Carisma</strong><span>Lábia</span></div>
+        </div>
+        <h4 style="color:#ffd700; margin-top:20px;">🎲 Bônus de Dados (Corrigido)</h4>
+        <table class="tabela-banco" style="font-size:13px;">
+            <tr><th>Pontos</th><th>Bônus</th><th>Pontos</th><th>Bônus</th></tr>
+            <tr><td>0</td><td>-2</td><td>4 - 5</td><td>+2</td></tr>
+            <tr><td>1</td><td>-1</td><td>6 - 7</td><td>+3</td></tr>
+            <tr><td>2</td><td>0</td><td>8-9-10</td><td>+4</td></tr>
+            <tr><td>3</td><td>+1</td><td>11+</td><td>+5 (Máx)</td></tr>
+        </table>`;
+}
+
+
+const classesRPG = {
+    "Feiticeiro": {
+        emoji: "🔮",
+        desc: "Possuem habilidades de controle e utilidade, uma classe que consegue se adaptar em diversas situações.",
+        proximas: {
+            "Invocador": { 
+                emoji: "🧞", desc: "Utiliza magias místicas para invocar criaturas que lutam ao seu lado ou defendem a equipe.",
+                final: { 
+                    "Mestre Invocador": { emoji: "🐉", desc: "Passa a invocar criaturas mais poderosas por rituais que duram dias." },
+                    "Espiritualista": { emoji: "👻", desc: "Ganha uma conexão espiritual para invocar espíritos poderosos por curto período." }
+                }
+            },
+            "Bruxo": { 
+                emoji: "💀", desc: "Utiliza magia negra para enfraquecer, envenenar e amaldiçoar seus oponentes.",
+                final: { 
+                    "Necromante": { emoji: "🧟", desc: "Aprende a fazer com que criaturas mortas voltem à vida para ajudar." },
+                    "Demonologista": { emoji: "👹", desc: "Aumenta sua ligação com o mundo inferior para feitiços demoníacos intensos." }
+                }
+            },
+            "Feiticeiro Temporal": { 
+                emoji: "⏳", desc: "Usa de poderes estranhos para controlar o tempo a sua volta (não volta no tempo).",
+                final: { 
+                    "Temporalista": { emoji: "🌀", desc: "Maximiza seus poderes temporais ao nível mais elevado." },
+                    "Dimensionalista": { emoji: "🌌", desc: "Controla o espaço, criando fendas dimensionais e alterando a matéria." }
+                }
+            }
+        }
+    },
+    "Mago": {
+        emoji: "🔥",
+        desc: "Possuem, principalmente, habilidades de ataque, sem deixar de lado truques importantes.",
+        proximas: {
+            "Elementalista": { 
+                emoji: "🌪️", desc: "Consegue extrair o poder da natureza, usando magias dos elementos.",
+                final: { 
+                    "Mestre do Fogo": { emoji: "🔥", desc: "O mago extrai o poder puro do fogo, controlando-o e seus derivados." },
+                    "Mestre do Ar": { emoji: "💨", desc: "O mago extrai o poder puro do ar, controlando-o e seus derivados." },
+                    "Mestre da Água": { emoji: "🌊", desc: "O mago extrai o poder puro da água, controlando-a e seus derivados." },
+                    "Mestre da Terra": { emoji: "⛰️", desc: "O mago extrai o poder puro da terra, controlando-a e seus derivados." }
+                }
+            },
+            "Mago Arcano": { 
+                emoji: "📖", desc: "Estudiosos da magia pura, manipulam as leis do mundo através da força da mente.",
+                final: { "Rúnico": { emoji: "📜", desc: "Usa poderes de escritas antigas para feitiços complexos bem poderosos." } }
+            },
+            "Mago de Combate": { 
+                emoji: "👊", desc: "Especialista em combates mágicos corpo a corpo e média distância.",
+                final: { "Mago de Combate Especializado": { emoji: "⚔️", desc: "Escolhe um estilo de luta para se especializar com técnicas especiais." } }
+            }
+        }
+    },
+    "Caçador": {
+        emoji: "🏹",
+        desc: "Utilizam de facas e arcos para derrotar oponentes. Classe versátil para confronto ou furtividade.",
+        proximas: {
+            "Arqueiro": { 
+                emoji: "🎯", desc: "Foca no arco, aprendendo técnicas que combinam magia e precisão.",
+                final: { 
+                    "Sniper": { emoji: "🔭", desc: "Visão melhorada para ver a grandes distâncias. Dano aumenta com a distância." },
+                    "Atirador de Elite": { emoji: "🔫", desc: "Invoca armas de fogo e tecnologias de uma civilização tecnológica antiga." },
+                    "Mestre Arqueiro": { emoji: "🏹", desc: "Armazenamento de flechas variadas para qualquer situação de combate." }
+                }
+            },
+            "Assassino": { 
+                emoji: "🗡️", desc: "Utiliza adagas e venenos para permanecer oculto até o momento oportuno.",
+                final: { 
+                    "Ceifador": { emoji: "⚰️", desc: "Maneja corrente e foice, trabalhando para um deus à sua escolha." },
+                    "Sombra": { emoji: "👥", desc: "Evolui as técnicas de ocultação para se esconder facilmente de qualquer um." }
+                }
+            },
+            "Druida": { 
+                emoji: "🌿", desc: "Utiliza conhecimentos da natureza para aprender magias e curas.",
+                final: { "Druida (reencarnado)": { emoji: "🦄", desc: "Torna-se um com a natureza, reencarnando em uma classe selvagem mística." } }
+            }
+        }
+    },
+    "Guerreiro": {
+        emoji: "🛡️",
+        desc: "Consegue utilizar espadas e escudos para causar grande dano e suportar ataques.",
+        proximas: {
+            "Paladino": { 
+                emoji: "⚖️", desc: "Recebe o dom mágico de um deus sem abandonar suas técnicas de esgrima.",
+                final: { 
+                    "Anjo": { emoji: "👼", desc: "Ganha dons e graça divina, tornando-se quase um anjo verdadeiro." },
+                    "Monge": { emoji: "🧘", desc: "Abandona seu deus mas segue o caminho da bondade e resistência elemental." }
+                }
+            },
+            "Cavaleiro das Trevas": { 
+                emoji: "🌑", desc: "Cavaleiro movido por magia negra que ganha poder ao causar dano e matar.",
+                final: { 
+                    "Cavaleiro Demoníaco": { emoji: "😈", desc: "Adquire poderes de mestre, acessando magias perdidas do submundo." },
+                    "Berserker": { emoji: "💢", desc: "Focado em dano extremamente alto e resistência. Mais forte quanto mais apanha." }
+                }
+            },
+            "Guerreiro Arcano": { 
+                emoji: "⚔️✨", desc: "Combina as técnicas de magia arcana com suas habilidades de esgrima.",
+                final: { "Veterano": { emoji: "🎖️", desc: "Mestre em todos os tipos de armas, podendo melhorá-las e usar feitiços extras." } }
+            }
+        }
+    },
+    "Curandeiro": {
+        emoji: "💖",
+        desc: "Utilizam poderes divinos para curar aliados. Classe essencial para sobrevivência em combate.",
+        proximas: {
+            "Sacerdote": { 
+                emoji: "☀️", desc: "Caminho da iluminação para abençoar aliados e destruir mortos-vivos.",
+                final: { 
+                    "Anjo": { emoji: "😇", desc: "Ganha dons do seu deus e a graça divina, tornando-se quase um anjo." },
+                    "Vampiro": { emoji: "🧛", desc: "Amaldiçoado pela noite; o sol causa dano e necessita de sangue para viver." }
+                }
+            },
+            "Encantador": { 
+                emoji: "✨", desc: "Mestre em buffs e debuffs, encantando itens para terem poderes estranhos.",
+                final: { "Mestre Encantador": { emoji: "💎", desc: "Modifica magias e itens, criando ou destruindo itens mágicos e maldições." } }
+            },
+            "Bardo": { 
+                emoji: "🎵", desc: "Habilidades musicais de cura, utilidade e suporte.",
+                final: { "Estrela": { emoji: "🌟", desc: "Ganha habilidades cósmicas. Canto e fala tornam-se mecanismos de magia." } }
+            }
+        }
+    }
+};
+
+function biblioClasses(tier, c1 = null, c2 = null) {
+    const container = document.getElementById('conteudo-menu-capital');
+    const titulo = document.getElementById('titulo-menu-capital');
+    
+    if (tier === 't1') {
+        titulo.innerText = "Classes Iniciais";
+        container.innerHTML = `<button onclick="abrirBiblioteca()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
+            <div class="biblio-nav">
+                ${Object.keys(classesRPG).map(c => `
+                    <div class="rpg-card-small" onclick="biblioClasses('t2', '${c}')">
+                        <span>${classesRPG[c].emoji}</span>
+                        <strong>${c}</strong>
+                    </div>`).join('')}
+            </div>`;
+    } 
+    else if (tier === 't2') {
+        titulo.innerText = `Evoluções de ${c1}`;
+        container.innerHTML = `<button onclick="biblioClasses('t1')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
+            <div class="detalhe-box">
+                <h3>${classesRPG[c1].emoji} ${c1}</h3>
+                <p>${classesRPG[c1].desc}</p>
+            </div>
+            <h4 style="text-align:center; color:#ffd700; margin: 15px 0;">▼ Escolha a 2ª Classe ▼</h4>
+            <div class="biblio-nav">
+                ${Object.keys(classesRPG[c1].proximas).map(c => `
+                    <div class="rpg-card-small" onclick="biblioClasses('t3', '${c1}', '${c}')">
+                        <span>${classesRPG[c1].proximas[c].emoji}</span>
+                        <strong>${c}</strong>
+                    </div>`).join('')}
+            </div>`;
+    } 
+    else if (tier === 't3') {
+        titulo.innerText = `Especializações de ${c2}`;
+        const classeT2 = classesRPG[c1].proximas[c2];
+        container.innerHTML = `<button onclick="biblioClasses('t2', '${c1}')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
+            <div class="detalhe-box">
+                <h3>${classeT2.emoji} ${c2}</h3>
+                <p>${classeT2.desc}</p>
+            </div>
+            <h4 style="text-align:center; color:#00ffff; margin: 15px 0;">▼ Escolha a 3ª Classe ▼</h4>
+            <div class="biblio-nav">
+                ${Object.keys(classeT2.final).map(c => `
+                    <div class="rpg-card-small" onclick="biblioClasses('t4', '${c1}', '${c2}', '${c}')">
+                        <span>${classeT2.final[c].emoji}</span>
+                        <strong>${c}</strong>
+                    </div>`).join('')}
+            </div>`;
+    } 
+    else if (tier === 't4') {
+        const c3 = arguments[3];
+        const dadosC3 = classesRPG[c1].proximas[c2].final[c3];
+        titulo.innerText = c3;
+        container.innerHTML = `<button onclick="biblioClasses('t3', '${c1}', '${c2}')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
+            <div class="detalhe-box">
+                <h3>${dadosC3.emoji} ${c3}</h3>
+                <p>${dadosC3.desc}</p>
+            </div>`;
+    }
+}
 
 /**
  * Exibe o conteúdo completo de um capítulo do histórico
