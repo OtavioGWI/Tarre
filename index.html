@@ -503,17 +503,20 @@
 .card-atributo strong { display: block; color: #ffd700; font-size: 15px; margin-bottom: 3px; }
 .card-atributo span { font-size: 12px; color: #ccc; }
 
-/* --- CARDS DA BIBLIOTECA (QUADRADOS) --- */
+/* --- AJUSTE DEFINITIVO DO GRID (2x2 NO CELULAR) --- */
 .biblio-nav { 
     display: grid; 
-    grid-template-columns: repeat(2, 1fr); /* Força 2 colunas */
+    /* Força exatamente 2 colunas no celular */
+    grid-template-columns: repeat(2, 1fr); 
     gap: 10px; 
     margin-top: 15px; 
 }
 
-/* No computador, ele pode ter mais colunas se houver espaço */
+/* No computador (telas maiores que 600px), ele volta a ser expansível */
 @media only screen and (min-width: 600px) {
-    .biblio-nav { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+    .biblio-nav { 
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
+    }
 }
 
 .rpg-card-small {
@@ -529,9 +532,6 @@
 /* --- MAGIAS E HABILIDADES --- */
 .spell-level { color: #ffd700; font-size: 14px; text-transform: uppercase; margin: 15px 0 5px 0; border-left: 3px solid #ffd700; padding-left: 8px; }
 .spell-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; margin-bottom: 6px; font-size: 13px; border-left: 2px solid #555; }
-
-/* --- CARDS DA BIBLIOTECA (QUADRADOS) --- */
-.biblio-nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
 
 .rpg-card-small {
     background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
