@@ -1321,110 +1321,96 @@ function atualizarVisualBotao() {
  * Back buttons de imagens retornam a menuCapital(tipo) via callback
  */
 function menuCapital(tipo) {
-        menuAtualAberto = tipo; // Rastreia qual menu está aberto (essencial para navegação de fotos)
-        const modal = document.getElementById('modal-capital');
-        const container = document.getElementById('conteudo-menu-capital');
-        const titulo = document.getElementById('titulo-menu-capital');
-        modal.style.display = 'flex';
-        container.innerHTML = "";
+    const modal = document.getElementById('modal-capital');
+    const container = document.getElementById('conteudo-menu-capital');
+    const titulo = document.getElementById('titulo-menu-capital');
+    
+    modal.style.display = 'flex';
+    container.innerHTML = "";
+    
+    // Salva qual aba está aberta para as fotos saberem para onde voltar
+    if (tipo !== 'hub') { menuAtualAberto = tipo; }
 
-        // Aba: Os 12 Heróis Lendários (histórico imutável)
-        if (tipo === 'lendas') {
-            titulo.innerText = "🏛️ Os 12 Heróis Lendários";
-            
-            container.innerHTML += `<p style="font-style:italic; color:#aaa; font-size:14px; text-align:center; margin-bottom:20px; border-bottom:1px solid #444; padding-bottom:10px;">"Aqueles que derrotaram o Primeiro Rei Demônio e forjaram a Era da Paz."</p>`;
+    // --- SEÇÃO: HUB CENTRAL (PAINEL IMPERIAL) ---
+    if (tipo === 'hub') {
+        menuAtualAberto = 'hub';
+        titulo.innerText = "🏛️ Centro Administrativo Imperial";
+        container.innerHTML = `
+            <div style="display: grid; gap: 25px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <section>
+                    <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">📚 CONHECIMENTOS</div>
+                    ${criarBtn("📜 Histórico de Missões", "menuCapital('historico')", "#9370DB")}
+                    ${criarBtn("📖 Bestiário Imperial", "menuCapital('bestiario')", "#2E8B57")}
+                    ${criarBtn("🗣️ Boatos Conhecidos", "menuCapital('boatos')", "#800080")}
+                </section>
+                
+                <section>
+                    <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">👥 FIGURAS & LENDAS</div>
+                    ${criarBtn("🛡️ Esquadrão", "menuCapital('esquadrao')", "#4682B4")}
+                    ${criarBtn("⚜️ Heróis Lendários", "menuCapital('lendas')", "#DAA520")}
+                    ${criarBtn("☠️ Cartazes de Procurados", "menuCapital('procurados')", "#8b0000")}
+                </section>
 
-            dadosCapital.lendas.forEach(heroi => {
-                container.innerHTML += `
-                    <div class="item-menu">
-                        <div class="texto-item" style="width: 100%;">
-                            <h4 style="color:#ffd700; margin-bottom: 2px;">${heroi.nome}</h4>
-                            <span style="font-size:12px; font-weight:bold; color:#cd853f; text-transform:uppercase;">${heroi.titulo}</span>
-                            <p style="margin-top:5px; font-size:13px; color:#ccc;">${heroi.desc}</p>
-                        </div>
-                    </div>`;
-            });
-            return;
-        }
+                <section>
+                    <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">🛠️ SERVIÇOS</div>
+                    ${criarBtn("🏦 Banco Imperial", "menuCapital('banco')", "#ffd700")}
+                    ${criarBtn("📸 Ver Cidade", "verImagemEstatica('Capital.png', () => { restaurarMapaMenu(); menuCapital('hub'); })", "#5F9EA0")}
+                </section>
+            </div>
+        `;
+        return;
+    }
 
-        // Aba: Banco Imperial (6 pacotes de seguro + investimentos)
-        if (tipo === 'banco') {
-            titulo.innerText = "🏦 Banco Imperial";
-            let html = `<h4 style="color:#ffdead; margin-top:0;">Pacotes de Serviços</h4>`;
-            html += `<table class="tabela-banco"><tr><th>Pacote</th><th>Custo</th><th>Benefícios</th></tr>`;
-            dadosGerais.banco.forEach(item => {
-                html += `<tr><td>${item.nome}</td><td class="preco-banco">${item.custo}</td><td>${item.desc}</td></tr>`;
-            });
-            html += `</table>`;
-            html += `<h4 style="color:#ffdead; margin-top:20px;">Investimentos</h4><ul style="color:#ccc; padding-left:20px;">`;
-            dadosGerais.investimentos.forEach(inv => {
-                html += `<li><strong>${inv.nome}:</strong> ${inv.risco} (Mínimo ${inv.min})</li>`;
-            });
-            html += `</ul><div class="nota-banco">* Garantia total sobre bens guardados.<br>* Não existe upgrade de pacote (preço integral na troca).</div>`;
-            container.innerHTML = html;
-            return;
-        }
+    // Botão de retorno ao Hub (usado em todas as sub-abas)
+    const btnVoltarHub = `<button onclick="menuCapital('hub')" class="btn-popup" style="margin-bottom: 15px; background: #444; width: 100%;">⬅ Voltar ao Painel Imperial</button>`;
 
-        // Aba: Boatos da Capital (100 total, apenas 1 descoberto)
-        if (tipo === 'boatos') {
-            titulo.innerText = "🗣️ Boatos da Capital (1/100)";
-            let html = `<div class="lista-boatos">`;
-            dadosCapital.boatos.forEach(boato => {
-                const classeExtra = boato.descoberto ? 'boato-descoberto' : '';
-                const textoFinal = boato.descoberto ? boato.texto : "??????????????????";
-                html += `<div class="boato-item ${classeExtra}"><span class="boato-numero">#${boato.id}</span><span class="boato-texto">"${textoFinal}"</span></div>`;
-            });
-            html += `</div>`;
-            container.innerHTML = html;
-            return;
-        }
+    // --- SUB-ABA: BANCO (RESTAURADA CONFORME IMAGEM 5) ---
+    if (tipo === 'banco') {
+        titulo.innerText = "🏦 Banco Imperial";
+        let html = btnVoltarHub + `<h4 style="color:#ffdead; margin-top:0;">Pacotes de Serviços</h4>`;
+        html += `<table class="tabela-banco"><tr><th>Pacote</th><th>Custo</th><th>Benefícios</th></tr>`;
+        dadosGerais.banco.forEach(item => {
+            html += `<tr><td>${item.nome}</td><td class="preco-banco">${item.custo}</td><td>${item.desc}</td></tr>`;
+        });
+        html += `</table>`;
+        
+        // PARTE RESTAURADA: Investimentos e Notas
+        html += `<h4 style="color:#ffdead; margin-top:20px;">Investimentos</h4><ul style="color:#ccc; padding-left:20px;">`;
+        dadosGerais.investimentos.forEach(inv => {
+            html += `<li><strong>${inv.nome}:</strong> ${inv.risco} (Mínimo ${inv.min})</li>`;
+        });
+        html += `</ul><div class="nota-banco">* Garantia total sobre bens guardados.<br>* Não existe upgrade de pacote (preço integral na troca).</div>`;
+        
+        container.innerHTML = html;
+    }
 
-        // Aba: Histórico de Aventuras (5 capítulos com imagens embarcadas)
-        if (tipo === 'historico') {
-            titulo.innerText = "📜 Histórico de Aventuras";
-            dadosCapital.historico.forEach((cap, index) => {
-                container.innerHTML += `
-                    <div class="item-menu" onclick="lerCapitulo(${index})" style="cursor: pointer; align-items: center;">
-                        <div class="foto-placeholder" style="width: 50px; height: 50px; font-size: 20px;">📖</div>
-                        <div class="texto-item"><h4 style="margin-top: 10px;">${cap.titulo}</h4><p style="font-size: 12px; color: #aaa;">Clique para ler</p></div>
-                    </div>`;
-            });
-            return;
-        }
-
-        // Aba: Bestiário Conhecido (criaturas encontradas com photos)
-        if (tipo === 'bestiario') {
-            titulo.innerText = "📖 Bestiário Conhecido";
-            dadosCapital.bestiario.forEach(monstro => {
-                let img = monstro.foto 
-                    ? `<img src="${monstro.foto}" class="foto-lista" onclick="verImagemPersonagem('${monstro.foto}')" style="cursor: zoom-in;" title="Clique para ampliar">` 
-                    : `<div class="foto-placeholder">?</div>`;
-                container.innerHTML += `
-                    <div class="item-menu">${img}<div class="texto-item">
-                        <h4 style="color:#ff4444;">${monstro.nome}</h4>
-                        <span style="font-size:12px;">Perigo: ${monstro.perigo}</span><br>
-                        <span style="font-size:12px; color:#aaa;">Fraqueza: ${monstro.fraqueza}</span>
-                        <p style="font-style:italic; margin-top:5px;">"${monstro.desc}"</p>
-                        <div style="margin-top:5px; font-size:11px; color:#ffd700;">Drop: ${monstro.drops}</div>
-                    </div></div>`;
-            });
-            return;
-        }
-
-        // Aba: Esquadrão (PCs) e Procurados (Criminosos)
-        // Mesmo HTML, dados diferentes conforme tipo
-        const lista = (tipo === 'esquadrao') ? dadosCapital.esquadrao : dadosCapital.procurados;
-        titulo.innerText = (tipo === 'esquadrao') ? "🛡️ Os Pandemônios" : "☠️ Cartazes de Procurados";
-        lista.forEach(item => {
-            let htmlImagem = item.foto 
-                ? `<img src="${item.foto}" class="foto-lista" onclick="verImagemPersonagem('${item.foto}')" style="cursor: zoom-in;" title="Clique para ampliar">` 
-                : `<div class="foto-placeholder">${tipo === 'esquadrao' ? 'RETRATO' : 'WANTED'}</div>`;
-            let htmlSubtitulo = (tipo === 'esquadrao')
-                ? `<span class="classe-char">${item.classe} • ${item.raca || 'Desconhecido'}</span>`
-                : `<span class="recompensa">💰 ${item.recompensa}</span>`;
-            container.innerHTML += `<div class="item-menu">${htmlImagem}<div class="texto-item"><h4>${item.nome}</h4>${htmlSubtitulo}<p>${item.desc}</p></div></div>`;
+    // --- OUTRAS SUB-ABAS (Com botão de voltar incluído) ---
+    else if (tipo === 'boatos') {
+        titulo.innerText = "🗣️ Boatos da Capital";
+        container.innerHTML = btnVoltarHub + `<div class="lista-boatos">`;
+        dadosCapital.boatos.forEach(boato => {
+            const txt = boato.descoberto ? boato.texto : "??????????????????";
+            container.innerHTML += `<div class="boato-item ${boato.descoberto ? 'boato-descoberto' : ''}"><span class="boato-numero">#${boato.id}</span><span class="boato-texto">"${txt}"</span></div>`;
+        });
+        container.innerHTML += `</div>`;
+    }
+    else if (tipo === 'historico') {
+        titulo.innerText = "📜 Histórico de Missões";
+        container.innerHTML = btnVoltarHub;
+        dadosCapital.historico.forEach((cap, index) => {
+            container.innerHTML += `<div class="item-menu" onclick="lerCapitulo(${index})" style="cursor: pointer; align-items: center;"><div class="foto-placeholder" style="width: 40px; height: 40px;">📖</div><div class="texto-item"><h4>${cap.titulo}</h4></div></div>`;
         });
     }
+    else if (tipo === 'bestiario' || tipo === 'esquadrao' || tipo === 'procurados' || tipo === 'lendas') {
+        titulo.innerText = (tipo === 'bestiario') ? "📖 Bestiário" : (tipo === 'esquadrao' ? "🛡️ Esquadrão" : (tipo === 'lendas' ? "⚜️ Heróis" : "☠️ Procurados"));
+        container.innerHTML = btnVoltarHub;
+        const lista = (tipo === 'bestiario') ? dadosCapital.bestiario : (tipo === 'esquadrao' ? dadosCapital.esquadrao : (tipo === 'lendas' ? dadosCapital.lendas : dadosCapital.procurados));
+        lista.forEach(item => {
+            let img = item.foto ? `<img src="${item.foto}" class="foto-lista" onclick="verImagemPersonagem('${item.foto}')" style="cursor: zoom-in;">` : `<div class="foto-placeholder">?</div>`;
+            container.innerHTML += `<div class="item-menu">${img}<div class="texto-item"><h4>${item.nome}</h4><p>${item.desc || item.titulo || ""}</p></div></div>`;
+        });
+    }
+}
 
 /**
  * Exibe a grade de 12 deuses do panteão com seus títulos e domínios
@@ -1473,18 +1459,18 @@ function menuDeuses() {
  * Fotos dentro do texto são clicáveis (onclick verImagemHistoria)
  * @param {number} index - Índice do capítulo em dadosCapital.historico
  */
-    function lerCapitulo(index) {
-        const container = document.getElementById('conteudo-menu-capital');
-        const cap = dadosCapital.historico[index];
-        
-        // Botão de Voltar para a lista de capítulos
-        let html = `<button onclick="menuCapital('historico')" class="btn-popup" style="margin-bottom: 15px; background: #444;">⬅ Voltar à Lista</button>`;
-        
-        html += `<h3 style="color: #ffdead; border-bottom: 1px dashed #555; padding-bottom: 10px;">${cap.titulo}</h3>`;
-        html += `<div class="texto-capitulo">${cap.texto}</div>`;
-        
-        container.innerHTML = html;
-    }
+function lerCapitulo(index) {
+    const container = document.getElementById('conteudo-menu-capital');
+    const cap = dadosCapital.historico[index];
+    
+    // Botão para voltar à LISTA de capítulos (não ao Hub direto)
+    let html = `<button onclick="menuCapital('historico')" class="btn-popup" style="margin-bottom: 15px; background: #444; width: 100%;">⬅ Voltar à Lista de Capítulos</button>`;
+    
+    html += `<h3 style="color: #ffdead; border-bottom: 1px dashed #555; padding-bottom: 10px;">${cap.titulo}</h3>`;
+    html += `<div class="texto-capitulo">${cap.texto}</div>`;
+    
+    container.innerHTML = html;
+}
 
 /**
  * Exibe foto do deus em fullscreen e volta para o panteão ao clicar voltar
@@ -1505,14 +1491,19 @@ function verImagemDeus(arquivo) {
  * @param {string} arquivo - Nome do arquivo PNG da foto
  */
 function verImagemPersonagem(arquivo) {
+    // Abre a imagem e define um bilhete de volta personalizado
     verImagemEstatica(arquivo, function() {
-        restaurarMapaMenu(); // Volta mapa e menu
+        restaurarMapaMenu(); // Reexibe mapa e menu lateral
+        document.getElementById('modal-capital').style.display = 'flex'; // Reabre o modal
+        
+        // Volta para a aba específica que estava aberta (Ex: 'bestiario')
         if (menuAtualAberto) {
-            menuCapital(menuAtualAberto); // Volta para a aba específica (Bestiário, Esquadrão, etc)
+            menuCapital(menuAtualAberto);
+        } else {
+            menuCapital('hub'); // Fallback caso perca o estado
         }
     });
 }
-
 /**
  * Exibe foto linkada dentro de um capítulo do histórico em fullscreen
  * Volta para o mesmo capítulo após fechar a imagem
@@ -2053,17 +2044,10 @@ if (nomeDoMapa === 'Planos.jpg') {
             const m = L.marker(coord, { icon: grande ? iconG : iconP, opacity: 0 }).addTo(map);
             let botoes = `<div style="margin-top:10px; display:flex; flex-direction:column;">`;
 
-            // --- LÓGICA ESPECIAL PARA A CAPITAL ---
+// --- LÓGICA NOVA PARA A CAPITAL (PAINEL UNIFICADO) ---
             if (nome === "Capital Imperial") {
-                botoes += criarBtn("⚜️ Heróis Lendários", "menuCapital('lendas')", "#DAA520");
-                botoes += criarBtn("🏦 Banco Imperial", "menuCapital('banco')", "#ffd700");
-                botoes += criarBtn("🛡️ Esquadrão", "menuCapital('esquadrao')", "#4682B4");
-                botoes += criarBtn("📸 Ver Cidade", `verImagemEstatica('${arquivo}')`, "#5F9EA0");
-                botoes += criarBtn("📜 Histórico", "menuCapital('historico')", "#9370DB");
-                botoes += criarBtn("☠️ Procurados", "menuCapital('procurados')", "#8b0000");
-                botoes += criarBtn("🗣️ Boatos", "menuCapital('boatos')", "#800080");
-                botoes += criarBtn("📖 Bestiário", "menuCapital('bestiario')", "#2E8B57");
-            } 
+                    botoes += criarBtn("🏛️ Acessar Painel Imperial", "menuCapital('hub')", "#DAA520");
+                }
             // --- CIDADE SAGRADA ---
             else if (nome === "Cidade Sagrada") {
                 if (arquivo) botoes += criarBtn("📸 Ver Cidade", `verImagemEstatica('${arquivo}')`, "#5F9EA0");
