@@ -393,6 +393,14 @@
         margin-right: 15px; flex-shrink: 0; display: flex; 
         align-items: center; justify-content: center; font-size: 10px; color: #777; 
     }
+    /* Borda azul para membros da escola */
+.foto-escola { 
+    width: 80px; height: 110px; 
+    object-fit: cover; 
+    border: 2px solid #00bfff !important; 
+    margin-right: 15px; 
+    background: #000;
+}
     
     .texto-item h4 { margin: 0 0 5px 0; color: #ffdead; font-size: 18px; }
     .texto-item p { font-size: 14px; margin: 0; color: #ccc; }
@@ -649,6 +657,24 @@
 
 // Variável de controle: qual o andar máximo que o grupo já liberou?
 // --- SISTEMA DA ESCOLA DE MAGIA ---
+const dadosEscola = {
+    pessoas: [
+        { nome: "Arquimago Valerius", cargo: "Diretor", desc: "Um elfo alto de idade incalculável. Consegue ver o fluxo de mana de Tarre.", foto: "Valerius.png" },
+        { nome: "Mestra Elara", cargo: "Professora de Runas", desc: "Exigente e mestre em encantamentos permanentes.", foto: "Elara.png" },
+        { nome: "Kael, o Prodígio", cargo: "Aluno (Umbra)", desc: "Domina fendas dimensionais. Calado e misterioso.", foto: "Kael.png" }
+    ],
+    perguntasQuiz: [
+        { p: "Em um combate, o que você prioriza?", r: { "Ignis": "Poder bruto e finalização rápida.", "Aetheris": "Estratégia e controle do espaço.", "Sylvana": "Cura e proteção dos aliados.", "Umbra": "Aproveitar as brechas e o erro inimigo." } },
+        { p: "Onde você passaria seu tempo livre na Academia?", r: { "Aetheris": "No observatório, estudando os astros.", "Sylvana": "Nos jardins, conversando com os espíritos.", "Ignis": "Na arena de duelos praticando feitiços.", "Umbra": "Na seção proibida da biblioteca." } },
+        { p: "Qual dessas qualidades você mais valoriza?", r: { "Ignis": "Coragem", "Aetheris": "Lógica", "Sylvana": "Instinto", "Umbra": "Perspicácia" } },
+        { p: "Se encontrasse um artefato antigo e perigoso, você:", r: { "Umbra": "O guardaria para estudar seus segredos.", "Ignis": "O usaria para testar seu poder em batalha.", "Aetheris": "O levaria para o conselho para análise técnica.", "Sylvana": "O enterraria para que a natureza o retomasse." } },
+        { p: "Como você prefere resolver um enigma?", r: { "Aetheris": "Analisando cada detalhe matematicamente.", "Umbra": "Pensando fora da caixa e buscando atalhos.", "Sylvana": "Escutando a intuição e o ambiente.", "Ignis": "Tentando várias vezes até quebrar o mistério." } },
+        { p: "Um feitiço seu falha e causa uma pequena explosão. Você:", r: { "Ignis": "Dá risada e tenta um maior logo em seguida.", "Aetheris": "Anota exatamente o que deu errado no pergaminho.", "Sylvana": "Pede desculpas às energias ao redor.", "Umbra": "Analisa se a 'falha' pode ser usada como uma nova arma." } },
+        { p: "Qual criatura seria seu companheiro ideal?", r: { "Sylvana": "Um lobo espiritual leal.", "Aetheris": "Uma coruja de cristal observadora.", "Ignis": "Um pequeno dragão impetuoso.", "Umbra": "Um corvo que sussurra segredos." } }
+    ]
+};
+let pontosQuiz = { Aetheris: 0, Sylvana: 0, Ignis: 0, Umbra: 0 };
+let perguntaAtual = 0;
 function abrirEscolaMagia() {
     const container = document.getElementById('conteudo-menu-capital');
     const modal = document.getElementById('modal-capital');
@@ -656,63 +682,129 @@ function abrirEscolaMagia() {
     modal.style.display = 'flex';
     
     container.innerHTML = `
-        <p style="color:#aaa; font-style:italic; text-align:center; margin-bottom:15px;">"Onde o conhecimento molda a realidade."</p>
         <div class="biblio-nav">
             <div class="rpg-card-small" onclick="menuEscola('casas')"><span>🏰</span><strong>As 4 Casas</strong></div>
-            <div class="rpg-card-small" onclick="menuEscola('aulas')"><span>📜</span><strong>Aulas & Desafios</strong></div>
-            <div class="rpg-card-small" onclick="menuEscola('runas')"><span>💎</span><strong>Sistema de Runas</strong></div>
-            <div class="rpg-card-small" onclick="fecharModais()"><span>🚪</span><strong>Sair</strong></div>
+            <div class="rpg-card-small" onclick="menuEscola('runas')"><span>💎</span><strong>Runas & Encantos</strong></div>
+            <div class="rpg-card-small" onclick="menuEscola('pessoas')"><span>👥</span><strong>Membros</strong></div>
+            <div class="rpg-card-small" onclick="iniciarQuiz()" style="border-color:#ffd700;"><span>⚖️</span><strong>Teste de Casa</strong></div>
         </div>
+        
     `;
 }
 
 function menuEscola(aba) {
     const container = document.getElementById('conteudo-menu-capital');
-    const btnVoltar = `<button onclick="abrirEscolaMagia()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar à Academia</button>`;
+    const btnVoltar = `<button onclick="abrirEscolaMagia()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>`;
 
     if (aba === 'casas') {
         container.innerHTML = btnVoltar + `
             <div class="biblio-nav">
-                <div class="rpg-card-small" style="border-color:#ffd700;" onclick="detalheEscola('Aetheris')"><span>✨</span><strong>Aetheris</strong></div>
-                <div class="rpg-card-small" style="border-color:#2e8b57;" onclick="detalheEscola('Sylvana')"><span>🌿</span><strong>Sylvana</strong></div>
-                <div class="rpg-card-small" style="border-color:#ff4500;" onclick="detalheEscola('Ignis')"><span>🔥</span><strong>Ignis</strong></div>
-                <div class="rpg-card-small" style="border-color:#8a2be2;" onclick="detalheEscola('Umbra')"><span>🌑</span><strong>Umbra</strong></div>
+                <div class="rpg-card-small" style="border-color:#ffd700;" onclick="detalheCasa('Aetheris')"><span>✨</span><strong>Aetheris</strong></div>
+                <div class="rpg-card-small" style="border-color:#2e8b57;" onclick="detalheCasa('Sylvana')"><span>🌿</span><strong>Sylvana</strong></div>
+                <div class="rpg-card-small" style="border-color:#ff4500;" onclick="detalheCasa('Ignis')"><span>🔥</span><strong>Ignis</strong></div>
+                <div class="rpg-card-small" style="border-color:#8a2be2;" onclick="detalheCasa('Umbra')"><span>🌑</span><strong>Umbra</strong></div>
             </div>`;
     } 
-    else if (aba === 'aulas') {
-        container.innerHTML = btnVoltar + `
-            <div class="detalhe-box">
-                <h4 style="color:#ffd700; margin-top:0;">📝 Desafios de Aula (Presencial)</h4>
-                <div class="spell-item"><b>🧪 Alquimia Prática:</b> O mestre apresenta 3 frascos (ou descrições). Identifique a mistura correta para ganhar 1 Runa de Vida.</div>
-                <div class="spell-item"><b>✍️ Traçado de Runas:</b> Desenhe no papel a runa mostrada pelo mestre em 10 segundos sem errar os traços. Recompensa: 1 Runa Arcana.</div>
-                <div class="spell-item"><b>🧠 Enigma de Mana:</b> Resolva o enigma lógico do professor para desbloquear o fluxo de mana. Recompensa: Bônus de +2 no próximo dano mágico.</div>
-            </div>`;
-    }
     else if (aba === 'runas') {
         container.innerHTML = btnVoltar + `
             <div class="detalhe-box">
-                <h4 style="color:#ffd700; margin-top:0;">💎 Recompensas de Runas</h4>
-                <p>As runas ganhas nos desafios podem ser trocadas com o Mestre por:</p>
-                <div class="spell-item"><b>3 Runas:</b> Aprender uma Magia de Nível 0 extra.</div>
-                <div class="spell-item"><b>5 Runas:</b> Melhorar o dano de uma magia em +1d4 permanentemente.</div>
-                <div class="spell-item"><b>10 Runas:</b> Upgrade de classe (reduz o custo de ouro para evoluir).</div>
+                <h4 style="color:#ffd700; margin-top:0;">💎 Sistema de Runas e Encantamentos</h4>
+                <div class="spell-item"><b>📜 Magia Nível 0:</b> 2 Runas.</div>
+                <div class="spell-item"><b>🔶 Magia Nível 1:</b> 5 Runas.</div>
+                <div class="spell-item"><b>🔷 Magia Nível 2:</b> 9 Runas.</div>
+                <div class="spell-item"><b>⚔️ Encanto de Arma:</b> 6 Runas (+2 dano elemental).</div>
+                <div class="spell-item"><b>🛡️ Encanto de Armadura:</b> 6 Runas (-1 dano físico ou +2 HP).</div>
+                <div class="spell-item"><b>💍 Objeto Místico:</b> 12 Runas (+1 em Atributo).</div>
             </div>`;
+    }
+    else if (aba === 'pessoas') {
+        container.innerHTML = btnVoltar;
+        dadosEscola.pessoas.forEach(p => {
+            let img = p.foto ? `<img src="${p.foto}" class="foto-escola" onclick="verImagemEscola('${p.foto}')">` : `<div class="foto-escola">📸</div>`;
+            container.innerHTML += `
+                <div class="item-menu">
+                    ${img}
+                    <div class="texto-item">
+                        <h4>${p.nome}</h4>
+                        <span class="classe-char" style="color:#00bfff">${p.cargo}</span>
+                        <p>${p.desc}</p>
+                    </div>
+                </div>`;
+        });
     }
 }
 
-function detalheEscola(casa) {
+// Função específica para voltar para a lista de pessoas da escola
+function verImagemEscola(arquivo) {
+    verImagemEstatica(arquivo, function() {
+        restaurarMapaMenu();
+        document.getElementById('modal-capital').style.display = 'flex';
+        menuEscola('pessoas'); // Força a volta para o menu de pessoas da escola
+    });
+}
+
+function mostrarPergunta() {
+    const container = document.getElementById('conteudo-menu-capital');
+    const q = dadosEscola.perguntasQuiz[perguntaAtual];
+    
+    let botoes = "";
+    // Embaralha levemente a ordem para não ser viciado
+    const chaves = Object.keys(q.r);
+    chaves.forEach(casa => {
+        botoes += `<button class="botao-estiloso" onclick="responderQuiz('${casa}')">${q.r[casa]}</button>`;
+    });
+
+    container.innerHTML = `
+        <div class="detalhe-box">
+            <p style="text-align:center; color:#aaa; font-size: 12px;">Pergunta ${perguntaAtual + 1} de ${dadosEscola.perguntasQuiz.length}</p>
+            <h3 style="text-align:center; margin-bottom: 20px;">${q.p}</h3>
+            <div style="display: flex; flex-direction: column; gap: 8px;">${botoes}</div>
+        </div>`;
+}
+
+function detalheCasa(casa) {
     const container = document.getElementById('conteudo-menu-capital');
     const info = {
-        "Aetheris": { emoji: "✨", cor: "#ffd700", desc: "Focada na magia pura e manipulação do espaço. Seus alunos valorizam a lógica, a disciplina e o estudo dos planos superiores." },
-        "Sylvana": { emoji: "🌿", cor: "#2e8b57", desc: "Estudiosos da vida, natureza e cura. Possuem forte conexão com os espíritos e a flora de Blat'khyr." },
-        "Ignis": { emoji: "🔥", cor: "#ff4500", desc: "A casa dos magos de combate e destruição. Valorizam o ímpeto, a coragem e o poder bruto dos elementos." },
-        "Umbra": { emoji: "🌑", cor: "#8a2be2", desc: "Dedicada aos segredos das trevas, tempo e necromancia. Alunos perspicazes que não temem investigar o desconhecido." }
+        "Aetheris": { cor: "#ffd700", desc: "<b>Personalidade:</b> Alunos metódicos, lógicos e frequentemente vistos como distantes. Valorizam o intelecto acima da emoção e buscam entender as leis matemáticas da magia." },
+        "Sylvana": { cor: "#2e8b57", desc: "<b>Personalidade:</b> Alunos intuitivos e empáticos. Possuem uma calma natural e preferem a magia que flui organicamente. São os protetores da vida e do equilíbrio espiritual." },
+        "Ignis": { cor: "#ff4500", desc: "<b>Personalidade:</b> Impetuosos, corajosos e competitivos. Alunos desta casa acreditam que a magia é uma extensão de sua vontade e não temem o confronto direto." },
+        "Umbra": { cor: "#8a2be2", desc: "<b>Personalidade:</b> Curiosos, estoicos e perspicazes. Não acreditam em 'conhecimento proibido', apenas em falta de preparo. São ótimos investigadores e estrategistas silenciosos." }
     };
-    
     container.innerHTML = `<button onclick="menuEscola('casas')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
         <div class="detalhe-box" style="border-color:${info[casa].cor}">
-            <h3 style="color:${info[casa].cor}">${info[casa].emoji} Casa ${casa}</h3>
+            <h3 style="color:${info[casa].cor}">Casa ${casa}</h3>
             <p>${info[casa].desc}</p>
+        </div>`;
+}
+
+// --- SISTEMA DE QUIZ ---
+function iniciarQuiz() {
+    perguntaAtual = 0;
+    pontosQuiz = { Aetheris: 0, Sylvana: 0, Ignis: 0, Umbra: 0 };
+    mostrarPergunta();
+}
+
+
+function responderQuiz(casa) {
+    pontosQuiz[casa]++;
+    perguntaAtual++;
+    if (perguntaAtual < dadosEscola.perguntasQuiz.length) {
+        mostrarPergunta();
+    } else {
+        finalizarQuiz();
+    }
+}
+
+function finalizarQuiz() {
+    const container = document.getElementById('conteudo-menu-capital');
+    let vencedor = Object.keys(pontosQuiz).reduce((a, b) => pontosQuiz[a] > pontosQuiz[b] ? a : b);
+    
+    container.innerHTML = `
+        <div class="detalhe-box" style="text-align:center;">
+            <p>O veredito da Academia é...</p>
+            <h2 style="color:#ffd700;">Casa ${vencedor}!</h2>
+            <p>Seja bem-vindo, aprendiz. Honre as tradições de Blat'khyr.</p>
+            <button onclick="abrirEscolaMagia()" class="btn-popup" style="margin-top:20px; background:#444;">Voltar ao Menu</button>
         </div>`;
 }
 
@@ -1629,10 +1721,13 @@ function menuCapital(tipo) {
                     ${criarBtn("☠️ Procurados", "menuCapital('procurados')", "#8b0000")}
                 </section>
                 <section>
-                    <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">ℹ️ INFORMAÇÕES</div>
-                    ${criarBtn("📚 Biblioteca", "abrirBiblioteca()", "#483D8B")}
-                    ${criarBtn("🏦 Banco Imperial", "menuCapital('banco')", "#ffd700")}
+                
+            <section>
+                <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">ℹ️ INFORMAÇÕES</div>
+                    ${criarBtn("📚 Biblioteca Imperial", "abrirBiblioteca()", "#483D8B")}
+                    ${criarBtn("💼 Serviços", "menuServicos('menu')", "#ffd700")}
                     ${criarBtn("📸 Ver Cidade", "verImagemEstatica('Capital.png', () => { restaurarMapaMenu(); menuCapital('hub'); })", "#5F9EA0")}
+                </section>
                 </section>
             </div>`;
         return;
@@ -1705,6 +1800,184 @@ function menuCapital(tipo) {
 }
 
 
+const dadosServicos = {
+    alquimia: {
+        titulo: "🧪 Alquimia e Vigor: O Frasco de Mana",
+        lore: '"Poção é pra quem não tem tempo de dormir", diz o alquimista.',
+        categorias: {
+            "Recuperação e Estados": [
+                { nome: "Poção de Cura Menor", preco: "1g 50p", desc: "Recupera 2d6 + 2 de Vida." },
+                { nome: "Poção de Mana Menor", preco: "1g 50p", desc: "Recupera 1d6 + 2 de Mana." },
+                { nome: "Poção de Cura Média", preco: "4g", desc: "Recupera 4d6 + 4 de Vida." },
+                { nome: "Poção de Mana Média", preco: "4g", desc: "Recupera 2d6 + 3 de Mana." },
+                { nome: "Antídoto Comum", preco: "1g", desc: "Cura venenos e estado Adoecido." },
+                { nome: "Poção de Fôlego Renovado", preco: "2g 50p", desc: "Remove estado Cansado (beber não gasta turno)." }
+            ],
+            "Combate e Utilitários": [
+                { nome: "Estimulante de Combate", preco: "2g", desc: "Recupera 2 usos de habilidades ativas." },
+                { nome: "Óleo de Fogo (Armas)", preco: "2g", desc: "Próximos 3 ataques: +1d6 dano fogo + Queimando." },
+                { nome: "Elixir da Pele de Ferro", preco: "5g", desc: "+2 na CA por 5 turnos." },
+                { nome: "Soro do Olho de Águia", preco: "3g", desc: "+2 Precisão e Visão no Escuro (5 turnos)." },
+                { nome: "Pó de Desaparecimento", preco: "6g", desc: "Invisível por 2 turnos ou até atacar." },
+                { nome: "Solvente de Corrosão", preco: "4g", desc: "Arremessável: 1d8 dano ácido e -1 CA permanente." },
+                { nome: "Destilado de Mente Alerta", preco: "5g", desc: "+2 Inteligência e Sabedoria por 5 turnos." },
+                { nome: "Elixir de Fala Natural", preco: "2g", desc: "Fala com animais/plantas por 10 min." },
+                { nome: "Estimulante de Corrida", preco: "5g", desc: "+2 Destreza por 5 turnos." },
+                { nome: "Poção Aleatória", preco: "50p", desc: "Garante um efeito aleatório." }
+            ]
+        }
+    },
+    forja: {
+        titulo: "🛡️ Forja de Aço e Couro",
+        lore: "Equipamentos de combate de alta qualidade.",
+        categorias: {
+            "Armas de Combate": [
+                { nome: "Espada de Aço Tramontina", preco: "8g", desc: "Dano 1d10 + Força. Balanceada e superior." },
+                { nome: "Arco Composto de Caça", preco: "12g", desc: "Dano 1d8 + Precisão. Perfurante (ignora 1 CA)." },
+                { nome: "Manoplas de Impacto", preco: "10g", desc: "Dano 1d8 + Força. Pode empurrar 2m." },
+                { nome: "Daga de Sangue (Par)", preco: "12g", desc: "Dano 1d6 + Destreza. Causa Sangramento (1d4/turno)." },
+                { nome: "Martelo Quebra-Crânios", preco: "12g", desc: "Dano 2d6 + Força. Quebra escudos de madeira." },
+                { nome: "Lança de Falange", preco: "10g", desc: "Dano 1d8 + 1 + Força. Ataca em média distância." }
+            ],
+            "Armaduras e Defesa": [
+                { nome: "Armadura de Couro Batido", preco: "12g", desc: "CA 13. Leve e sem penalidades." },
+                { nome: "Manto de Couro Reforçado", preco: "14g", desc: "CA 13. Reduz dano de flechas em 1." },
+                { nome: "Cota de Malha Imperial", preco: "15g", desc: "CA 14. Penalidade em Destreza." },
+                { nome: "Armadura de Placas Parcial", preco: "18g", desc: "CA 15. Penalidade -2 Destreza; sem furtividade." },
+                { nome: "Escudo Reforçado", preco: "8g", desc: "+1 CA. Pode usar ação para +2 Defesa." },
+                { nome: "Braçadeiras de Wyvern", preco: "9g", desc: "Reação Aparar: reduz dano físico em 2d6 (1x/combate)." }
+            ]
+        }
+    },
+    emporio: {
+        titulo: "🔮 Empório Arcano: O Olho que tudo vê",
+        lore: "Itens que flutuam e roupas que brilham sob a luz fraca.",
+        categorias: {
+            "Focos Arcanos e Vestes": [
+                { nome: "Cajado de Aprendiz", preco: "8g", desc: "+1 ao realizar magias." },
+                { nome: "Orbe de Cristal Estilhaçado", preco: "12g", desc: "+1 em testes e +1 dano em magias." },
+                { nome: "Cetro de Cristal Arcano", preco: "12g", desc: "+2 ao realizar magias." },
+                { nome: "Túnica de Tecido Encantado", preco: "11g", desc: "CA 11. Reduz dano mágico em 2." },
+                { nome: "Manto do Teurgista", preco: "14g", desc: "CA 11. +2 de Mana Máxima." },
+                { nome: "Manto Arcano", preco: "12g", desc: "CA 11. Reduz dano mágico em 2." }
+            ],
+            "Itens Mágicos": [
+                { nome: "Anel da Estabilidade", preco: "10g", desc: "Imune a ser derrubado ou empurrado." },
+                { nome: "Amuleto do Eco Mental", preco: "13g", desc: "1x/dia: Re-conjura magia sem gastar mana." },
+                { nome: "Lanterna de Almas", preco: "8g", desc: "Revela pegadas mágicas recentes (2h)." },
+                { nome: "Bolsa de Dimensão de Bolso", preco: "16g", desc: "Carrega até 50kg extras sem peso." },
+                { nome: "Apito de Invocação", preco: "7g", desc: "Sopre para invocar criatura aleatória." }
+            ]
+        }
+    },
+    biblioteca: {
+        titulo: "📜 Biblioteca de Cristal: Pergaminhos",
+        lore: "Pergaminhos que SEMPRE FUNCIONAM, mas viram pó após o uso.",
+        categorias: {
+            "Utilidade e Combate": [
+                { nome: "Luz Eterna (3 usos)", preco: "2 PO", desc: "Esfera de luz por 1 hora." },
+                { nome: "Mãos Mágicas (3 usos)", preco: "2 PO", desc: "Move objetos de 5kg a 10m." },
+                { nome: "Tradução Instantânea (3 usos)", preco: "3 PO", desc: "Lê qualquer língua por 10 min." },
+                { nome: "Escudo Arcano (2 usos)", preco: "4 PO", desc: "+4 Defesa contra o próximo ataque." },
+                { nome: "Flecha Elétrica (2 usos)", preco: "5 PO", desc: "2d6 + Int dano área; chance de atordoar." },
+                { nome: "Névoa Obscurecedora (2 usos)", preco: "4 PO", desc: "Nuvem de fumaça por 3 turnos." }
+            ],
+            "Poder e Especialista (1 uso)": [
+                { nome: "Bola de Fogo", preco: "7 PO", desc: "4d6 + Int dano fogo (área 5m)." },
+                { nome: "Teia de Aranha", preco: "6 PO", desc: "Imobiliza inimigos em área (Teste Força)." },
+                { nome: "Sopro de Cura", preco: "8 PO", desc: "Recupera 3d6 Vida de todos aliados (3m)." },
+                { nome: "Invocação de Golem", preco: "12 PO", desc: "Guardião com 30 Vida por 5 turnos." },
+                { nome: "Paralisia Temporal", preco: "10 PO", desc: "Congela inimigo por 2 turnos." },
+                { nome: "Terremoto Localizado", preco: "11 PO", desc: "3d8 dano físico e derruba inimigos." },
+                { nome: "Selagem (Reação)", preco: "5 PO", desc: "Tenta capturar magia inimiga no papel." },
+                { nome: "Teletransporte Emergência", preco: "9 PO", desc: "Grupo viaja para local aleatório." }
+            ]
+        }
+    },
+    animais: {
+        titulo: "🐾 O Cocho e a Sela: Animais e Criaturas",
+        lore: "O mercado de criaturas vende seres que não deveriam existir. Prepare o ouro.",
+        categorias: {
+            "Mascotes Místicos": [
+                { nome: "Corcuja", preco: "35g", desc: "<b>Habilidade:</b> Sentidos Compartilhados (100m). <br><b>Bônus:</b> +2 em Sabedoria para o dono." },
+                { nome: "Dragão de Fumaça", preco: "45g", desc: "<b>Habilidade:</b> Cortina de Cinzas (camuflagem 1 turno). <br><b>Bônus:</b> +2 em Inteligência e +1 em Carisma." },
+                { nome: "Levim (Lontra Branca)", preco: "28g", desc: "<b>Habilidade:</b> Agilidade Fluida (natação rápida). <br><b>Bônus:</b> +1 em Destreza." },
+                { nome: "Gafa (Gato Espiritual)", preco: "50g", desc: "<b>Habilidade:</b> Melodia do Sono e Voo. <br><b>Bônus:</b> +2 em Sabedoria, Inteligência e Carisma." },
+                { nome: "Gato Alado", preco: "30g", desc: "<b>Habilidade:</b> Bote Aéreo (busca itens no alto). <br><b>Bônus:</b> +2 em Destreza." },
+                { nome: "Caelho (Cachorro-Coelho)", preco: "25g", desc: "<b>Habilidade:</b> Super Salto e Farejador de Tesouros. <br><b>Bônus:</b> +1 em Destreza e +1 em Precisão." },
+                { nome: "Correiro (Coruja Guerreira)", preco: "40g", desc: "<b>Habilidade:</b> Guarda Armada (reação de 2d4+2 de dano). <br><b>Bônus:</b> +2 em Força." },
+                { nome: "Girapo (Girafa-Sapo)", preco: "22g", desc: "<b>Habilidade:</b> Língua Longa (pega itens/desarma à distância). <br><b>Bônus:</b> +1 em Constituição." },
+                { nome: "Porco-Galho", preco: "32g", desc: "<b>Habilidade:</b> Espinhos Defensivos (inimigo corpo a corpo sofre 2d4). <br><b>Bônus:</b> +2 em Constituição e +1 em Força." },
+                { nome: "Latorvo (Lagarto-Corvo)", preco: "38g", desc: "<b>Habilidade:</b> Olhar Carniceiro (detecta inimigos fracos). <br><b>Bônus:</b> +2 em Precisão." },
+                { nome: "Maguin (Pinguim Mago)", preco: "60g", desc: "<b>Habilidade:</b> Reserva Arcana (recupera 2d6 Mana) e Replica Feitiço. <br><b>Bônus:</b> +3 em Sabedoria e Inteligência." },
+                { nome: "Taractet (Aranha Tecelã)", preco: "26g", desc: "<b>Habilidade:</b> Fio de Prumo (teia para escalar ou amarrar). <br><b>Bônus:</b> +1 em Inteligência." },
+                { nome: "Beholdin (Mini Beholder)", preco: "85g", desc: "<b>Habilidade:</b> Olhar Paralisante (2 turnos) ou Laser (3d6). <br><b>Bônus:</b> +3 em TODOS os atributos." }
+            ],
+            "Montarias de Elite": [
+                { nome: "Calorro (Cão Gigante)", preco: "35g", desc: "Extremamente leal. Vantagem em mordida se estiver montado." },
+                { nome: "Carreiro (Cabra Gigante)", preco: "40g", desc: "Ignora terreno difícil em montanhas/cavernas. Escala vertical." },
+                { nome: "Caveixe (Anfíbia)", preco: "45g", desc: "Velocidade dobrada na água. Precisa hidratar a cada 4 horas." },
+                { nome: "Draguês (Terrestre)", preco: "70g", desc: "Máquina de guerra (não voa). CA 15 e ataque de cauda em área." },
+                { nome: "Grifo Imperial", preco: "120g", desc: "Voo Total. Exige alto nível de adestramento ou empatia animal." },
+                { nome: "Felano (Gato Gigante)", preco: "55g", desc: "Silencioso. Permite testes de Furtividade mesmo montado." },
+                { nome: "Mamute", preco: "90g", desc: "Fortaleza móvel (50 Vida). Carrega o squad e ignora gelo." },
+                { nome: "Tigre de Bengala Real", preco: "65g", desc: "Ataque rápido. Intimida inimigos ao iniciar o combate." },
+                { nome: "Lagartão (Lagarto Gigante)", preco: "45g", desc: "Anda em tetos e paredes. Útil para exploração vertical." },
+                { nome: "Rasapo (Raposa Gigante)", preco: "50g", desc: "Ágil. Concede +2 em Iniciativa e desvia de ataques em área." },
+                { nome: "Pequeno Dragão Voador", preco: "150g", desc: "O ápice. Voo, lufada de fogo (4d6) e entende comandos complexos." }
+            ]
+        }
+    }
+};
+
+function menuServicos(aba) {
+    const container = document.getElementById('conteudo-menu-capital');
+    const titulo = document.getElementById('titulo-menu-capital');
+    
+    if (aba === 'menu') {
+        titulo.innerText = "💼 Serviços da Capital";
+        container.innerHTML = `
+            <button onclick="menuCapital('hub')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar ao Painel</button>
+            <div class="biblio-nav">
+                <div class="rpg-card-small" onclick="menuServicos('banco')"><span>🏦</span><strong>Banco</strong></div>
+                <div class="rpg-card-small" onclick="menuServicos('alquimia')"><span>🧪</span><strong>Alquimia</strong></div>
+                <div class="rpg-card-small" onclick="menuServicos('forja')"><span>🛡️</span><strong>Forja</strong></div>
+                <div class="rpg-card-small" onclick="menuServicos('emporio')"><span>🔮</span><strong>Empório</strong></div>
+                <div class="rpg-card-small" onclick="menuServicos('biblioteca')"><span>📜</span><strong>Pergaminhos</strong></div>
+                <div class="rpg-card-small" onclick="menuServicos('animais')"><span>🐾</span><strong>Animais</strong></div>
+            </div>`;
+    } 
+    else if (aba === 'banco') {
+        // Reutiliza exatamente o que você já tinha no Banco
+        titulo.innerText = "🏦 Banco Imperial";
+        let html = `<button onclick="menuServicos('menu')" class="btn-popup" style="margin-bottom: 15px; background: #444; width: 100%;">⬅ Voltar aos Serviços</button>`;
+        html += `<h4 style="color:#ffdead; margin-top:0;">Pacotes de Serviços</h4><table class="tabela-banco"><tr><th>Pacote</th><th>Custo</th><th>Benefícios</th></tr>`;
+        dadosGerais.banco.forEach(item => { html += `<tr><td>${item.nome}</td><td class="preco-banco">${item.custo}</td><td>${item.desc}</td></tr>`; });
+        html += `</table><h4 style="color:#ffdead; margin-top:20px;">Investimentos</h4><ul style="color:#ccc;">`;
+        dadosGerais.investimentos.forEach(inv => { html += `<li><strong>${inv.nome}:</strong> ${inv.risco} (Min ${inv.min})</li>`; });
+        container.innerHTML = html + `</ul><div class="nota-banco"><p>Obs: Garantia total sobre bens guardados.</p><p>Obs 2: Troca de pacote requer preço integral.</p></div>`;
+    }
+    else {
+        const dados = dadosServicos[aba];
+        titulo.innerText = "Lojas da Capital";
+        let html = `<button onclick="menuServicos('menu')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar aos Serviços</button>`;
+        html += `<div class="detalhe-box">
+                    <h3 style="color:#ffd700; margin-top:0;">${dados.titulo}</h3>
+                    <p style="font-style:italic; font-size:13px; color:#aaa;">${dados.lore}</p>`;
+        
+        for (let cat in dados.categorias) {
+            html += `<div class="spell-level">${cat}</div>`;
+            dados.categorias[cat].forEach(i => {
+                html += `<div class="spell-item">
+                            <b style="color:#87CEEB;">${i.nome}</b> 
+                            <span style="float:right; color:#ffd700; font-weight:bold;">${i.preco}</span>
+                            <br><small style="color:#ccc; display:block; margin-top:4px;">${i.desc}</small>
+                         </div>`;
+            });
+        }
+        container.innerHTML = html + `</div>`;
+    }
+}
 
 /**
  * Exibe a grade de 12 deuses do panteão com seus títulos e domínios
@@ -2803,7 +3076,7 @@ if (nomeDoMapa === 'Planos.jpg') {
             else if (nome === "Ilha Paradisíaca") {
     if (arquivo) botoes += criarBtn("📸 Ver Ilha", `verImagemEstatica('${arquivo}')`, "#5F9EA0");
     // Adicionando a Importação com o estilo novo
-    botoes += criarBtn("📦 Importação", "verImagemEstatica('bloqueado.jpg')", "#FF8C00");
+    botoes += criarBtn("📦 Importação", "abrirImportacaoIlha()", "#FF8C00");
 }
             // --- PONTOS GENÉRICOS (VILAREJOS / PROVÍNCIAS) ---
             else {
@@ -2864,6 +3137,82 @@ if (nomeDoMapa === 'Planos.jpg') {
     }
     
 
+// --- SISTEMA DE IMPORTAÇÃO DA ILHA ---
+// --- DADOS DE IMPORTAÇÃO (ITENS CAROS E EXÓTICOS) ---
+// --- DADOS DE IMPORTAÇÃO DA ILHA (MISTERIOSOS E CAROS) ---
+// --- DADOS DE IMPORTAÇÃO DA ILHA (MISTERIOSOS, EXÓTICOS E CAROS) ---
+const dadosIlha = {
+    alquimia: [
+        { item: "🥥 Fruta do Esquecimento", preco: "35 Golds", desc: "Uma fruta roxa que cheira a infância. Dizem que apaga uma lembrança dolorosa... ou uma perícia inteira." },
+        { item: "🧪 Extrato de Coral Pulsante", preco: "48 Golds", desc: "O líquido vibra dentro do vidro. Beber pode harmonizar seu sangue ou fazer seu coração bater no ritmo errado." },
+        { item: "🌪️ Essência de Tempestade Engarrafada", preco: "60 Golds", desc: "Um redemoinho em miniatura. Se quebrado, pode limpar o campo de batalha ou engolir o esquadrão." },
+        { item: "💧 Lágrima de Sereia Destilada", preco: "75 Golds", desc: "Um óleo denso e salgado. Dizem que permite ver a beleza em qualquer coisa, ou revela a face mais monstruosa da realidade." },
+        { item: "🍄 Esporo de Cogumelo Abissal", preco: "42 Golds", desc: "Pó bioluminescente. Pode causar alucinações divinas ou uma conexão psíquica temporária com o fundo do mar." }
+    ],
+    equipamentos: [
+        { item: "🧥 Manto de Seda de Sereia", preco: "85 Golds", desc: "Tecido frio e translúcido. Garante movimentos graciosos, mas dizem que o dono começa a ouvir cantos vindo do nada." },
+        { item: "⚔️ Lâmina de Osso de Leviatã", preco: "120 Golds", desc: "Uma espada orgânica que parece estar viva. Ela ignora defesas, mas pode tentar morder a mão de quem a empunha." },
+        { item: "🛡️ Escudo de Casco de Tartaruga-Ansiã", preco: "95 Golds", desc: "Duro como diamante. O peso é insuportável para os fracos, mas protege contra o que os olhos não veem." },
+        { item: "🏹 Arco de Madeira de Naufrágio", preco: "110 Golds", desc: "Cheira a sal e madeira podre, mas nunca quebra. Suas flechas parecem ser guiadas pelas correntes marítimas, mesmo fora da água." },
+        { item: "👟 Sandálias de Vidro Vulcânico", preco: "70 Golds", desc: "Caminhar com elas é como andar sobre brasas. Dizem que permitem ignorar qualquer obstáculo terrestre, ao custo de feridas persistentes nos pés." }
+    ],
+    pets: [
+        { item: "🐙 Pólipo das Nuvens", preco: "110 Golds", desc: "Uma pequena criatura que flutua no ar. Não come, mas parece se alimentar das cores ao redor. Efeito desconhecido." },
+        { item: "🥚 Ovo Manchado de Púrpura", preco: "150 Golds", desc: "Ninguém sabe o que tem dentro. O vendedor garante que 'escolhe o dono'. Não há devoluções após o nascimento." },
+        { item: "🦀 Caranguejo de Joia", preco: "75 Golds", desc: "Um crustáceo que brilha como rubi. Ele gosta de enterrar itens pequenos e os devolve... ligeiramente alterados." },
+        { item: "🐡 Baiacu de Mana", preco: "90 Golds", desc: "Um peixe que levita dentro de uma bolha de água. Ele infla na presença de magia poderosa, mas pode explodir se for perturbado." },
+        { item: "🦑 Água-viva de Memória", preco: "135 Golds", desc: "Flutua sobre a cabeça do dono como um chapéu. Dizem que armazena feitiços lançados contra você, mas pode esquecer de devolvê-los." }
+    ],
+    reliquias: [
+        { item: "🧭 Bússola Desorientada", preco: "130 Golds", desc: "O ponteiro não aponta para o Norte. Dizem que ele aponta para o que você mais precisa, mesmo que você não queira ir até lá." },
+        { item: "📦 Baú Lacrado com Algas Místicas", preco: "200 Golds", desc: "O ápice do risco. Pode conter um artefato de um deus caído ou apenas areia molhada e uma maldição ancestral." },
+        { item: "🐚 Concha dos Sussurros Mortais", preco: "180 Golds", desc: "Ao colocar no ouvido, você ouve segredos de pessoas que morreram no mar. Pode revelar tesouros escondidos ou levar à loucura total." },
+        { item: "🗿 Totem do Rei de Coral", preco: "165 Golds", desc: "Uma estatueta que sangra água salgada. Quando fincada no solo, a terra ao redor torna-se instável, como se fosse o convés de um navio em tempestade." },
+        { item: "🪞 Espelho de Água Parada", preco: "145 Golds", desc: "A superfície não reflete o presente. Mostra como o espectador será no momento de sua morte. Use por sua conta e risco." }
+    ]
+};
+
+function abrirImportacaoIlha() {
+    const container = document.getElementById('conteudo-menu-capital');
+    const modal = document.getElementById('modal-capital');
+    document.getElementById('titulo-menu-capital').innerText = "📦 Importações da Ilha";
+    modal.style.display = 'flex';
+    
+    container.innerHTML = `
+        <p style="color:#aaa; font-style:italic; text-align:center; margin-bottom:15px;">"Artigos de luxo e recursos raros do arquipélago."</p>
+        <div class="biblio-nav">
+            <div class="rpg-card-small" onclick="menuIlha('alquimia')"><span>🧪</span><strong>Alquimia</strong></div>
+            <div class="rpg-card-small" onclick="menuIlha('equipamentos')"><span>⚔️</span><strong>Equipamentos</strong></div>
+            <div class="rpg-card-small" onclick="menuIlha('pets')"><span>🐘</span><strong>Criaturas</strong></div>
+            <div class="rpg-card-small" onclick="menuIlha('reliquias')"><span>🔱</span><strong>Relíquias</strong></div>
+        </div>
+    `;
+}
+
+function menuIlha(categoria) {
+    const container = document.getElementById('conteudo-menu-capital');
+    const btnVoltar = `<button onclick="abrirImportacaoIlha()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar ao Catálogo</button>`;
+    
+    const titulos = {
+        alquimia: "Consumíveis Exóticos",
+        equipamentos: "Materiais de Forja e Vestes",
+        pets: "Ovos e Montarias",
+        reliquias: "Artefatos Únicos"
+    };
+
+    let html = btnVoltar + `<div class="detalhe-box"><h4 style="color:#ffd700; margin-top:0;">🛒 ${titulos[categoria]}</h4>`;
+    
+    dadosIlha[categoria].forEach(i => {
+        html += `
+            <div class="spell-item">
+                <b style="color:#87CEEB;">${i.item}</b> 
+                <span style="float:right; color:#ffd700; font-weight:bold;">${i.preco}</span>
+                <br><small style="color:#ccc; display:block; margin-top:5px;">${i.desc}</small>
+            </div>`;
+    });
+    
+    container.innerHTML = html + `</div>`;
+}
 
 /**
  * Atualiza visual dos botões de calculadora de viagem (Menu + Região)
