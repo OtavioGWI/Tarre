@@ -648,7 +648,73 @@
  * banco imperial, bestiário, histórico de aventuras, senhas, cálculo de rotas */
 
 // Variável de controle: qual o andar máximo que o grupo já liberou?
+// --- SISTEMA DA ESCOLA DE MAGIA ---
+function abrirEscolaMagia() {
+    const container = document.getElementById('conteudo-menu-capital');
+    const modal = document.getElementById('modal-capital');
+    document.getElementById('titulo-menu-capital').innerText = "🎓 Academia de Arcana";
+    modal.style.display = 'flex';
+    
+    container.innerHTML = `
+        <p style="color:#aaa; font-style:italic; text-align:center; margin-bottom:15px;">"Onde o conhecimento molda a realidade."</p>
+        <div class="biblio-nav">
+            <div class="rpg-card-small" onclick="menuEscola('casas')"><span>🏰</span><strong>As 4 Casas</strong></div>
+            <div class="rpg-card-small" onclick="menuEscola('aulas')"><span>📜</span><strong>Aulas & Desafios</strong></div>
+            <div class="rpg-card-small" onclick="menuEscola('runas')"><span>💎</span><strong>Sistema de Runas</strong></div>
+            <div class="rpg-card-small" onclick="fecharModais()"><span>🚪</span><strong>Sair</strong></div>
+        </div>
+    `;
+}
 
+function menuEscola(aba) {
+    const container = document.getElementById('conteudo-menu-capital');
+    const btnVoltar = `<button onclick="abrirEscolaMagia()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar à Academia</button>`;
+
+    if (aba === 'casas') {
+        container.innerHTML = btnVoltar + `
+            <div class="biblio-nav">
+                <div class="rpg-card-small" style="border-color:#ffd700;" onclick="detalheEscola('Aetheris')"><span>✨</span><strong>Aetheris</strong></div>
+                <div class="rpg-card-small" style="border-color:#2e8b57;" onclick="detalheEscola('Sylvana')"><span>🌿</span><strong>Sylvana</strong></div>
+                <div class="rpg-card-small" style="border-color:#ff4500;" onclick="detalheEscola('Ignis')"><span>🔥</span><strong>Ignis</strong></div>
+                <div class="rpg-card-small" style="border-color:#8a2be2;" onclick="detalheEscola('Umbra')"><span>🌑</span><strong>Umbra</strong></div>
+            </div>`;
+    } 
+    else if (aba === 'aulas') {
+        container.innerHTML = btnVoltar + `
+            <div class="detalhe-box">
+                <h4 style="color:#ffd700; margin-top:0;">📝 Desafios de Aula (Presencial)</h4>
+                <div class="spell-item"><b>🧪 Alquimia Prática:</b> O mestre apresenta 3 frascos (ou descrições). Identifique a mistura correta para ganhar 1 Runa de Vida.</div>
+                <div class="spell-item"><b>✍️ Traçado de Runas:</b> Desenhe no papel a runa mostrada pelo mestre em 10 segundos sem errar os traços. Recompensa: 1 Runa Arcana.</div>
+                <div class="spell-item"><b>🧠 Enigma de Mana:</b> Resolva o enigma lógico do professor para desbloquear o fluxo de mana. Recompensa: Bônus de +2 no próximo dano mágico.</div>
+            </div>`;
+    }
+    else if (aba === 'runas') {
+        container.innerHTML = btnVoltar + `
+            <div class="detalhe-box">
+                <h4 style="color:#ffd700; margin-top:0;">💎 Recompensas de Runas</h4>
+                <p>As runas ganhas nos desafios podem ser trocadas com o Mestre por:</p>
+                <div class="spell-item"><b>3 Runas:</b> Aprender uma Magia de Nível 0 extra.</div>
+                <div class="spell-item"><b>5 Runas:</b> Melhorar o dano de uma magia em +1d4 permanentemente.</div>
+                <div class="spell-item"><b>10 Runas:</b> Upgrade de classe (reduz o custo de ouro para evoluir).</div>
+            </div>`;
+    }
+}
+
+function detalheEscola(casa) {
+    const container = document.getElementById('conteudo-menu-capital');
+    const info = {
+        "Aetheris": { emoji: "✨", cor: "#ffd700", desc: "Focada na magia pura e manipulação do espaço. Seus alunos valorizam a lógica, a disciplina e o estudo dos planos superiores." },
+        "Sylvana": { emoji: "🌿", cor: "#2e8b57", desc: "Estudiosos da vida, natureza e cura. Possuem forte conexão com os espíritos e a flora de Blat'khyr." },
+        "Ignis": { emoji: "🔥", cor: "#ff4500", desc: "A casa dos magos de combate e destruição. Valorizam o ímpeto, a coragem e o poder bruto dos elementos." },
+        "Umbra": { emoji: "🌑", cor: "#8a2be2", desc: "Dedicada aos segredos das trevas, tempo e necromancia. Alunos perspicazes que não temem investigar o desconhecido." }
+    };
+    
+    container.innerHTML = `<button onclick="menuEscola('casas')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
+        <div class="detalhe-box" style="border-color:${info[casa].cor}">
+            <h3 style="color:${info[casa].cor}">${info[casa].emoji} Casa ${casa}</h3>
+            <p>${info[casa].desc}</p>
+        </div>`;
+}
 
 const dadosTorre = [
     { andar: 12, titulo: "O Primeiro Sábio", nome: "Aurelius, o Eterno", desc: "O pilar da sabedoria e fundador da ordem.", cor: "#ffd700", aprendizes: 1 },
@@ -2456,7 +2522,7 @@ function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoEx
 
         if (nomeDoMapa === 'Blat_khyr.jpg') {
             // --- PONTO DA ESCOLA DE MAGIA (JÁ EXISTIA) ---
-            const btnEscola = criarBtn("🎓 Escola de Magia", "abrirModalSenha('poder', 'bloqueado.jpg', 'imagem')", "#800080");
+            const btnEscola = criarBtn("🎓 Escola de Magia", "abrirModalSenha('poder', 'abrirEscolaMagia()', 'funcao')", "#800080");
             criarPontoLocal([382, 1359], "Capital de Blat'khyr", "Elfos", "cidade magica.png", true, btnEscola);
             
             // --- OUTROS PONTOS ---
