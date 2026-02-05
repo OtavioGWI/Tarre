@@ -66,7 +66,7 @@
 <head>
     <title>Mapa RPG Interativo 8K</title>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -75,7 +75,14 @@
     
     /* Fundo Azul Escolhido (#4F686E) */
     body { margin: 0; background: #4F686E; overflow: hidden; font-family: sans-serif; }
-    #map { height: 100vh; width: 100vw; z-index: 1; background: #4F686E; }
+    /* map: usa calc no mobile para evitar overflow quando menus expandem */
+    #map { height: 100vh; width: 100vw; z-index: 1; background: #4F686E; min-height: 320px; }
+    @media (max-width: 600px) {
+      #map { height: calc(100vh - 88px); }
+      /* Controles de zoom maiores e mais fáceis de tocar em mobile */
+      .leaflet-control-zoom a { width: 44px; height: 44px; line-height: 44px; font-size: 20px; }
+      .leaflet-control-zoom { box-shadow: 0 2px 8px rgba(0,0,0,0.35); border-radius: 10px; }
+    }
 
     /* MENU LATERAL (PRETO) */
     #menu-provincias {
@@ -191,6 +198,14 @@
     border-color: #444 !important;
     color: #ddd !important;
     padding-left: 10px !important;
+}
+
+/* Estado desabilitado para botões de ferramenta (feedback claro em mobile) */
+.botao-provincia[disabled], .btn-disabled {
+    opacity: 0.55 !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    transform: none !important;
 }
 
 /* 3. PRIORIDADE TOTAL: Se estiver ON, fica verde e ignora qualquer outro hover ou cor */
@@ -740,6 +755,8 @@ function detalharAndar(num) {
     let fatorEscala = 0.23;                // Varia por mapa: 0.23 continental, 0.13 províncias, 0.5 planos
     let menuAtualAberto = null;            // 'banco', 'bestiario', 'esquadrao', 'deuses', etc (essencial para voltar)
     let selecaoAtual = null;               // Rastreia qual região foi clicada (para planos)
+    // Guarda os limites da imagem atualmente carregada (usado em reajustes de layout)
+    let ultimaImagemBounds = null;
     
 /**
  * ÍCONE CUSTOMIZADO - Marcador de coordenadas
@@ -826,6 +843,12 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom) {
     L.control.zoom({ position: 'topleft' }).addTo(map);
     L.imageOverlay(arquivo, limitesImagem).addTo(map);
     map.fitBounds(limitesImagem);
+    // guarda os limites da imagem para possíveis reajustes após resize
+    ultimaImagemBounds = limitesImagem;
+    // pequeno delay para permitir que o layout (menus, headers) estabilize antes de forçar o redraw
+    setTimeout(() => { try { map.invalidateSize(); } catch (err) { /* noop */ } }, 120);
+    // sincroniza visibilidade do menu (mobile/desktop) imediatamente após montar o mapa
+    atualizarVisibilidadeMenuMobile();
     
     // Listener: prioriza medição > coordenadas > marcadores
     map.on('click', function(e) {
@@ -916,6 +939,26 @@ function atualizarVisibilidadeMenuMobile() {
         if (listaFerramentas) listaFerramentas.style.display = 'block';
     }
 }
+
+// Debounce utilitário leve — usado para evitar chamadas excessivas durante resize
+function debounce(fn, wait = 150) {
+    let t = null;
+    return function(...args) {
+        clearTimeout(t);
+        t = setTimeout(() => fn.apply(this, args), wait);
+    };
+}
+
+// Resize responsivo: atualiza menu e força Leaflet a recalcular dimensões (debounced)
+const handleResizeMap = debounce(function() {
+    atualizarVisibilidadeMenuMobile();
+    if (map && typeof map.invalidateSize === 'function') {
+        try { map.invalidateSize(); } catch (err) { /* noop */ }
+    }
+}, 180);
+
+window.addEventListener('resize', handleResizeMap, { passive: true });
+window.addEventListener('orientationchange', handleResizeMap, { passive: true });
 
 /**
  * Carrega o mapa do continente (vista inicial do jogo)
@@ -2737,6 +2780,9 @@ if (nomeDoMapa === 'Planos.jpg') {
         criarPonto([2300, 3400], "Vilarejo", "Sem detalhes", 'none');
         criarPonto([1830, 4354], "Vilarejo", "Sem detalhes", 'none');
         criarPonto([1630, 3054], "Vilarejo", "Sem detalhes", 'none');
+        criarPonto([1640, 6736], "Monstro Marinho", "Eu não queria estar nesse barco", 'none');
+        criarPonto([2516, 996], "Monstro Marinho", "Oxi, uma tainha gigante", 'none');
+        criarPonto([412, 460], "Nuvens", "É igual algodão-doce", 'none');
         criarPonto([2464, 4974], "Ilha de Blat'khyr", "Cadê?", "Ilha.png", 'imagem');
         
         criarPonto([1838, 3526], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
@@ -2757,13 +2803,21 @@ if (nomeDoMapa === 'Planos.jpg') {
 function atualizarBotaoMedidor(estado) {
     const botoes = [document.getElementById('btn-medidor'), document.getElementById('btn-medidor-prov')];
     let texto = (estado === 'medindo') ? "🏁 Finalizar Rota" : "📏 Calculadora de Viagem";
+
     botoes.forEach(btn => {
         if (!btn) return;
-        btn.innerHTML = texto;
+
+        // Se estiver em modo de medição, mostra quantos pontos faltam para permitir finalizar
         if (estado === 'medindo') {
+            // Mostrar apenas o estado (sem aviso de pontos faltando)
+            btn.innerHTML = texto;
             btn.classList.add('btn-ferramenta-ativa');
+            btn.classList.remove('btn-disabled');
         } else {
+            btn.innerHTML = texto;
             btn.classList.remove('btn-ferramenta-ativa');
+            btn.removeAttribute('disabled');
+            btn.classList.remove('btn-disabled');
         }
     });
 }
@@ -2822,6 +2876,9 @@ function processarCliqueMedicao(latlng) {
                 color: '#ff4444', weight: 3, dashArray: '5, 10'
             }).addTo(grupoRota);
         }
+
+        // Atualiza o botão (mostra quantos pontos faltam / habilita o finalizar)
+        atualizarBotaoMedidor('medindo');
     }
 
 /**
@@ -2832,60 +2889,77 @@ function processarCliqueMedicao(latlng) {
  * Abre modal com tabela de resultados
  */
 function calcularResultados() {
-        let distanciaTotalPixels = 0;
-
-        // Soma distância de todos os segmentos
-        for (let i = 0; i < pontosRota.length - 1; i++) {
-            distanciaTotalPixels += map.distance(pontosRota[i], pontosRota[i+1]);
+        // Validação mínima
+        if (!pontosRota || pontosRota.length < 2) {
+            alert('Coloque pelo menos 2 pontos para calcular a rota.');
+            return;
         }
 
-        // --- CÁLCULOS ---
-        const distanciaReal = distanciaTotalPixels * fatorEscala;
+        try {
+            let distanciaTotalPixels = 0;
 
-        // CALIBRAÇÃO: 30 km/dia é ritmo padrão de marcha RPG
-        const kmPorDiaPe = 30; 
-        
-        const diasPe = (distanciaReal / kmPorDiaPe).toFixed(1);
-        const diasMontariaLenta = (distanciaReal / (kmPorDiaPe * 1.5)).toFixed(1); // Mula
-        const diasMontariaNormal = (distanciaReal / (kmPorDiaPe * 2.0)).toFixed(1); // Cavalo
-        const diasMontariaRapida = (distanciaReal / (kmPorDiaPe * 4.0)).toFixed(1); // Voo
+            // Soma distância de todos os segmentos (Leaflet retorna unidades do CRS -- aqui pixels)
+            for (let i = 0; i < pontosRota.length - 1; i++) {
+                distanciaTotalPixels += map.distance(pontosRota[i], pontosRota[i+1]);
+            }
 
-        // ECONOMIA: 2.5 Ouro taxa + 2.5 Prata/km (1 Ouro = 100 Prata = 10000 Bronze)  
-        
-        let custoTotalCobre = Math.floor(custoBase + (distanciaReal * custoPorKm));
+            // --- CÁLCULOS ---
+            const distanciaReal = distanciaTotalPixels * fatorEscala; // km
 
-        // Conversão de Moedas
-        const golds = Math.floor(custoTotalCobre / 10000);
-        custoTotalCobre %= 10000;
-        const silvers = Math.floor(custoTotalCobre / 100);
-        const bronzes = custoTotalCobre % 100;
+            // CALIBRAÇÃO: 30 km/dia é ritmo padrão de marcha RPG
+            const kmPorDiaPe = 30;
 
-        // Monta o HTML do Resultado
-        let html = `
-            <p><strong>Rota Total:</strong> ${Math.floor(distanciaReal)} km (aprox).</p>
-            <table class="tabela-viagem">
-                <tr><th>Método</th><th>Tempo Total</th></tr>
-                <tr><td>🚶 A Pé</td><td>${diasPe} dias</td></tr>
-                <tr><td>🐴 Mula/Burro (Montaria Lenta)</td><td>${diasMontariaLenta} dias</td></tr>
-                <tr><td>🐎 Cavalo (Montaria Normal)</td><td>${diasMontariaNormal} dias</td></tr>
-                <tr><td>⚡ Montaria Especial (Montaria Rápida)</td><td>${diasMontariaRapida} dias</td></tr>
-            </table>
+            const diasPe = (distanciaReal / kmPorDiaPe).toFixed(1);
+            const diasMontariaLenta = (distanciaReal / (kmPorDiaPe * 1.5)).toFixed(1); // Mula
+            const diasMontariaNormal = (distanciaReal / (kmPorDiaPe * 2.0)).toFixed(1); // Cavalo
+            const diasMontariaRapida = (distanciaReal / (kmPorDiaPe * 4.0)).toFixed(1); // Voo
 
-            <hr>
-            <h4 style="color: #87CEEB;">🔮 Transporte Imperial Seguro</h4>
-            <p>Taxa de risco e seguro inclusos.</p>
-            <p><strong>Valor Total:</strong><br>
-            <span class="destaque-gold">${golds} Ouro</span>, 
-            <span class="destaque-silver">${silvers} Prata</span>, 
-            <span class="destaque-bronze">${bronzes} Bronze</span>.
-            </p>
-        `;
+            // ECONOMIA: 2.5 Ouro taxa + 2.5 Prata/km
+            // Conversão interna para bronze (unidade inteira): 1 Ouro = 100 Prata = 10000 Bronze
+            const taxaOuro = 2.5; // ouro (flat)
+            const tarifaPorKmPrata = 2.5; // prata por km
 
-        document.getElementById('resultado-viagem').innerHTML = html;
-        document.getElementById('modal-viagem').style.display = 'flex';
-        
-        // Sai do modo de medição, mas MANTÉM O DESENHO na tela para verem
-        cancelarModoMedicao();
+            const custoBase = Math.round(taxaOuro * 10000); // em bronze
+            const custoPorKm = Math.round(tarifaPorKmPrata * 100); // em bronze/km
+
+            let custoTotalBronze = Math.floor(custoBase + (distanciaReal * custoPorKm));
+
+            // Conversão de Moedas
+            const golds = Math.floor(custoTotalBronze / 10000);
+            custoTotalBronze %= 10000;
+            const silvers = Math.floor(custoTotalBronze / 100);
+            const bronzes = custoTotalBronze % 100;
+
+            // Monta o HTML do Resultado (valores arredondados de forma legível)
+            let html = `
+                <p><strong>Rota Total:</strong> ${distanciaReal.toFixed(1)} km (aprox).</p>
+                <table class="tabela-viagem">
+                    <tr><th>Método</th><th>Tempo Total</th></tr>
+                    <tr><td>🚶 A Pé</td><td>${diasPe} dias</td></tr>
+                    <tr><td>🐴 Mula/Burro (Montaria Lenta)</td><td>${diasMontariaLenta} dias</td></tr>
+                    <tr><td>🐎 Cavalo (Montaria Normal)</td><td>${diasMontariaNormal} dias</td></tr>
+                    <tr><td>⚡ Montaria Especial (Montaria Rápida)</td><td>${diasMontariaRapida} dias</td></tr>
+                </table>
+
+                <hr>
+                <h4 style="color: #87CEEB;">🔮 Transporte Imperial Seguro</h4>
+                <p>Taxa fixa de <strong>2.5 ouro</strong> + <strong>2.5 prata/km</strong> aplicada automaticamente.</p>
+                <p><strong>Valor Total:</strong><br>
+                <span class="destaque-gold">${golds} Ouro</span>, 
+                <span class="destaque-silver">${silvers} Prata</span>, 
+                <span class="destaque-bronze">${bronzes} Bronze</span>.
+                </p>
+            `;
+
+            document.getElementById('resultado-viagem').innerHTML = html;
+            document.getElementById('modal-viagem').style.display = 'flex';
+
+            // Sai do modo de medição, mas MANTÉM O DESENHO na tela para verem
+            cancelarModoMedicao();
+        } catch (err) {
+            console.error('Erro ao calcular rota:', err);
+            alert('Erro ao calcular a rota — veja o console para detalhes.');
+        }
     }
 /**
  * Remove o último ponto e linha da rota durante medição
@@ -2906,6 +2980,9 @@ function calcularResultados() {
                      grupoRota.removeLayer(camadas[camadas.length - 2]); 
                 }
             }
+
+            // Atualiza o estado do botão de medição (pontos faltando / habilitar finalizar)
+            atualizarBotaoMedidor('medindo');
         }
     }
     // Inicialização
