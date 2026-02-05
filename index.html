@@ -1616,7 +1616,11 @@ function menuCapital(tipo) {
         dadosGerais.banco.forEach(i => { html += `<tr><td>${i.nome}</td><td class="preco-banco">${i.custo}</td><td>${i.desc}</td></tr>`; });
         html += `</table><h4 style="color:#ffdead; margin-top:20px;">Investimentos</h4><ul style="color:#ccc;">`;
         dadosGerais.investimentos.forEach(inv => { html += `<li><strong>${inv.nome}:</strong> ${inv.risco} (Min ${inv.min})</li>`; });
-        container.innerHTML = html + `</ul>`;
+        container.innerHTML = html + `</ul>` +
+            `<div class="nota-banco" style="margin-top:12px;">` +
+            `<p>Obs: Todo o dinheiro, itens e criaturas guardadas pelo banco imperial possui garantia total</p>` +
+            `<p>Obs 2: Não existe melhoramento de pacote, se for trocar seu pacote será com o preço integral</p>` +
+            `</div>`;
     } else if (tipo === 'boatos') {
         titulo.innerText = "🗣️ Boatos";
         container.innerHTML = btnVoltar + `<div class="lista-boatos">`;
