@@ -1453,58 +1453,81 @@ function atualizarVisualBotao() {
     ]
 };
 
-    const dadosCapital = {
-        esquadrao: [
-            // Coloque o nome EXATO do arquivo da imagem que está na pasta
-            { 
-                nome: "Lythael Serindë", 
-                classe: "Curandeira", 
-                raca: "Elfa alta",
-                foto: "Lythael.png",  // <--- AQUI VAI O ARQUIVO DA FOTO
-                desc: "Uma guardiã serena e observadora, cuja gentileza externa esconde uma força inabalável dedicada a proteger e valorizar toda forma de vida.", 
-                stats: [2, 9, 7, 8, 5, 4, 6, 8] // Ordem: For, Sab, Int, Man, Des, Con, Pre, Car
-            },
-            { 
-                nome: "Valkia Huniman", 
-                raca: "Meio Anja",
-                classe: "Guerreira", 
-                foto: "Valkia.png",     // <--- AQUI VAI O ARQUIVO DA FOTO
-                desc: "Embora aparente seriedade inicial, logo revela uma natureza vibrante e impetuosa, movida pelo desejo de provar sua evolução enquanto exalta constantemente os nomes de Ryuiki e Daruin.",
-                stats: [2, 9, 7, 8, 5, 4, 6, 8]
-            },
-                        { 
-                nome: "Greta Thunder", 
-                raca: "Elfa da Floresta",
-                classe: "Maga", 
-                foto: "Greta.jpg",     // <--- AQUI VAI O ARQUIVO DA FOTO
-                desc: "Uma guardiã solitária de Desterroth que nutre profundo desprezo pela humanidade e outras raças, confiando apenas na justiça da natureza e em seus cactos. Agora, ela é forçada a agir contra uma corrupção obscura que ameaça a floresta que jurou proteger.",
-                stats: [2, 9, 7, 8, 5, 4, 6, 8]
-            },
-                        { 
-                nome: "Balon Blacktide", 
-                raca: "Meio Demônio",
-                classe: "Caçador", 
-                foto: "Balon.jpg",     // <--- AQUI VAI O ARQUIVO DA FOTO
-                desc: "Das lições da nobreza aos naufrágios da pirataria, este meio-demônio de poucas palavras carrega no sobrenome a marca de sua sobrevivência e, na alma, o conflito eterno entre o sangue amaldiçoado e a luz que busca guiá-lo.",
-                stats: [2, 9, 7, 8, 5, 4, 6, 8] 
-            },
-                        { 
-                nome: "Thorga Punho de Ferro", 
-                raca: "Anão",
-                classe: "Guerreiro", 
-                foto: "Thorga.jpg",     // <--- AQUI VAI O ARQUIVO DA FOTO
-                desc: "Exilado injustamente das forjas ancestrais, Thorga é um mercenário impetuoso que rejeita a autoridade de reis e deuses, lutando pela pura emoção da batalha e para provar que sua força basta por si só.",
-                stats: [2, 9, 7, 8, 5, 4, 6, 8] 
-            },
-                        { 
-                nome: "Liésty", 
-                raca: "Elfa Negra",
-                classe: "Maga", 
-                foto: "Liésty.jpg",     // <--- AQUI VAI O ARQUIVO DA FOTO
-                desc: "Sobrevivente solitária de uma destruição brutal, esta elfa negra trocou a companhia dos vivos pelo silêncio de sua cabana na floresta, onde sua natureza sombria e suas artes arcanas servem como barreira contra um mundo que ela aprendeu a desprezar.",
-                stats: [2, 9, 7, 8, 5, 4, 6, 8]
-            }
-        ],
+const dadosCapital = {
+    esquadrao: [
+        { 
+            nome: "Lythael Serindë", 
+            classe: "Curandeira", 
+            raca: "Elfa alta",
+            foto: "Lythael.png",
+            desc: "Uma guardiã serena e observadora, cuja gentileza externa esconde uma força inabalável dedicada a proteger e valorizar toda forma de vida.", 
+            stats: [2, 9, 7, 8, 5, 4, 6, 8], // For, Sab, Int, Man, Des, Con, Pre, Car
+            hab_raca: "<b>🧘 Meditação:</b> Recupera 1d4 + Nível de Mana 1x ao dia.",
+            passivas: [],
+            ativas: [],
+            magias: ["Luz", "Solo Sagrado"]
+        },
+        { 
+            nome: "Valkia Huniman", 
+            raca: "Meio Anja",
+            classe: "Guerreira", 
+            foto: "Valkia.png",
+            desc: "Embora aparente seriedade inicial, logo revela uma natureza vibrante e impetuosa, movida pelo desejo de provar sua evolução enquanto exalta constantemente os nomes de Ryuiki e Daruin.",
+            stats: [2, 9, 7, 8, 5, 4, 6, 8],
+            hab_raca: "<b>✨ Aura Protetora:</b> Remove estados negativos e cura ¼ da vida do alvo.",
+            passivas: [],
+            ativas: [],
+            magias: []
+        },
+        { 
+            nome: "Greta Thunder", 
+            raca: "Elfa da Floresta",
+            classe: "Maga", 
+            foto: "Greta.jpg",
+            desc: "Uma guardiã solitária de Desterroth que nutre profundo desprezo pela humanidade e outras raças, confiando apenas na justiça da natureza e em seus cactos. Agora, ela é forçada a agir contra uma corrupção obscura que ameaça a floresta que jurou proteger.",
+            stats: [2, 9, 7, 8, 5, 4, 6, 8],
+            hab_raca: "<b>🗣️ Conversa Natural:</b> Pode-se comunicar com elementos da natureza.",
+            passivas: [],
+            ativas: [],
+            magias: []
+        },
+        { 
+            nome: "Balon Blacktide", 
+            raca: "Meio Demônio",
+            classe: "Caçador", 
+            foto: "Balon.jpg",
+            desc: "Das lições da nobreza aos naufrágios da pirataria, este meio-demônio de poucas palavras carrega no sobrenome a marca de sua sobrevivência e, na alma, o conflito eterno entre o sangue amaldiçoado e a luz que busca guiá-lo.",
+            stats: [2, 9, 7, 8, 5, 4, 6, 8],
+            hab_raca: "<b>💢 Fúria Demoníaca:</b> Entra em fúria por (n+1) turnos (+2 For/Des, -2 Int/Sab/Prec).",
+            passivas: [],
+            ativas: [],
+            magias: []
+        },
+        { 
+            nome: "Thorga Punho de Ferro", 
+            raca: "Anão",
+            classe: "Guerreiro", 
+            foto: "Thorga.jpg",
+            desc: "Exilado injustamente das forjas ancestrais, Thorga é um mercenário impetuoso que rejeita a autoridade de reis e deuses, lutando pela pura emoção da batalha e para provar que sua força basta por si só.",
+            stats: [2, 9, 7, 8, 5, 4, 6, 8],
+            hab_raca: "<b>🛡️ Pele de aço:</b> Uma vez por dia, reduz o dano de um ataque pela metade.",
+            passivas: [],
+            ativas: [],
+            magias: []
+        },
+        { 
+            nome: "Liésty", 
+            raca: "Elfa Negra",
+            classe: "Maga", 
+            foto: "Liésty.jpg",
+            desc: "Sobrevivente solitária de uma destruição brutal, esta elfa negra trocou a companhia dos vivos pelo silêncio de sua cabana na floresta, onde sua natureza sombria e suas artes arcanas servem como barreira contra um mundo que ela aprendeu a desprezar.",
+            stats: [2, 9, 7, 8, 5, 4, 6, 8],
+            hab_raca: "<b>🔥 Vontade Ardente:</b> Ataque em área de chamas (2d6*Nv + 1d4*Nv).",
+            passivas: [],
+            ativas: [],
+            magias: []
+        }
+    ],
         procurados: [
             { 
                 nome: "Kalamar", 
@@ -3407,54 +3430,75 @@ function abrirStatsPersonagem(index) {
     
     titulo.innerText = `Estatísticas: ${p.nome}`;
     
-    // Adicionado "max-width: 320px" e "margin: 0 auto" para centralizar e diminuir o gráfico
+    // HTML Base: Gráfico + Listas
     container.innerHTML = `
         <button onclick="menuCapital('esquadrao')" class="btn-popup" style="margin-bottom: 20px; background: #444; width: 100%;">⬅ Voltar ao Esquadrão</button>
-        <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1px solid #555; max-width: 320px; margin: 0 auto;">
+        
+        <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1px solid #555; max-width: 300px; margin: 0 auto;">
             <canvas id="radarChart"></canvas>
         </div>
+
+        <div id="lista-stats-manual" style="margin-top: 20px;"></div>
     `;
 
+    // Renderiza o Radar (Tamanho reduzido)
     const ctx = document.getElementById('radarChart').getContext('2d');
     if (chartInstance) { chartInstance.destroy(); }
-
     chartInstance = new Chart(ctx, {
         type: 'radar',
         data: {
-            labels: ['Força', 'Sabedoria', 'Inteligência', 'Mana', 'Destreza', 'Constituição', 'Precisão', 'Carisma'],
+            labels: ['FOR', 'SAB', 'INT', 'MAN', 'DES', 'CON', 'PRE', 'CAR'],
             datasets: [{
-                label: 'Nível',
                 data: p.stats,
                 fill: true,
                 backgroundColor: 'rgba(135, 206, 235, 0.3)',
                 borderColor: '#87CEEB',
-                pointBackgroundColor: '#fff',
-                pointBorderColor: '#87CEEB',
-                pointHoverBackgroundColor: '#87CEEB',
-                pointHoverBorderColor: '#fff'
+                pointBackgroundColor: '#fff'
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: true,
             scales: {
                 r: {
-                    angleLines: { color: '#555' },
-                    grid: { color: '#555' },
-                    pointLabels: { 
-                        color: '#ffdead', 
-                        font: { size: 10, family: 'sans-serif' } // Fonte ligeiramente menor para o gráfico menor
-                    },
-                    ticks: { display: false, stepSize: 2 },
-                    suggestedMin: 0,
-                    suggestedMax: 10
+                    angleLines: { color: '#444' },
+                    grid: { color: '#444' },
+                    pointLabels: { color: '#ffdead', font: { size: 10 } },
+                    ticks: { display: false },
+                    suggestedMin: 0, suggestedMax: 10
                 }
             },
-            plugins: {
-                legend: { display: false }
-            }
+            plugins: { legend: { display: false } }
         }
     });
+
+    // Monta as listas de habilidades baseado no que você preencheu
+    const divListas = document.getElementById('lista-stats-manual');
+    let html = "";
+
+    // Traço de Raça
+    if (p.hab_raca) {
+        html += `<div class="spell-level">🧬 Traço de Raça</div>`;
+        html += `<div class="spell-item">${p.hab_raca}</div>`;
+    }
+
+    // Passivas
+    if (p.passivas && p.passivas.length > 0) {
+        html += `<div class="spell-level">✨ Habilidades Passivas</div>`;
+        p.passivas.forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
+    }
+
+    // Ativas
+    if (p.ativas && p.ativas.length > 0) {
+        html += `<div class="spell-level">🛡️ Habilidades Ativas</div>`;
+        p.ativas.forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
+    }
+
+    // Magias
+    if (p.magias && p.magias.length > 0) {
+        html += `<div class="spell-level">🔥 Magias</div>`;
+        p.magias.forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
+    }
+
+    divListas.innerHTML = html;
 }
 /**
  * Remove o último ponto e linha da rota durante medição
