@@ -64,6 +64,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>Mapa RPG Interativo 8K</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1460,42 +1461,48 @@ function atualizarVisualBotao() {
                 classe: "Curandeira", 
                 raca: "Elfa alta",
                 foto: "Lythael.png",  // <--- AQUI VAI O ARQUIVO DA FOTO
-                desc: "Uma guardiã serena e observadora, cuja gentileza externa esconde uma força inabalável dedicada a proteger e valorizar toda forma de vida.om uma espada longa." 
+                desc: "Uma guardiã serena e observadora, cuja gentileza externa esconde uma força inabalável dedicada a proteger e valorizar toda forma de vida.", 
+                stats: [2, 9, 7, 8, 5, 4, 6, 8] // Ordem: For, Sab, Int, Man, Des, Con, Pre, Car
             },
             { 
                 nome: "Valkia Huniman", 
                 raca: "Meio Anja",
                 classe: "Guerreira", 
                 foto: "Valkia.png",     // <--- AQUI VAI O ARQUIVO DA FOTO
-                desc: "Embora aparente seriedade inicial, logo revela uma natureza vibrante e impetuosa, movida pelo desejo de provar sua evolução enquanto exalta constantemente os nomes de Ryuiki e Daruin." 
+                desc: "Embora aparente seriedade inicial, logo revela uma natureza vibrante e impetuosa, movida pelo desejo de provar sua evolução enquanto exalta constantemente os nomes de Ryuiki e Daruin.",
+                stats: [2, 9, 7, 8, 5, 4, 6, 8]
             },
                         { 
                 nome: "Greta Thunder", 
                 raca: "Elfa da Floresta",
                 classe: "Maga", 
                 foto: "Greta.jpg",     // <--- AQUI VAI O ARQUIVO DA FOTO
-                desc: "Uma guardiã solitária de Desterroth que nutre profundo desprezo pela humanidade e outras raças, confiando apenas na justiça da natureza e em seus cactos; agora, ela é forçada a agir contra uma corrupção obscura que ameaça a floresta que jurou proteger." 
+                desc: "Uma guardiã solitária de Desterroth que nutre profundo desprezo pela humanidade e outras raças, confiando apenas na justiça da natureza e em seus cactos. Agora, ela é forçada a agir contra uma corrupção obscura que ameaça a floresta que jurou proteger.",
+                stats: [2, 9, 7, 8, 5, 4, 6, 8]
             },
                         { 
                 nome: "Balon Blacktide", 
                 raca: "Meio Demônio",
                 classe: "Caçador", 
                 foto: "Balon.jpg",     // <--- AQUI VAI O ARQUIVO DA FOTO
-                desc: "Das lições da nobreza aos naufrágios da pirataria, este meio-demônio de poucas palavras carrega no sobrenome a marca de sua sobrevivência e, na alma, o conflito eterno entre o sangue amaldiçoado e a luz que busca guiá-lo." 
+                desc: "Das lições da nobreza aos naufrágios da pirataria, este meio-demônio de poucas palavras carrega no sobrenome a marca de sua sobrevivência e, na alma, o conflito eterno entre o sangue amaldiçoado e a luz que busca guiá-lo.",
+                stats: [2, 9, 7, 8, 5, 4, 6, 8] 
             },
                         { 
                 nome: "Thorga Punho de Ferro", 
                 raca: "Anão",
                 classe: "Guerreiro", 
                 foto: "Thorga.jpg",     // <--- AQUI VAI O ARQUIVO DA FOTO
-                desc: "Exilado injustamente das forjas ancestrais, Thorgar é um mercenário impetuoso que rejeita a autoridade de reis e deuses, lutando pela pura emoção da batalha e para provar que sua força basta por si só." 
+                desc: "Exilado injustamente das forjas ancestrais, Thorga é um mercenário impetuoso que rejeita a autoridade de reis e deuses, lutando pela pura emoção da batalha e para provar que sua força basta por si só.",
+                stats: [2, 9, 7, 8, 5, 4, 6, 8] 
             },
                         { 
                 nome: "Liésty", 
                 raca: "Elfa Negra",
                 classe: "Maga", 
                 foto: "Liésty.jpg",     // <--- AQUI VAI O ARQUIVO DA FOTO
-                desc: "Sobrevivente solitária de uma destruição brutal, esta elfa negra trocou a companhia dos vivos pelo silêncio de sua cabana na floresta, onde sua natureza sombria e suas artes arcanas servem como barreira contra um mundo que ela aprendeu a desprezar." 
+                desc: "Sobrevivente solitária de uma destruição brutal, esta elfa negra trocou a companhia dos vivos pelo silêncio de sua cabana na floresta, onde sua natureza sombria e suas artes arcanas servem como barreira contra um mundo que ela aprendeu a desprezar.",
+                stats: [2, 9, 7, 8, 5, 4, 6, 8]
             }
         ],
         procurados: [
@@ -1515,7 +1522,7 @@ function atualizarVisualBotao() {
                 nome: "Leimo", 
                 recompensa: "1.500 Moedas de Ouro", 
                 foto: "Leimo.png",           // Se não tiver foto, coloque null ou apague a linha foto
-                desc: "Morto. Ex-membro da Torre dos Sábios. Sua genialidade tornou-se arrogância; ele se rebelou por acreditar ser uma divindade entre mortais, usando segredos arcanos para cometer crimes contra o Império." 
+                desc: "Morto. Ex-membro da Torre dos Sábios. Sua genialidade tornou-se arrogância. Leimo se rebelou por acreditar ser uma divindade entre mortais, usando segredos arcanos para cometer crimes contra o Império." 
             },
             { 
                 nome: "O Palhaço", 
@@ -1533,7 +1540,7 @@ function atualizarVisualBotao() {
                 nome: "Mari, a Psicopata", 
                 recompensa: "500 Moedas de Ouro", 
                 foto: "Mari.png",           // Se não tiver foto, coloque null ou apague a linha foto
-                desc: "Morto. Uma força de destruição imprevisível e sem remorso. Não possui agenda política ou mágica; mata por impulso e loucura, deixando um rastro de terror por onde passa." 
+                desc: "Morto. Uma força de destruição imprevisível e sem remorso. Não segue causa, crença ou propósito algum. Mata por impulso e loucura, deixando um rastro de terror por onde passa." 
             },
             { 
                 nome: "Leoncio", 
@@ -1760,10 +1767,20 @@ function menuCapital(tipo) {
         });
     } else if (tipo === 'esquadrao') {
         titulo.innerText = "🛡️ Esquadrão";
-        container.innerHTML = btnVoltar;
-        dadosCapital.esquadrao.forEach(e => {
-            let img = e.foto ? `<img src="${e.foto}" class="foto-lista" onclick="verImagemPersonagem('${e.foto}')">` : `<div class="foto-placeholder">RETRATO</div>`;
-            container.innerHTML += `<div class="item-menu">${img}<div class="texto-item"><h4>${e.nome}</h4><span class="classe-char">${e.raca} • ${e.classe}</span><p>${e.desc}</p></div></div>`;
+        // Corrigido de btnVoltarHub para btnVoltar
+        container.innerHTML = btnVoltar; 
+        dadosCapital.esquadrao.forEach((item, index) => {
+            let img = item.foto ? `<img src="${item.foto}" class="foto-lista" onclick="verImagemPersonagem('${item.foto}')" style="cursor: zoom-in;">` : `<div class="foto-placeholder">?</div>`;
+            container.innerHTML += `
+                <div class="item-menu">
+                    ${img}
+                    <div class="texto-item">
+                        <h4>${item.nome}</h4>
+                        <span class="classe-char">${item.raca} • ${item.classe}</span>
+                        <p>${item.desc || ""}</p>
+                        <button onclick="abrirStatsPersonagem(${index})" class="btn-popup" style="margin-top:10px; background: #2c3e50; font-size: 11px; border: 1px solid #87CEEB;">📊 Ver Estatísticas</button>
+                    </div>
+                </div>`;
         });
     } else if (tipo === 'lendas') {
         titulo.innerText = "🏛️ Heróis Lendários";
@@ -1940,9 +1957,9 @@ function menuServicos(aba) {
             <button onclick="menuCapital('hub')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar ao Painel</button>
             <div class="biblio-nav">
                 <div class="rpg-card-small" onclick="menuServicos('banco')"><span>🏦</span><strong>Banco</strong></div>
-                <div class="rpg-card-small" onclick="menuServicos('alquimia')"><span>🧪</span><strong>Alquimia</strong></div>
+                <div class="rpg-card-small" onclick="menuServicos('alquimia')"><span>🧪</span><strong>Alquimista</strong></div>
                 <div class="rpg-card-small" onclick="menuServicos('forja')"><span>🛡️</span><strong>Forja</strong></div>
-                <div class="rpg-card-small" onclick="menuServicos('emporio')"><span>🔮</span><strong>Empório</strong></div>
+                <div class="rpg-card-small" onclick="menuServicos('emporio')"><span>🔮</span><strong>Arcano</strong></div>
                 <div class="rpg-card-small" onclick="menuServicos('biblioteca')"><span>📜</span><strong>Pergaminhos</strong></div>
                 <div class="rpg-card-small" onclick="menuServicos('animais')"><span>🐾</span><strong>Animais</strong></div>
             </div>`;
@@ -2275,11 +2292,11 @@ function biblioAtributos() {
         <div class="grid-atributos">
             <div class="card-atributo"><strong>💪 Força</strong><span>Físico</span></div>
             <div class="card-atributo"><strong>📖 Sabedoria</strong><span>Conhecimento</span></div>
-            <div class="card-atributo"><strong>🧠 Intelig.</strong><span>Mental</span></div>
-            <div class="card-atributo"><strong>✨ Mana</strong><span>Quantidade</span></div>
+            <div class="card-atributo"><strong>🧠 Intelig.</strong><span>Psicológico</span></div>
+            <div class="card-atributo"><strong>✨ Mana</strong><span>Magia</span></div>
             <div class="card-atributo"><strong>⚡ Destreza</strong><span>Agilidade</span></div>
             <div class="card-atributo"><strong>🛡️ Const.</strong><span>Vida</span></div>
-            <div class="card-atributo"><strong>🎯 Precisão</strong><span>Precisão</span></div>
+            <div class="card-atributo"><strong>🎯 Precisão</strong><span>Acertar</span></div>
             <div class="card-atributo"><strong>🗣️ Carisma</strong><span>Persuasão</span></div>
         </div>
         <h4 style="color:#ffd700; margin-top:20px; text-align:center;">🎲 Tabela de Bônus</h4>
@@ -2401,7 +2418,7 @@ const classesRPG = {
                 emoji: "☀️", desc: "Caminho da iluminação para abençoar aliados e destruir mortos-vivos.",
                 final: { 
                     "Anjo": { emoji: "😇", desc: "Ganha dons do seu deus e a graça divina, tornando-se quase um anjo." },
-                    "Vampiro": { emoji: "🧛", desc: "Amaldiçoado pela noite; o sol causa dano e necessita de sangue para viver." }
+                    "Vampiro": { emoji: "🧛", desc: "Amaldiçoado pela noite. O sol causa dano e necessita de sangue para viver." }
                 }
             },
             "Encantador": { 
@@ -3380,6 +3397,65 @@ function calcularResultados() {
             alert('Erro ao calcular a rota — veja o console para detalhes.');
         }
     }
+
+    let chartInstance = null; // Armazena o gráfico para poder destruí-lo antes de criar outro
+
+function abrirStatsPersonagem(index) {
+    const p = dadosCapital.esquadrao[index];
+    const container = document.getElementById('conteudo-menu-capital');
+    const titulo = document.getElementById('titulo-menu-capital');
+    
+    titulo.innerText = `Estatísticas: ${p.nome}`;
+    
+    // Adicionado "max-width: 320px" e "margin: 0 auto" para centralizar e diminuir o gráfico
+    container.innerHTML = `
+        <button onclick="menuCapital('esquadrao')" class="btn-popup" style="margin-bottom: 20px; background: #444; width: 100%;">⬅ Voltar ao Esquadrão</button>
+        <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1px solid #555; max-width: 320px; margin: 0 auto;">
+            <canvas id="radarChart"></canvas>
+        </div>
+    `;
+
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    if (chartInstance) { chartInstance.destroy(); }
+
+    chartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Força', 'Sabedoria', 'Inteligência', 'Mana', 'Destreza', 'Constituição', 'Precisão', 'Carisma'],
+            datasets: [{
+                label: 'Nível',
+                data: p.stats,
+                fill: true,
+                backgroundColor: 'rgba(135, 206, 235, 0.3)',
+                borderColor: '#87CEEB',
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#87CEEB',
+                pointHoverBackgroundColor: '#87CEEB',
+                pointHoverBorderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                r: {
+                    angleLines: { color: '#555' },
+                    grid: { color: '#555' },
+                    pointLabels: { 
+                        color: '#ffdead', 
+                        font: { size: 10, family: 'sans-serif' } // Fonte ligeiramente menor para o gráfico menor
+                    },
+                    ticks: { display: false, stepSize: 2 },
+                    suggestedMin: 0,
+                    suggestedMax: 10
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+}
 /**
  * Remove o último ponto e linha da rota durante medição
  * Atalho: Ctrl+Z
