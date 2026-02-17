@@ -3569,12 +3569,48 @@ function menuMercado(categoria) {
 
 // --- SISTEMA DA DUNGEON: MASMORRA DO EQUILÍBRIO ---
 const dadosMasmorra = [
-    { sala: 0, titulo: "A Entrada", foto: "Dungeon_gelo.png", cor: "#add8e6", desc: "Uma construção de pedra antiga surge entre as fendas das cavernas. O que mais assusta não é o frio, mas o campo de flores coloridas que floresce sobre o gelo absoluto. O ar cheira a pólen e morte, enquanto ventos uivantes parecem sussurrar nomes esquecidos." },
-    { sala: 1, titulo: "A Fenda da Xamã", foto: "fenda_stats.png", cor: "#87cefa", desc: "Uma fenda estreita onde a luz se comporta de forma estranha. No centro, uma pedra flutuante pulsa, drenando qualquer centelha mágica. Você vê vultos de um homem e uma mulher sorrindo, colhendo flores em paz absoluta, como se o tempo estivesse suspenso." },
-    { sala: 2, titulo: "A Ponte do Abismo", foto: "ponte_gelo.png", cor: "#00bfff", desc: "Uma ponte de gelo fina como uma lâmina cruza a escuridão. Estalactites gigantes vibram com a sua respiração. A imagem fantasmagórica de um dragão protetor estende suas asas sobre o casal, protegendo-os de uma sombra que tenta alcançá-los." },
-    { sala: 3, titulo: "A Passagem dos Ventos", foto: "ventos.png", cor: "#1e90ff", desc: "Redemoinhos de neve cegante giram em uma sala circular, apagando suas chamas. A visão dos fantasmas muda: uma sombra toca seus ombros e a confiança desaparece. Eles agora se olham com desconfiança, sacando armas para o que antes era amor." },
-    { sala: 4, titulo: "O Salão dos Fantasmas Cruzados", foto: "gelo_negro.png", cor: "#4682b4", desc: "O gelo aqui é negro e translúcido. Os fantasmas do casal agora gritam de ódio contra o dragão. Uma névoa preta cobre os olhos de ambos, cegando-os para a verdade, enquanto o dragão apenas abaixa a cabeça em tristeza profunda." },
-    { sala: 5, titulo: "O Ninho do Dragão", foto: "ninho_dragao.png", cor: "#b0c4de", desc: "Um anfiteatro colossal aberto para o céu de Hukmal'tep. No centro, uma Joia Azul brilha presa em gelo eterno. Membros de túnica violeta observam de cima, forçando o dragão a quebrar o que ele jurou proteger." }
+    { 
+        sala: 0, 
+        titulo: "A Entrada", 
+        fotos: ["Dungeon_gelo.png", "entrada_detalhe.png"], // Duas fotos aqui
+        cor: "#add8e6", 
+        desc: "Uma construção de pedra antiga surge entre as fendas das cavernas. O que mais assusta não é o frio, mas o campo de flores coloridas que floresce sobre o gelo absoluto. O ar cheira a pólen e morte, enquanto ventos uivantes parecem sussurrar nomes esquecidos." 
+    },
+    { 
+        sala: 1, 
+        titulo: "O Ossuário", 
+        fotos: ["ossuario.png", "Lily.png", "Murakielomos.png"], // Apenas uma foto aqui
+        cor: "#87cefa", 
+        desc: "Uma fenda estreita onde a luz se comporta de forma estranha. No centro, uma pedra flutuante pulsa, drenando qualquer centelha mágica. Você vê vultos de um homem e uma mulher sorrindo, colhendo flores em paz absoluta, como se o tempo estivesse suspenso." 
+    },
+    { 
+        sala: 2, 
+        titulo: "A Ponte do Abismo", 
+        fotos: ["ponte_gelo.png", "abismo_vista.jpg"], 
+        cor: "#00bfff", 
+        desc: "Uma ponte de gelo fina como uma lâmina cruza a escuridão. Estalactites gigantes vibram com a sua respiração. A imagem fantasmagórica de um dragão protetor estende suas asas sobre o casal, protegendo-os de uma sombra que tenta alcançá-los." 
+    },
+    { 
+        sala: 3, 
+        titulo: "A Passagem dos Ventos", 
+        fotos: ["ventos.png"], 
+        cor: "#1e90ff", 
+        desc: "Redemoinhos de neve cegante giram em uma sala circular, apagando suas chamas. A visão dos fantasmas muda: uma sombra toca seus ombros e a confiança desaparece. Eles agora se olham com desconfiança, sacando armas para o que antes era amor." 
+    },
+    { 
+        sala: 4, 
+        titulo: "O Salão dos Fantasmas Cruzados", 
+        fotos: ["gelo_negro.png", "fantasmas_luta.png"], 
+        cor: "#4682b4", 
+        desc: "O gelo aqui é negro e translúcido. Os fantasmas do casal agora gritam de ódio contra o dragão. Uma névoa preta cobre os olhos de ambos, cegando-os para a verdade, enquanto o dragão apenas abaixa a cabeça em tristeza profunda." 
+    },
+    { 
+        sala: 5, 
+        titulo: "O Ninho do Dragão", 
+        fotos: ["ninho_dragao.png", "Dragao_gelo.png", "Encapuzados 2.png"], 
+        cor: "#b0c4de", 
+        desc: "Um anfiteatro colossal aberto para o céu de Hukmal'tep. No centro, uma Joia Azul brilha presa em gelo eterno. Membros de túnica violeta observam de cima, forçando o dragão a quebrar o que ele jurou proteger." 
+    }
 ];
 
 let salaMaximoLiberada = 0; 
@@ -3615,16 +3651,20 @@ function abrirMenuDungeon() {
 }
 
 function detalharSala(num) {
-    // Corrigido: agora busca em dadosMasmorra
     const s = dadosMasmorra.find(item => item.sala === num);
     const container = document.getElementById('conteudo-menu-capital');
     
+    // Gera o HTML de todas as fotos da lista
+    const htmlFotos = s.fotos.map(foto => `
+        <img src="${foto}" style="max-width: 250px; width: 85%; border-radius: 8px; border: 2px solid ${s.cor}; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">
+    `).join('');
+
     container.innerHTML = `
         <button onclick="abrirMenuDungeon()" class="btn-popup" style="margin-bottom:20px; background:#444; width:100%;">⬅ Voltar às Salas</button>
         <div style="text-align:center;">
-            <img src="${s.foto}" style="max-width: 250px; width: 80%; border-radius: 8px; border: 2px solid ${s.cor}; margin-bottom: 15px;">
-            <h2 style="color:${s.cor}; margin-top:0;">${s.titulo}</h2>
-            <hr style="border:0; border-top:1px solid #444;">
+            ${htmlFotos}
+            <h2 style="color:${s.cor}; margin-top:10px;">${s.titulo}</h2>
+            <hr style="border:0; border-top:1px solid #444; margin: 15px 0;">
             <p style="font-size: 15px; line-height: 1.5; text-align: justify; color: #ddd;">${s.desc}</p>
         </div>
     `;
