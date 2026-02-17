@@ -1458,16 +1458,16 @@ function atualizarVisualBotao() {
  */
     const dadosGerais = {
         banco: [
-            { nome: "Pacote Econômico", custo: "2 Golds", desc: "Poder enterrar em um canto e o gerente finge que não viu." },
-            { nome: "Pacote Iniciante", custo: "5 Golds", desc: "Guarda até 50 golds e 1 item." },
-            { nome: "Pacote Intermediário", custo: "15 Golds", desc: "Guarda 150g, 1 armadura, 1 arma, 3 itens. (Acesso transporte imperial)" },
-            { nome: "Pacote Avançado", custo: "35 Golds", desc: "Seguro de vida, 300g, 2 armaduras, 4 armas, 6 itens, 1 criatura. (Acesso transporte)" },
+            { nome: "Pacote Econômico", custo: "2 Moedas de Ouro", desc: "Poder enterrar em um canto e o gerente finge que não viu." },
+            { nome: "Pacote Iniciante", custo: "5 Moedas de Ouro", desc: "Guarda até 50 Moedas de Ouro e 1 item." },
+            { nome: "Pacote Intermediário", custo: "15 Moedas de Ouro", desc: "Guarda 150 Moedas de Ouro, 1 armadura, 1 arma, 3 itens. (Acesso transporte imperial)" },
+            { nome: "Pacote Avançado", custo: "35 Moedas de Ouro", desc: "Seguro de vida, 300 Moedas de Ouro, 2 armaduras, 4 armas, 6 itens, 1 criatura. (Acesso transporte)" },
             { nome: "Pacote Arranjado", custo: "A Definir", desc: "Negociado diretamente com o contratante." },
             { nome: "Pacote VIP", custo: "Exclusivo", desc: "Guarda de objeto/criatura com avaliação personalizada." }
         ],
         investimentos: [
-            { nome: "Tesouro Imperial", risco: "Baixo Risco", min: "5g" },
-            { nome: "Ações do Império", risco: "Alto Risco", min: "5g" }
+            { nome: "Tesouro Imperial", risco: "Baixo Risco", min: "5 Moedas de Ouro" },
+            { nome: "Ações do Império", risco: "Alto Risco", min: "5 Moedas de Ouro" }
         ],
         // Panteão: 12 deuses principais com domínios
         deuses: [
@@ -1600,13 +1600,13 @@ const dadosCapital = {
             },
             { 
                 nome: "Leoncio", 
-                recompensa: "2.000 Moedas", 
+                recompensa: "2.000 Moedas de Ouro", 
                 foto: "Leoncio.png",           // Se não tiver foto, coloque null ou apague a linha foto
                 desc: "Morto. Antigo instrutor de elite do Império, agora seu maior traidor. Conhece todas as táticas militares de seus ex-aliados, usando esse conhecimento para desestabilizar a nação que jurou defender." 
             },
             { 
                 nome: "Drai", 
-                recompensa: "2.000 Moedas", 
+                recompensa: "2.000 Moedas de Ouro", 
                 foto: "Drai.png",           // Se não tiver foto, coloque null ou apague a linha foto
                 desc: "Morto. Feiticeira xenófoba obcecada pelos espíritos da floresta. Vê outras raças como pragas e executa assassinatos em massa para 'purificar' a natureza, servindo a uma visão distorcida do equilíbrio." 
             }
@@ -1879,24 +1879,24 @@ const dadosServicos = {
         lore: '"Poção é pra quem não tem tempo de dormir", diz o alquimista.',
         categorias: {
             "Recuperação e Estados": [
-                { nome: "Poção de Cura Menor", preco: "1g 50p", desc: "Recupera 2d6 + 2 de Vida." },
-                { nome: "Poção de Mana Menor", preco: "1g 50p", desc: "Recupera 1d6 + 2 de Mana." },
-                { nome: "Poção de Cura Média", preco: "4g", desc: "Recupera 4d6 + 4 de Vida." },
-                { nome: "Poção de Mana Média", preco: "4g", desc: "Recupera 2d6 + 3 de Mana." },
-                { nome: "Antídoto Comum", preco: "1g", desc: "Cura venenos e estado Adoecido." },
-                { nome: "Poção de Fôlego Renovado", preco: "2g 50p", desc: "Remove estado Cansado (beber não gasta turno)." }
+                { nome: "Poção de Cura Menor", preco: "1 Moeda de Ouro e 50 de Prata", desc: "Recupera 2d6 + 2 de Vida." },
+                { nome: "Poção de Mana Menor", preco: "1 Moeda de Ouro e 50 de Prata", desc: "Recupera 1d6 + 2 de Mana." },
+                { nome: "Poção de Cura Média", preco: "4 Moedas de Ouro", desc: "Recupera 4d6 + 4 de Vida." },
+                { nome: "Poção de Mana Média", preco: "4 Moedas de Ouro", desc: "Recupera 2d6 + 3 de Mana." },
+                { nome: "Antídoto Comum", preco: "1 Moeda de Ouro", desc: "Cura venenos e estado Adoecido." },
+                { nome: "Poção de Fôlego Renovado", preco: "2 Moedas de Ouro e 50 de Prata", desc: "Remove estado Cansado (beber não gasta turno)." }
             ],
             "Combate e Utilitários": [
-                { nome: "Estimulante de Combate", preco: "2g", desc: "Recupera 2 usos de habilidades ativas." },
-                { nome: "Óleo de Fogo (Armas)", preco: "2g", desc: "Próximos 3 ataques: +1d6 dano fogo + Queimando." },
-                { nome: "Elixir da Pele de Ferro", preco: "5g", desc: "+2 na CA por 5 turnos." },
-                { nome: "Soro do Olho de Águia", preco: "3g", desc: "+2 Precisão e Visão no Escuro (5 turnos)." },
-                { nome: "Pó de Desaparecimento", preco: "6g", desc: "Invisível por 2 turnos ou até atacar." },
-                { nome: "Solvente de Corrosão", preco: "4g", desc: "Arremessável: 1d8 dano ácido e -1 CA permanente." },
-                { nome: "Destilado de Mente Alerta", preco: "5g", desc: "+2 Inteligência e Sabedoria por 5 turnos." },
-                { nome: "Elixir de Fala Natural", preco: "2g", desc: "Fala com animais/plantas por 10 min." },
-                { nome: "Estimulante de Corrida", preco: "5g", desc: "+2 Destreza por 5 turnos." },
-                { nome: "Poção Aleatória", preco: "50p", desc: "Garante um efeito aleatório." }
+                { nome: "Estimulante de Combate", preco: "2 Moedas de Ouro", desc: "Recupera 2 usos de habilidades ativas." },
+                { nome: "Óleo de Fogo (Armas)", preco: "2 Moedas de Ouro", desc: "Próximos 3 ataques: +1d6 dano fogo + Queimando." },
+                { nome: "Elixir da Pele de Ferro", preco: "5 Moedas de Ouro", desc: "+2 na CA por 5 turnos." },
+                { nome: "Soro do Olho de Águia", preco: "3 Moedas de Ouro", desc: "+2 Precisão e Visão no Escuro (5 turnos)." },
+                { nome: "Pó de Desaparecimento", preco: "6 Moedas de Ouro", desc: "Invisível por 2 turnos ou até atacar." },
+                { nome: "Solvente de Corrosão", preco: "4 Moedas de Ouro", desc: "Arremessável: 1d8 dano ácido e -1 CA permanente." },
+                { nome: "Destilado de Mente Alerta", preco: "5 Moedas de Ouro", desc: "+2 Inteligência e Sabedoria por 5 turnos." },
+                { nome: "Elixir de Fala Natural", preco: "2 Moedas de Ouro", desc: "Fala com animais/plantas por 10 min." },
+                { nome: "Estimulante de Corrida", preco: "5 Moedas de Ouro", desc: "+2 Destreza por 5 turnos." },
+                { nome: "Poção Aleatória", preco: "50 Moedas de Prata", desc: "Garante um efeito aleatório." }
             ]
         }
     },
@@ -1905,20 +1905,20 @@ const dadosServicos = {
         lore: "Equipamentos de combate de alta qualidade.",
         categorias: {
             "Armas de Combate": [
-                { nome: "Espada de Aço Tramontina", preco: "8g", desc: "Dano 1d10 + Força. Balanceada e superior." },
-                { nome: "Arco Composto de Caça", preco: "12g", desc: "Dano 1d8 + Precisão. Perfurante (ignora 1 CA)." },
-                { nome: "Manoplas de Impacto", preco: "10g", desc: "Dano 1d8 + Força. Pode empurrar 2m." },
-                { nome: "Daga de Sangue (Par)", preco: "12g", desc: "Dano 1d6 + Destreza. Causa Sangramento (1d4/turno)." },
-                { nome: "Martelo Quebra-Crânios", preco: "12g", desc: "Dano 2d6 + Força. Quebra escudos de madeira." },
-                { nome: "Lança de Falange", preco: "10g", desc: "Dano 1d8 + 1 + Força. Ataca em média distância." }
+                { nome: "Espada de Aço Tramontina", preco: "8 Moedas de Ouro", desc: "Dano 1d10 + Força. Balanceada e superior." },
+                { nome: "Arco Composto de Caça", preco: "12 Moedas de Ouro", desc: "Dano 1d8 + Precisão. Perfurante (ignora 1 CA)." },
+                { nome: "Manoplas de Impacto", preco: "10 Moedas de Ouro", desc: "Dano 1d8 + Força. Pode empurrar 2m." },
+                { nome: "Daga de Sangue (Par)", preco: "12 Moedas de Ouro", desc: "Dano 1d6 + Destreza. Causa Sangramento (1d4/turno)." },
+                { nome: "Martelo Quebra-Crânios", preco: "12 Moedas de Ouro", desc: "Dano 2d6 + Força. Quebra escudos de madeira." },
+                { nome: "Lança de Falange", preco: "10 Moedas de Ouro", desc: "Dano 1d8 + 1 + Força. Ataca em média distância." }
             ],
             "Armaduras e Defesa": [
-                { nome: "Armadura de Couro Batido", preco: "12g", desc: "CA 13. Leve e sem penalidades." },
-                { nome: "Manto de Couro Reforçado", preco: "14g", desc: "CA 13. Reduz dano de flechas em 1." },
-                { nome: "Cota de Malha Imperial", preco: "15g", desc: "CA 14. Penalidade em Destreza." },
-                { nome: "Armadura de Placas Parcial", preco: "18g", desc: "CA 15. Penalidade -2 Destreza; sem furtividade." },
-                { nome: "Escudo Reforçado", preco: "8g", desc: "+1 CA. Pode usar ação para +2 Defesa." },
-                { nome: "Braçadeiras de Wyvern", preco: "9g", desc: "Reação Aparar: reduz dano físico em 2d6 (1x/combate)." }
+                { nome: "Armadura de Couro Batido", preco: "12 Moedas de Ouro", desc: "CA 13. Leve e sem penalidades." },
+                { nome: "Manto de Couro Reforçado", preco: "14 Moedas de Ouro", desc: "CA 13. Reduz dano de flechas em 1." },
+                { nome: "Cota de Malha Imperial", preco: "15 Moedas de Ouro", desc: "CA 14. Penalidade em Destreza." },
+                { nome: "Armadura de Placas Parcial", preco: "18 Moedas de Ouro", desc: "CA 15. Penalidade -2 Destreza; sem furtividade." },
+                { nome: "Escudo Reforçado", preco: "8 Moedas de Ouro", desc: "+1 CA. Pode usar ação para +2 Defesa." },
+                { nome: "Braçadeiras de Wyvern", preco: "9 Moedas de Ouro", desc: "Reação Aparar: reduz dano físico em 2d6 (1x/combate)." }
             ]
         }
     },
@@ -1927,19 +1927,19 @@ const dadosServicos = {
         lore: "Itens que flutuam e roupas que brilham sob a luz fraca.",
         categorias: {
             "Focos Arcanos e Vestes": [
-                { nome: "Cajado de Aprendiz", preco: "8g", desc: "+1 ao realizar magias." },
-                { nome: "Orbe de Cristal Estilhaçado", preco: "12g", desc: "+1 em testes e +1 dano em magias." },
-                { nome: "Cetro de Cristal Arcano", preco: "12g", desc: "+2 ao realizar magias." },
-                { nome: "Túnica de Tecido Encantado", preco: "11g", desc: "CA 11. Reduz dano mágico em 2." },
-                { nome: "Manto do Teurgista", preco: "14g", desc: "CA 11. +2 de Mana Máxima." },
-                { nome: "Manto Arcano", preco: "12g", desc: "CA 11. Reduz dano mágico em 2." }
+                { nome: "Cajado de Aprendiz", preco: "8 Moedas de Ouro", desc: "+1 ao realizar magias." },
+                { nome: "Orbe de Cristal Estilhaçado", preco: "12 Moedas de Ouro", desc: "+1 em testes e +1 dano em magias." },
+                { nome: "Cetro de Cristal Arcano", preco: "12 Moedas de Ouro", desc: "+2 ao realizar magias." },
+                { nome: "Túnica de Tecido Encantado", preco: "11 Moedas de Ouro", desc: "CA 11. Reduz dano mágico em 2." },
+                { nome: "Manto do Teurgista", preco: "14 Moedas de Ouro", desc: "CA 11. +2 de Mana Máxima." },
+                { nome: "Manto Arcano", preco: "12 Moedas de Ouro", desc: "CA 11. Reduz dano mágico em 2." }
             ],
             "Itens Mágicos": [
-                { nome: "Anel da Estabilidade", preco: "10g", desc: "Imune a ser derrubado ou empurrado." },
-                { nome: "Amuleto do Eco Mental", preco: "13g", desc: "1x/dia: Re-conjura magia sem gastar mana." },
-                { nome: "Lanterna de Almas", preco: "8g", desc: "Revela pegadas mágicas recentes (2h)." },
-                { nome: "Bolsa de Dimensão de Bolso", preco: "16g", desc: "Carrega até 50kg extras sem peso." },
-                { nome: "Apito de Invocação", preco: "7g", desc: "Sopre para invocar criatura aleatória." }
+                { nome: "Anel da Estabilidade", preco: "10 Moedas de Ouro", desc: "Imune a ser derrubado ou empurrado." },
+                { nome: "Amuleto do Eco Mental", preco: "13 Moedas de Ouro", desc: "1x/dia: Re-conjura magia sem gastar mana." },
+                { nome: "Lanterna de Almas", preco: "8 Moedas de Ouro", desc: "Revela pegadas mágicas recentes (2h)." },
+                { nome: "Bolsa de Dimensão de Bolso", preco: "16 Moedas de Ouro", desc: "Carrega até 50kg extras sem peso." },
+                { nome: "Apito de Invocação", preco: "7 Moedas de Ouro", desc: "Sopre para invocar criatura aleatória." }
             ]
         }
     },
@@ -1948,22 +1948,22 @@ const dadosServicos = {
         lore: "Pergaminhos que SEMPRE FUNCIONAM, mas viram pó após o uso.",
         categorias: {
             "Utilidade e Combate": [
-                { nome: "Luz Eterna (3 usos)", preco: "2 PO", desc: "Esfera de luz por 1 hora." },
-                { nome: "Mãos Mágicas (3 usos)", preco: "2 PO", desc: "Move objetos de 5kg a 10m." },
-                { nome: "Tradução Instantânea (3 usos)", preco: "3 PO", desc: "Lê qualquer língua por 10 min." },
-                { nome: "Escudo Arcano (2 usos)", preco: "4 PO", desc: "+4 Defesa contra o próximo ataque." },
-                { nome: "Flecha Elétrica (2 usos)", preco: "5 PO", desc: "2d6 + Int dano área; chance de atordoar." },
-                { nome: "Névoa Obscurecedora (2 usos)", preco: "4 PO", desc: "Nuvem de fumaça por 3 turnos." }
+                { nome: "Luz Eterna (3 usos)", preco: "2 Moedas de Ouro", desc: "Esfera de luz por 1 hora." },
+                { nome: "Mãos Mágicas (3 usos)", preco: "2 Moedas de Ouro", desc: "Move objetos de 5kg a 10m." },
+                { nome: "Tradução Instantânea (3 usos)", preco: "3 Moedas de Ouro", desc: "Lê qualquer língua por 10 min." },
+                { nome: "Escudo Arcano (2 usos)", preco: "4 Moedas de Ouro", desc: "+4 Defesa contra o próximo ataque." },
+                { nome: "Flecha Elétrica (2 usos)", preco: "5 Moedas de Ouro", desc: "2d6 + Int dano área; chance de atordoar." },
+                { nome: "Névoa Obscurecedora (2 usos)", preco: "4 Moedas de Ouro", desc: "Nuvem de fumaça por 3 turnos." }
             ],
             "Poder e Especialista (1 uso)": [
-                { nome: "Bola de Fogo", preco: "7 PO", desc: "4d6 + Int dano fogo (área 5m)." },
-                { nome: "Teia de Aranha", preco: "6 PO", desc: "Imobiliza inimigos em área (Teste Força)." },
-                { nome: "Sopro de Cura", preco: "8 PO", desc: "Recupera 3d6 Vida de todos aliados (3m)." },
-                { nome: "Invocação de Golem", preco: "12 PO", desc: "Guardião com 30 Vida por 5 turnos." },
-                { nome: "Paralisia Temporal", preco: "10 PO", desc: "Congela inimigo por 2 turnos." },
-                { nome: "Terremoto Localizado", preco: "11 PO", desc: "3d8 dano físico e derruba inimigos." },
-                { nome: "Selagem (Reação)", preco: "5 PO", desc: "Tenta capturar magia inimiga no papel." },
-                { nome: "Teletransporte Emergência", preco: "9 PO", desc: "Grupo viaja para local aleatório." }
+                { nome: "Bola de Fogo", preco: "7 Moedas de Ouro", desc: "4d6 + Int dano fogo (área 5m)." },
+                { nome: "Teia de Aranha", preco: "6 Moedas de Ouro", desc: "Imobiliza inimigos em área (Teste Força)." },
+                { nome: "Sopro de Cura", preco: "8 Moedas de Ouro", desc: "Recupera 3d6 Vida de todos aliados (3m)." },
+                { nome: "Invocação de Golem", preco: "12 Moedas de Ouro", desc: "Guardião com 30 Vida por 5 turnos." },
+                { nome: "Paralisia Temporal", preco: "10 Moedas de Ouro", desc: "Congela inimigo por 2 turnos." },
+                { nome: "Terremoto Localizado", preco: "11 Moedas de Ouro", desc: "3d8 dano físico e derruba inimigos." },
+                { nome: "Selagem (Reação)", preco: "5 Moedas de Ouro", desc: "Tenta capturar magia inimiga no papel." },
+                { nome: "Teletransporte Emergência", preco: "9 Moedas de Ouro", desc: "Grupo viaja para local aleatório." }
             ]
         }
     },
@@ -1972,32 +1972,32 @@ const dadosServicos = {
         lore: "O mercado de criaturas vende seres que não deveriam existir. Prepare o ouro.",
         categorias: {
             "Mascotes Místicos": [
-                { nome: "Corcuja", preco: "35g", desc: "<b>Habilidade:</b> Sentidos Compartilhados (100m). <br><b>Bônus:</b> +2 em Sabedoria para o dono." },
-                { nome: "Dragão de Fumaça", preco: "45g", desc: "<b>Habilidade:</b> Cortina de Cinzas (camuflagem 1 turno). <br><b>Bônus:</b> +2 em Inteligência e +1 em Carisma." },
-                { nome: "Levim (Lontra Branca)", preco: "28g", desc: "<b>Habilidade:</b> Agilidade Fluida (natação rápida). <br><b>Bônus:</b> +1 em Destreza." },
-                { nome: "Gafa (Gato Espiritual)", preco: "50g", desc: "<b>Habilidade:</b> Melodia do Sono e Voo. <br><b>Bônus:</b> +2 em Sabedoria, Inteligência e Carisma." },
-                { nome: "Gato Alado", preco: "30g", desc: "<b>Habilidade:</b> Bote Aéreo (busca itens no alto). <br><b>Bônus:</b> +2 em Destreza." },
-                { nome: "Caelho (Cachorro-Coelho)", preco: "25g", desc: "<b>Habilidade:</b> Super Salto e Farejador de Tesouros. <br><b>Bônus:</b> +1 em Destreza e +1 em Precisão." },
-                { nome: "Correiro (Coruja Guerreira)", preco: "40g", desc: "<b>Habilidade:</b> Guarda Armada (reação de 2d4+2 de dano). <br><b>Bônus:</b> +2 em Força." },
-                { nome: "Girapo (Girafa-Sapo)", preco: "22g", desc: "<b>Habilidade:</b> Língua Longa (pega itens/desarma à distância). <br><b>Bônus:</b> +1 em Constituição." },
-                { nome: "Porco-Galho", preco: "32g", desc: "<b>Habilidade:</b> Espinhos Defensivos (inimigo corpo a corpo sofre 2d4). <br><b>Bônus:</b> +2 em Constituição e +1 em Força." },
-                { nome: "Latorvo (Lagarto-Corvo)", preco: "38g", desc: "<b>Habilidade:</b> Olhar Carniceiro (detecta inimigos fracos). <br><b>Bônus:</b> +2 em Precisão." },
-                { nome: "Maguin (Pinguim Mago)", preco: "60g", desc: "<b>Habilidade:</b> Reserva Arcana (recupera 2d6 Mana) e Replica Feitiço. <br><b>Bônus:</b> +3 em Sabedoria e Inteligência." },
-                { nome: "Taractet (Aranha Tecelã)", preco: "26g", desc: "<b>Habilidade:</b> Fio de Prumo (teia para escalar ou amarrar). <br><b>Bônus:</b> +1 em Inteligência." },
-                { nome: "Beholdin (Mini Beholder)", preco: "85g", desc: "<b>Habilidade:</b> Olhar Paralisante (2 turnos) ou Laser (3d6). <br><b>Bônus:</b> +3 em TODOS os atributos." }
+                { nome: "Corcuja", preco: "35 Moedas de Ouro", desc: "<b>Habilidade:</b> Sentidos Compartilhados (100m). <br><b>Bônus:</b> +2 em Sabedoria para o dono." },
+                { nome: "Dragão de Fumaça", preco: "45 Moedas de Ouro", desc: "<b>Habilidade:</b> Cortina de Cinzas (camuflagem 1 turno). <br><b>Bônus:</b> +2 em Inteligência e +1 em Carisma." },
+                { nome: "Levim (Lontra Branca)", preco: "28 Moedas de Ouro", desc: "<b>Habilidade:</b> Agilidade Fluida (natação rápida). <br><b>Bônus:</b> +1 em Destreza." },
+                { nome: "Gafa (Gato Espiritual)", preco: "50 Moedas de Ouro", desc: "<b>Habilidade:</b> Melodia do Sono e Voo. <br><b>Bônus:</b> +2 em Sabedoria, Inteligência e Carisma." },
+                { nome: "Gato Alado", preco: "30 Moedas de Ouro", desc: "<b>Habilidade:</b> Bote Aéreo (busca itens no alto). <br><b>Bônus:</b> +2 em Destreza." },
+                { nome: "Caelho (Cachorro-Coelho)", preco: "25 Moedas de Ouro", desc: "<b>Habilidade:</b> Super Salto e Farejador de Tesouros. <br><b>Bônus:</b> +1 em Destreza e +1 em Precisão." },
+                { nome: "Correiro (Coruja Guerreira)", preco: "40 Moedas de Ouro", desc: "<b>Habilidade:</b> Guarda Armada (reação de 2d4+2 de dano). <br><b>Bônus:</b> +2 em Força." },
+                { nome: "Girapo (Girafa-Sapo)", preco: "22 Moedas de Ouro", desc: "<b>Habilidade:</b> Língua Longa (pega itens/desarma à distância). <br><b>Bônus:</b> +1 em Constituição." },
+                { nome: "Porco-Galho", preco: "32 Moedas de Ouro", desc: "<b>Habilidade:</b> Espinhos Defensivos (inimigo corpo a corpo sofre 2d4). <br><b>Bônus:</b> +2 em Constituição e +1 em Força." },
+                { nome: "Latorvo (Lagarto-Corvo)", preco: "38 Moedas de Ouro", desc: "<b>Habilidade:</b> Olhar Carniceiro (detecta inimigos fracos). <br><b>Bônus:</b> +2 em Precisão." },
+                { nome: "Maguin (Pinguim Mago)", preco: "60 Moedas de Ouro", desc: "<b>Habilidade:</b> Reserva Arcana (recupera 2d6 Mana) e Replica Feitiço. <br><b>Bônus:</b> +3 em Sabedoria e Inteligência." },
+                { nome: "Taractet (Aranha Tecelã)", preco: "26 Moedas de Ouro", desc: "<b>Habilidade:</b> Fio de Prumo (teia para escalar ou amarrar). <br><b>Bônus:</b> +1 em Inteligência." },
+                { nome: "Beholdin (Mini Beholder)", preco: "85 Moedas de Ouro", desc: "<b>Habilidade:</b> Olhar Paralisante (2 turnos) ou Laser (3d6). <br><b>Bônus:</b> +3 em TODOS os atributos." }
             ],
             "Montarias de Elite": [
-                { nome: "Calorro (Cão Gigante)", preco: "35g", desc: "Extremamente leal. Vantagem em mordida se estiver montado." },
-                { nome: "Carreiro (Cabra Gigante)", preco: "40g", desc: "Ignora terreno difícil em montanhas/cavernas. Escala vertical." },
-                { nome: "Caveixe (Anfíbia)", preco: "45g", desc: "Velocidade dobrada na água. Precisa hidratar a cada 4 horas." },
-                { nome: "Draguês (Terrestre)", preco: "70g", desc: "Máquina de guerra (não voa). CA 15 e ataque de cauda em área." },
-                { nome: "Grifo Imperial", preco: "120g", desc: "Voo Total. Exige alto nível de adestramento ou empatia animal." },
-                { nome: "Felano (Gato Gigante)", preco: "55g", desc: "Silencioso. Permite testes de Furtividade mesmo montado." },
-                { nome: "Mamute", preco: "90g", desc: "Fortaleza móvel (50 Vida). Carrega o squad e ignora gelo." },
-                { nome: "Tigre de Bengala Real", preco: "65g", desc: "Ataque rápido. Intimida inimigos ao iniciar o combate." },
-                { nome: "Lagartão (Lagarto Gigante)", preco: "45g", desc: "Anda em tetos e paredes. Útil para exploração vertical." },
-                { nome: "Rasapo (Raposa Gigante)", preco: "50g", desc: "Ágil. Concede +2 em Iniciativa e desvia de ataques em área." },
-                { nome: "Pequeno Dragão Voador", preco: "150g", desc: "O ápice. Voo, lufada de fogo (4d6) e entende comandos complexos." }
+                { nome: "Calorro (Cão Gigante)", preco: "35 Moedas de Ouro", desc: "Extremamente leal. Vantagem em mordida se estiver montado." },
+                { nome: "Carreiro (Cabra Gigante)", preco: "40 Moedas de Ouro", desc: "Ignora terreno difícil em montanhas/cavernas. Escala vertical." },
+                { nome: "Caveixe (Anfíbia)", preco: "45 Moedas de Ouro", desc: "Velocidade dobrada na água. Precisa hidratar a cada 4 horas." },
+                { nome: "Draguês (Terrestre)", preco: "70 Moedas de Ouro", desc: "Máquina de guerra (não voa). CA 15 e ataque de cauda em área." },
+                { nome: "Grifo Imperial", preco: "120 Moedas de Ouro", desc: "Voo Total. Exige alto nível de adestramento ou empatia animal." },
+                { nome: "Felano (Gato Gigante)", preco: "55 Moedas de Ouro", desc: "Silencioso. Permite testes de Furtividade mesmo montado." },
+                { nome: "Mamute", preco: "90 Moedas de Ouro", desc: "Fortaleza móvel (50 Vida). Carrega o squad e ignora gelo." },
+                { nome: "Tigre de Bengala Real", preco: "65 Moedas de Ouro", desc: "Ataque rápido. Intimida inimigos ao iniciar o combate." },
+                { nome: "Lagartão (Lagarto Gigante)", preco: "45 Moedas de Ouro", desc: "Anda em tetos e paredes. Útil para exploração vertical." },
+                { nome: "Rasapo (Raposa Gigante)", preco: "50 Moedas de Ouro", desc: "Ágil. Concede +2 em Iniciativa e desvia de ataques em área." },
+                { nome: "Pequeno Dragão Voador", preco: "150 Moedas de Ouro", desc: "O ápice. Voo, lufada de fogo (4d6) e entende comandos complexos." }
             ]
         }
     }
@@ -3222,32 +3222,32 @@ if (nomeDoMapa === 'Planos.jpg') {
 // --- DADOS DE IMPORTAÇÃO DA ILHA (MISTERIOSOS, EXÓTICOS E CAROS) ---
 const dadosIlha = {
     alquimia: [
-        { item: "🥥 Fruta do Esquecimento", preco: "35 Golds", desc: "Uma fruta roxa que cheira a infância. Dizem que apaga uma lembrança dolorosa... ou uma perícia inteira." },
-        { item: "🧪 Extrato de Coral Pulsante", preco: "48 Golds", desc: "O líquido vibra dentro do vidro. Beber pode harmonizar seu sangue ou fazer seu coração bater no ritmo errado." },
-        { item: "🌪️ Essência de Tempestade Engarrafada", preco: "60 Golds", desc: "Um redemoinho em miniatura. Se quebrado, pode limpar o campo de batalha ou engolir o esquadrão." },
-        { item: "💧 Lágrima de Sereia Destilada", preco: "75 Golds", desc: "Um óleo denso e salgado. Dizem que permite ver a beleza em qualquer coisa, ou revela a face mais monstruosa da realidade." },
-        { item: "🍄 Esporo de Cogumelo Abissal", preco: "42 Golds", desc: "Pó bioluminescente. Pode causar alucinações divinas ou uma conexão psíquica temporária com o fundo do mar." }
+        { item: "🥥 Fruta do Esquecimento", preco: "35 Moedas de Ouro", desc: "Uma fruta roxa que cheira a infância. Dizem que apaga uma lembrança dolorosa... ou uma perícia inteira." },
+        { item: "🧪 Extrato de Coral Pulsante", preco: "48 Moedas de Ouro", desc: "O líquido vibra dentro do vidro. Beber pode harmonizar seu sangue ou fazer seu coração bater no ritmo errado." },
+        { item: "🌪️ Essência de Tempestade Engarrafada", preco: "60 Moedas de Ouro", desc: "Um redemoinho em miniatura. Se quebrado, pode limpar o campo de batalha ou engolir o esquadrão." },
+        { item: "💧 Lágrima de Sereia Destilada", preco: "75 Moedas de Ouro", desc: "Um óleo denso e salgado. Dizem que permite ver a beleza em qualquer coisa, ou revela a face mais monstruosa da realidade." },
+        { item: "🍄 Esporo de Cogumelo Abissal", preco: "42 Moedas de Ouro", desc: "Pó bioluminescente. Pode causar alucinações divinas ou uma conexão psíquica temporária com o fundo do mar." }
     ],
     equipamentos: [
-        { item: "🧥 Manto de Seda de Sereia", preco: "85 Golds", desc: "Tecido frio e translúcido. Garante movimentos graciosos, mas dizem que o dono começa a ouvir cantos vindo do nada." },
-        { item: "⚔️ Lâmina de Osso de Leviatã", preco: "120 Golds", desc: "Uma espada orgânica que parece estar viva. Ela ignora defesas, mas pode tentar morder a mão de quem a empunha." },
-        { item: "🛡️ Escudo de Casco de Tartaruga-Ansiã", preco: "95 Golds", desc: "Duro como diamante. O peso é insuportável para os fracos, mas protege contra o que os olhos não veem." },
-        { item: "🏹 Arco de Madeira de Naufrágio", preco: "110 Golds", desc: "Cheira a sal e madeira podre, mas nunca quebra. Suas flechas parecem ser guiadas pelas correntes marítimas, mesmo fora da água." },
-        { item: "👟 Sandálias de Vidro Vulcânico", preco: "70 Golds", desc: "Caminhar com elas é como andar sobre brasas. Dizem que permitem ignorar qualquer obstáculo terrestre, ao custo de feridas persistentes nos pés." }
+        { item: "🧥 Manto de Seda de Sereia", preco: "85 Moedas de Ouro", desc: "Tecido frio e translúcido. Garante movimentos graciosos, mas dizem que o dono começa a ouvir cantos vindo do nada." },
+        { item: "⚔️ Lâmina de Osso de Leviatã", preco: "120 Moedas de Ouro", desc: "Uma espada orgânica que parece estar viva. Ela ignora defesas, mas pode tentar morder a mão de quem a empunha." },
+        { item: "🛡️ Escudo de Casco de Tartaruga-Ansiã", preco: "95 Moedas de Ouro", desc: "Duro como diamante. O peso é insuportável para os fracos, mas protege contra o que os olhos não veem." },
+        { item: "🏹 Arco de Madeira de Naufrágio", preco: "110 Moedas de Ouro", desc: "Cheira a sal e madeira podre, mas nunca quebra. Suas flechas parecem ser guiadas pelas correntes marítimas, mesmo fora da água." },
+        { item: "👟 Sandálias de Vidro Vulcânico", preco: "70 Moedas de Ouro", desc: "Caminhar com elas é como andar sobre brasas. Dizem que permitem ignorar qualquer obstáculo terrestre, ao custo de feridas persistentes nos pés." }
     ],
     pets: [
-        { item: "🐙 Pólipo das Nuvens", preco: "110 Golds", desc: "Uma pequena criatura que flutua no ar. Não come, mas parece se alimentar das cores ao redor. Efeito desconhecido." },
-        { item: "🥚 Ovo Manchado de Púrpura", preco: "150 Golds", desc: "Ninguém sabe o que tem dentro. O vendedor garante que 'escolhe o dono'. Não há devoluções após o nascimento." },
-        { item: "🦀 Caranguejo de Joia", preco: "75 Golds", desc: "Um crustáceo que brilha como rubi. Ele gosta de enterrar itens pequenos e os devolve... ligeiramente alterados." },
-        { item: "🐡 Baiacu de Mana", preco: "90 Golds", desc: "Um peixe que levita dentro de uma bolha de água. Ele infla na presença de magia poderosa, mas pode explodir se for perturbado." },
-        { item: "🦑 Água-viva de Memória", preco: "135 Golds", desc: "Flutua sobre a cabeça do dono como um chapéu. Dizem que armazena feitiços lançados contra você, mas pode esquecer de devolvê-los." }
+        { item: "🐙 Pólipo das Nuvens", preco: "110 Moedas de Ouro", desc: "Uma pequena criatura que flutua no ar. Não come, mas parece se alimentar das cores ao redor. Efeito desconhecido." },
+        { item: "🥚 Ovo Manchado de Púrpura", preco: "150 Moedas de Ouro", desc: "Ninguém sabe o que tem dentro. O vendedor garante que 'escolhe o dono'. Não há devoluções após o nascimento." },
+        { item: "🦀 Caranguejo de Joia", preco: "75 Moedas de Ouro", desc: "Um crustáceo que brilha como rubi. Ele gosta de enterrar itens pequenos e os devolve... ligeiramente alterados." },
+        { item: "🐡 Baiacu de Mana", preco: "90 Moedas de Ouro", desc: "Um peixe que levita dentro de uma bolha de água. Ele infla na presença de magia poderosa, mas pode explodir se for perturbado." },
+        { item: "🦑 Água-viva de Memória", preco: "135 Moedas de Ouro", desc: "Flutua sobre a cabeça do dono como um chapéu. Dizem que armazena feitiços lançados contra você, mas pode esquecer de devolvê-los." }
     ],
     reliquias: [
-        { item: "🧭 Bússola Desorientada", preco: "130 Golds", desc: "O ponteiro não aponta para o Norte. Dizem que ele aponta para o que você mais precisa, mesmo que você não queira ir até lá." },
-        { item: "📦 Baú Lacrado com Algas Místicas", preco: "200 Golds", desc: "O ápice do risco. Pode conter um artefato de um deus caído ou apenas areia molhada e uma maldição ancestral." },
-        { item: "🐚 Concha dos Sussurros Mortais", preco: "180 Golds", desc: "Ao colocar no ouvido, você ouve segredos de pessoas que morreram no mar. Pode revelar tesouros escondidos ou levar à loucura total." },
-        { item: "🗿 Totem do Rei de Coral", preco: "165 Golds", desc: "Uma estatueta que sangra água salgada. Quando fincada no solo, a terra ao redor torna-se instável, como se fosse o convés de um navio em tempestade." },
-        { item: "🪞 Espelho de Água Parada", preco: "145 Golds", desc: "A superfície não reflete o presente. Mostra como o espectador será no momento de sua morte. Use por sua conta e risco." }
+        { item: "🧭 Bússola Desorientada", preco: "130 Moedas de Ouro", desc: "O ponteiro não aponta para o Norte. Dizem que ele aponta para o que você mais precisa, mesmo que você não queira ir até lá." },
+        { item: "📦 Baú Lacrado com Algas Místicas", preco: "200 Moedas de Ouro", desc: "O ápice do risco. Pode conter um artefato de um deus caído ou apenas areia molhada e uma maldição ancestral." },
+        { item: "🐚 Concha dos Sussurros Mortais", preco: "180 Moedas de Ouro", desc: "Ao colocar no ouvido, você ouve segredos de pessoas que morreram no mar. Pode revelar tesouros escondidos ou levar à loucura total." },
+        { item: "🗿 Totem do Rei de Coral", preco: "165 Moedas de Ouro", desc: "Uma estatueta que sangra água salgada. Quando fincada no solo, a terra ao redor torna-se instável, como se fosse o convés de um navio em tempestade." },
+        { item: "🪞 Espelho de Água Parada", preco: "145 Moedas de Ouro", desc: "A superfície não reflete o presente. Mostra como o espectador será no momento de sua morte. Use por sua conta e risco." }
     ]
 };
 
@@ -3543,19 +3543,19 @@ function abrirStatsPersonagem(index) {
 // --- SISTEMA DE MERCADO NEGRO (ALCOVA) ---
 const dadosMercadoNegro = {
     substancias: [
-        { item: "🧪 Veneno de Krait", preco: "12 Golds", desc: "Altamente letal. Adiciona 2d6 de dano de veneno por 3 turnos (Teste de Resistência anula)." },
-        { item: "💉 Soro da Fúria Cega", preco: "15 Golds", desc: "Consumível. Dobra o dano físico, mas o usuário perde a habilidade de distinguir amigos de inimigos." },
-        { item: "🌫️ Gás Alucinógeno", preco: "20 Golds", desc: "Item de arremesso. Deixa todos na área de 3m Confusos por 1d4 turnos." }
+        { item: "🧪 Veneno de Krait", preco: "12 Moedas de Ouro", desc: "Altamente letal. Adiciona 2d6 de dano de veneno por 3 turnos (Teste de Resistência anula)." },
+        { item: "💉 Soro da Fúria Cega", preco: "15 Moedas de Ouro", desc: "Consumível. Dobra o dano físico, mas o usuário perde a habilidade de distinguir amigos de inimigos." },
+        { item: "🌫️ Gás Alucinógeno", preco: "20 Moedas de Ouro", desc: "Item de arremesso. Deixa todos na área de 3m Confusos por 1d4 turnos." }
     ],
     equipamentos: [
-        { item: "🗡️ Adaga com Serrote", preco: "18 Golds", desc: "Dano 1d6+2. Impossibilita a cura natural do ferimento até que um médico trate a ferida." },
-        { item: "🧤 Luvas de Gatuno Imperial", preco: "25 Golds", desc: "Roubadas da guarda. Concedem vantagem em testes de Furtividade e Prestidigitação." },
-        { item: "🧥 Capa de Sombras", preco: "40 Golds", desc: "Permite se fundir a sombras uma vez por dia, ficando invisível enquanto estiver no escuro." }
+        { item: "🗡️ Adaga com Serrote", preco: "18 Moedas de Ouro", desc: "Dano 1d6+2. Impossibilita a cura natural do ferimento até que um médico trate a ferida." },
+        { item: "🧤 Luvas de Gatuno Imperial", preco: "25 Moedas de Ouro", desc: "Roubadas da guarda. Concedem vantagem em testes de Furtividade e Prestidigitação." },
+        { item: "🧥 Capa de Sombras", preco: "40 Moedas de Ouro", desc: "Permite se fundir a sombras uma vez por dia, ficando invisível enquanto estiver no escuro." }
     ],
     proibidos: [
-        { item: "📜 Mapa de Rotas de Contrabando", preco: "30 Golds", desc: "Revela atalhos no mar. Diminui o tempo de viagem na Alcova pela metade." },
-        { item: "💀 Crânio de Invocação Proibida", preco: "60 Golds", desc: "Consumível. Invoca um espectro que luta ao seu lado por 3 turnos, mas drena 1d8 de vida do usuário ao expirar." },
-        { item: "💎 Joia da Alma Aprisionada", preco: "100 Golds", desc: "Dizem que contém a essência de um herói antigo. Pode ser usada para barganhar com demônios ou fortalecer uma arma (decisão do Mestre)." }
+        { item: "📜 Mapa de Rotas de Contrabando", preco: "30 Moedas de Ouro", desc: "Revela atalhos no mar. Diminui o tempo de viagem na Alcova pela metade." },
+        { item: "💀 Crânio de Invocação Proibida", preco: "60 Moedas de Ouro", desc: "Consumível. Invoca um espectro que luta ao seu lado por 3 turnos, mas drena 1d8 de vida do usuário ao expirar." },
+        { item: "💎 Joia da Alma Aprisionada", preco: "100 Moedas de Ouro", desc: "Dizem que contém a essência de um herói antigo. Pode ser usada para barganhar com demônios ou fortalecer uma arma (decisão do Mestre)." }
     ]
 };
 
