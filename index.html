@@ -3600,15 +3600,12 @@ function menuMercado(categoria) {
     container.innerHTML = html + `</div>`;
 }
 
-// --- SISTEMA DA DUNGEON: MASMORRA DO EQUILÍBRIO ---
-// --- SISTEMA DA DUNGEON: MASMORRA DO EQUILÍBRIO ---
-// --- SISTEMA DA DUNGEON: MASMORRA DO EQUILÍBRIO ---
 const dadosMasmorra = [
     { sala: 0, titulo: "A Entrada", fotos: ["Dungeon_gelo.png"], cor: "#add8e6" },
     { sala: 1, titulo: "O Ossuário", fotos: ["ossuario.png", "Lily.png", "Murakielomos.png", "Yeti.png"], cor: "#87cefa" },
     { sala: 2, titulo: "A Ponte do Abismo", fotos: ["ponte_gelo.png", "Aranha.png"], cor: "#00bfff" },
     { sala: 3, titulo: "A Passagem dos Ventos", fotos: ["ventos.png", "espiritos_gelo.png"], cor: "#1e90ff" },
-    { sala: 4, titulo: "O Salão dos Fantasmas Cruzados", fotos: ["gelo_negro.png", "Golem de gelo.png"], cor: "#4682b4" },
+    { sala: 4, titulo: "O Salão dos Fantasmas", fotos: ["gelo_negro.png", "Golem de gelo.png"], cor: "#4682b4" },
     { sala: 5, titulo: "O Ninho do Dragão", fotos: ["ninho_dragao.png", "Dragao_gelo.png", "Encapuzados 2.png"], cor: "#b0c4de" }
 ];
 
@@ -3620,7 +3617,7 @@ function abrirMenuDungeon() {
     const titulo = document.getElementById('titulo-menu-capital');
     
     modal.style.display = 'flex';
-    titulo.innerText = "❄️ Masmorra do Equilíbrio Perdido";
+    titulo.innerText = "❄️ Masmorra Congelada Perdida";
     
     container.innerHTML = `
         <div style="background: rgba(135, 206, 235, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #87ceeb;">
