@@ -744,6 +744,16 @@ function verImagemEscola(arquivo) {
     });
 }
 
+function zoomFotoDungeon(arquivo, salaNum) {
+    // Abre a imagem usando sua função verImagemEstatica
+    verImagemEstatica(arquivo, function() {
+        // Isso roda ao clicar no "Voltar" da imagem em tela cheia
+        restaurarMapaMenu(); 
+        document.getElementById('modal-capital').style.display = 'flex'; 
+        detalharSala(salaNum); // Reabre a sala específica da masmorra
+    });
+}
+
 function mostrarPergunta() {
     const container = document.getElementById('conteudo-menu-capital');
     const q = dadosEscola.perguntasQuiz[perguntaAtual];
@@ -878,22 +888,45 @@ function subirAndar() {
     }
 }
 
-function detalharAndar(num) {
-    const andar = dadosTorre.find(a => a.andar === num);
+function detalharSala(num) {
+    const s = dadosMasmorra.find(item => item.sala === num);
     const container = document.getElementById('conteudo-menu-capital');
     
+    // GERA AS FOTOS: Agora com onclick para zoom
+    const htmlFotos = s.fotos.map(foto => `
+        <img src="${foto}" 
+             onclick="zoomFotoDungeon('${foto}', ${num})" 
+             style="
+                display: block;
+                margin: 0 auto 15px auto;
+                max-width: 100%;
+                height: auto;
+                max-height: 450px; 
+                border-radius: 4px;
+                border: 2px solid ${s.cor};
+                box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+                cursor: zoom-in;
+             ">
+    `).join('');
+
     container.innerHTML = `
-        <button onclick="abrirMenuTorre()" class="btn-popup" style="margin-bottom:20px; background:#444;">⬅ Voltar aos Andares</button>
-        <div style="text-align:center; padding: 20px; border: 2px solid ${andar.cor}; border-radius: 10px; background: rgba(0,0,0,0.3);">
-            <h2 style="color:${andar.cor}; margin-top:0;">${andar.titulo}</h2>
-            <h3 style="color:#fff;">${andar.nome}</h3>
-            <hr style="border:0; border-top:1px solid #444;">
-            <p style="font-size:18px; line-height:1.6;">${andar.desc}</p>
-            <div style="margin-top:20px; padding:10px; background:rgba(255,255,255,0.05);">
-                <strong>👥 Aprendizes no andar:</strong> ${andar.aprendizes}
+        <button onclick="abrirMenuDungeon()" class="btn-popup" style="margin-bottom:20px; background:#444; width:100%;">⬅ Voltar às Salas</button>
+        <div style="text-align:center;">
+            <h2 style="color:${s.cor}; margin-top:0; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 20px;">${s.titulo}</h2>
+            <div style="padding: 0 5px;">
+                ${htmlFotos}
             </div>
         </div>
     `;
+}
+function zoomFotoDungeon(arquivo, salaNum) {
+    // Abre a imagem usando sua função verImagemEstatica
+    verImagemEstatica(arquivo, function() {
+        // Código para quando o jogador clicar no botão "Voltar" da imagem
+        restaurarMapaMenu(); 
+        document.getElementById('modal-capital').style.display = 'flex'; 
+        detalharSala(salaNum); // Reabre a sala específica
+    });
 }
 
 /**
@@ -3620,28 +3653,27 @@ function detalharSala(num) {
     const s = dadosMasmorra.find(item => item.sala === num);
     const container = document.getElementById('conteudo-menu-capital');
     
-    // GERA AS FOTOS: 
-    // max-height: 450px permite retratos maiores que antes.
-    // width: auto e max-width: 100% mantém a proporção correta.
+    // GERA AS FOTOS: Com onclick para zoom e proporção correta
     const htmlFotos = s.fotos.map(foto => `
-        <img src="${foto}" style="
-            display: block;
-            margin: 0 auto 15px auto;
-            max-width: 100%;
-            max-height: 450px; 
-            width: auto;
-            border-radius: 6px;
-            border: 2px solid ${s.cor};
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-            object-fit: contain;
-        ">
+        <img src="${foto}" 
+             onclick="zoomFotoDungeon('${foto}', ${num})" 
+             style="
+                display: block;
+                margin: 0 auto 15px auto;
+                max-width: 100%;
+                height: auto;
+                max-height: 450px; 
+                border-radius: 6px;
+                border: 2px solid ${s.cor};
+                box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+                cursor: zoom-in;
+             ">
     `).join('');
 
     container.innerHTML = `
         <button onclick="abrirMenuDungeon()" class="btn-popup" style="margin-bottom:20px; background:#444; width:100%;">⬅ Voltar às Salas</button>
         <div style="text-align:center;">
-            <h2 style="color:${s.cor}; margin-top:0;">${s.titulo}</h2>
-            <hr style="border:0; border-top:1px solid #444; margin-bottom: 20px;">
+            <h2 style="color:${s.cor}; margin-top:0; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 20px;">${s.titulo}</h2>
             <div style="padding-bottom: 10px;">
                 ${htmlFotos}
             </div>
