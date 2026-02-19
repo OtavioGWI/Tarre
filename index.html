@@ -1512,18 +1512,28 @@ const dadosCapital = {
             ativas: [],
             magias: []
         },
-        { 
-            nome: "Greta Thunder", 
-            raca: "Elfa da Floresta",
-            classe: "Maga", 
-            foto: "Greta.jpg",
-            desc: "Uma guardiã solitária de Desterroth que nutre profundo desprezo pela humanidade e outras raças, confiando apenas na justiça da natureza e em seus cactos. Agora, ela é forçada a agir contra uma corrupção obscura que ameaça a floresta que jurou proteger.",
-            stats: [2, 9, 7, 8, 5, 4, 6, 8],
-            hab_raca: "<b>🗣️ Conversa Natural:</b> Pode-se comunicar com elementos da natureza.",
-            passivas: [],
-            ativas: [],
-            magias: []
-        },
+{
+    nome: "Greta Thunder",
+    raca: "Elfa da Floresta",
+    classe: "Maga",
+    foto: "Greta.jpg",
+    desc: "Uma guardiã solitária de Desterroth que nutre profundo desprezo pela humanidade e outras raças, confiando apenas na justiça da natureza e em seus cactos. Agora, ela é forçada a agir contra uma corrupção obscura que ameaça a floresta que jurou proteger.",
+    // Ordem: Força, Sabedoria, Inteligência, Mana, Destreza, Constituição, Precisão, Carisma
+    stats: [3, 6, 9, 8, 4, 5, 7, 2], 
+    hab_raca: "<b>🗣️ Conversa Natural:</b> Comunica-se com elementos da natureza.",
+    passivas: ["Resistência Mágica: Redução permanente de -2 em dano mágico."], 
+    ativas: [
+    ],
+    magias: [
+        "Detectar Magia Menor (Nível 0)", 
+        "Chama Contínua (Nível 0): 1d4 de dano + Queimando", 
+        "Mão Arcana (Nível 0): Manipula objetos à distância",
+        "Raio Adoecente (Nível 1): 1d6 de dano + Adoecido", 
+        "Teia (Nível 1): Prende adversários", 
+        "Bola de Fogo Menor (Nível 1): 1d6 de dano + Queimando",
+        "Raio Congelante (Nível 2): 2d4 de dano + Congelado"
+    ]
+},
         { 
             nome: "Balon Blacktide", 
             raca: "Meio Demônio",
