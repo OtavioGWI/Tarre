@@ -1518,19 +1518,18 @@ const dadosCapital = {
     classe: "Maga",
     foto: "Greta.jpg",
     desc: "Uma guardiã solitária de Desterroth que nutre profundo desprezo pela humanidade e outras raças, confiando apenas na justiça da natureza e em seus cactos. Agora, ela é forçada a agir contra uma corrupção obscura que ameaça a floresta que jurou proteger.",
-    stats: [2, 2, 4, 5, 3, 2, 2, 0],  // For, Sab, Int, Man, Des, Con, Pre, Car
+    stats: [2, 2, 4, 5, 3, 2, 2, 0], // For, Sab, Int, Man, Des, Con, Pre, Car
     hab_raca: "<b>🗣️ Conversa Natural:</b> Comunica-se com elementos da natureza.",
-    passivas: ["Resistência Mágica: Redução permanente de -2 em dano mágico."], 
-    ativas: [
-    ],
+    passivas: ["🛡️ Resistência Mágica: Redução permanente de -2 em dano mágico."], 
+    ativas: [],
     magias: [
-        "Detectar Magia Menor (Nível 0)", 
-        "Chama Contínua (Nível 0): 1d4 de dano + Queimando", 
-        "Mão Arcana (Nível 0): Manipula objetos à distância",
-        "Raio Adoecente (Nível 1): 1d6 de dano + Adoecido", 
-        "Teia (Nível 1): Prende adversários", 
-        "Bola de Fogo Menor (Nível 1): 1d6 de dano + Queimando",
-        "Raio Congelante (Nível 2): 2d4 de dano + Congelado"
+        "🔍 Detectar Magia Menor (Nível 0)", 
+        "🔥 Chama Contínua (Nível 0): 1d4 de dano + Queimando", 
+        "🖐️ Mão Arcana (Nível 0): Manipula objetos à distância",
+        "🤢 Raio Adoecente (Nível 1): 1d6 de dano + Adoecido", 
+        "🕸️ Teia (Nível 1): Prende adversários", 
+        "☄️ Bola de Fogo Menor (Nível 1): 1d6 de dano + Queimando",
+        "❄️ Raio Congelante (Nível 2): 2d4 de dano + Congelado"
     ]
 },
         { 
@@ -1557,18 +1556,26 @@ const dadosCapital = {
             ativas: [],
             magias: []
         },
-        { 
-            nome: "Liésty", 
-            raca: "Elfa Negra",
-            classe: "Maga", 
-            foto: "Liésty.jpg",
-            desc: "Sobrevivente solitária de uma destruição brutal, esta elfa negra trocou a companhia dos vivos pelo silêncio de sua cabana na floresta, onde sua natureza sombria e suas artes arcanas servem como barreira contra um mundo que ela aprendeu a desprezar.",
-            stats: [0, 0, 0, 0, 0, 0, 0, 0], // For, Sab, Int, Man, Des, Con, Pre, Car
-            hab_raca: "<b>🔥 Vontade Ardente:</b> Ataque em área de chamas (2d6*Nv + 1d4*Nv).",
-            passivas: [],
-            ativas: [],
-            magias: []
-        }
+{ 
+    nome: "Liésty", 
+    raca: "Elfa Negra",
+    classe: "Maga", 
+    foto: "Liésty.jpg",
+    desc: "Sobrevivente solitária de uma destruição brutal, esta elfa negra trocou a companhia dos vivos pelo silêncio de sua cabana na floresta, onde sua natureza sombria e suas artes arcanas servem como barreira contra um mundo que ela aprendeu a desprezar.",
+    stats: [1, 2, 5, 4, 3, 3, 1, 1], // For, Sab, Int, Man, Des, Con, Pre, Car
+    hab_raca: "<b>🔥 Vontade Ardente:</b> Ataque em área de chamas (2d6*Nv + 1d4*Nv).",
+    passivas: ["📚 Conhecimento das Eras: Ganha +3 em testes de História, Arcanismo e Investigação."],
+    ativas: [],
+    magias: [
+        "🔥 Chama Contínua (Nível 0): 1d4 de dano + Queimando",
+        "🖐️ Mão Arcana (Nível 0): Manipula objetos à distância",
+        "🕸️ Teia (Nível 1): Prende adversários",
+        "🤢 Raio Adoecente (Nível 1): 1d6 de dano + Adoecido",
+        "🧪 Espirro Ácido (Nível 1): 2d4 de dano perfurante",
+        "☄️ Bola de Fogo Menor (Nível 1): 1d6 de dano + Queimando",
+        "🛡️ Escudo de Mana (Nível 2): Absorve 3d6 de dano por 1d2 turnos"
+    ]
+}
     ],
         procurados: [
             { 
@@ -3577,7 +3584,7 @@ function abrirStatsPersonagem(index) {
 
     // Magias
     if (p.magias && p.magias.length > 0) {
-        html += `<div class="spell-level">🔥 Magias</div>`;
+        html += `<div class="spell-level">🔮 Magias</div>`;
         p.magias.forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
     }
 
