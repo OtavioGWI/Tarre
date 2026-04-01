@@ -1451,7 +1451,31 @@ function atualizarVisualBotao() {
         texto: "Dizem que existe um 101º boato que revela o segredo para se tornar um deus, mas ninguém nunca o ouviu. E dizem que tudo o que você ouviu até agora pode ser uma mentira inventada para te manter longe da verdade.",
         descoberto: true
     };
-
+    listaBoatos[15] = { 
+        id: 16, 
+        texto: "Dizem que um bando de halflings vivem perto do deserto.", 
+        descoberto: true 
+    };
+    listaBoatos[50] = { 
+        id: 51, 
+        texto: "Dizem que a pessoa que tirou a espada é o novo herói que vai salvar o mundo.", 
+        descoberto: true 
+    };
+    listaBoatos[67] = { 
+        id: 68, 
+        texto: "Dizem que os Machinas que voltaram não são os originais, mas sim cópias feitas de metal e memórias falsas.", 
+        descoberto: true 
+    };
+    listaBoatos[70] = { 
+        id: 71, 
+        texto: "Dizem que as fadas na Floresta dos Sonhos sequestram pessoas para usá-las como peças em um jogo de xadrez eterno.", 
+        descoberto: true 
+    };
+    listaBoatos[99] = {
+        id: 100,
+        texto: "Dizem que existe um 101º boato que revela o segredo para se tornar um deus, mas ninguém nunca o ouviu. E dizem que tudo o que você ouviu até agora pode ser uma mentira inventada para te manter longe da verdade.",
+        descoberto: true
+    };
 /**
  * DADOS GERAIS - Banco Imperial e Pantheon
  * Informações de investimentos, pacotes de seguro, e 12 deuses principais
@@ -1676,9 +1700,27 @@ const dadosCapital = {
             • "Após a falsa sensação de calma, vem a tempestade." 
         </div>`
     },
-            {
-                titulo: "Capítulo 1: Desconhecido",
-                texto: `Aventura em progresso...`
+{
+                titulo: "Capítulo 1: Em Busca da Paz em Hukmal'tep",
+                texto: `
+                Após os eventos na masmorra, o grupo retornou aos portões da Capital, onde foram recebidos por <span class="link-historia" onclick="verImagemHistoria('Mina.png', 1)">Mina</span>. Ela é a verdadeira líder do esquadrão Falcões Dourados e estava furiosa porque Will e Carla haviam partido para a missão sem ela. Apesar da irritação com seus companheiros de equipe, Mina os guiou pelo quartel imperial, explicou como as coisas funcionavam por lá e entregou as recompensas por entrarem oficialmente no exército, incluindo um mapa mágico.
+
+                Após fazerem compras e se reequiparem, foram abordados por <span class="link-historia" onclick="verImagemHistoria('Violeta.png', 1)">Violeta</span>, a silenciosa carteira imperial, que lhes entregou o mandado para a próxima missão.
+
+                <div style="font-style: italic; color: #87CEEB; border-left: 2px solid #87CEEB; padding-left: 15px; margin-top: 15px; margin-bottom: 15px; font-size: 14px;">
+                    <b>Mandado Imperial:</b><br>
+                    Ficais designados a servir como força de mediação e contenção na província de Hukmal’tep. Relatos indicam tensões crescentes entre as três tribos: Malistas, Felistas e a Garra do Inverno, com risco de guerra civil. Vossa missão consiste em atuar como representantes, investigar as causas, intervir para evitar derramamento de sangue e garantir a segurança dos civis não combatentes. O uso da força deve ser criterioso. Que a Ordem prevaleça.
+                </div>
+
+                Sem moedas suficientes para o transporte oficial do Império, o esquadrão partiu a pé rumo ao gelado continente. No caminho, sofreram uma emboscada por bandidos, mas após derrotá-los, a sorte sorriu: encontraram <span class="link-historia" onclick="verImagemHistoria('Will.png', 1)">Will</span>, que viajava na carruagem de seu pai e generosamente a cedeu para que os Pandemônios continuassem a jornada.
+
+                Ao chegarem em uma vila neutra, conversaram com o líder local, <span class="link-historia" onclick="verImagemHistoria('Junikardep, o Sexto.png', 1)">Junikardep, o sexto</span>. Ele explicou sobre a iminente guerra entre os clãs e ressaltou que a vila não possuía relação com nenhuma das tribos. Na verdade, a vila mantinha excelentes laços com o Império através de um famoso mercador imperial que costumava frequentar o local. Aproveitando a parada e prevendo o frio extremo, o grupo comprou roupas de pele de Pot. Apenas o anão <span class="link-historia" onclick="verImagemHistoria('Thorga.jpg', 1)">Thorga</span> preferiu economizar, comprando roupas feitas de pele de rato.
+
+                Seguindo viagem rumo ao leste na carruagem, acabaram se perdendo em meio à neve e se depararam com um <span class="link-historia" onclick="verImagemHistoria('Pot.png', 1)">Pot</span> raivoso. Felizmente, <span class="link-historia" onclick="verImagemHistoria('Greta.jpg', 1)">Greta</span> utilizou sua habilidade de Conversa Natural para negociar com a fera, convencendo-a a ir embora sem confronto.
+
+                Finalmente alcançaram o vilarejo mais próximo pertencente à <b>Garra do Inverno</b>, uma tribo isolacionista formada apenas por Mestiços e Bestiais que nutrem ódio por humanos. Após pagarem os guardas para entrar, descobriram o motivo do rancor entre as tribos: reza a lenda que Hukmal'tep foi fundada por dois humanos e um Dragão. O Dragão protegeu os humanos, mas, corrompidos pela ganância, eles o assassinaram para roubar suas riquezas.
+
+                O grupo comprou duas mulas capengas e agora se prepara para partir rumo ao local onde a guerra entre os clãs eclodirá em exatos cinco dias. Aventura em progresso...`
             },
             {
                 titulo: "Capítulo 2: Desconhecido",
