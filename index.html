@@ -1438,44 +1438,23 @@ function atualizarVisualBotao() {
 
 // --- DADOS DA CAPITAL (COM FOTOS) ---
 // 1. Cria 100 boatos vazios automaticamente
-    const listaBoatos = Array.from({ length: 100 }, (_, i) => ({
-        id: i + 1,
-        texto: "Boato ainda não ouvido...",
-        descoberto: false
-    }));
+const listaBoatos = Array.from({ length: 100 }, (_, i) => ({
+    id: i + 1,
+    texto: "Boato ainda não ouvido...",
+    descoberto: false
+}));
 
-    // 2. Define o Boato 100 (O único conhecido agora)
-    // Nota: Como array começa no 0, o boato 100 fica na posição 99
-    listaBoatos[99] = {
-        id: 100,
-        texto: "Dizem que existe um 101º boato que revela o segredo para se tornar um deus, mas ninguém nunca o ouviu. E dizem que tudo o que você ouviu até agora pode ser uma mentira inventada para te manter longe da verdade.",
-        descoberto: true
-    };
-    listaBoatos[15] = { 
-        id: 16, 
-        texto: "Dizem que um bando de halflings vivem perto do deserto.", 
-        descoberto: true 
-    };
-    listaBoatos[50] = { 
-        id: 51, 
-        texto: "Dizem que a pessoa que tirou a espada é o novo herói que vai salvar o mundo.", 
-        descoberto: true 
-    };
-    listaBoatos[67] = { 
-        id: 68, 
-        texto: "Dizem que os Machinas que voltaram não são os originais, mas sim cópias feitas de metal e memórias falsas.", 
-        descoberto: true 
-    };
-    listaBoatos[70] = { 
-        id: 71, 
-        texto: "Dizem que as fadas na Floresta dos Sonhos sequestram pessoas para usá-las como peças em um jogo de xadrez eterno.", 
-        descoberto: true 
-    };
-    listaBoatos[99] = {
-        id: 100,
-        texto: "Dizem que existe um 101º boato que revela o segredo para se tornar um deus, mas ninguém nunca o ouviu. E dizem que tudo o que você ouviu até agora pode ser uma mentira inventada para te manter longe da verdade.",
-        descoberto: true
-    };
+// 2. Define os Boatos descobertos
+listaBoatos[15] = { id: 16, texto: "Dizem que um bando de halflings vivem perto do deserto.", descoberto: true };
+listaBoatos[16] = { id: 17, texto: "Dizem que atrás da floresta dos sonhos existe umas ilhas onde a morte é uma benção", descoberto: true };
+listaBoatos[25] = { id: 26, texto: "Dizem que existe uma arma escondida em algum lugar criada por antigos anciões anões para derrotarem os humanos em guerras passadas mas nunca foi encontrada", descoberto: true };
+listaBoatos[29] = { id: 30, texto: "Dizem que existe uma planta secreta na floresta dos sonhos que cresce mais do que o céu", descoberto: true };
+listaBoatos[50] = { id: 51, texto: "Dizem que a pessoa que tirou a espada é o novo herói que vai salvar o mundo.", descoberto: true };
+listaBoatos[57] = { id: 58, texto: "Dizem que se você nadar até o fundo do Lago das Bênçãos, encontrará uma porta para o palácio de cristal de um deus esquecido.", descoberto: true };
+listaBoatos[67] = { id: 68, texto: "Dizem que os Machinas que voltaram não são os originais, mas sim cópias feitas de metal e memórias falsas.", descoberto: true };
+listaBoatos[70] = { id: 71, texto: "Dizem que as fadas na Floresta dos Sonhos sequestram pessoas para usá-las como peças em um jogo de xadrez eterno.", descoberto: true };
+listaBoatos[71] = { id: 72, texto: "Dizem que se você ouvir o sino da Torre do Relógio bater 12 vezes, o tempo vai parar para você para sempre.", descoberto: true };
+listaBoatos[99] = { id: 100, texto: "Dizem que existe um 101º boato que revela o segredo para se tornar um deus, mas ninguém nunca o ouviu. E dizem que tudo o que você ouviu até agora pode ser uma mentira inventada para te manter longe da verdade.", descoberto: true };
 /**
  * DADOS GERAIS - Banco Imperial e Pantheon
  * Informações de investimentos, pacotes de seguro, e 12 deuses principais
@@ -1701,7 +1680,7 @@ const dadosCapital = {
         </div>`
     },
 {
-                titulo: "Capítulo 1: Em Busca da Paz em Hukmal'tep",
+                titulo: "Capítulo 1: A Guerra Sem Sentido",
                 texto: `
                 Após os eventos na masmorra, o grupo retornou aos portões da Capital, onde foram recebidos por <span class="link-historia" onclick="verImagemHistoria('Mina.png', 1)">Mina</span>. Ela é a verdadeira líder do esquadrão Falcões Dourados e estava furiosa porque Will e Carla haviam partido para a missão sem ela. Apesar da irritação com seus companheiros de equipe, Mina os guiou pelo quartel imperial, explicou como as coisas funcionavam por lá e entregou as recompensas por entrarem oficialmente no exército, incluindo um mapa mágico.
 
@@ -1714,13 +1693,27 @@ const dadosCapital = {
 
                 Sem moedas suficientes para o transporte oficial do Império, o esquadrão partiu a pé rumo ao gelado continente. No caminho, sofreram uma emboscada por bandidos, mas após derrotá-los, a sorte sorriu: encontraram <span class="link-historia" onclick="verImagemHistoria('Will.png', 1)">Will</span>, que viajava na carruagem de seu pai e generosamente a cedeu para que os Pandemônios continuassem a jornada.
 
-                Ao chegarem em uma vila neutra, conversaram com o líder local, <span class="link-historia" onclick="verImagemHistoria('Junikardep, o Sexto.png', 1)">Junikardep, o sexto</span>. Ele explicou sobre a iminente guerra entre os clãs e ressaltou que a vila não possuía relação com nenhuma das tribos. Na verdade, a vila mantinha excelentes laços com o Império através de um famoso mercador imperial que costumava frequentar o local. Aproveitando a parada e prevendo o frio extremo, o grupo comprou roupas de pele de Pot. Apenas o anão <span class="link-historia" onclick="verImagemHistoria('Thorga.jpg', 1)">Thorga</span> preferiu economizar, comprando roupas feitas de pele de rato.
+                Ao chegarem em uma vila neutra, conversaram com o líder local, <span class="link-historia" onclick="verImagemHistoria('Junikardep.png', 1)">Junikardep, o sexto</span>. Ele explicou sobre a iminente guerra entre os clãs e ressaltou que a vila não possuía relação com nenhuma das tribos. Na verdade, a vila mantinha excelentes laços com o Império através de um famoso mercador imperial que costumava frequentar o local. Aproveitando a parada e prevendo o frio extremo, o grupo comprou roupas de pele de Pot. Apenas o anão <span class="link-historia" onclick="verImagemHistoria('Thorga.jpg', 1)">Thorga</span> preferiu economizar, comprando roupas feitas de pele de rato.
 
                 Seguindo viagem rumo ao leste na carruagem, acabaram se perdendo em meio à neve e se depararam com um <span class="link-historia" onclick="verImagemHistoria('Pot.png', 1)">Pot</span> raivoso. Felizmente, <span class="link-historia" onclick="verImagemHistoria('Greta.jpg', 1)">Greta</span> utilizou sua habilidade de Conversa Natural para negociar com a fera, convencendo-a a ir embora sem confronto.
 
-                Finalmente alcançaram o vilarejo mais próximo pertencente à <b>Garra do Inverno</b>, uma tribo isolacionista formada apenas por Mestiços e Bestiais que nutrem ódio por humanos. Após pagarem os guardas para entrar, descobriram o motivo do rancor entre as tribos: reza a lenda que Hukmal'tep foi fundada por dois humanos e um Dragão. O Dragão protegeu os humanos, mas, corrompidos pela ganância, eles o assassinaram para roubar suas riquezas.
+                Finalmente alcançaram o vilarejo mais próximo pertencente à <b>Garra do Inverno</b>, uma tribo isolacionista formada apenas por Mestiços e Bestiais que nutrem ódio por humanos. Após pagarem os guardas para entrar, descobriram a base do rancor ancestral: reza a lenda que Hukmal'tep foi fundada por um homem, uma mulher e um Dragão que protegia os humanos, mas cada tribo afirma que seu progenitor foi traído pelos outros.
 
-                O grupo comprou duas mulas capengas e agora se prepara para partir rumo ao local onde a guerra entre os clãs eclodirá em exatos cinco dias. Aventura em progresso...`
+                Compraram duas mulas capengas e dispararam rumo ao local onde o conflito eclodiria. No percurso, foram surpreendidos por um deslizamento de neve devastador. Todos conseguiram fugir por um triz, com exceção de Valkia, salva no último segundo por seus colegas, mas as mulas e o "rato pelado" desapareceram sob o gelo para nunca mais voltarem. Em meio ao caos da avalanche, <span class="link-historia" onclick="verImagemHistoria('Yeti.png', 1)">Yetis</span> furiosos, também arrastados pelo desastre, atacaram o grupo.
+
+                Avançando a pé, chegaram finalmente ao acampamento dos <b>Malistas</b> (um exército composto exclusivamente por homens). Negociaram com o líder <span class="link-historia" onclick="verImagemHistoria('Morundinguopu.png', 1)">Morundinguopu</span>, que concordou em dar dois dias de trégua para que os Pandemônios tentassem convencer o exército Felista a se render. 
+
+                A caminho da capital de Hukmal'tep, notaram que as torres de vigia e as vilas estavam todas vazias, pois a população inteira havia se refugiado na cidade-fortaleza. Lá, falaram com a líder das <b>Felistas</b> (um exército exclusivo de mulheres), <span class="link-historia" onclick="verImagemHistoria('Xandrilatrunca.png', 1)">Xandrilatrunca</span>. Ela permitiu que investigassem a biblioteca da cidade, mas tomou <span class="link-historia" onclick="verImagemHistoria('Liésty.jpg', 1)">Liésty</span> como garantia de que o grupo voltaria com a ajuda (comida) que ela queria, justificando a prisão também pelo fato de afirmarem que a elfa negra era uma bruxa. 
+
+                A biblioteca revelou informações vitais, levando os jogadores a subirem a grande montanha de gelo. No topo, encontraram uma caverna com um campo de lírios intactos na frente: a <span class="link-historia" onclick="verImagemHistoria('Dungeon_gelo.png', 1)">Entrada</span> da masmorra. 
+                
+                Lá dentro, o ambiente era extremamente hostil. Pedras estranhas espalhadas pelo local absorviam qualquer magia que fosse usada perto delas. Atravessaram a perigosa <span class="link-historia" onclick="verImagemHistoria('ponte_gelo.png', 1)">Ponte do Abismo</span>, enfrentaram terríveis <span class="link-historia" onclick="verImagemHistoria('Aranha.png', 1)">Aranhas de Gelo</span>, lutaram contra um colossal <span class="link-historia" onclick="verImagemHistoria('Golem de gelo.png', 1)">Golem de Gelo</span> e encontraram mais Yetis pelo caminho.
+
+                No coração da ruína, o grupo se deparou com os fantasmas dos fundadores de Hukmal'tep. Descobriram que o homem, <span class="link-historia" onclick="verImagemHistoria('Murakielomos.png', 1)">Murakielomos</span>, e a mulher, <span class="link-historia" onclick="verImagemHistoria('Lily.png', 1)">Lily</span>, se amavam profundamente. O <span class="link-historia" onclick="verImagemHistoria('Dragao_gelo.png', 1)">Dragão</span> não foi morto por traição, ele apenas queria ajudar a humanidade a sobreviver. Na verdade, os três foram impiedosamente manipulados e assassinados por misteriosos <span class="link-historia" onclick="verImagemHistoria('Encapuzados 2.png', 1)">Encapuzados</span>, que forjaram a mentira da traição para gerar um ódio e preconceito eterno entre as tribos de homens, mulheres e mestiços.
+
+                Durante a revelação, o próprio fantasma do dragão, que estava sendo controlado pelos Encapuzados, atacou o grupo. Os cultistas revelaram que já sabiam que os jogadores haviam sido enviados pelo Serafim da Ordem para intervir na organização deles. 
+
+                No fim do confronto, os Pandemônios destruíram o cristal que aprisionava o Dragão, deixando a fera fugir da caverna enfurecida. Após a sala da batalha, encontraram um pedestal guardando um cristal resplandecente, de tom fúcsia (rosa e roxo). Nele, havia uma inscrição final dita: "A primeira chave dos esquecidos". O destino das três tribos agora depende da verdade que o esquadrão carrega em suas mãos e de como irão lidar com a fúria do Dragão.`
             },
             {
                 titulo: "Capítulo 2: Desconhecido",
@@ -1948,13 +1941,27 @@ function menuCapital(tipo) {
             `<p>Obs: Todo o dinheiro, itens e criaturas guardadas pelo banco imperial possui garantia total</p>` +
             `<p>Obs 2: Não existe melhoramento de pacote, se for trocar seu pacote será com o preço integral</p>` +
             `</div>`;
-    } else if (tipo === 'boatos') {
+   } else if (tipo === 'boatos') {
         titulo.innerText = "🗣️ Boatos";
-        container.innerHTML = btnVoltar + `<div class="lista-boatos">`;
+        
+        // Transformamos a div em um <label>. Assim, clicar no texto também marca o quadradinho.
+        let htmlTop = btnVoltar + `
+            <label style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 5px; border: 1px solid #444; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer;">
+                <input type="checkbox" id="filtro-boatos" onchange="alternarFiltroBoatos()" style="transform: scale(1.5); cursor: pointer; accent-color: #cd853f; margin-left: 5px;">
+                <span style="color: #ffdead; font-size: 14px; font-weight: bold;">Filtrar Boatos Conhecidos</span>
+            </label>
+            <div class="lista-boatos">
+        `;
+        
+        container.innerHTML = htmlTop;
+        
         dadosCapital.boatos.forEach(b => {
             const txt = b.descoberto ? b.texto : "??????????";
-            container.innerHTML += `<div class="boato-item ${b.descoberto ? 'boato-descoberto' : ''}"><span class="boato-numero">#${b.id}</span><span class="boato-texto">"${txt}"</span></div>`;
+            // Adiciona a classe 'boato-desconhecido' para podermos esconder via JavaScript
+            const classeOculta = b.descoberto ? 'boato-descoberto' : 'boato-desconhecido';
+            container.innerHTML += `<div class="boato-item ${classeOculta}"><span class="boato-numero">#${b.id}</span><span class="boato-texto">"${txt}"</span></div>`;
         });
+        
         container.innerHTML += `</div>`;
     } else if (tipo === 'historico') {
         titulo.innerText = "📜 Missões & Relatos";
@@ -2095,7 +2102,15 @@ const dadosServicos = {
         }
     }
 };
-
+function alternarFiltroBoatos() {
+    const checkbox = document.getElementById('filtro-boatos');
+    const desconhecidos = document.querySelectorAll('.boato-desconhecido');
+    
+    // Se a caixa estiver marcada, esconde (none), senão, mostra (flex)
+    desconhecidos.forEach(b => {
+        b.style.display = checkbox.checked ? 'none' : 'flex';
+    });
+}
 function menuServicos(aba) {
     const container = document.getElementById('conteudo-menu-capital');
     const titulo = document.getElementById('titulo-menu-capital');
