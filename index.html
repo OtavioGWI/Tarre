@@ -659,23 +659,140 @@
 // Variável de controle: qual o andar máximo que o grupo já liberou?
 // --- SISTEMA DA ESCOLA DE MAGIA ---
 const dadosEscola = {
+    casas: {
+        "Aetheris": { 
+            cor: "#ffd700", 
+            elemento: "Ar / Espaço", 
+            guardiao: "Coruja", 
+            emblema: "Aetheris.png",
+            desc: "Alunos metódicos e lógicos. Valorizam o intelecto acima da emoção e buscam entender as leis matemáticas da magia. Passam noites em claro na biblioteca calculando equações arcanas e prevendo movimentos celestes. Em batalha, são táticos frios." 
+        },
+        "Sylvana": { 
+            cor: "#2e8b57", 
+            elemento: "Terra / Natureza", 
+            guardiao: "Lobo", 
+            emblema: "Sylvana.png",
+            desc: "Alunos intuitivos e empáticos. Possuem uma calma natural e preferem a magia que flui organicamente. São os protetores da vida, excelentes ouvintes e buscam sempre a harmonia com o ambiente, usando o próprio terreno como extensão do corpo." 
+        },
+        "Ignis": { 
+            cor: "#ff4500", 
+            elemento: "Fogo", 
+            guardiao: "Dragão", 
+            emblema: "ignis.png",
+            desc: "Impetuosos, corajosos e competitivos. Acreditam que a magia é uma extensão da própria vontade e não temem o confronto direto. As arenas de duelo e as demonstrações de puro poder destrutivo são a especialidade e o orgulho desta casa." 
+        },
+        "Umbra": { 
+            cor: "#8a2be2", 
+            elemento: "Trevas", 
+            guardiao: "Corvo", 
+            emblema: "Umbra.png",
+            desc: "Curiosos, estoicos e perspicazes. Não acreditam no conceito de 'conhecimento proibido', apenas em falta de preparo. São ótimos investigadores e espiões, movendo-se nas sombras para desvendar segredos esquecidos e explorar as falhas do inimigo." 
+        },
+        "Aquaris": { 
+            cor: "#1e90ff", 
+            elemento: "Água", 
+            guardiao: "Serpente", 
+            emblema: "Aquaris.png",
+            desc: "Adaptáveis, serenos e resilientes. Focados na fluidez da magia, na adaptação e no equilíbrio emocional da equipe. São os grandes suportes e curandeiros da academia, mas podem ser tão devastadores quanto um maremoto quando provocados." 
+        },
+        "Luminius": { 
+            cor: "#fff8dc", 
+            elemento: "Luz", 
+            guardiao: "Leão", 
+            emblema: "Luminius.png",
+            desc: "Justos, honrados e protetores. Dedicados à ordem, à purificação e a usar a magia sagrada para ser o escudo dos mais fracos. Seus membros seguem códigos morais estritos e frequentemente lideram esquadrões pelo exemplo heroico." 
+        }
+    },
     pessoas: [
-        { nome: "Arquimago Valerius", cargo: "Diretor", desc: "Um elfo alto de idade incalculável. Consegue ver o fluxo de mana de Tarre.", foto: "Valerius.png" },
-        { nome: "Mestra Elara", cargo: "Professora de Runas", desc: "Exigente e mestre em encantamentos permanentes.", foto: "Elara.png" },
-        { nome: "Kael, o Prodígio", cargo: "Aluno (Umbra)", desc: "Domina fendas dimensionais. Calado e misterioso.", foto: "Kael.png" }
+        { nome: "Arquimago Valerius", cargo: "Professor", casa: "Diretoria", desc: "Um elfo de idade incalculável. Consegue ver o fluxo de mana de Tarre.", foto: "Valerius.png" },
+        { nome: "Mestra Elara", cargo: "Professora", casa: "Aetheris", desc: "Exigente e mestre em encantamentos permanentes.", foto: "Elara.png" },
+        { nome: "Mestre Trovus", cargo: "Professor", casa: "Ignis", desc: "Ensina magias de combate ofensivo. Grita muito durante as aulas.", foto: null },
+        { nome: "Kael, o Prodígio", cargo: "Aluno", casa: "Umbra", desc: "Domina fendas dimensionais. Calado e misterioso.", foto: "Kael.png" },
+        { nome: "Lívia Gota-fria", cargo: "Aluna", casa: "Aquaris", desc: "Especialista em magia curativa aquática. Sempre calma e diplomática.", foto: null },
+        { nome: "Thalindor", cargo: "Aluno", casa: "Sylvana", desc: "Passa mais tempo conversando com as trepadeiras do que com pessoas.", foto: null },
+        { nome: "Aurora Vanguarda", cargo: "Aluna", casa: "Luminius", desc: "A paladina da turma, não tolera quebras de regras.", foto: null }
+    ],
+    lojaEncantamentos: [
+        { nome: "Runa do Peso Pluma", preco: "20 Runas", desc: "Encanta armadura pesada: Remove a penalidade de deslocamento e furtividade." },
+
+        { nome: "Runa do Passo Silencioso", preco: "30 Runas", desc: "Encanta bota: Concede vantagem em testes de furtividade." },
+
+        { nome: "Encanto do Sangue Quente", preco: "35 Runas", desc: "Encanta peitoral: Imunidade passiva a congelamento, queimamento e penalidades de clima." },
+
+        { nome: "Selo do Casco de Pedra", preco: "45 Runas", desc: "Encanta escudo ou peitoral: Reduz o dano físico recebido em 1 (Permanente)." },
+
+        { nome: "Runa do Ricochete", preco: "50 Runas", desc: "Encanta arma de arremesso: Erros têm 50% de chance de ricochetear num alvo secundário." },
+
+        { nome: "Fio de Tempestade", preco: "60 Runas", desc: "Encanta arma cortante: Ataques tem chance de atordoar o inimigo eletricamente (perde 1 ação)." },
+
+        { nome: "Símbolo do Guardião", preco: "70 Runas", desc: "Encanta escudo: +1 CA extra para o usuário e para aliados próximos (2 metros)." },
+
+        { nome: "Gravação do Sanguessuga", preco: "80 Runas", desc: "Encanta arma corpo-a-corpo: Ao tirar dano máximo no dado de ataque, recupera metade do dado de dano em HP." },
+
+        { nome: "Fio Venenoso Perene", preco: "95 Runas", desc: "Encanta arma: Ignora a imunidade natural a veneno de monstros de níveis baixos/médios." },
+
+        { nome: "Runa da Reação Arcana", preco: "120 Runas", desc: "Encanta acessório: Uma vez por combate, se sofrer dano mágico, reflete metade do dano de volta." }
+    ],
+
+    lojaMagias: [
+        { nome: "Corrente de Vento (Nível 0)", preco: "15 Runas", desc: "Magia (0 Mana): Empurra criaturas pequenas 2m para trás ou dissipa nuvens/gases venenosos na área." },
+
+        { nome: "Olhar do Rastreador (Nível 0)", preco: "20 Runas", desc: "Magia (0 Mana): Marca pegadas recentes no chão com um brilho que só você vê por 1 hora." },
+
+        { nome: "Passo Magnético (Nível 1)", preco: "25 Runas", desc: "Magia (1 Mana): Puxa um aliado ou item leve (até 10m) para o seu lado. Salva colegas de abismos." },
+
+        { nome: "Eco Ilusório (Nível 1)", preco: "40 Runas", desc: "Magia (1 Mana): Cria um clone seu que corre pro lado oposto. Tem 1 HP e absorve o próximo golpe focado em você." },
+
+        { nome: "Terreno Escorregadio (Nível 1)", preco: "45 Runas", desc: "Magia (1 Mana): Transforma 16m² de chão em uma poça de óleo escorregadio. Inimigos escorregam e caem." },
+
+        { nome: "Vínculo de Sangue (Nível 2)", preco: "55 Runas", desc: "Magia (2 Mana): Conecta sua vida à de um aliado. Por 3 turnos, todo dano ou cura é dividido igualmente entre vocês." },
+
+        { nome: "Bolha de Silêncio (Nível 2)", preco: "65 Runas", desc: "Magia (2 Mana): Cria cúpula de 4m sem som. Magos não conseguem conjurar lá dentro e alarmes não tocam." },
+
+        { nome: "Gravidade Localizada (Nível 2)", preco: "80 Runas", desc: "Magia (2 Mana): Inimigos numa área de 16m² ficam com 50% do deslocamento e -2 em Força e Destreza." },
+
+        { nome: "Troca Equivalente (Nível 2)", preco: "95 Runas", desc: "Magia (2 Mana): Troca de lugar instantaneamente com um aliado ou inimigo (teste de resistência) até 10m." },
+
+        { nome: "Prisão de Cristal (Nível 3)", preco: "115 Runas", desc: "Magia (3 Mana): Envolve um inimigo de tamanho médio em cristal. Ele não age, mas não toma dano até alguém quebrar o cristal." },
+
+        { nome: "Muralha de Espelhos (Nível 3)", preco: "160 Runas", desc: "Magia (3 Mana): Barreira translúcida de 6m. Magias de nível 1 ou 2 disparadas contra ela rebatem no atirador." }
+    ],
+
+    lojaItens: [
+        { nome: "Tinta Invisível Mágica", preco: "10 Runas", desc: "Frasco. Mensagens escritas só podem ser lidas se iluminadas por magias de nível 0 (como Luz)." },
+
+        { nome: "Frasco de Névoa Instantânea", preco: "15 Runas", desc: "Arremessável (Uso único). Explode numa nuvem de fumaça densa para cobrir retiradas." },
+
+        { nome: "Pó de Fada Concentrado", preco: "25 Runas", desc: "Consumível (Uso único). O usuário flutua 10cm do chão por 1 hora. Ignora armadilhas de piso e não faz barulho." },
+
+        { nome: "Corda Infinita", preco: "35 Runas", desc: "Um novelo de corda que nunca acaba e se retrai instantaneamente com uma palavra de comando." },
+
+        { nome: "Lente Reveladora", preco: "50 Runas", desc: "Monóculo. Enxerga magia invisível, armadilhas arcanas e ilusões (raio de 12m) por 10 mins (1 uso/dia)." },
+
+        { nome: "Amuleto do Intérprete", preco: "60 Runas", desc: "Acessório. Permite entender perfeitamente o idioma de qualquer criatura humanóide bípede." },
+
+        { nome: "Anel do Eco Vital", preco: "85 Runas", desc: "Acessório de proteção. Se seu HP cair a 0, o anel quebra magicamente e te estabiliza em 1 de HP." },
+
+        { nome: "Capa do Viajante dos Ventos", preco: "100 Runas", desc: "Equipamento. +4m de deslocamento por turno. Pode planar ao pular de grandes alturas (anula queda)." },
+
+        { nome: "Grimório Absorvente", preco: "140 Runas", desc: "Livro arcano em branco. Usa Reação (1x/dia) para engolir magias (abaixo do seu nível) atiradas em você, podendo reconjurá-las." },
+
+        { nome: "Estilhaço de Estrela Cadente", preco: "300 Runas", desc: "Artefato Consumível. Esmague-o para recuperar 100% de HP e Mana, curar todas as condições negativas e recuperar membros perdidos." }
     ],
     perguntasQuiz: [
-        { p: "Em um combate, o que você prioriza?", r: { "Ignis": "Poder bruto e finalização rápida.", "Aetheris": "Estratégia e controle do espaço.", "Sylvana": "Cura e proteção dos aliados.", "Umbra": "Aproveitar as brechas e o erro inimigo." } },
-        { p: "Onde você passaria seu tempo livre na Academia?", r: { "Aetheris": "No observatório, estudando os astros.", "Sylvana": "Nos jardins, conversando com os espíritos.", "Ignis": "Na arena de duelos praticando feitiços.", "Umbra": "Na seção proibida da biblioteca." } },
-        { p: "Qual dessas qualidades você mais valoriza?", r: { "Ignis": "Coragem", "Aetheris": "Lógica", "Sylvana": "Instinto", "Umbra": "Perspicácia" } },
-        { p: "Se encontrasse um artefato antigo e perigoso, você:", r: { "Umbra": "O guardaria para estudar seus segredos.", "Ignis": "O usaria para testar seu poder em batalha.", "Aetheris": "O levaria para o conselho para análise técnica.", "Sylvana": "O enterraria para que a natureza o retomasse." } },
-        { p: "Como você prefere resolver um enigma?", r: { "Aetheris": "Analisando cada detalhe matematicamente.", "Umbra": "Pensando fora da caixa e buscando atalhos.", "Sylvana": "Escutando a intuição e o ambiente.", "Ignis": "Tentando várias vezes até quebrar o mistério." } },
-        { p: "Um feitiço seu falha e causa uma pequena explosão. Você:", r: { "Ignis": "Dá risada e tenta um maior logo em seguida.", "Aetheris": "Anota exatamente o que deu errado no pergaminho.", "Sylvana": "Pede desculpas às energias ao redor.", "Umbra": "Analisa se a 'falha' pode ser usada como uma nova arma." } },
-        { p: "Qual criatura seria seu companheiro ideal?", r: { "Sylvana": "Um lobo espiritual leal.", "Aetheris": "Uma coruja de cristal observadora.", "Ignis": "Um pequeno dragão impetuoso.", "Umbra": "Um corvo que sussurra segredos." } }
+        { p: "Em um combate, o que você prioriza?", r: { "Ignis": "Poder bruto e finalização rápida.", "Aetheris": "Estratégia, posicionamento e controle do espaço.", "Sylvana": "Observar o ambiente e usar o terreno a favor.", "Umbra": "Aproveitar as brechas e o erro inimigo.", "Aquaris": "Curar, adaptar-se e desgastar o oponente.", "Luminius": "Proteger os aliados com escudos impenetráveis." } },
+        { p: "Onde você passaria seu tempo livre na Academia?", r: { "Aetheris": "No observatório celeste, estudando os astros.", "Sylvana": "Nos jardins internos, conversando com a fauna.", "Ignis": "Na arena de duelos, praticando e competindo.", "Umbra": "Na seção esquecida e proibida da biblioteca.", "Aquaris": "Nas fontes termais ou próximo ao lago principal.", "Luminius": "Na capela sagrada, meditando ou treinando os novatos." } },
+        { p: "Qual dessas qualidades você mais valoriza?", r: { "Ignis": "Coragem inabalável.", "Aetheris": "Lógica impecável.", "Sylvana": "Instinto natural.", "Umbra": "Perspicácia e frieza.", "Aquaris": "Resiliência e calma.", "Luminius": "Honra e sacrifício." } },
+        { p: "Se encontrasse um artefato antigo e perigoso, você:", r: { "Umbra": "O guardaria oculto para estudar seus segredos sombrios.", "Ignis": "O usaria imediatamente para testar seu poder destrutivo.", "Aetheris": "O levaria para o conselho para análise técnica e desconstrução.", "Sylvana": "O enterraria profundamente para que a natureza o retomasse.", "Aquaris": "O jogaria no fundo do mar, onde a água diluiria sua magia.", "Luminius": "O purificaria com magia divina ou o destruiria para proteger a todos." } },
+        { p: "Como você prefere resolver um enigma?", r: { "Aetheris": "Analisando cada detalhe e calculando as probabilidades.", "Umbra": "Pensando fora da caixa, trapaceando se for necessário.", "Sylvana": "Escutando a intuição e o que o ambiente sussurra.", "Ignis": "Quebrando o mecanismo. Quem precisa de porta quando se tem fogo?", "Aquaris": "Tentando caminhos diferentes suavemente até a resposta fluir.", "Luminius": "Buscando nos textos sagrados e nas regras antigas a resposta certa." } },
+        { p: "Um feitiço seu falha e causa uma explosão. Você:", r: { "Ignis": "Dá risada e tenta um feitiço ainda maior logo em seguida.", "Aetheris": "Anota a falha no pergaminho para corrigir a fórmula matemática.", "Sylvana": "Pede desculpas às energias e tenta de forma mais orgânica.", "Umbra": "Analisa se a explosão pode ser usada como uma nova tática de ataque.", "Aquaris": "Mantém a calma, apaga o fogo e reflete sobre o que sentiu na hora.", "Luminius": "Verifica se todos estão seguros antes de assumir total responsabilidade." } },
+        { p: "Qual espírito guardião seria seu companheiro ideal?", r: { "Sylvana": "Um Lobo silvestre leal.", "Aetheris": "Uma Coruja observadora.", "Ignis": "Um Dragão escamado impetuoso.", "Umbra": "Um Corvo que sussurra segredos.", "Aquaris": "Uma Serpente aquática fluida.", "Luminius": "Um Leão majestoso de juba brilhante." } }
     ]
 };
-let pontosQuiz = { Aetheris: 0, Sylvana: 0, Ignis: 0, Umbra: 0 };
+
+let pontosQuiz = { Aetheris: 0, Sylvana: 0, Ignis: 0, Umbra: 0, Aquaris: 0, Luminius: 0 };
 let perguntaAtual = 0;
+
 function abrirEscolaMagia() {
     const container = document.getElementById('conteudo-menu-capital');
     const modal = document.getElementById('modal-capital');
@@ -683,75 +800,125 @@ function abrirEscolaMagia() {
     modal.style.display = 'flex';
     
     container.innerHTML = `
+        <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; border: 1px dashed #ffd700;">
+            <p style="color:#aaa; margin:0; font-size: 13px;">As transações na Academia são feitas com <b style="color:#ffd700;">Runas</b>. <br>Conclua aulas e tire boas notas com os professores para ganhá-las!</p>
+        </div>
         <div class="biblio-nav">
-            <div class="rpg-card-small" onclick="menuEscola('casas')"><span>🏰</span><strong>As 4 Casas</strong></div>
-            <div class="rpg-card-small" onclick="menuEscola('runas')"><span>💎</span><strong>Runas & Encantos</strong></div>
-            <div class="rpg-card-small" onclick="menuEscola('pessoas')"><span>👥</span><strong>Membros</strong></div>
+            <div class="rpg-card-small" onclick="menuEscola('casas')"><span>🏰</span><strong>As 6 Casas</strong></div>
+            <div class="rpg-card-small" onclick="menuEscola('membros')"><span>👥</span><strong>Membros</strong></div>
             <div class="rpg-card-small" onclick="iniciarQuiz()" style="border-color:#ffd700;"><span>⚖️</span><strong>Teste de Casa</strong></div>
         </div>
-        
+        <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center; border-bottom: 1px solid #444; padding-bottom: 5px;">MERCADO ACADÊMICO</div>
+        <div class="biblio-nav">
+            <div class="rpg-card-small" onclick="menuEscola('encantamentos')"><span>💎</span><strong>Encantamentos</strong></div>
+            <div class="rpg-card-small" onclick="menuEscola('magias')"><span>📜</span><strong>Aprender Magias</strong></div>
+            <div class="rpg-card-small" onclick="menuEscola('itens')"><span>🔮</span><strong>Itens Mágicos</strong></div>
+        </div>
     `;
 }
 
 function menuEscola(aba) {
     const container = document.getElementById('conteudo-menu-capital');
-    const btnVoltar = `<button onclick="abrirEscolaMagia()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>`;
+    const btnVoltar = `<button onclick="abrirEscolaMagia()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar à Academia</button>`;
 
     if (aba === 'casas') {
         container.innerHTML = btnVoltar + `
-            <div class="biblio-nav">
-                <div class="rpg-card-small" style="border-color:#ffd700;" onclick="detalheCasa('Aetheris')"><span>✨</span><strong>Aetheris</strong></div>
+            <div class="biblio-nav" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="rpg-card-small" style="border-color:#ffd700;" onclick="detalheCasa('Aetheris')"><span>🌪️</span><strong>Aetheris</strong></div>
                 <div class="rpg-card-small" style="border-color:#2e8b57;" onclick="detalheCasa('Sylvana')"><span>🌿</span><strong>Sylvana</strong></div>
                 <div class="rpg-card-small" style="border-color:#ff4500;" onclick="detalheCasa('Ignis')"><span>🔥</span><strong>Ignis</strong></div>
                 <div class="rpg-card-small" style="border-color:#8a2be2;" onclick="detalheCasa('Umbra')"><span>🌑</span><strong>Umbra</strong></div>
+                <div class="rpg-card-small" style="border-color:#1e90ff;" onclick="detalheCasa('Aquaris')"><span>💧</span><strong>Aquaris</strong></div>
+                <div class="rpg-card-small" style="border-color:#fff8dc;" onclick="detalheCasa('Luminius')"><span>☀️</span><strong>Luminius</strong></div>
             </div>`;
     } 
-    else if (aba === 'runas') {
-        container.innerHTML = btnVoltar + `
-            <div class="detalhe-box">
-                <h4 style="color:#ffd700; margin-top:0;">💎 Sistema de Runas e Encantamentos</h4>
-                <div class="spell-item"><b>📜 Magia Nível 0:</b> 2 Runas.</div>
-                <div class="spell-item"><b>🔶 Magia Nível 1:</b> 5 Runas.</div>
-                <div class="spell-item"><b>🔷 Magia Nível 2:</b> 9 Runas.</div>
-                <div class="spell-item"><b>⚔️ Encanto de Arma:</b> 6 Runas (+2 dano elemental).</div>
-                <div class="spell-item"><b>🛡️ Encanto de Armadura:</b> 6 Runas (-1 dano físico ou +2 HP).</div>
-                <div class="spell-item"><b>💍 Objeto Místico:</b> 12 Runas (+1 em Atributo).</div>
-            </div>`;
-    }
-    else if (aba === 'pessoas') {
+    else if (aba === 'membros') {
         container.innerHTML = btnVoltar;
-        dadosEscola.pessoas.forEach(p => {
+        
+        let professores = dadosEscola.pessoas.filter(p => p.cargo === 'Professor');
+        let alunos = dadosEscola.pessoas.filter(p => p.cargo === 'Aluno');
+
+        let renderPessoa = (p) => {
             let img = p.foto ? `<img src="${p.foto}" class="foto-escola" onclick="verImagemEscola('${p.foto}')">` : `<div class="foto-escola">📸</div>`;
-            container.innerHTML += `
+            return `
                 <div class="item-menu">
                     ${img}
                     <div class="texto-item">
                         <h4>${p.nome}</h4>
-                        <span class="classe-char" style="color:#00bfff">${p.cargo}</span>
+                        <span class="classe-char" style="color:${p.cargo === 'Professor' ? '#ffd700' : '#00bfff'}">${p.cargo} • ${p.casa}</span>
                         <p>${p.desc}</p>
                     </div>
                 </div>`;
+        };
+
+        container.innerHTML += `<h4 style="color:#ffd700; border-bottom: 1px solid #555; padding-bottom: 5px;">Corpo Docente</h4>`;
+        professores.forEach(p => container.innerHTML += renderPessoa(p));
+
+        container.innerHTML += `<h4 style="color:#00bfff; border-bottom: 1px solid #555; padding-bottom: 5px; margin-top: 15px;">Alunos</h4>`;
+        alunos.forEach(p => container.innerHTML += renderPessoa(p));
+    }
+    else if (aba === 'encantamentos' || aba === 'magias' || aba === 'itens') {
+        let lista = aba === 'encantamentos' ? dadosEscola.lojaEncantamentos : (aba === 'magias' ? dadosEscola.lojaMagias : dadosEscola.lojaItens);
+        let titulo = aba === 'encantamentos' ? "💎 Oficina de Encantamentos" : (aba === 'magias' ? "📜 Sala de Estudos de Magia" : "🔮 Almoxarifado Arcano");
+        
+        let html = btnVoltar + `<div class="detalhe-box"><h4 style="color:#ffd700; margin-top:0;">${titulo}</h4>`;
+        lista.forEach(i => {
+            html += `
+                <div class="spell-item">
+                    <b style="color:#87CEEB;">${i.nome}</b> 
+                    <span style="float:right; color:#ffd700; font-weight:bold;">${i.preco}</span>
+                    <br><small style="color:#ccc; display:block; margin-top:5px;">${i.desc}</small>
+                </div>`;
         });
+        container.innerHTML = html + `</div>`;
     }
 }
 
-// Função específica para voltar para a lista de pessoas da escola
-function verImagemEscola(arquivo) {
+function detalheCasa(casa) {
+    const container = document.getElementById('conteudo-menu-capital');
+    const info = dadosEscola.casas[casa];
+    
+    container.innerHTML = `
+        <button onclick="menuEscola('casas')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar às Casas</button>
+        <div class="detalhe-box" style="border-color:${info.cor}">
+            <h2 style="color:${info.cor}; margin-top:0; text-align:center; border-bottom: 1px solid #444; padding-bottom:10px;">Casa ${casa}</h2>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="${info.emblema}" alt="Emblema ${casa}" onclick="verImagemCasa('${info.emblema}', '${casa}')" style="
+                    width: 180px; 
+                    height: 180px; 
+                    object-fit: cover; 
+                    border-radius: 50%; 
+                    border: 3px solid ${info.cor};
+                    box-shadow: 0 0 20px ${info.cor}66;
+                    background: #000;
+                    cursor: zoom-in;
+                ">
+            </div>
+
+            <p style="text-align:center; font-weight:bold; color:#aaa; text-transform: uppercase; letter-spacing: 2px;">Elemento: ${info.elemento}</p>
+            <p style="text-align:center; margin-bottom: 20px; font-size: 18px;"><b>Espírito Guardião:</b> <span style="color:${info.cor}">${info.guardiao}</span></p>
+            
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; border-left: 4px solid ${info.cor};">
+                <p style="font-size: 15px; line-height: 1.6; margin: 0;"><b>Perfil Acadêmico:</b> ${info.desc}</p>
+            </div>
+        </div>`;
+}
+
+// Adicione esta função nova logo abaixo para lidar com o clique e o retorno:
+function verImagemCasa(arquivo, casa) {
     verImagemEstatica(arquivo, function() {
         restaurarMapaMenu();
         document.getElementById('modal-capital').style.display = 'flex';
-        menuEscola('pessoas'); // Força a volta para o menu de pessoas da escola
+        detalheCasa(casa); // Força a volta exata para a aba da casa que foi clicada
     });
 }
 
-function zoomFotoDungeon(arquivo, salaNum) {
-    // Abre a imagem usando sua função verImagemEstatica
-    verImagemEstatica(arquivo, function() {
-        // Isso roda ao clicar no "Voltar" da imagem em tela cheia
-        restaurarMapaMenu(); 
-        document.getElementById('modal-capital').style.display = 'flex'; 
-        detalharSala(salaNum); // Reabre a sala específica da masmorra
-    });
+// --- SISTEMA DE QUIZ DA ESCOLA ---
+function iniciarQuiz() {
+    perguntaAtual = 0;
+    pontosQuiz = { Aetheris: 0, Sylvana: 0, Ignis: 0, Umbra: 0, Aquaris: 0, Luminius: 0 };
+    mostrarPergunta();
 }
 
 function mostrarPergunta() {
@@ -759,42 +926,20 @@ function mostrarPergunta() {
     const q = dadosEscola.perguntasQuiz[perguntaAtual];
     
     let botoes = "";
-    // Embaralha levemente a ordem para não ser viciado
-    const chaves = Object.keys(q.r);
+    // Embaralha levemente a ordem para não ser viciado na mesma posição
+    const chaves = Object.keys(q.r).sort(() => Math.random() - 0.5);
     chaves.forEach(casa => {
-        botoes += `<button class="botao-estiloso" onclick="responderQuiz('${casa}')">${q.r[casa]}</button>`;
+        // A borda agora fica com a cor neutra #555 para esconder a qual casa a resposta pertence
+        botoes += `<button class="botao-estiloso" onclick="responderQuiz('${casa}')" style="border-left-color: #555; margin-bottom: 10px;">${q.r[casa]}</button>`;
     });
 
     container.innerHTML = `
         <div class="detalhe-box">
-            <p style="text-align:center; color:#aaa; font-size: 12px;">Pergunta ${perguntaAtual + 1} de ${dadosEscola.perguntasQuiz.length}</p>
-            <h3 style="text-align:center; margin-bottom: 20px;">${q.p}</h3>
-            <div style="display: flex; flex-direction: column; gap: 8px;">${botoes}</div>
+            <p style="text-align:center; color:#aaa; font-size: 12px; margin-bottom: 5px;">Pergunta ${perguntaAtual + 1} de ${dadosEscola.perguntasQuiz.length}</p>
+            <h3 style="text-align:center; margin-top: 0; margin-bottom: 20px; color: #ffdead;">${q.p}</h3>
+            <div style="display: flex; flex-direction: column;">${botoes}</div>
         </div>`;
 }
-
-function detalheCasa(casa) {
-    const container = document.getElementById('conteudo-menu-capital');
-    const info = {
-        "Aetheris": { cor: "#ffd700", desc: "<b>Personalidade:</b> Alunos metódicos, lógicos e frequentemente vistos como distantes. Valorizam o intelecto acima da emoção e buscam entender as leis matemáticas da magia." },
-        "Sylvana": { cor: "#2e8b57", desc: "<b>Personalidade:</b> Alunos intuitivos e empáticos. Possuem uma calma natural e preferem a magia que flui organicamente. São os protetores da vida e do equilíbrio espiritual." },
-        "Ignis": { cor: "#ff4500", desc: "<b>Personalidade:</b> Impetuosos, corajosos e competitivos. Alunos desta casa acreditam que a magia é uma extensão de sua vontade e não temem o confronto direto." },
-        "Umbra": { cor: "#8a2be2", desc: "<b>Personalidade:</b> Curiosos, estoicos e perspicazes. Não acreditam em 'conhecimento proibido', apenas em falta de preparo. São ótimos investigadores e estrategistas silenciosos." }
-    };
-    container.innerHTML = `<button onclick="menuEscola('casas')" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar</button>
-        <div class="detalhe-box" style="border-color:${info[casa].cor}">
-            <h3 style="color:${info[casa].cor}">Casa ${casa}</h3>
-            <p>${info[casa].desc}</p>
-        </div>`;
-}
-
-// --- SISTEMA DE QUIZ ---
-function iniciarQuiz() {
-    perguntaAtual = 0;
-    pontosQuiz = { Aetheris: 0, Sylvana: 0, Ignis: 0, Umbra: 0 };
-    mostrarPergunta();
-}
-
 
 function responderQuiz(casa) {
     pontosQuiz[casa]++;
@@ -808,15 +953,50 @@ function responderQuiz(casa) {
 
 function finalizarQuiz() {
     const container = document.getElementById('conteudo-menu-capital');
+    // Determina a casa vencedora com base nos pontos acumulados
     let vencedor = Object.keys(pontosQuiz).reduce((a, b) => pontosQuiz[a] > pontosQuiz[b] ? a : b);
+    let info = dadosEscola.casas[vencedor];
     
     container.innerHTML = `
-        <div class="detalhe-box" style="text-align:center;">
-            <p>O veredito da Academia é...</p>
-            <h2 style="color:#ffd700;">Casa ${vencedor}!</h2>
-            <p>Seja bem-vindo, aprendiz. Honre as tradições de Blat'khyr.</p>
-            <button onclick="abrirEscolaMagia()" class="btn-popup" style="margin-top:20px; background:#444;">Voltar ao Menu</button>
+        <div class="detalhe-box" style="text-align:center; border-color:${info.cor};">
+            <p style="color:#aaa;">Você encontrou o seu caminho...</p>
+            <h1 style="color:${info.cor}; margin: 10px 0;">CASA ${vencedor.toUpperCase()}!</h1>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="${info.emblema}" alt="Emblema ${vencedor}" onclick="verImagemResultadoQuiz('${info.emblema}')" style="
+                    width: 160px; 
+                    height: 160px; 
+                    object-fit: cover; 
+                    border-radius: 50%; 
+                    border: 3px solid ${info.cor};
+                    box-shadow: 0 0 20px ${info.cor}66;
+                    background: #000;
+                    cursor: zoom-in;
+                ">
+            </div>
+
+            <p>Elemento: <b>${info.elemento}</b></p>
+            <p>Seu espírito guardião, o <b>${info.guardiao}</b>, o guiará em seus estudos.</p>
+            <p style="margin-top: 20px; font-style: italic;">"Seja bem-vindo, aprendiz. Honre as tradições e faça por merecer suas Runas."</p>
+            <button onclick="abrirEscolaMagia()" class="btn-popup" style="margin-top:20px; background:#444; width:100%;">Voltar à Academia</button>
         </div>`;
+}
+
+// Nova função para permitir expandir o emblema a partir da tela de resultado do quiz
+function verImagemResultadoQuiz(arquivo) {
+    verImagemEstatica(arquivo, function() {
+        restaurarMapaMenu();
+        document.getElementById('modal-capital').style.display = 'flex';
+        finalizarQuiz(); // Recarrega a tela de vitória mantendo os pontos calculados
+    });
+}
+
+function verImagemEscola(arquivo) {
+    verImagemEstatica(arquivo, function() {
+        restaurarMapaMenu();
+        document.getElementById('modal-capital').style.display = 'flex';
+        menuEscola('membros'); 
+    });
 }
 
 const dadosTorre = [
