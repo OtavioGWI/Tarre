@@ -787,6 +787,14 @@ const dadosEscola = {
         { p: "Como você prefere resolver um enigma?", r: { "Aetheris": "Analisando cada detalhe e calculando as probabilidades.", "Umbra": "Pensando fora da caixa, trapaceando se for necessário.", "Sylvana": "Escutando a intuição e o que o ambiente sussurra.", "Ignis": "Quebrando o mecanismo. Quem precisa de porta quando se tem fogo?", "Aquaris": "Tentando caminhos diferentes suavemente até a resposta fluir.", "Luminius": "Buscando nos textos sagrados e nas regras antigas a resposta certa." } },
         { p: "Um feitiço seu falha e causa uma explosão. Você:", r: { "Ignis": "Dá risada e tenta um feitiço ainda maior logo em seguida.", "Aetheris": "Anota a falha no pergaminho para corrigir a fórmula matemática.", "Sylvana": "Pede desculpas às energias e tenta de forma mais orgânica.", "Umbra": "Analisa se a explosão pode ser usada como uma nova tática de ataque.", "Aquaris": "Mantém a calma, apaga o fogo e reflete sobre o que sentiu na hora.", "Luminius": "Verifica se todos estão seguros antes de assumir total responsabilidade." } },
         { p: "Qual espírito guardião seria seu companheiro ideal?", r: { "Sylvana": "Um Lobo silvestre leal.", "Aetheris": "Uma Coruja observadora.", "Ignis": "Um Dragão escamado impetuoso.", "Umbra": "Um Corvo que sussurra segredos.", "Aquaris": "Uma Serpente aquática fluida.", "Luminius": "Um Leão majestoso de juba brilhante." } }
+    ],
+    quadroTarefas: [
+        { nome: "🌿 Podar as Trepadeiras Carnívoras", recompensa: "15 Runas", desc: "Thalindor precisa de ajuda nos jardins da casa Sylvana. Cuidado com os dedos, elas tentam morder quem se aproxima sem uma boa conversa pacífica." },
+        { nome: "💎 Catalogar Runas de Treino", recompensa: "20 Runas", desc: "Mestra Elara exige que as runas básicas da casa Aetheris sejam limpas e ordenadas por peso místico e lógica aritmética. Proibido usar magia de levitação." },
+        { nome: "🔥 Limpar a Arena de Duelos", recompensa: "12 Runas", desc: "Mestre Trovus reclamou que a última aula prática da casa Ignis deixou o chão coberto de cinzas abrasivas e fuligem mágica. Requer esforço físico pesado." },
+        { nome: "💧 Investigar Sussurros no Poço", recompensa: "30 Runas", desc: "Alunos da casa Aquaris relatam ruídos estranhos vindos das tubulações sob as fontes termais. Pode ser apenas um cano entupido... ou algo pior." },
+        { nome: "🌑 Recuperar Grimório Extraviado", recompensa: "45 Runas", desc: "Um livro de anotações perigosas sumiu da seção avançada da casa Umbra. Kael suspeita que o livro ganhou consciência e se escondeu nas fendas do porão." },
+        { nome: "☀️ Polir as Armaduras de Luminius", recompensa: "18 Runas", desc: "Aurora Vanguarda quer que as armaduras cerimoniais de leão fiquem impecáveis para a próxima inspeção de honra. Exige polimento manual estrito." }
     ]
 };
 
@@ -807,7 +815,9 @@ function abrirEscolaMagia() {
             <div class="rpg-card-small" onclick="menuEscola('casas')"><span>🏰</span><strong>As 6 Casas</strong></div>
             <div class="rpg-card-small" onclick="menuEscola('membros')"><span>👥</span><strong>Membros</strong></div>
             <div class="rpg-card-small" onclick="iniciarQuiz()" style="border-color:#ffd700;"><span>⚖️</span><strong>Teste de Casa</strong></div>
+            <div class="rpg-card-small" onclick="menuEscola('tarefas')" style="border-color: #9370DB;"><span>📌</span><strong>Mural de Tarefas</strong></div>
         </div>
+
         <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center; border-bottom: 1px solid #444; padding-bottom: 5px;">MERCADO ACADÊMICO</div>
         <div class="biblio-nav">
             <div class="rpg-card-small" onclick="menuEscola('encantamentos')"><span>💎</span><strong>Encantamentos</strong></div>
@@ -857,16 +867,42 @@ function menuEscola(aba) {
         container.innerHTML += `<h4 style="color:#00bfff; border-bottom: 1px solid #555; padding-bottom: 5px; margin-top: 15px;">Alunos</h4>`;
         alunos.forEach(p => container.innerHTML += renderPessoa(p));
     }
-    else if (aba === 'encantamentos' || aba === 'magias' || aba === 'itens') {
-        let lista = aba === 'encantamentos' ? dadosEscola.lojaEncantamentos : (aba === 'magias' ? dadosEscola.lojaMagias : dadosEscola.lojaItens);
-        let titulo = aba === 'encantamentos' ? "💎 Oficina de Encantamentos" : (aba === 'magias' ? "📜 Sala de Estudos de Magia" : "🔮 Almoxarifado Arcano");
+    // ... dentro da função menuEscola(aba), procure a verificação das lojas e substitua por esta:
+    else if (aba === 'encantamentos' || aba === 'magias' || aba === 'itens' || aba === 'tarefas') {
+        let lista, titulo, corBorda;
         
-        let html = btnVoltar + `<div class="detalhe-box"><h4 style="color:#ffd700; margin-top:0;">${titulo}</h4>`;
+        if (aba === 'encantamentos') {
+            lista = dadosEscola.lojaEncantamentos;
+            titulo = "💎 Oficina de Encantamentos";
+            corBorda = "#ffd700";
+        } else if (aba === 'magias') {
+            lista = dadosEscola.lojaMagias;
+            titulo = "📜 Sala de Estudos de Magia";
+            corBorda = "#ffd700";
+        } else if (aba === 'itens') {
+            lista = dadosEscola.lojaItens;
+            titulo = "🔮 Almoxarifado Arcano";
+            corBorda = "#ffd700";
+        } else if (aba === 'tarefas') {
+            lista = dadosEscola.quadroTarefas;
+            titulo = "📌 Mural de Estágios e Tarefas";
+            corBorda = "#9370DB";
+        }
+        
+        let html = btnVoltar + `<div class="detalhe-box"><h4 style="color:${corBorda}; margin-top:0;">${titulo}</h4>`;
+        
+        if (aba === 'tarefas') {
+            html += `<p style="color:#aaa; font-style:italic; font-size:12px; margin-bottom:15px; text-align:center;">"Editais do Conselho de Arcana: A retirada de qualquer pergaminho de requisição exige estrito cumprimento das normas acadêmicas. O pagamento em Runas será efetuado na Tesouraria Central mediante a entrega deste pergaminho carimbado com o selo de aprovação do solicitante."</p>`;
+        }
+        
         lista.forEach(i => {
+            let nomeItem = i.nome || i.item; 
+            let indicadorPreco = i.preco ? i.preco : `💰 Recompensa: ${i.recompensa}`;
+            
             html += `
-                <div class="spell-item">
-                    <b style="color:#87CEEB;">${i.nome}</b> 
-                    <span style="float:right; color:#ffd700; font-weight:bold;">${i.preco}</span>
+                <div class="spell-item" style="border-left-color: ${corBorda};">
+                    <b style="color:#87CEEB;">${nomeItem}</b> 
+                    <span style="float:right; color:#ffd700; font-weight:bold;">${indicadorPreco}</span>
                     <br><small style="color:#ccc; display:block; margin-top:5px;">${i.desc}</small>
                 </div>`;
         });
