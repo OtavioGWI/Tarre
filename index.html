@@ -566,6 +566,10 @@
         <div id="map"></div>
     </div>
 
+    <div class="rpg-card-small" onclick="abrirModalSenha('sacrificio', 'abrirForjaSacrificio()', 'funcao')" style="border-color:#555; background: rgba(0,0,0,0.6);">
+        <span>🔥</span><strong style="color:#777;">???</strong>
+    </div>
+
     <div id="modal-info" style="display: none;">
         <div class="modal-conteudo">
             <span class="fechar-modal" onclick="fecharModalInfo()">&times;</span>
@@ -657,6 +661,34 @@
  * banco imperial, bestiário, histórico de aventuras, senhas, cálculo de rotas */
 
 // Variável de controle: qual o andar máximo que o grupo já liberou?
+// --- SISTEMA DA VILA DAS BRUXAS - FORJA DO SACRIFÍCIO ---
+// --- SISTEMA DA VILA DAS BRUXAS - FORJA DO SACRIFÍCIO ---
+// --- SISTEMA DA VILA DAS BRUXAS - FORJA DO SACRIFÍCIO ---
+// --- SISTEMA DA VILA DAS BRUXAS - FORJA DO SACRIFÍCIO ---
+const dadosForjaBruxas = {
+    ofertas: [
+        { nome: "Morfose: Magia Aumentada", custo: "❌ 5 HP Máximo", desc: "Todas as suas magias ou efeitos de dano passam a causar +1d6 de dano extra permanente." },
+        { nome: "Olho dos Mil Olhos", custo: "❌ 2 ponto de Precisão", desc: "Seu olho se divide em pupilas concêntricas. Permite enxergar flashes e ter visão de alguma localidade ou sala por onde já tenha passado anteriormente e marcado (pode marcar 5 locais por vez)." },
+        { nome: "Olho da Verdade Verdadeira", custo: "❌ 2 ponto de Sabedoria", desc: "Sua íris se torna branca e estática. Permite enxergar através de qualquer magia de ilusão, invisibilidade, camuflagem ou disfarce mundano instantaneamente." },
+        { nome: "Olho Lírico", custo: "❌ 2 ponto de Força", desc: "Seu olho brilha em tom roxo suave. Permite enxergar a aura de sentimentos e o humor de qualquer pessoa ao olhar." },
+        { nome: "Olho Distante", custo: "❌ 2 ponto de Constituição", desc: "Seu olho se torna completamente negro, agindo como uma lente de longo alcance. Concede vantagem absoluta e +3 de bônus em testes de Percepção visual a longa distância." },
+        { nome: "Olho Idêntico", custo: "❌ 2 ponto de Carisma", desc: "A pupila assume o formato de uma runa analítica. Identifica instantaneamente o nome, propriedades mágicas e maldições ocultas de qualquer item ou relíquia apenas ao focar o olhar." },
+        { nome: "Olho Mentiroso", custo: "❌ Maldição da Visão Turva", desc: "Sua visão geral fica ligeiramente embaçada, mas você ganha a capacidade de projetar uma ilusão visual menor diretamente na mente de quem olhar nos seus olhos, criando distractions perfeitas." },
+        { nome: "Olho da Busca", custo: "❌ 2 pontos de Mana", desc: "Seu olho passa a detectar o brilho residual e o rastro de objetos inanimados. Concede vantagem em testes de Investigação para localizar itens escondidos, cofres, trancas ou compartimentos ocultos." },
+        { nome: "Olho Escudeiro", custo: "❌ 2 ponto de Inteligência", desc: "Seu olho projeta barreiras de reflexo cinético. Uma vez por combate, como reação ao sofrer dano, você cria uma barreira de energia pura que absorbs 2d4 de dano do ataque sofrido." },
+        
+        // --- NOVAS OFERTAS: CORPOREIDADE, MUTACÕES E MALDITIONS ---
+        { nome: "Morfose: Punho de Titã", custo: "❌ 2 ponto de Destreza", desc: "Sua mão e antebraço são transmutados em metal denso e pesado. Seus ataques desarmados ou com armas corpo-a-corpo pesadas causam +3 de dano fixo permanente." },
+        { nome: "Pele de Ébano Rúnico", custo: "❌ 5 HP Máximo", desc: "Sua derme escurece adquirindo a textura de madeira mística envelhecida. Concede uma redução permanente de -2 em qualquer dano físico recebido." },
+        { nome: "Morfose: Sombra Rastejante", custo: "❌ Maldição da Sombra Pálida", desc: "Sua sombra se torna semi-independente e drena a luz ao redor. Você ganha vantagem absoluta em testes de Furtividade no escuro, mas locais bem iluminados causam tontura." },
+        { nome: "Guelras de Sangue", custo: "❌ 5 HP Máximo", desc: "Fendas biológicas se abrem nas laterais do seu pescoço. Permite respirar e falar debaixo d'água perfeitamente, além de conceder imunidade a asfixia por gases." },
+        { nome: "Garras de Dragão", custo: "❌ 2 ponto de Destreza", desc: "Suas unhas se transformam em garras rígidas e retráteis. Concede a habilidade passiva de escalar superfícies verticais de pedra ou madeira sem necessidade de testes de atletismo." },
+        
+        // --- ADICIONADOS: PACTOS BASEADOS EM MALDIÇÕES ---
+        { nome: "Morfose: Pele Ácida", custo: "❌ Maldição da Cicatrização", desc: "Sua pele torna-se altamente cáustica. Sempre que você sofrer dano físico corpo a corpo, o atacante recebe 1d4 de dano ácido imediato. Contudo, você perde a capacidade de receber curas mágicas de Nível 1 ou inferior." },
+        { nome: "Morfose: Pássaro Pequeno", custo: "❌ Maldição da Transforção", desc: "Asas membranosas de couro crescem sob seus braços, permitindo que você plane de qualquer altura e ganhe +2 metros de deslocamento em combate. Em contrapartida, em noites de lua cheia você se transforma em um pássaro aleatório sedento por sangue por 1 hora sem autocontrole." },
+        ]
+};
 // --- SISTEMA DA ESCOLA DE MAGIA ---
 const dadosEscola = {
     casas: {
@@ -869,6 +901,33 @@ function abrirEscolaMagia() {
             <div class="rpg-card-small" onclick="abrirModalSenha('sussurro', 'menuEscola(&quot;mercado_negro&quot;)', 'funcao')" style="border-color:#555; background: rgba(0,0,0,0.6);"><span>🚪</span><strong style="color:#777;">???</strong></div>
         </div>
     `;
+}
+
+function abrirForjaSacrificio() {
+    const container = document.getElementById('conteudo-menu-capital');
+    const modal = document.getElementById('modal-capital');
+    document.getElementById('titulo-menu-capital').innerText = "🔥 Forja do Sacrifício";
+    modal.style.display = 'flex';
+    
+    let html = `
+        <button onclick="fecharModais()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar à Vila</button>
+        <div class="detalhe-box" style="border-color: #4a0e4e;">
+            <p style="color:#ff4444; font-style:italic; font-size:12px; margin-bottom:15px; text-align:center;">
+                "O ferro exige calor. A carne exige perda. Não há ouro ou runas neste solo. Deixe uma parte de si mesmo no calor da bigorna se deseja empunhar o proibido."
+            </p>
+    `;
+    
+    dadosForjaBruxas.ofertas.forEach(o => {
+        html += `
+            <div class="spell-item" style="border-left-color: #4a0e4e; background: rgba(74, 14, 78, 0.1);">
+                <b style="color:#da70d6;">${o.nome}</b> 
+                <span style="float:right; color:#ff4444; font-weight:bold; font-size:12px;">${o.custo}</span>
+                <br><small style="color:#ccc; display:block; margin-top:5px;">${o.desc}</small>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html + `</div>`;
 }
 
 function menuEscola(aba) {
@@ -3289,20 +3348,18 @@ function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoEx
         }
 
         if (nomeDoMapa === 'Blat_khyr.jpg') {
-            // --- PONTO DA ESCOLA DE MAGIA (JÁ EXISTIA) ---
+            // --- PONTO DA ESCOLA DE MAGIA ---
             const btnEscola = criarBtn("🎓 Escola de Magia", "abrirModalSenha('poder', 'abrirEscolaMagia()', 'funcao')", "#800080");
             criarPontoLocal([382, 1359], "Capital de Blat'khyr", "Elfos", "cidade magica.png", true, btnEscola);
             
-            // --- OUTROS PONTOS ---
             criarPontoLocal([986, 1239], "Vilarejo", "Desconhecido");
             criarPontoLocal([1091, 606], "Vilarejo", "Desconhecido");
 
-            // --- NOVO: PONTO DAS BRUXAS [1463, 1151] ---
-            // 1. Cria o botão com a senha "Bruxas" que abre a imagem "Vila bruxa.png"
+           // --- PONTO DAS BRUXAS COM OS DOIS BOTÕES DE SENHA ---
             const btnBruxas = criarBtn("🔍 Descobrir", "abrirModalSenha('Bruxas', 'Vila bruxa.png', 'imagem')", "#2E8B57");
+            const btnForja = criarBtn("???", "abrirModalSenha('sacrificio', 'abrirForjaSacrificio()', 'funcao')", "#555");
             
-            // 2. Cria o ponto passando o botão
-            criarPontoLocal([1463, 1151], "Vilarejo", "Desconhecido", null, true, btnBruxas);
+            criarPontoLocal([1463, 1151], "Vilarejo", "Desconhecido", null, true, btnBruxas + btnForja);
 
             // --- RESTANTE DOS PONTOS DE BLAT'KHYR ---
             criarPontoLocal([491, 371], "Cidade", "Elfos", "Cidade portuária 4.png", true);
