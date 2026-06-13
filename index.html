@@ -735,14 +735,18 @@ const dadosEscola = {
             desc: "Justos, honrados e protetores. Dedicados à ordem, à purificação e a usar a magia sagrada para ser o escudo dos mais fracos. Seus membros seguem códigos morais estritos e frequentemente lideram esquadrões pelo exemplo heroico." 
         }
     },
-    pessoas: [
-        { nome: "Arquimago Valerius", cargo: "Professor", casa: "Diretoria", desc: "Um elfo de idade incalculável. Consegue ver o fluxo de mana de Tarre.", foto: "Valerius.png" },
-        { nome: "Mestra Elara", cargo: "Professora", casa: "Aetheris", desc: "Exigente e mestre em encantamentos permanentes.", foto: "Elara.png" },
-        { nome: "Mestre Trovus", cargo: "Professor", casa: "Ignis", desc: "Ensina magias de combate ofensivo. Grita muito durante as aulas.", foto: null },
-        { nome: "Kael, o Prodígio", cargo: "Aluno", casa: "Umbra", desc: "Domina fendas dimensionais. Calado e misterioso.", foto: "Kael.png" },
-        { nome: "Lívia Gota-fria", cargo: "Aluna", casa: "Aquaris", desc: "Especialista em magia curativa aquática. Sempre calma e diplomática.", foto: null },
-        { nome: "Thalindor", cargo: "Aluno", casa: "Sylvana", desc: "Passa mais tempo conversando com as trepadeiras do que com pessoas.", foto: null },
-        { nome: "Aurora Vanguarda", cargo: "Aluna", casa: "Luminius", desc: "A paladina da turma, não tolera quebras de regras.", foto: null }
+   pessoas: [
+        // --- CORPO DOCENTE ---
+        { nome: "Arquimaga Aurelia", cargo: "Professor", casa: "Diretora", desc: "Um elfo de idade incalculável. Consegue enxergar as linhas brutas do fluxo de mana de Tarre.", foto: "Aurelia.png" },
+        { nome: "Mestra Elara", cargo: "Professora", casa: "Aetheris", desc: "Extremamente exigente. Mestre absoluta em runas teóricas e encantamentos permanentes.", foto: "Elara.png" },
+        { nome: "Mestre Trovus", cargo: "Professor", casa: "Ignis", desc: "Ensina magias de combate ofensivo e aplicação cinética. Costuma berrar ordens durante os duelos.", foto: "Trovus.png" },
+        { nome: "Mestra Saphira", cargo: "Professora", casa: "Aquaris", desc: "Leciona hidromancia e correntes arcanas líquidas. Possui um desprezo silencioso por raças mundanas.", foto: "Saphira.png" },
+        { nome: "Mestre Sylph", cargo: "Professor", casa: "Sylvana", desc: "Responsável pelas estufas e botânica arcana superior. Estuda a mutação da flora sob alta densidade de mana.", foto: "Sylph.png" },
+        
+        // --- FUNCIONÁRIOS E ADMINISTRAÇÃO ---
+        { nome: "Inquisidor Alistair", cargo: "Funcionário", casa: "Burocracia", desc: "Burocrata-chefe do Conselho Élfico encarregado da disciplina. Detesta quebras de regras e barulho nos corredores.", foto: "Alistair.png" },
+        { nome: "Madame Sybila", cargo: "Funcionário", casa: "Biblioteca", desc: "A severa e perspicaz guardiã da Biblioteca de Cristal. Vigia os arquivos proibidos e a Seção Restrita com unhas e dentes.", foto: "Sybila.png" },
+        { nome: "Capitão Malakor", cargo: "Funcionário", casa: "Segurança", desc: "Líder da guarda armada da Academia. Coordena as patrulhas internas e a contenção de fendas ou magias ilegais.", foto: "Malakor.png" }
     ],
     lojaEncantamentos: [
         { nome: "Runa do Peso Pluma", preco: "20 Runas", desc: "Encanta armadura pesada: Remove a penalidade de deslocamento e furtividade." },
@@ -948,8 +952,9 @@ function menuEscola(aba) {
     else if (aba === 'membros') {
         container.innerHTML = btnVoltar;
         
-        let professores = dadosEscola.pessoas.filter(p => p.cargo === 'Professor');
-        let alunos = dadosEscola.pessoas.filter(p => p.cargo === 'Aluno');
+        // Filtros ajustados para separar Docentes de Funcionários administrativos
+        let docentes = dadosEscola.pessoas.filter(p => p.cargo.includes('Professor'));
+        let funcionarios = dadosEscola.pessoas.filter(p => p.cargo.includes('Funcionário'));
 
         let renderPessoa = (p) => {
             let img = p.foto ? `<img src="${p.foto}" class="foto-escola" onclick="verImagemEscola('${p.foto}')">` : `<div class="foto-escola">📸</div>`;
@@ -958,17 +963,17 @@ function menuEscola(aba) {
                     ${img}
                     <div class="texto-item">
                         <h4>${p.nome}</h4>
-                        <span class="classe-char" style="color:${p.cargo === 'Professor' ? '#ffd700' : '#00bfff'}">${p.cargo} • ${p.casa}</span>
+                        <span class="classe-char" style="color:${p.cargo.includes('Professor') ? '#ffd700' : '#ffdead'}">${p.cargo} • ${p.casa}</span>
                         <p>${p.desc}</p>
                     </div>
                 </div>`;
         };
 
         container.innerHTML += `<h4 style="color:#ffd700; border-bottom: 1px solid #555; padding-bottom: 5px;">Corpo Docente</h4>`;
-        professores.forEach(p => container.innerHTML += renderPessoa(p));
+        docentes.forEach(p => container.innerHTML += renderPessoa(p));
 
-        container.innerHTML += `<h4 style="color:#00bfff; border-bottom: 1px solid #555; padding-bottom: 5px; margin-top: 15px;">Alunos</h4>`;
-        alunos.forEach(p => container.innerHTML += renderPessoa(p));
+        container.innerHTML += `<h4 style="color:#ffdead; border-bottom: 1px solid #555; padding-bottom: 5px; margin-top: 15px;">Funcionários e Administração</h4>`;
+        funcionarios.forEach(p => container.innerHTML += renderPessoa(p));
     }
     else if (aba === 'encantamentos' || aba === 'magias' || aba === 'itens' || aba === 'tarefas' || aba === 'mercado_negro') {
         let lista, titulo, corBorda;
