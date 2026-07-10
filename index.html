@@ -566,9 +566,6 @@
         <div id="map"></div>
     </div>
 
-    <div class="rpg-card-small" onclick="abrirModalSenha('sacrificio', 'abrirForjaSacrificio()', 'funcao')" style="border-color:#555; background: rgba(0,0,0,0.6);">
-        <span>🔥</span><strong style="color:#777;">???</strong>
-    </div>
 
     <div id="modal-info" style="display: none;">
         <div class="modal-conteudo">
@@ -742,11 +739,15 @@ const dadosEscola = {
         { nome: "Mestre Trovus", cargo: "Professor", casa: "Ignis", desc: "Ensina magias de combate ofensivo e aplicação cinética. Costuma berrar ordens durante os duelos.", foto: "Trovus.png" },
         { nome: "Mestra Saphira", cargo: "Professora", casa: "Aquaris", desc: "Leciona hidromancia e correntes arcanas líquidas. Possui um desprezo silencioso por raças mundanas.", foto: "Saphira.png" },
         { nome: "Mestre Sylph", cargo: "Professor", casa: "Sylvana", desc: "Responsável pelas estufas e botânica arcana superior. Estuda a mutação da flora sob alta densidade de mana.", foto: "Sylph.png" },
+        { nome: "Mestre Kaelen", cargo: "Professor", casa: "Umbra", desc: "Meio-demônio astuto. Leciona ilusionismo e manipulação de sombras profundas e fendas escuras.", foto: "Kaelen.png" },
+        { nome: "Mestra Vespera", cargo: "Professora", casa: "Aetheris", desc: "Elfa excêntrica. Ensina astromancia, leitura de constelações e a abertura de fendas espaciais cósmicas.", foto: "Vespera.png" },
         
         // --- FUNCIONÁRIOS E ADMINISTRAÇÃO ---
         { nome: "Inquisidor Alistair", cargo: "Funcionário", casa: "Burocracia", desc: "Burocrata-chefe do Conselho Élfico encarregado da disciplina. Detesta quebras de regras e barulho nos corredores.", foto: "Alistair.png" },
         { nome: "Madame Sybila", cargo: "Funcionário", casa: "Biblioteca", desc: "A severa e perspicaz guardiã da Biblioteca de Cristal. Vigia os arquivos proibidos e a Seção Restrita com unhas e dentes.", foto: "Sybila.png" },
-        { nome: "Capitão Malakor", cargo: "Funcionário", casa: "Segurança", desc: "Líder da guarda armada da Academia. Coordena as patrulhas internas e a contenção de fendas ou magias ilegais.", foto: "Malakor.png" }
+        { nome: "Capitão Malakor", cargo: "Funcionário", casa: "Segurança", desc: "Líder da guarda armada da Academia. Coordena as patrulhas internas e a contenção de fendas ou magias ilegais.", foto: "Malakor.png" },
+        { nome: "Almoxarife Barnaby", cargo: "Funcionário", casa: "Estoque", desc: "Anão ranzinza responsável pela distribuição de caldeirões, poções e reagentes alquímicos para as aulas.", foto: "Barnaby.png" },
+        { nome: "Feitor Janus", cargo: "Funcionário", casa: "Estábulos", desc: "Mestiço felino encarregado de cuidar dos Pot, mulas e criaturas místicas de transporte da Academia.", foto: "Janus.png" }
     ],
     lojaEncantamentos: [
         { nome: "Runa do Peso Pluma", preco: "20 Runas", desc: "Encanta armadura pesada: Remove a penalidade de deslocamento e furtividade." },
@@ -2089,10 +2090,31 @@ const dadosCapital = {
                 Ao acordarem, pesquisaram na biblioteca e descobriram que existem vários desses "Princípios da Morte", abominações que, segundo os grimórios antigos, foram criadas por uma entidade apenas listada como "A Bruxa". Concluíram que o ser de cartola que derrotaram era um desses princípios, conhecido nos textos antigos como <b>"O Engano"</b>.
                 
                 A sessão terminou com o esquadrão partindo de volta para a Capital Imperial, viajando confortavelmente através do serviço de transporte imperial, uma cortesia paga pelo agradecido Morundinguopu.` },
-            {
-                titulo: "Capítulo 2: Desconhecido",
-                texto: `Aventura em progresso...`
-            },
+           {
+            titulo: "Capítulo 2: Os Portões de Blat'khyr",
+            texto: `Os Pandemônios retornaram de Hukmal'tep e realizaram compras na capital, encomendando dois escudos de escama de dragão com prazo de entrega de uma semana. Nesse período, receberam uma nova correspondência oficial entregue por <span class="link-historia" onclick="verImagemHistoria('Violeta.png', 2)">Violeta</span>:
+
+            <div style="font-style: italic; color: #87CEEB; border-left: 2px solid #87CEEB; padding-left: 15px; margin-top: 15px; margin-bottom: 15px; font-size: 14px;">
+                Ao Portador deste Mandado,
+                Por autoridade do Império de Tarre e sob o selo da Carteira Imperial Violeta, ficais designados a servir como força oculta de investigação e resgate na província de Blat’khyr.
+                Chegaram à capital relatos consistentes de que o Esquadrão Rosa Vermelha, uma de nossas unidades de elite enviada secretamente à região para conter uma célula de magia proibida, cessou completamente todas as comunicações. Há indícios de que o avanço deles foi interrompido nas dependências da Academia de Arcana, indicando risco absoluto de comprometimento da missão original.
+                Vossa missão consiste em:
+                • Infiltrar-se nas dependências locais de Blat'khyr sem levantar suspeitas das autoridades monárquicas ou do Conselho Élfico.
+                • Investigar o paradeiro exato do esquadrão desaparecido e, se seguro, auxiliá-los a concluir a contenção da célula dissendente.
+                • Recuar imediatamente para a capital com as informações obtidas caso a unidade anterior tenha sido capturada ou comprometida de forma irreversível.
+                Ressaltamos que a província possui soberania política estrita e vossa presença é de caráter totalmente confidencial. O uso de insígnias imperiais ou a revelação de vossos laços com a coroa é terminantemente proibido. O fracasso em manter o sigilo poderá resultar em um incidente diplomático severo que o Império deseja evitar.
+                Confere-se aos portadores deste documento autoridade limitada para agir nas sombras, coletar pistas e tomar decisões de campo em nome da segurança do Império.
+                Que a Ordem prevaleça. Vida longa ao Imperador.
+            </div>
+
+            Como não possuíam moedas para utilizar o transporte imperial oficial, os soldados retornaram à sede do exército imperial. No local, entraram por uma porta que dava acesso a um quarto gigante e bizarro, repleto de uma pilha de objetos aleatórios. No topo de tudo encontraram <span class="link-historia" onclick="verImagemHistoria('Naza.png', 2)">Naza</span>, uma mulher jovem adulta com comportamento maluquinho que queria brincar com eles. Ao interagirem com ela, conseguiram obter três apitos de invocação de cavalo, capazes de gerar uma montaria para cada apito.
+
+            O esquadrão seguiu cavalgando em direção à província, mas foi interceptado no meio do caminho por uma emboscada de bandidos, lobos gigantes e uma criatura estranha. O ser roubou os pertences dos jogadores, incluindo o braço esquerdo de <span class="link-historia" onclick="verImagemHistoria('Greta.jpg', 2)">Greta</span>. No momento crítico, <span class="link-historia" onclick="verImagemHistoria('Liésty.jpg', 2)">Liésty</span> utilizou um pergaminho de teletransporte, salvando o grupo e levando todos os integrantes e seus respectivos itens recuperados para o território de Blat'khyr.
+
+            Ao chegarem no destino, os soldados testemunharam o preconceito escancarado contra raças não élficas, contrastando com um lugar fascinante, repleto de itens voadores espalhados pelas ruas, postes iluminados por magia e animais mágicos perambulando por toda a cidade.
+
+            Com exceção do anão, todo o grupo dirigiu-se à escola de magia e prestou o teste da escola, sendo aprovados e tornando-se oficialmente estudantes da instituição. Enquanto isso, <span class="link-historia" onclick="verImagemHistoria('Thorga.jpg', 2)">Thorga</span> deslocou-se até um bairro periférico e mais pobre habitado por humanos, entrando em um bar para colher informações. Ao interagir com a atendente, recebeu ordens discretas para disfarçar e coletou um bilhete misterioso instruindo-o a retornar ao mesmo local ao anoitecer, permanecendo no aguardo do passar das horas.`
+        },
             {
                 titulo: "Capítulo 3: Desconhecido",
                 texto: `Aventura em progresso...`
