@@ -1804,9 +1804,14 @@ listaBoatos[15] = { id: 16, texto: "Dizem que um bando de halflings vivem perto 
 listaBoatos[16] = { id: 17, texto: "Dizem que atrás da floresta dos sonhos existe umas ilhas onde a morte é uma benção", descoberto: true };
 listaBoatos[25] = { id: 26, texto: "Dizem que existe uma arma escondida em algum lugar criada por antigos anciões anões para derrotarem os humanos em guerras passadas mas nunca foi encontrada", descoberto: true };
 listaBoatos[29] = { id: 30, texto: "Dizem que existe uma planta secreta na floresta dos sonhos que cresce mais do que o céu", descoberto: true };
+listaBoatos[36] = { id: 37, texto: "Dizem que o fantasma da Bruxa vai retornar e se vingar de todo o império", descoberto: true };
+listaBoatos[37] = { id: 38, texto: "Dizem que goblins de toda Tarre estão se juntando", descoberto: true };
+listaBoatos[40] = { id: 41, texto: "Dizem que o poder da amizade não é real", descoberto: true };
 listaBoatos[42] = { id: 43, texto: "Dizem que vulcões estão surgindo em Tarre", descoberto: true };
 listaBoatos[43] = { id: 44, texto: "Dizem que existe uma vila onde sempre chove", descoberto: true };
 listaBoatos[50] = { id: 51, texto: "Dizem que a pessoa que tirou a espada é o novo herói que vai salvar o mundo.", descoberto: true };
+listaBoatos[54] = { id: 55, texto: "Dizem que a terceira calamidade foi uma guerra continental que envolveu todas as províncias", descoberto: true };
+listaBoatos[56] = { id: 57, texto: "Dizem que as nuvens sobre a Espinha do Gigante são, na verdade, fumaça de cidades voadoras escondidas.", descoberto: true };
 listaBoatos[57] = { id: 58, texto: "Dizem que se você nadar até o fundo do Lago das Bênçãos, encontrará uma porta para o palácio de cristal de um deus esquecido.", descoberto: true };
 listaBoatos[58] = { id: 59, texto: "Dizem que as árvores na Floresta dos Sonhos sussurram os nomes de quem vai morrer no dia seguinte.", descoberto: true };
 listaBoatos[60] = { id: 61, texto: "Dizem que a capital foi construída sobre o esqueleto de um dragão tão grande que suas costelas formam os alicerces do castelo.", descoberto: true };
@@ -1814,8 +1819,8 @@ listaBoatos[67] = { id: 68, texto: "Dizem que os Machinas que voltaram não são
 listaBoatos[70] = { id: 71, texto: "Dizem que as fadas na Floresta dos Sonhos sequestram pessoas para usá-las como peças em um jogo de xadrez eterno.", descoberto: true };
 listaBoatos[71] = { id: 72, texto: "Dizem que se você ouvir o sino da Torre do Relógio bater 12 vezes, o tempo vai parar para você para sempre.", descoberto: true };
 listaBoatos[97] = { id: 98, texto: "Dizem que as flores vermelhas que nascem perto do Coliseu crescem onde o sangue de um herói foi derramado.", descoberto: true };
-listaBoatos[99] = { id: 100, texto: "Dizem que existe um 101º boato que revela o segredo para se tornar um deus, mas ninguém nunca o ouviu. E dizem que tudo o que você ouviu até agora pode ser uma mentira inventada para te manter longe da verdade.", descoberto: true };
-/**
+listaBoatos[98] = { id: 99, texto: "Dizem que o autor do mundo às vezes esquece onde colocou itens importantes, por isso eles aparecem em lugares aleatórios.", descoberto: true };
+listaBoatos[99] = { id: 100, texto: "Dizem que existe um 101º boato que reveals o segredo para se tornar um deus, mas ninguém nunca o ouviu. E dizem que tudo o que você ouviu até agora pode ser uma mentira inventada para te manter longe da verdade.", descoberto: true };/**
  * DADOS GERAIS - Banco Imperial e Pantheon
  * Informações de investimentos, pacotes de seguro, e 12 deuses principais
  */
@@ -2135,11 +2140,11 @@ const dadosCapital = {
 // ... dentro de dadosCapital ...
         bestiario: [
             { 
-                nome: "Gorila Gliador", 
+                nome: "Gorila Gladiador", 
                 perigo: "💀", 
                 fraqueza: "Não há", 
                 drops: "Pele de gorila", 
-                foto: "Gorila.png", // Coloque a foto se tiver
+                foto: "Gorila.png",
                 desc: "Uma besta territorial encontrada nas selvas do Coliseu. Usado para testar a força de gladiadores."
             },
             { 
@@ -2156,9 +2161,65 @@ const dadosCapital = {
                 fraqueza: "Fogo, Ataques físicos, Gente inteligente", 
                 drops: "Armas simples", 
                 foto: "murloc.png", 
-                desc: "Caçam em bandos, gostam de lugares úmidos e fechados"
+                desc: "Caçam em bandos, gostam de lugares úmidos e fechados."
+            },
+            { 
+                nome: "Dragão de Gelo", 
+                perigo: "💀💀💀💀💀", 
+                fraqueza: "Catapultas e pedras anti-magia", 
+                drops: "Escamas de dragão", 
+                foto: "Dragao_gelo.png", 
+                desc: "Criatura ancestral que estava sob o controle dos Magnolos."
+            },
+            { 
+                nome: "Pot", 
+                perigo: "💀💀💀💀", 
+                fraqueza: "Habilidade de Conversa Natural", 
+                drops: "Pele de Pot", 
+                foto: "Pot.png", 
+                desc: "Fera raivosa e territorial nativa das neves de Hukmal'tep."
+            },
+            { 
+                nome: "Yeti", 
+                perigo: "💀💀", 
+                fraqueza: "Fogo", 
+                drops: "Pele de Yeti", 
+                foto: "Yeti.png", 
+                desc: "Criatura violenta encontrada nas montanhas de gelo, frequentemente arrastada por avalanches."
+            },
+            { 
+                nome: "Aranha de Gelo", 
+                perigo: "💀", 
+                fraqueza: "Fogo", 
+                drops: "Teia congelada", 
+                foto: "Aranha.png", 
+                desc: "Aracnídeo hostil que habita túneis congelados."
+            },
+            { 
+                nome: "Golem de Gelo", 
+                perigo: "💀💀💀", 
+                fraqueza: "Fogo e ataques no seu núcleo", 
+                drops: "Núcleo de gelo cristalino", 
+                foto: "Golem de gelo.png", 
+                desc: "Constructo colossal de gelo sólido."
+            },
+            { 
+                nome: "Lobo Gigante", 
+                perigo: "💀💀", 
+                fraqueza: "Boa pergunta, o grupo não descobriu", 
+                drops: "??", 
+                foto: "Lobo_gigante.png", 
+                desc: "Predador veloz que intercepta viajantes nas estradas."
+            },
+            { 
+                nome: "Serpente Marinha", 
+                perigo: "💀💀💀💀", 
+                fraqueza: "??", 
+                drops: "??", 
+                foto: "Serpente_marinha.png", 
+                desc: "Criatura de grande porte que habita os oceanos."
             }
-        ], 
+        ],
         // ... dentro de dadosCapital ...
         
         lendas: [
@@ -2760,94 +2821,122 @@ function renderizarMagias(classe) {
     if (classe === 'Mago') {
         html += `
             <div class="spell-level">✨ Habilidades Passivas</div>
-            <div class="spell-item"><b>Eco de Mana:</b> Sempre que conjurar uma magia de Nível 1+ e tirar dano máximo, recupera 1 Mana instantaneamente.</div>
-            <div class="spell-item"><b>Resistência Mágica:</b> Recebe redução permanente de -2 em qualquer dano de origem mágica.</div>
-            <div class="spell-item"><b>Conhecimento das Eras:</b> Ganha +3 em todos os testes de História, Arcanismo e Investigação.</div>
+            <div class="spell-item"><b>Eco de Mana:</b> Sempre que o Mago conjurar uma magia de Nível 1 ou superior e tirar o valor máximo de dano, ele recupera 1 ponto de Mana instantaneamente.</div>
+            <div class="spell-item"><b>Resistência Mágica:</b> O Mago recebe uma redução permanente de -2 em qualquer dano de origem mágica (feitiços, explosões arcanas, etc).</div>
+            <div class="spell-item"><b>Conhecimento das Eras:</b> O Mago ganha +3 em todos os testes de História, Arcanismo e Investigação.</div>
 
-            <div class="spell-level">🌟 Nível 0 (0 Mana)</div>
+            <div class="spell-level">🌟 Nível 0 (Custa 0 Mana)</div>
             <div class="spell-item"><b>Luz:</b> Cria uma fonte de luz.</div>
             <div class="spell-item"><b>Prestidigitação:</b> Realiza pequenos truques e efeitos menores.</div>
             <div class="spell-item"><b>Globos de Luz:</b> Cria esferas luminosas para iluminar o caminho.</div>
             <div class="spell-item"><b>Detectar Magia Menor:</b> Sente a presença de magias fracas no ambiente.</div>
-            <div class="spell-item"><b>Chama Contínua:</b> Cria uma pequena chama (1d4 de dano) e aplica o estado queimando.</div>
+            <div class="spell-item"><b>Chama Contínua:</b> Cria uma pequena chama que causa 1d4 de dano e aplica o estado queimando.</div>
             <div class="spell-item"><b>Sentir Aura:</b> Permite sentir a aura e a mana do alvo.</div>
             <div class="spell-item"><b>Ilusão Menor:</b> Cria uma ilusão pequena de imagem ou som.</div>
-            <div class="spell-item"><b>Mão Arcana:</b> Mão mágica flutuante que manipula objetos a curta distância.</div>
+            <div class="spell-item"><b>Mão Arcana:</b> Cria uma mão mágica flutuante que pode manipular objetos a uma distância curta.</div>
 
-            <div class="spell-level">🔶 Nível 1 (1 Mana)</div>
+            <div class="spell-level">🔶 Nível 1 (Custa 1 Mana)</div>
             <div class="spell-item"><b>Raio Pequeno:</b> Causa 2d4 de dano.</div>
+            <div class="spell-item"><b>Sono Leve:</b> Um alvo deve passar em um teste de resistência mental ou dorme por 1d2+1 turnos. Qualquer dano recebido acorda o alvo.</div>
+            <div class="spell-item"><b>Névoa Arcana:</b> Cria uma névoa mágica em área pequena dificultando ataques à distância e visão por 2 turnos.</div>
             <div class="spell-item"><b>Bola de Fogo Menor:</b> Causa 1d6 de dano e aplica o estado queimando.</div>
             <div class="spell-item"><b>Espirro Ácido:</b> Lança um jato que causa 2d4 de dano perfurante.</div>
             <div class="spell-item"><b>Raio Adoecente:</b> Causa 1d6 de dano e adoece o alvo por 2 turnos.</div>
             <div class="spell-item"><b>Teia:</b> Cria uma teia que prende os adversários.</div>
             <div class="spell-item"><b>Concentração:</b> Melhora o próximo ataque do usuário em +2d6.</div>
-            <div class="spell-item"><b>Proteção contra Lâminas:</b> Escudo que diminui danos de lâminas em 3 por 2 turnos.</div>
+            <div class="spell-item"><b>Proteção contra Lâminas:</b> Cria um escudo que diminui danos de lâminas em 3 por 2 turnos.</div>
 
-            <div class="spell-level">🔷 Nível 2 (2 Mana)</div>
+            <div class="spell-level">🔷 Nível 2 (Custa 2 Mana)</div>
             <div class="spell-item"><b>Raio Congelante:</b> Causa 2d4 de dano e congela o inimigo por 1d2 turnos.</div>
-            <div class="spell-item"><b>Míssil Arcano:</b> Três projéteis de energia que nunca erram, causando 1d4 cada.</div>
-            <div class="spell-item"><b>Escudo de Mana:</b> Barreira que absorve 3d6 de dano por 1d2 turnos.</div>`;
-    } 
+            <div class="spell-item"><b>Míssil Arcano:</b> Dispara três projéteis de energia que seguem o alvo e nunca erram, causando 1d4 cada.</div>
+            <div class="spell-item"><b>Escudo de Mana:</b> Cria uma barreira em volta de si que absorve 3d6 de dano por 1d2 turnos.</div>
+            <div class="spell-item"><b>Drenar Mana:</b> Rouba energia mágica do alvo. Causa 1d6 de dano e recupera 1d2 ponto de Mana caso o alvo use magia.</div>
+            <div class="spell-item"><b>Explosão Trovejante:</b> Uma onda sonora explode ao redor do alvo causando 1d8 de dano e empurrando criaturas pequenas/medianas para trás.</div>
+            <div class="spell-item"><b>Corrente Elétrica:</b> Um raio salta entre até 3 inimigos próximos causando 2d4 de dano em cada.</div>
+            <div class="spell-item"><b>Explosão de Mana:</b> O mago libera mana ao redor do corpo causando 2d4 de dano em todos os seres próximos. Pode escolher gastar mais mana para causar 1d4 de dano a mais para cada ponto de mana.</div>
+            <div class="spell-item"><b>Olho Arcano:</b> Invoca um olho mágico flutuante capaz de atravessar pequenas frestas e enxergar locais distantes.</div>
+
+            <div class="spell-level">🔮 Nível 3 (Custa 3 Mana)</div>
+            <div class="spell-item"><b>Olho Arcano:</b> Invoca um olho mágico flutuante capaz de atravessar pequenas frestas e enxergar locais distantes.</div>
+            <div class="spell-item"><b>Passo Etéreo:</b> O mago se teletransporta por uma curta distância para um local que possa ver. Não conta como ataque e pode ser usado como reação a ataques. Anda metade do deslocamento.</div>
+            <div class="spell-item"><b>Prisão Arcana:</b> Cria correntes mágicas ao redor do alvo. O inimigo fica preso por 2. O alvo fará um teste de resistência caso falhe fica preso por mais 1d2 turno e toma 1d8 de dano.</div>
+            <div class="spell-item"><b>Bola de Fogo:</b> Uma explosão em área causa 2d6 de dano e aplica queimando que causa 1d6 por 1d2 turnos.</div>
+            <div class="spell-item"><b>Relâmpago:</b> Dispara um raio destrutivo em linha reta causando 2d8 de dano no alvo.</div>
+            <div class="spell-item"><b>Invocar Familiar Arcano:</b> Invoca uma criatura mágica pequena que auxilia o mago por 2+1d4 turnos. Pode atacar causando 1d6 de dano ou ajudar em testes. Caso não esteja em combate pode ser invocado por 1 hora.</div>`;
+    }
     else if (classe === 'Curandeiro') {
         html += `
             <div class="spell-level">🙏 Habilidades Passivas</div>
-            <div class="spell-item"><b>Aura de Tranquilidade:</b> Aliados (3m) recebem +2 contra estados "Aterrorizado", "Adoecido" ou venenos.</div>
-            <div class="spell-item"><b>Ajuda aos Necessitados:</b> Curas em aliados com menos de metade da vida recuperam +3 de vida adicional.</div>
-            <div class="spell-item"><b>Olhar Clínico:</b> Enxerga o HP (%) e identifica condições negativas instantaneamente sem testes.</div>
+            <div class="spell-item"><b>Aura de Tranquilidade:</b> O Curandeiro e aliados a até 3 metros de distância recebem +2 em testes de resistência contra o estado "Aterrorizado", "Adoecido" ou venenos. A presença do curandeiro acalma os corações.</div>
+            <div class="spell-item"><b>Ajuda aos Necessitados:</b> Sempre que o Curandeiro utilizar uma habilidade de cura em um aliado que tenha menos que a metade da vida, o alvo recupera +3 de vida adicional. Se o curandeiro curar a si mesmo, esse bônus não se aplica.</div>
+            <div class="spell-item"><b>Olhar Clínico:</b> O Curandeiro consegue enxergar (em porcentagem) a vida de todos os aliados e inimigos apenas ao olhar para eles. Ele também identifica instantaneamente se alguém está sob efeito de uma condição negativa (sono, paralisia, fraqueza) sem precisar de testes.</div>
 
-            <div class="spell-level">🌟 Nível 0 (0 Mana)</div>
+            <div class="spell-level">🌟 Nível 0 (Custa 0 Mana)</div>
             <div class="spell-item"><b>Luz:</b> Cria luz.</div>
             <div class="spell-item"><b>Quebrar Maldição Menor:</b> Remove maldições fracas.</div>
             <div class="spell-item"><b>Bênção de Força:</b> Melhora os atributos do alvo em +1 Força por 1d4 turnos.</div>
             <div class="spell-item"><b>Cura Menor:</b> Cura 1d6 de vida de um alvo.</div>
             <div class="spell-item"><b>Detectar Magia Menor:</b> Sente a presença de magias fracas no ambiente.</div>
 
-            <div class="spell-level">💚 Nível 1 (1 Mana)</div>
-            <div class="spell-item"><b>Curar Ferimentos:</b> Cura aliados visíveis em 2d4 de vida.</div>
-            <div class="spell-item"><b>Regeneração:</b> O alvo recupera 1d4 de vida por round (3 rounds).</div>
+            <div class="spell-level">💚 Nível 1 (Custa 1 Mana)</div>
+            <div class="spell-item"><b>Curar Ferimentos:</b> Cura ferimentos de aliados que você possa ver em 2d4 de vida.</div>
+            <div class="spell-item"><b>Regeneração:</b> O alvo recupera 1d4 de vida por round por 3 rounds.</div>
             <div class="spell-item"><b>Tiro de Luz:</b> Atira um projétil de luz que causa 2d4 de dano.</div>
-            <div class="spell-item"><b>Solo Sagrado:</b> Cura ferimentos de aliados em área pequena em 1d6 de vida.</div>
+            <div class="spell-item"><b>Solo Sagrado:</b> Cura ferimentos de aliados dentro de uma área pequena em 1d6 de vida.</div>
             <div class="spell-item"><b>Palavra de Cura:</b> Cura ferimentos de aliados a curta distância em 2d6 de vida.</div>
 
-            <div class="spell-level">💠 Nível 2 (2 Mana)</div>
-            <div class="spell-item"><b>Fechar Ferimentos:</b> Cura ferimentos de aliados visíveis em 2d6 de vida.</div>
-            <div class="spell-item"><b>Escudo Sagrado:</b> Concede escudo reduzindo 2 de dano e dando 2d4 de vida extra pelo combate.</div>
-            <div class="spell-item"><b>Círculo de Luz:</b> Área que ilumina, afasta mortos-vivos e cura 1d6 de vida por 1d4 turnos.</div>
-            <div class="spell-item"><b>Bênção Intermediária:</b> Melhora atributos de um alvo em +2 por 1d4 turnos.</div>`;
+            <div class="spell-level">💠 Nível 2 (Custa 2 Mana)</div>
+            <div class="spell-item"><b>Fechar Ferimentos:</b> Cura ferimentos de aliados que você possa ver em 2d6 de vida.</div>
+            <div class="spell-item"><b>Escudo Sagrado:</b> Concede um escudo a um aliado reduzindo em 2 todos os danos e concedendo 2d4 de vida extra por 1d2+1 turnos.</div>
+            <div class="spell-item"><b>Círculo de Luz:</b> Crie uma área que ilumina, afasta mortos-vivos fracos e cura 1d6 de vida por 1d4 turnos.</div>
+            <div class="spell-item"><b>Bênção Intermediária:</b> Melhora os atributos de um alvo em +2 por 1d4 turnos.</div>
+            <div class="spell-item"><b>Corrente Sagrada:</b> Uma corrente de luz salta entre até 3 aliados curando 1d6 cada.</div>
+
+            <div class="spell-level">✨ Nível 3 (Custa 3 Mana)</div>
+            <div class="spell-item"><b>Raio Sagrado:</b> Conjura um feixe sagrado que causa 3d4+2 de dano mágico. Mortos-vivos sofrem dano dobrado.</div>
+            <div class="spell-item"><b>Invocar Orbe de Cura:</b> Invoca uma esfera flutuante de luz que pode ir em direção à aliados por 1d2+2 turnos e cura 1d6+2 de vida quando se aproxima de um aliado. Ele também ilumina o ambiente ao redor dele.</div>
+            <div class="spell-item"><b>Proteção Maior:</b> Abençoa um aliado fazendo ele receber menos dano de ataques -5 de dano recebido por 1d2+2 turnos.</div>
+            <div class="spell-item"><b>Milagre Menor:</b> Cura um aliado em 4d4 de vida.</div>`;
     }
-    else if (classe === 'Guerreiro') {
+   else if (classe === 'Guerreiro') {
         html += `
             <div class="spell-level">⚔️ Habilidades Passivas</div>
-            <div class="spell-item"><b>Força de Vontade:</b> Com menos de metade da vida, recebe +2 em testes de resistência física.</div>
-            <div class="spell-item"><b>Empolgação:</b> A partir do seu 3º turno em combate, ganha +2 em força.</div>
-            <div class="spell-item"><b>Casca Grossa:</b> Recebe uma redução permanente de -1 em todo dano físico recebido.</div>
-            <div class="spell-item"><b>Mártir:</b> Pode absorver 2 de dano de um aliado (5m) para si mesmo automaticamente.</div>
+            <div class="spell-item"><b>Força de Vontade:</b> Quando o Guerreiro está com menos da metade da vida máxima, ele recebe +2 em todos os testes de resistência física.</div>
+            <div class="spell-item"><b>Empolgação:</b> A partir do seu 3º turno em um combate ganha +2 em força.</div>
+            <div class="spell-item"><b>Casca Grossa:</b> Você recebe uma redução permanente de -1 em todo dano físico recebido.</div>
+            <div class="spell-item"><b>Mártir:</b> Sempre que um aliado a até 5 metros de distância for sofrer dano, o guerreiro pode (automaticamente e sem gastar ação) absorver 2 pontos desse dano para si mesmo. Esse valor é subtraído do dano do aliado e causado diretamente ao guerreiro.</div>
 
-            <div class="spell-level">🛡️ Habilidades Ativas (5 Usos por Dia)</div>
-            <div class="spell-item"><b>Corte Perfurante:</b> Estocada que causa o dano da arma e ignora 2 de armadura física.</div>
-            <div class="spell-item"><b>Grito de Desafio:</b> Rugido que força inimigos próximos a focar ataques no Guerreiro.</div>
-            <div class="spell-item"><b>Postura Defensiva:</b> Reduz todo dano físico em 4 até o próximo turno, mas fica imóvel.</div>
-            <div class="spell-item"><b>Corte Meteoro:</b> Corte em longa distância causando o dano da arma.</div>
-            <div class="spell-item"><b>Investida Impactante:</b> Ombrada (1d6) com teste de resistência: chance de empurrar e atordoar.</div>
-            <div class="spell-item"><b>Fôlego Renovado:</b> Respira fundo e recupera 1d8 de vida no combate.</div>
-            <div class="spell-item"><b>Impacto Sísmico:</b> Bate arma/escudo no chão, forçando inimigos pequenos ao redor a recuar.</div>
-            <div class="spell-item"><b>Desarmar:</b> Teste de Força para fazer a arma do inimigo voar para longe.</div>`;
+            <div class="spell-level">🛡️ Habilidades Ativas (6 usos totais por descanso)</div>
+            <div class="spell-item"><b>Corte Perfurante:</b> O Guerreiro realiza um golpe de estocada focado. Causa o dano da arma e ignora 2 de armadura física do alvo.</div>
+            <div class="spell-item"><b>Grito de Desafio:</b> O Guerreiro solta um rugido imponente. Inimigos próximos devem focar seus ataques apenas no Guerreiro no próximo turno.</div>
+            <div class="spell-item"><b>Postura Defensiva:</b> O Guerreiro se fecha em guarda. Até o seu próximo turno, ele reduz todo dano físico recebido em 4, mas deve ficar imóvel.</div>
+            <div class="spell-item"><b>Corte Distante:</b> Corta em longa distância causando o dano da arma.</div>
+            <div class="spell-item"><b>Investida Impactante:</b> O Guerreiro avança rapidamente e dá uma ombrada em um alvo causando 1d6 e fazendo com que o alvo faça um teste de resistência física, se falhar ele é jogado para trás e fica atordoado por 1 turno.</div>
+            <div class="spell-item"><b>Fôlego Renovado:</b> Respira fundo e recupera 1d8 de vida no meio do combate.</div>
+            <div class="spell-item"><b>Impacto Sísmico:</b> Bate sua arma ou escudo no chão, forçando todos os inimigos pequenos ao redor a recuarem.</div>
+            <div class="spell-item"><b>Desarmar:</b> Em vez de causar dano, realiza um teste de força, se vencer, a arma do inimigo voa para longe.</div>
+            <div class="spell-item"><b>Golpe Giratório:</b> Ataca todos os inimigos próximos causando o dano da arma+2 em cada alvo.</div>
+            <div class="spell-item"><b>Quebra-Guarda:</b> Causa dano da arma +1d6 e reduz a armadura física do alvo em 2 até por 2+1d2 turnos.</div>
+            <div class="spell-item"><b>Corte Ascendente:</b> Golpeia de baixo para cima causando dano da arma +1d6 e lançando o alvo no ar.</div>`;
     }
     else if (classe === 'Caçador') {
         html += `
             <div class="spell-level">🌿 Habilidades Passivas</div>
-            <div class="spell-item"><b>Rastrear:</b> Vantagem em testes de percepção para pegadas, cheiros ou sons.</div>
-            <div class="spell-item"><b>Armadilheiro:</b> Vantagem em testes para detectar ou montar armadilhas.</div>
+            <div class="spell-item"><b>Rastrear:</b> O Caçador possui sentidos aguçados, recebendo vantagem em testes de percepção para identificar pegadas, cheiros ou sons de criaturas.</div>
+            <div class="spell-item"><b>Armadilheiro:</b> O Caçador possui vantagem em teste de percepção para armadilhas e para montar armadilhas.</div>
             <div class="spell-item"><b>Camuflagem:</b> Ganha +2 em testes para se esconder.</div>
-            <div class="spell-item"><b>Sobrevivente:</b> Imune a penalidades de terrenos difíceis e recebe -2 dano de climas extremos.</div>
-            <div class="spell-item"><b>Sentido de Perigo:</b> +2 em Iniciativa e nunca pode ser surpreendido enquanto acordado.</div>
+            <div class="spell-item"><b>Sobrevivente:</b> O Caçador é imune a penalidades de movimento em terrenos difíceis naturais (lama, floresta densa, neve). Além disso, ele recebe uma redução permanente de -2 de dano contra efeitos de clima (frio extremo ou calor intenso).</div>
+            <div class="spell-item"><b>Sentido de Perigo:</b> O Caçador nunca pode ser surpreendido enquanto estiver acordado. Ele recebe um bônus permanente de +2 em testes de iniciativa, permitindo que ele quase sempre aja antes dos inimigos no início de um combate.</div>
 
-            <div class="spell-level">🏹 Habilidades Ativas (5 Usos por Dia)</div>
-            <div class="spell-item"><b>Tiro Triplo:</b> Três disparos rápidos. Cada acerto (teste de Precisão) causa 1d6.</div>
-            <div class="spell-item"><b>Foco do Predador:</b> Mira intensa; próximo ataque ignora distância e ganha +3 na Precisão.</div>
-            <div class="spell-item"><b>Salto Acrobático:</b> Move-se metade do deslocamento sem sofrer ataques e ganha +2 Destreza no turno.</div>
-            <div class="spell-item"><b>Bomba de Fumaça:</b> Produz 2 bombas que criam cortina de fumaça em área mediana (1 turno).</div>
-            <div class="spell-item"><b>Tiro Marcador:</b> Marca o alvo para que o próximo ataque cause +2d4 de dano.</div>`;
+            <div class="spell-level">🏹 Habilidades Ativas (6 usos totais por descanso)</div>
+            <div class="spell-item"><b>Tiro Triplo:</b> O Caçador dispara três projéteis rapidamente. Realiza três testes de Precisão. Cada acerto causa 1d6 de dano.</div>
+            <div class="spell-item"><b>Foco do Predador:</b> O Caçador utiliza sua ação para mirar intensamente. O próximo ataque ignora penalidades de distância e recebe +3 de bônus no teste de Precisão.</div>
+            <div class="spell-item"><b>Salto Acrobático:</b> O Caçador realiza uma manobra de esquiva. Ele se move metade do deslocamento sem sofrer ataques e recebe +2 em Destreza para desviar de golpes ou armadilhas naquele turno (ainda pode atacar depois).</div>
+            <div class="spell-item"><b>Bomba de Fumaça:</b> O Caçador consegue produzir bombas de fumaça com elementos da natureza que podem ser usadas para criar uma cortina de fumaça em uma área mediana (em combates dura 1 turno) (produz 2 bombas de fumaça por vez).</div>
+            <div class="spell-item"><b>Tiro Marcador:</b> Atira uma flecha que marca o alvo, seu próximo ataque causará 2d4 a mais de dano, causa o dano normal da flecha (1d6).</div>
+            <div class="spell-item"><b>Tiro Certeiro:</b> Se concentra e atira um ataque que tem +3 no modificador para acertar e causa o dano da arma+1d4.</div>
+            <div class="spell-item"><b>Flecha Venenosa:</b> Causa dano normal da arma +1d6 de veneno por 2 turnos.</div>
+            <div class="spell-item"><b>Tiro Silencioso:</b> Ataque furtivo que não revela a posição do Caçador se estiver escondido.</div>`;
     }
 
     div.innerHTML = html;
