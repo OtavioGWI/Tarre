@@ -903,7 +903,7 @@ function abrirEscolaMagia() {
             <div class="rpg-card-small" onclick="menuEscola('encantamentos')"><span>💎</span><strong>Encantamentos</strong></div>
             <div class="rpg-card-small" onclick="menuEscola('magias')"><span>📜</span><strong>Aprender Magias</strong></div>
             <div class="rpg-card-small" onclick="menuEscola('itens')"><span>🔮</span><strong>Itens Mágicos</strong></div>
-            <div class="rpg-card-small" onclick="abrirModalSenha('sussurro', 'menuEscola(&quot;mercado_negro&quot;)', 'funcao')" style="border-color:#555; background: rgba(0,0,0,0.6);"><span>🚪</span><strong style="color:#777;">???</strong></div>
+            <div class="rpg-card-small" onclick="menuEscola('mercado_negro')" style="border-color:#ff4444; background: rgba(0,0,0,0.6);"><span>🚪</span><strong style="color:#ff4444;">Mercado Negro</strong></div>
         </div>
     `;
 }
@@ -1866,7 +1866,13 @@ const dadosCapital = {
             hab_raca: "<b>🧘 Meditação:</b> Recupera 1d4 + Nível de Mana 1x ao dia.",
             passivas: [],
             ativas: [],
-            magias: ["Luz", "Solo Sagrado"]
+            magias: ["Luz", "Solo Sagrado"],
+            evolucao: {
+                senha: "liora",
+                classeNova: "Sacerdote",
+                desbloqueado: false,
+                lore: "Lythael guardava consigo uma semente mágica de sua terra natal. Em uma noite silenciosa, a semente começou a brilhar e floresceu, revelando uma rosa dourada cintilante. O ser manifestou-se apresentando-se como Liora, filha do deus Terraria. Reconhecendo a nobreza e a pureza profunda no coração da elfa, Liora pediu sua ajuda para reencontrar seus irmãos perdidos pelo mundo. Firmando um pacto de amizade, a flor metamorfoseou-se em um poderoso cajado divino nas mãos de Lythael.<br><br><div style='display:flex; gap:10px;'><img src='liora.png' style='width: 48%; border-radius: 5px;'><img src='liora_2.png' style='width: 48%; border-radius: 5px;'></div>"
+            }
         },
         { 
             nome: "Valkia Huniman", 
@@ -1878,7 +1884,13 @@ const dadosCapital = {
             hab_raca: "<b>✨ Aura Protetora:</b> Remove estados negativos e cura ¼ da vida do alvo.",
             passivas: [],
             ativas: [],
-            magias: []
+            magias: [],
+            evolucao: {
+                senha: "espadas",
+                classeNova: "Cavaleira das Trevas",
+                desbloqueado: false,
+                lore: "Durante a noite, o descanso de Valkia foi invadido por uma presença esmagadora. Em seus sonhos, um ser celestial distorcido meio anjo meio demônio surgiu, identificando Valkia como sua filha e revelando segredos dolorosos de seu passado oculto. Antes de desaparecer na névoa do sonho, sua mãe cravou duas espadas diante dela uma irradiando pura luz sagrada e a outra consumida em trevas absolutas, questionando qual seria o caminho que Valkia escolheria trilhar.<br><br><img src='anja_demonio.png' style='width: 100%; border-radius: 5px; margin-bottom: 10px;'><br><img src='espadas_valkia.png' style='width: 100%; border-radius: 5px;'>"
+            }
         },
 {
     nome: "Greta Thunder",
@@ -1898,7 +1910,13 @@ const dadosCapital = {
         "🕸️ Teia (Nível 1): Prende adversários", 
         "☄️ Bola de Fogo Menor (Nível 1): 1d6 de dano + Queimando",
         "❄️ Raio Congelante (Nível 2): 2d4 de dano + Congelado"
-    ]
+    ],
+    evolucao: {
+                senha: "fogo",
+                classeNova: "Elementalista",
+                desbloqueado: false,
+                lore: "Mesmo com o braço decepado, Greta ainda sentia uma conexão mágica latejante com ele. Em um sono profundo, ela sonhou com uma floresta inteira sendo consumida por chamas, sentindo a dor excruciante da queimadura no membro fantasma. Ela acordou sonâmbula. Ao parar de frente para um espelho, o choque flutuando no ar logo atrás dela estava sua própria mão envolta em chamas. Ao se virar, viu a mão exibindo uma vibrante runa de fogo em sua palma. O fogo primordial agora lhe pertencia.<br><br><img src='mao_greta.png' style='width: 100%; border-radius: 5px;'>"
+            }
 },
         { 
             nome: "Balon Blacktide", 
@@ -1910,19 +1928,31 @@ const dadosCapital = {
             hab_raca: "<b>💢 Fúria Demoníaca:</b> Entra em fúria por (n+1) turnos (+2 For/Des, -2 Int/Sab/Prec).",
             passivas: [],
             ativas: [],
-            magias: []
+            magias: [],
+            evolucao: {
+                senha: "mare",
+                classeNova: "Arqueiro",
+                desbloqueado: false,
+                lore: "No meio da noite a porta de Balon foi esmurrada. Era Liam o filho de seu antigo patrão e alguém que Balon considerava um irmão. Liam trouxe um aviso urgente. O pirata Capitão Thorne que Balon matou no passado tinha um filho. Esse herdeiro assumiu a frota e busca vingança. Liam invadiu o navio inimigo para descobrir os planos e conseguiu fugir por pouco. Ele não saiu de mãos vazias e entregou a Balon o item que roubou da cabine do herdeiro. O Arco da Maré Negra. Com a caçada declarada Balon agora empunha a arma do próprio inimigo para o embate final.<br><br><img src='mare_negra.png' style='width: 100%; border-radius: 5px;'>"
+            }
         },
         { 
-            nome: "Thorga Punho de Ferro", 
+            nome: "Thorgar Punho de Ferro", 
             raca: "Anão",
             classe: "Guerreiro", 
             foto: "Thorga.jpg",
-            desc: "Exilado injustamente das forjas ancestrais, Thorga é um mercenário impetuoso que rejeita a autoridade de reis e deuses, lutando pela pura emoção da batalha e para provar que sua força basta por si só.",
+            desc: "Exilado injustamente das forjas ancestrais, Thorgar é um mercenário impetuoso que rejeita a autoridade de reis e deuses, lutando pela pura emoção da batalha e para provar que sua força basta por si só.",
             stats: [7, 1, 1, 0, 1, 8, 1, 1], // For, Sab, Int, Man, Des, Con, Pre, Car
             hab_raca: "<b>🛡️ Pele de aço:</b> Uma vez por dia, reduz o dano de um ataque pela metade.",
             passivas: [],
             ativas: [],
-            magias: []
+            magias: [],
+            evolucao: {
+                senha: "mascara",
+                classeNova: "Cavaleiro das Trevas",
+                desbloqueado: false,
+                lore: "Thorgar foi consumido por um pesadelo a antiga cidade de onde fora exilado ardia em um inferno de cinzas. Correndo por todos os lados, criaturas miúdas de orelhas pontudas, usando máscaras brancas e facas de abate, gargalhavam enquanto esfaqueavam e queimavam tudo. Thorga olhou para sua própria mão e percebeu que empunhava uma faca ensanguentada. De repente, o caos cessou. As criaturas o encararam e caminharam em sua direção. Uma delas estendeu uma máscara branca e sussurrou 'Você deixou cair... irmão'. Thorgar despertou arfando, com a máscara física materializada em suas mãos.<br><br><img src='demonios1.png' style='width: 100%; border-radius: 5px;'>"
+            }
         },
 { 
     nome: "Liésty", 
@@ -1942,7 +1972,13 @@ const dadosCapital = {
         "🧪 Espirro Ácido (Nível 1): 2d4 de dano perfurante",
         "☄️ Bola de Fogo Menor (Nível 1): 1d6 de dano + Queimando",
         "🛡️ Escudo de Mana (Nível 2): Absorve 3d6 de dano por 1d2 turnos"
-    ]
+    ],
+    evolucao: {
+                senha: "???",
+                classeNova: "???",
+                desbloqueado: false,
+                lore: "A ser definido em breve...<br><br><div style='text-align: center; color: #888; font-style: italic; padding: 10px;'>(Imagem em breve)</div>"
+            }
 }
     ],
         procurados: [
@@ -2365,27 +2401,33 @@ function menuCapital(tipo) {
                     </div>
                 </div>`;
         });
-    } else if (tipo === 'procurados') {
-        titulo.innerText = "☠️ Cartazes de Procurados";
-        container.innerHTML = btnVoltar;
-        dadosCapital.procurados.forEach(p => {
-            let img = p.foto ? `<img src="${p.foto}" class="foto-lista" onclick="verImagemPersonagem('${p.foto}')">` : `<div class="foto-placeholder">WANTED</div>`;
-            container.innerHTML += `<div class="item-menu">${img}<div class="texto-item"><h4>${p.nome}</h4><span class="recompensa">💰 ${p.recompensa}</span><p>${p.desc}</p></div></div>`;
-        });
     } else if (tipo === 'esquadrao') {
         titulo.innerText = "🛡️ Esquadrão";
-        // Corrigido de btnVoltarHub para btnVoltar
         container.innerHTML = btnVoltar; 
         dadosCapital.esquadrao.forEach((item, index) => {
             let img = item.foto ? `<img src="${item.foto}" class="foto-lista" onclick="verImagemPersonagem('${item.foto}')" style="cursor: zoom-in;">` : `<div class="foto-placeholder">?</div>`;
+            
+            // Lógica do botão de evolução baseado no status de desbloqueio
+            let btnEvolucao = "";
+            if (item.evolucao && item.evolucao.senha !== "???") {
+                if (item.evolucao.desbloqueado) {
+                    btnEvolucao = `<button onclick="verEvolucao(${index})" class="btn-popup" style="margin-top:5px; background: #8b008b; font-size: 11px; border: 1px solid #da70d6; width: 100%;">✨ Classe: ${item.evolucao.classeNova}</button>`;
+                } else {
+                    btnEvolucao = `<button onclick="abrirModalSenha('${item.evolucao.senha}', 'desbloquearEvolucao(${index})', 'funcao')" class="btn-popup" style="margin-top:5px; background: #222; color: #888; font-size: 11px; border: 1px solid #555; width: 100%;">🔒 Desbloquear Evolução</button>`;
+                }
+            }
+
             container.innerHTML += `
                 <div class="item-menu">
                     ${img}
-                    <div class="texto-item">
+                    <div class="texto-item" style="flex-grow: 1;">
                         <h4>${item.nome}</h4>
                         <span class="classe-char">${item.raca} • ${item.classe}</span>
                         <p>${item.desc || ""}</p>
-                        <button onclick="abrirStatsPersonagem(${index})" class="btn-popup" style="margin-top:10px; background: #2c3e50; font-size: 11px; border: 1px solid #87CEEB;">📊 Ver Estatísticas</button>
+                        <div style="display: flex; gap: 5px; flex-direction: column;">
+                            <button onclick="abrirStatsPersonagem(${index})" class="btn-popup" style="margin-top:10px; background: #2c3e50; font-size: 11px; border: 1px solid #87CEEB; width: 100%;">📊 Estatísticas Iniciais</button>
+                            ${btnEvolucao}
+                        </div>
                     </div>
                 </div>`;
         });
@@ -3438,7 +3480,8 @@ function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoEx
         if (nomeDoMapa === 'Hukmal_tep.jpg') {
 
             // Substitua o marcador antigo por este:
-            const btnMasmorra = criarBtn("🔍 Descobrir", "abrirModalSenha('lirio', 'abrirMenuDungeon()', 'funcao')", "#2E8B57");
+            // Substitua o btnMasmorra atual por:
+            const btnMasmorra = criarBtn("🔍 Descobrir", "abrirMenuDungeon()", "#2E8B57");
             criarPontoLocal([1173, 846], "Montanhas", "Picos Congelados", null, true, btnMasmorra);
             criarPontoLocal([1396, 780], "Capital de Hukmal'tep", "Felista", "Cópia de capital de hukmal_tep.png", true);
             criarPontoLocal([1422, 441], "Torre de Vigia", "Felista");
@@ -3473,7 +3516,8 @@ function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoEx
 
         if (nomeDoMapa === 'Blat_khyr.jpg') {
             // --- PONTO DA ESCOLA DE MAGIA ---
-            const btnEscola = criarBtn("🎓 Escola de Magia", "abrirModalSenha('poder', 'abrirEscolaMagia()', 'funcao')", "#800080");
+            // Substitua o btnEscola atual por:
+            const btnEscola = criarBtn("🎓 Escola de Magia", "abrirEscolaMagia()", "#800080");
             criarPontoLocal([382, 1359], "Capital de Blat'khyr", "Elfos", "cidade magica.png", true, btnEscola);
             
             criarPontoLocal([986, 1239], "Vilarejo", "Desconhecido");
@@ -4137,6 +4181,31 @@ function abrirStatsPersonagem(index) {
     }
 
     divListas.innerHTML = html;
+}
+function desbloquearEvolucao(index) {
+    // Altera o estado dinamicamente e injeta o novo nome da classe
+    dadosCapital.esquadrao[index].evolucao.desbloqueado = true;
+    dadosCapital.esquadrao[index].classe = dadosCapital.esquadrao[index].evolucao.classeNova;
+    
+    // Abre a tela de lore direto após acertar a senha
+    verEvolucao(index);
+}
+
+function verEvolucao(index) {
+    const p = dadosCapital.esquadrao[index];
+    const ev = p.evolucao;
+    const container = document.getElementById('conteudo-menu-capital');
+    const titulo = document.getElementById('titulo-menu-capital');
+
+    titulo.innerText = `✨ O Despertar de ${p.nome}`;
+
+    container.innerHTML = `
+        <button onclick="menuCapital('esquadrao')" class="btn-popup" style="margin-bottom: 20px; background: #444; width: 100%;">⬅ Voltar ao Esquadrão</button>
+        <div class="detalhe-box" style="border-color: #da70d6;">
+            <h3 style="color: #da70d6; text-align: center; margin-top: 0; margin-bottom: 20px; text-transform: uppercase;">Nova Classe: ${ev.classeNova}</h3>
+            <div style="font-size: 15px; line-height: 1.6; color: #ddd; white-space: pre-wrap; text-align: justify; padding: 10px;">${ev.lore}</div>
+        </div>
+    `;
 }
 
 // --- SISTEMA DE MERCADO NEGRO (ALCOVA) ---
