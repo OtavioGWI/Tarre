@@ -1858,11 +1858,11 @@ const dadosCapital = {
     esquadrao: [
         { 
             nome: "Lythael Serindë", 
-            classe: "Curandeira", 
+            classe: "Sacerdote", 
             raca: "Elfa alta",
             foto: "Lythael.png",
             desc: "Uma guardiã serena e observadora, cuja gentileza externa esconde uma força inabalável dedicada a proteger e valorizar toda forma de vida.", 
-            stats: [3, 6, 3, 10, 2, 2, 3, 1], // For, Sab, Int, Man, Des, Con, Pre, Car
+            stats: [1, 5, 4, 6, 1, 3, 2, 2], // For, Sab, Int, Man, Des, Con, Pre, Car
             hab_raca: "<b>🧘 Meditação:</b> Recupera 1d4 + Nível de Mana 1x ao dia.",
             passivas: [],
             ativas: [],
@@ -1870,17 +1870,17 @@ const dadosCapital = {
             evolucao: {
                 senha: "liora",
                 classeNova: "Sacerdote",
-                desbloqueado: false,
+                desbloqueado: true,
                 lore: "Lythael guardava consigo uma semente mágica de sua terra natal. Em uma noite silenciosa, a semente começou a brilhar e floresceu, revelando uma rosa dourada cintilante. O ser manifestou-se apresentando-se como Liora, filha do deus Terraria. Reconhecendo a nobreza e a pureza profunda no coração da elfa, Liora pediu sua ajuda para reencontrar seus irmãos perdidos pelo mundo. Firmando um pacto de amizade, a flor metamorfoseou-se em um poderoso cajado divino nas mãos de Lythael.<br><br><div style='display:flex; gap:10px;'><img src='liora.png' style='width: 48%; border-radius: 5px;'><img src='liora_2.png' style='width: 48%; border-radius: 5px;'></div>"
             }
         },
         { 
             nome: "Valkia Huniman", 
             raca: "Meio Anja",
-            classe: "Guerreira", 
+            classe: "Cavaleira das Trevas", 
             foto: "Valkia.png",
             desc: "Embora aparente seriedade inicial, logo revela uma natureza vibrante e impetuosa, movida pelo desejo de provar sua evolução enquanto exalta constantemente os nomes de Ryuiki e Daruin.",
-            stats: [6, 2, 1, 1, 2, 5, 3, 0],// For, Sab, Int, Man, Des, Con, Pre, Car
+            stats: [6, 2, 1, 0, 3, 3, 8, 0], // For, Sab, Int, Man, Des, Con, Pre, Car
             hab_raca: "<b>✨ Aura Protetora:</b> Remove estados negativos e cura ¼ da vida do alvo.",
             passivas: [],
             ativas: [],
@@ -1888,61 +1888,90 @@ const dadosCapital = {
             evolucao: {
                 senha: "espadas",
                 classeNova: "Cavaleira das Trevas",
-                desbloqueado: false,
+                desbloqueado: true,
                 lore: "Durante a noite, o descanso de Valkia foi invadido por uma presença esmagadora. Em seus sonhos, um ser celestial distorcido meio anjo meio demônio surgiu, identificando Valkia como sua filha e revelando segredos dolorosos de seu passado oculto. Antes de desaparecer na névoa do sonho, sua mãe cravou duas espadas diante dela uma irradiando pura luz sagrada e a outra consumida em trevas absolutas, questionando qual seria o caminho que Valkia escolheria trilhar.<br><br><img src='anja_demonio.png' style='width: 100%; border-radius: 5px; margin-bottom: 10px;'><br><img src='espadas_valkia.png' style='width: 100%; border-radius: 5px;'>"
             }
         },
-{
-    nome: "Greta Thunder",
-    raca: "Elfa da Floresta",
-    classe: "Maga",
-    foto: "Greta.jpg",
-    desc: "Uma guardiã solitária de Desterroth que nutre profundo desprezo pela humanidade e outras raças, confiando apenas na justiça da natureza e em seus cactos. Agora, ela é forçada a agir contra uma corrupção obscura que ameaça a floresta que jurou proteger.",
-    stats: [2, 2, 4, 5, 3, 2, 2, 0], // For, Sab, Int, Man, Des, Con, Pre, Car
-    hab_raca: "<b>🗣️ Conversa Natural:</b> Comunica-se com elementos da natureza.",
-    passivas: ["🛡️ Resistência Mágica: Redução permanente de -2 em dano mágico."], 
-    ativas: [],
-    magias: [
-        "🔍 Detectar Magia Menor (Nível 0)", 
-        "🔥 Chama Contínua (Nível 0): 1d4 de dano + Queimando", 
-        "🖐️ Mão Arcana (Nível 0): Manipula objetos à distância",
-        "🤢 Raio Adoecente (Nível 1): 1d6 de dano + Adoecido", 
-        "🕸️ Teia (Nível 1): Prende adversários", 
-        "☄️ Bola de Fogo Menor (Nível 1): 1d6 de dano + Queimando",
-        "❄️ Raio Congelante (Nível 2): 2d4 de dano + Congelado"
-    ],
-    evolucao: {
+        {
+            nome: "Greta Thunder",
+            raca: "Elfa da Floresta",
+            classe: "Elementalista",
+            foto: "Greta.jpg",
+            desc: "Uma guardiã solitária de Desterroth que nutre profundo desprezo pela humanidade e outras raças confiando apenas na justiça da natureza e em seus cactos Agora ela é forçada a agir contra uma corrupção obscura que ameaça a floresta que jurou proteger",
+            stats: [3, 2, 4, 5, 3, 2, 2, 2], // For, Sab, Int, Man, Des, Con, Pre, Car
+            hab_raca: "<b>🗣️ Conversa Natural</b> Comunica se com elementos da natureza",
+            passivas: [
+                "🛡️ Resistência Elemental Recebe uma redução permanente de 2 em qualquer dano de origem mágica Caso o dano seja do mesmo elemento da última magia que você usou essa redução vai para 4",
+                "🔋 Acúmulo Primordial Usar o mesmo elemento em turnos seguidos aumenta o efeito adicionando 1d4 de dano extra e acumula até três vezes para um máximo de 3d4"
+            ],
+            ativas: [],
+            magias: [
+                "🔍 Sentir Elementos Nível 0 rastreia fontes naturais e vibrações no ambiente num raio de 10 metros",
+                "✨ Faísca Elemental Nível 0 pequeno efeito contínuo no alvo causando 1d4 de dano e aplicando o efeito da tabela",
+                "🖐️ Controle Elemental Menor Nível 0 manipula porção leve de um elemento no cenário por 1 turno",
+                "☄️ Projétil Elemental Nível 1 dispara ataque que causa 1d6 de dano e aplica efeito do elemento",
+                "🪤 Runa Elemental Nível 1 armadilha invisível no solo explode causando 1d6 de dano e aplica efeito",
+                "💧 Prisão de Bolha Nível 1 cria bolha de água que prende imobilizando por 1d2 turnos e causando 1d4 de dano de sufocamento por turno",
+                "🧘 Concentração Nível 1 a próxima magia ganha mistura de um elemento extra abrindo combinações",
+                "💨 Rajada Elemental Nível 2 feixe concentrado que causa 2d4 de dano e aplica efeito elemental",
+                "⚡ Ricochete Elemental Nível 2 ataque que salta entre até três inimigos num raio de 3 metros causando 2d4 de dano",
+                "🧱 Parede Elemental Nível 2 barreira densa ou fluida de 3 metros dependendo do elemento dura 1d4+1 turnos",
+                "🌧️ Nuvem Tempestuosa Nível 3 invoca nuvem que chove na área de 4 metros quadrados e no turno seguinte lança raio causando 3d4 de dano elétrico nos molhados sem escolha de elemento",
+                "🌪️ Controle Elemental Intermediário Nível 3 move matéria de tamanho médio do cenário para soterrar afogar ou afastar alvos violentamente",
+                "🌋 Devastação Elemental Nível 4 junta dois elementos focado em uma área de 6 metros quadrados causa 2d6 mais 1d4 de dano e modifica o terreno",
+                "✨ Avatar da Natureza Ultimate absorve energia do ambiente por 1d4 mais 1 turnos aumentando danos em 2d4 e dando fusão grátis No final explode em direção aleatória causando 4d6 mais fusão"
+            ],
+            evolucao: {
                 senha: "fogo",
                 classeNova: "Elementalista",
-                desbloqueado: false,
-                lore: "Mesmo com o braço decepado, Greta ainda sentia uma conexão mágica latejante com ele. Em um sono profundo, ela sonhou com uma floresta inteira sendo consumida por chamas, sentindo a dor excruciante da queimadura no membro fantasma. Ela acordou sonâmbula. Ao parar de frente para um espelho, o choque flutuando no ar logo atrás dela estava sua própria mão envolta em chamas. Ao se virar, viu a mão exibindo uma vibrante runa de fogo em sua palma. O fogo primordial agora lhe pertencia.<br><br><img src='mao_greta.png' style='width: 100%; border-radius: 5px;'>"
-            }
-},
-        { 
-            nome: "Balon Blacktide", 
-            raca: "Meio Demônio",
-            classe: "Caçador", 
-            foto: "Balon.jpg",
-            desc: "Das lições da nobreza aos naufrágios da pirataria, este meio-demônio de poucas palavras carrega no sobrenome a marca de sua sobrevivência e, na alma, o conflito eterno entre o sangue amaldiçoado e a luz que busca guiá-lo.",
-            stats: [0, 0, 0, 0, 0, 0, 0, 0], // For, Sab, Int, Man, Des, Con, Pre, Car
-            hab_raca: "<b>💢 Fúria Demoníaca:</b> Entra em fúria por (n+1) turnos (+2 For/Des, -2 Int/Sab/Prec).",
-            passivas: [],
-            ativas: [],
-            magias: [],
-            evolucao: {
-                senha: "mare",
-                classeNova: "Arqueiro",
-                desbloqueado: false,
-                lore: "No meio da noite a porta de Balon foi esmurrada. Era Liam o filho de seu antigo patrão e alguém que Balon considerava um irmão. Liam trouxe um aviso urgente. O pirata Capitão Thorne que Balon matou no passado tinha um filho. Esse herdeiro assumiu a frota e busca vingança. Liam invadiu o navio inimigo para descobrir os planos e conseguiu fugir por pouco. Ele não saiu de mãos vazias e entregou a Balon o item que roubou da cabine do herdeiro. O Arco da Maré Negra. Com a caçada declarada Balon agora empunha a arma do próprio inimigo para o embate final.<br><br><img src='mare_negra.png' style='width: 100%; border-radius: 5px;'>"
-            }
+                desbloqueado: true,
+                lore: "Mesmo com o braço decepado Greta ainda sentia uma conexão mágica latejante com ele Em um sono profundo ela sonhou com uma floresta inteira sendo consumida por chamas sentindo a dor excruciante da queimadura no membro fantasma Ela acordou sonâmbula Ao parar de frente para um espelho o choque flutuando no ar logo atrás dela estava sua própria mão envolta em chamas Ao se virar viu a mão exibindo uma vibrante runa de fogo em sua palma O fogo primordial agora lhe pertencia<br><br><img src='mao_greta.png' style='width: 100%; border-radius: 5px;'>"
+            },
+            htmlExtra: `
+            <h4 style="color:#ffd700; text-align:center; margin-top:25px; border-bottom:1px solid #555; padding-bottom:5px;">🔥 Elementos Básicos</h4>
+            <div style="overflow-x:auto;">
+            <table class="tabela-banco" style="font-size:11px; width:100%; text-align:center;">
+                <tr><th>Nv</th><th>Fogo Queimar</th><th>Água ou Gelo Debilitar</th><th>Terra Impacto</th><th>Ar Empurrar</th></tr>
+                <tr><td>0</td><td>1d4 dano 1d2 turnos</td><td>Metade do mov 1 turno</td><td>Empurra 2m</td><td>Empurra 2m</td></tr>
+                <tr><td>1</td><td>1d6 dano 1d2 turnos</td><td>Prende pernas 1 turno</td><td>Derruba 1t e 1d4 dano</td><td>Empurra 4m</td></tr>
+                <tr><td>2</td><td>2d4 dano 1d4 turnos</td><td>Congela 1d2 turnos</td><td>Derruba 1t e 2d4 dano</td><td>Empurra 6m</td></tr>
+                <tr><td>3</td><td>1d6+1d4 dano 1d4+1 turnos</td><td>Congela 1d4t e 1d4 dano</td><td>Derruba 1t e 3d4 dano</td><td>Empurra 8m</td></tr>
+                <tr><td>4</td><td>2d6 dano 1d4+1 turnos</td><td>Congela 1d4+1t e 2d4 dano</td><td>Soterra 1t e 4d4 dano</td><td>Empurra 10m</td></tr>
+            </table>
+            </div>
+
+            <h4 style="color:#ffd700; text-align:center; margin-top:20px; border-bottom:1px solid #555; padding-bottom:5px;">🌪️ Combinações Diferentes Mais 1 Mana</h4>
+            <div style="overflow-x:auto;">
+            <table class="tabela-banco" style="font-size:10.5px; width:100%; text-align:center;">
+                <tr><th>Nv</th><th>Fogo+Água Vapor</th><th>Fogo+Terra Magma</th><th>Fogo+Ar Raio</th><th>Água+Terra Lama</th><th>Água+Ar Nevasca</th><th>Terra+Ar Areia</th></tr>
+                <tr><td>0</td><td>1d4 1d2t e Cega 1t</td><td>1d4 1d2t e Menos 1 CA</td><td>1d4 e Eletrocuta 1t</td><td>Metade mov 1t e Empurra 2m</td><td>Metade mov 1t e Empurra 2m</td><td>Cega 1t e Empurra 2m</td></tr>
+                <tr><td>1</td><td>1d6 1d2t e Cega 1t</td><td>1d6 1d2t e Menos 1 CA</td><td>1d6 e Eletrocuta 1t</td><td>Prende 1t e Derruba 1t</td><td>Prende 1t e Empurra 4m</td><td>Cega 1t e Empurra 4m</td></tr>
+                <tr><td>2</td><td>2d4 1d4t e Cega 1d2t</td><td>2d4 1d4t e Menos 2 CA</td><td>2d4 e Eletrocuta 1d2t</td><td>Congela 1d2t e Derruba 1t</td><td>Congela 1d2t e Empurra 6m</td><td>Cega 1t e Empurra 6m</td></tr>
+                <tr><td>3</td><td>1d6+1d4 1d4+1t e Cega 1d4t</td><td>1d6+1d4 1d4+1t e Menos 2 CA</td><td>1d6+1d4 e Eletrocuta 1d4t</td><td>Congela 1d4t e Derruba 1t</td><td>Congela 1d4t e Empurra 8m</td><td>Cega 1t e Empurra 8m</td></tr>
+                <tr><td>4</td><td>2d6 1d4+1t e Cega 1d4+1t</td><td>2d6 1d4+1t e Menos 3 CA</td><td>2d6 e Eletrocuta 1d4+1t</td><td>Congela 1d4+1t e Soterra 1t</td><td>Congela 1d4+1t e Empurra 10m</td><td>Cega 1t e Empurra 10m</td></tr>
+            </table>
+            </div>
+
+            <h4 style="color:#ffd700; text-align:center; margin-top:20px; border-bottom:1px solid #555; padding-bottom:5px;">💥 Combinações Iguais Mais 1 Mana</h4>
+            <div style="overflow-x:auto;">
+            <table class="tabela-banco" style="font-size:11px; width:100%; text-align:center;">
+                <tr><th>Nv</th><th>Fogo+Fogo</th><th>Água+Água</th><th>Terra+Terra</th><th>Ar+Ar</th></tr>
+                <tr><td>0</td><td>2d4 dano 1d2 turnos</td><td>Prende pernas 1 turno</td><td>Empurra 4m</td><td>Empurra 4m</td></tr>
+                <tr><td>1</td><td>2d6 dano 1d2 turnos</td><td>Prende pernas 2t</td><td>Derruba 1t 2d4 dano</td><td>Empurra 8m</td></tr>
+                <tr><td>2</td><td>4d4 dano 1d4 turnos</td><td>Congela 2d2 turnos</td><td>Derruba 1t 4d4 dano</td><td>Empurra 12m</td></tr>
+                <tr><td>3</td><td>2d6+2d4 dano 1d4+1 turnos</td><td>Congela 2d4 turnos 2d4 dano</td><td>Derruba 1t 6d4 dano</td><td>Empurra 16m</td></tr>
+                <tr><td>4</td><td>4d6 dano 1d4+1 turnos</td><td>Congela 2d4+2t 4d4 dano</td><td>Soterra 1t 8d4 dano</td><td>Empurra 20m</td></tr>
+            </table>
+            </div>
+            `
         },
         { 
-            nome: "Thorgar Punho de Ferro", 
+            nome: "Thorga Punho de Ferro", 
             raca: "Anão",
-            classe: "Guerreiro", 
+            classe: "Cavaleiro das Trevas", 
             foto: "Thorga.jpg",
-            desc: "Exilado injustamente das forjas ancestrais, Thorgar é um mercenário impetuoso que rejeita a autoridade de reis e deuses, lutando pela pura emoção da batalha e para provar que sua força basta por si só.",
-            stats: [7, 1, 1, 0, 1, 8, 1, 1], // For, Sab, Int, Man, Des, Con, Pre, Car
+            desc: "Exilado injustamente das forjas ancestrais, Thorga é um mercenário impetuoso que rejeita a autoridade de reis e deuses, lutando pela pura emoção da batalha e para provar que sua força basta por si só.",
+            stats: [8, 1, 1, 0, 2, 6, 2, 2], // For, Sab, Int, Man, Des, Con, Pre, Car
             hab_raca: "<b>🛡️ Pele de aço:</b> Uma vez por dia, reduz o dano de um ataque pela metade.",
             passivas: [],
             ativas: [],
@@ -1950,37 +1979,37 @@ const dadosCapital = {
             evolucao: {
                 senha: "mascara",
                 classeNova: "Cavaleiro das Trevas",
-                desbloqueado: false,
+                desbloqueado: true,
                 lore: "Thorgar foi consumido por um pesadelo a antiga cidade de onde fora exilado ardia em um inferno de cinzas. Correndo por todos os lados, criaturas miúdas de orelhas pontudas, usando máscaras brancas e facas de abate, gargalhavam enquanto esfaqueavam e queimavam tudo. Thorga olhou para sua própria mão e percebeu que empunhava uma faca ensanguentada. De repente, o caos cessou. As criaturas o encararam e caminharam em sua direção. Uma delas estendeu uma máscara branca e sussurrou 'Você deixou cair... irmão'. Thorgar despertou arfando, com a máscara física materializada em suas mãos.<br><br><img src='demonios1.png' style='width: 100%; border-radius: 5px;'>"
             }
         },
-{ 
-    nome: "Liésty", 
-    raca: "Elfa Negra",
-    classe: "Maga", 
-    foto: "Liésty.jpg",
-    desc: "Sobrevivente solitária de uma destruição brutal, esta elfa negra trocou a companhia dos vivos pelo silêncio de sua cabana na floresta, onde sua natureza sombria e suas artes arcanas servem como barreira contra um mundo que ela aprendeu a desprezar.",
-    stats: [1, 2, 5, 4, 3, 3, 1, 1], // For, Sab, Int, Man, Des, Con, Pre, Car
-    hab_raca: "<b>🔥 Vontade Ardente:</b> Ataque em área de chamas (2d6*Nv + 1d4*Nv).",
-    passivas: ["📚 Conhecimento das Eras: Ganha +3 em testes de História, Arcanismo e Investigação."],
-    ativas: [],
-    magias: [
-        "🔥 Chama Contínua (Nível 0): 1d4 de dano + Queimando",
-        "🖐️ Mão Arcana (Nível 0): Manipula objetos à distância",
-        "🕸️ Teia (Nível 1): Prende adversários",
-        "🤢 Raio Adoecente (Nível 1): 1d6 de dano + Adoecido",
-        "🧪 Espirro Ácido (Nível 1): 2d4 de dano perfurante",
-        "☄️ Bola de Fogo Menor (Nível 1): 1d6 de dano + Queimando",
-        "🛡️ Escudo de Mana (Nível 2): Absorve 3d6 de dano por 1d2 turnos"
-    ],
-    evolucao: {
+        { 
+            nome: "Liésty", 
+            raca: "Elfa Negra",
+            classe: "Bruxa", 
+            foto: "Liésty.jpg",
+            desc: "Sobrevivente solitária de uma destruição brutal, esta elfa negra trocou a companhia dos vivos pelo silêncio de sua cabana na floresta, onde sua natureza sombria e suas artes arcanas servem como barreira contra um mundo que ela aprendeu a desprezar.",
+            stats: [2, 2, 3, 3, 3, 3, 2, 2], // For, Sab, Int, Man, Des, Con, Pre, Car
+            hab_raca: "<b>🔥 Vontade Ardente:</b> Ataque em área de chamas (2d6*Nv + 1d4*Nv).",
+            passivas: ["📚 Conhecimento das Eras: Ganha +3 em testes de História, Arcanismo e Investigação."],
+            ativas: [],
+            magias: [
+                "🔥 Chama Contínua (Nível 0): 1d4 de dano + Queimando",
+                "🖐️ Mão Arcana (Nível 0): Manipula objetos à distância",
+                "🕸️ Teia (Nível 1): Prende adversários",
+                "🤢 Raio Adoecente (Nível 1): 1d6 de dano + Adoecido",
+                "🧪 Espirro Ácido (Nível 1): 2d4 de dano perfurante",
+                "☄️ Bola de Fogo Menor (Nível 1): 1d6 de dano + Queimando",
+                "🛡️ Escudo de Mana (Nível 2): Absorve 3d6 de dano por 1d2 turnos"
+            ],
+            evolucao: {
                 senha: "diario",
                 classeNova: "Bruxa",
-                desbloqueado: false,
+                desbloqueado: true,
                 lore: "Liésty viveu por um mês na vila das bruxas. Durante esse tempo ela escreveu um diário anotando tudo o que aprendeu entre elas e o que viu na biblioteca local. Certa noite o livro começou a se mexer sozinho. Quando ela foi investigar percebeu que o objeto possuía vida própria. As páginas se revelaram contendo muito mais informações do que ela havia escrito originalmente detalhando segredos de magia negra e artes arcaicas de magia antiga. Com esse conhecimento em mãos ela abraçou o novo poder.<br><br><img src='livro_bruxa.png' style='width: 100%; border-radius: 5px;'>"
-    
-}
-   }   ],
+            }
+        }
+    ],
         procurados: [
             { 
                 nome: "Kalamar", 
@@ -2162,7 +2191,27 @@ const dadosCapital = {
 
             O resto do esquadrão foi atrás deles, mas acabou entrando em combate contra guardas da higienização e contra o pai de Phynael, <span class="link-historia" onclick="verImagemHistoria('Malakor.png', 2)">Malakor</span>, acabando por perder a consciência por conta de um feitiço dele. Quando acordam, estão em um ambiente de neve e reconhecem estar ao norte da muralha. Eles vão até a outra vila e encontram <span class="link-historia" onclick="verImagemHistoria('Jessica.png', 2)">Jéssica</span>, um membro do esquadrão Rosa Vermelha que está muito debilitada.
 
-            Eles carregam Jéssica com uma maca pelas neves daquela terra de gelo, habitada apenas por não-elfos que estão praticamente morrendo, famintos e com sua energia mágica sugada pelo solo. O grupo segue ainda mais ao norte, para onde Jéssica falou que seu grupo foi e para onde a bússola do esquadrão Pandemônios aponta. Eles atravessam o mar para chegar à ilha e, quando chegam, cruzam um tipo de barreira que revela que a ilha não é congelada, mas cheia de vegetação, quente e não suga a magia.`
+            Eles carregam Jéssica com uma maca pelas neves daquela terra de gelo, habitada apenas por não-elfos que estão praticamente morrendo, famintos e com sua energia mágica sugada pelo solo. O grupo segue ainda mais ao norte, para onde Jéssica falou que seu grupo foi e para onde a bússola do esquadrão Pandemônios aponta. Eles atravessam o mar para chegar à ilha e, quando chegam, cruzam um tipo de barreira que revela que a ilha não é congelada, mas cheia de vegetação, quente e não suga a magia.
+            
+            Descobriram então que a ilha era a vila das bruxas. Lá conheceram <span class="link-historia" onclick="verImagemHistoria('Cassiopeia.png', 2)">Cassiopeia</span> que revelou que a vinda deles já era esperada por conta de uma profecia. 
+
+O grupo se reencontrou com <span class="link-historia" onclick="verImagemHistoria('Liésty.jpg', 2)">Liésty</span> que havia sido presa pelos elfos da higienização e salva por <span class="link-historia" onclick="verImagemHistoria('Cassiopeia.png', 2)">Cassiopeia</span>. A vila era composta apenas por bruxas e bruxos de diversas raças vivendo escondidos da sociedade. 
+
+<span class="link-historia" onclick="verImagemHistoria('Cassiopeia.png', 2)">Cassiopeia</span> os levou para conhecer <span class="link-historia" onclick="verImagemHistoria('Mussandra.png', 2)">Mussandra Talimo</span> da casa Talimo, Herdeira Legítima do trono de prata, Rainha legítima dos Dândalos e dos Últimos Homens, Destruidora de Reinos, Mãe das Bruxas, a Kilesa do grande mar de neve, a Queimada, a Forjadora de Correntes, <span class="link-historia" onclick="verImagemHistoria('Mussandra.png', 2)">Mussandra Talimo</span> a Terceira de Seu Nome. 
+
+A rainha das bruxas possuía um fragmento da chave dos esquecidos (pedra fúcsia). Eles conversaram e ela revelou que um grupo buscava o fim do mundo usando o princípio da morte do ódio para manipular toda Blat'khyr e os elfos. Para provar que eram pessoas boas ela pediu que eles se livrassem do ódio e desse grupo. 
+
+Para ajudar ela entregou a lágrima da serenidade que só poderia ser usada uma vez para limpar a área da influência do ódio. Ela também deu acesso à forja do sacrifício onde poderiam trocar partes de si por poderes. 
+
+Depois <span class="link-historia" onclick="verImagemHistoria('Mussandra.png', 2)">Mussandra</span> os teletransportou para a capital de Blat'khyr. Lá eles capturaram <span class="link-historia" onclick="verImagemHistoria('Phynael.png', 2)">Phynael</span> bateram e torturaram ele até ele ajudar a encontrar a professora grã diretora mestra doutora arquimaga <span class="link-historia" onclick="verImagemHistoria('Aurelia.png', 2)">Aurélia</span>. 
+
+Eles pediram ajuda para derrotar <span class="link-historia" onclick="verImagemHistoria('Malakor.png', 2)">Malakor</span> e <span class="link-historia" onclick="verImagemHistoria('Aurelia.png', 2)">Aurélia</span> usou uma magia para encantar as armas permitindo causar dano a ele e dando imunidade a ataques mentais. Ela também entregou um cristal especial para criar uma distração. 
+
+Eles foram até a casa de <span class="link-historia" onclick="verImagemHistoria('Malakor.png', 2)">Malakor</span> para enganá-lo com <span class="link-historia" onclick="verImagemHistoria('Liésty.jpg', 2)">Liésty</span> transformada em <span class="link-historia" onclick="verImagemHistoria('Phynael.png', 2)">Phynael</span>. Eles usaram a lágrima da serenidade em <span class="link-historia" onclick="verImagemHistoria('Malakor.png', 2)">Malakor</span> atraíram ele para fora e iniciaram um combate até matá-lo. 
+
+Depois foram a uma cripta atrás da casa desceram a escadaria e encontraram o princípio do <span class="link-historia" onclick="verImagemHistoria('o_odio.png', 2)">Ódio</span> trancado em uma jaula. Os <span class="link-historia" onclick="verImagemHistoria('Encapuzados 2.png', 2)">Magnolos</span> apareceram novamente levaram o ódio e sumiram do nada. 
+
+<span class="link-historia" onclick="verImagemHistoria('Aurelia.png', 2)">Aurélia</span> disse que todos sob influência do ódio estavam livres e que falaria com o conselho élfico para acabar com os problemas no norte. Ela entregou cem runas de recompensa para cada. Eles foram dormir e durante a noite cada membro passou por um evento de evolução de classe.`
         },
             {
                 titulo: "Capítulo 3: Desconhecido",
@@ -2425,7 +2474,7 @@ function menuCapital(tipo) {
                         <span class="classe-char">${item.raca} • ${item.classe}</span>
                         <p>${item.desc || ""}</p>
                         <div style="display: flex; gap: 5px; flex-direction: column;">
-                            <button onclick="abrirStatsPersonagem(${index})" class="btn-popup" style="margin-top:10px; background: #2c3e50; font-size: 11px; border: 1px solid #87CEEB; width: 100%;">📊 Estatísticas Iniciais</button>
+                            <button onclick="abrirStatsPersonagem(${index})" class="btn-popup" style="margin-top:10px; background: #2c3e50; font-size: 11px; border: 1px solid #87CEEB; width: 100%;">📊 Estatísticas</button>
                             ${btnEvolucao}
                         </div>
                     </div>
@@ -3523,9 +3572,9 @@ function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoEx
             criarPontoLocal([986, 1239], "Vilarejo", "Desconhecido");
             criarPontoLocal([1091, 606], "Vilarejo", "Desconhecido");
 
-           // --- PONTO DAS BRUXAS COM OS DOIS BOTÕES DE SENHA ---
-            const btnBruxas = criarBtn("🔍 Descobrir", "abrirModalSenha('Bruxas', 'Vila bruxa.png', 'imagem')", "#2E8B57");
-            const btnForja = criarBtn("???", "abrirModalSenha('sacrificio', 'abrirForjaSacrificio()', 'funcao')", "#555");
+           // --- PONTO DAS BRUXAS SEM BOTÕES DE SENHA ---
+            const btnBruxas = criarBtn("📸 Ver Vila", "verImagemEstatica('Vila bruxa.png')", "#2E8B57");
+            const btnForja = criarBtn("🔥 Forja do Sacrifício", "abrirForjaSacrificio()", "#555");
             
             criarPontoLocal([1463, 1151], "Vilarejo", "Desconhecido", null, true, btnBruxas + btnForja);
 
@@ -4110,11 +4159,10 @@ function abrirStatsPersonagem(index) {
     const container = document.getElementById('conteudo-menu-capital');
     const titulo = document.getElementById('titulo-menu-capital');
     
-    titulo.innerText = `Estatísticas: ${p.nome}`;
+    titulo.innerText = `Estatísticas ${p.nome}`;
     
-    // HTML Base: Gráfico + Listas
     container.innerHTML = `
-        <button onclick="menuCapital('esquadrao')" class="btn-popup" style="margin-bottom: 20px; background: #444; width: 100%;">⬅ Voltar ao Esquadrão</button>
+        <button onclick="menuCapital('esquadrao')" class="btn-popup" style="margin-bottom: 20px; background: #444; width: 100%;">Voltar ao Esquadrão</button>
         
         <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1px solid #555; max-width: 300px; margin: 0 auto;">
             <canvas id="radarChart"></canvas>
@@ -4123,7 +4171,6 @@ function abrirStatsPersonagem(index) {
         <div id="lista-stats-manual" style="margin-top: 20px;"></div>
     `;
 
-    // Renderiza o Radar (Tamanho reduzido)
     const ctx = document.getElementById('radarChart').getContext('2d');
     if (chartInstance) { chartInstance.destroy(); }
     chartInstance = new Chart(ctx, {
@@ -4152,35 +4199,60 @@ function abrirStatsPersonagem(index) {
         }
     });
 
-    // Monta as listas de habilidades baseado no que você preencheu
     const divListas = document.getElementById('lista-stats-manual');
     let html = "";
 
-    // Traço de Raça
     if (p.hab_raca) {
         html += `<div class="spell-level">🧬 Traço de Raça</div>`;
         html += `<div class="spell-item">${p.hab_raca}</div>`;
     }
 
-    // Passivas
     if (p.passivas && p.passivas.length > 0) {
         html += `<div class="spell-level">✨ Habilidades Passivas</div>`;
         p.passivas.forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
     }
 
-    // Ativas
     if (p.ativas && p.ativas.length > 0) {
         html += `<div class="spell-level">🛡️ Habilidades Ativas</div>`;
         p.ativas.forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
     }
 
-    // Magias
     if (p.magias && p.magias.length > 0) {
-        html += `<div class="spell-level">🔮 Magias</div>`;
-        p.magias.forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
+        let magiasPorNivel = {
+            "Geral": [], "0": [], "1": [], "2": [], "3": [], "4": [], "Ultimate": []
+        };
+        
+        p.magias.forEach(h => {
+            if (h.match(/Nível 0/i)) magiasPorNivel["0"].push(h.replace(/Nível 0\s*/i, ""));
+            else if (h.match(/Nível 1/i)) magiasPorNivel["1"].push(h.replace(/Nível 1\s*/i, ""));
+            else if (h.match(/Nível 2/i)) magiasPorNivel["2"].push(h.replace(/Nível 2\s*/i, ""));
+            else if (h.match(/Nível 3/i)) magiasPorNivel["3"].push(h.replace(/Nível 3\s*/i, ""));
+            else if (h.match(/Nível 4/i)) magiasPorNivel["4"].push(h.replace(/Nível 4\s*/i, ""));
+            else if (h.match(/Ultimate/i)) magiasPorNivel["Ultimate"].push(h.replace(/Ultimate\s*/i, ""));
+            else magiasPorNivel["Geral"].push(h);
+        });
+
+        if (magiasPorNivel["Geral"].length > 0) {
+            html += `<div class="spell-level">🔮 Magias Gerais</div>`;
+            magiasPorNivel["Geral"].forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
+        }
+        for (let i = 0; i <= 4; i++) {
+            if (magiasPorNivel[i].length > 0) {
+                html += `<div class="spell-level">✨ Magia Nível ${i}</div>`;
+                magiasPorNivel[i].forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
+            }
+        }
+        if (magiasPorNivel["Ultimate"].length > 0) {
+            html += `<div class="spell-level">🌟 Ultimate</div>`;
+            magiasPorNivel["Ultimate"].forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
+        }
     }
 
     divListas.innerHTML = html;
+
+    if (p.htmlExtra) {
+        divListas.innerHTML += p.htmlExtra;
+    }
 }
 function desbloquearEvolucao(index) {
     // Altera o estado dinamicamente e injeta o novo nome da classe
