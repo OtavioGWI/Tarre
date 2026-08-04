@@ -1919,7 +1919,7 @@ const dadosCapital = {
                 "🌧️ Nuvem Tempestuosa Nível 3: invoca nuvem que chove na área de 4 metros quadrados e no turno seguinte lança raio causando 3d4 de dano elétrico nos molhados sem escolha de elemento",
                 "🌪️ Controle Elemental Intermediário Nível 3: move matéria de tamanho médio do cenário para soterrar afogar ou afastar alvos violentamente",
                 "🌋 Devastação Elemental Nível 4: junta dois elementos focado em uma área de 6 metros quadrados causa 2d6 de dano e modifica o terreno",
-                "✨ Avatar da Natureza Ultimate: absorve energia do ambiente por 1d4 mais 1 turnos aumentando danos em 2d4 e ganha 1 elemento a mais para fundir nas magias grátis No final explode em direção aleatória causando 4d6 de dano e aplica os efeitos do elemento"
+                "✨ Avatar da Natureza Ultimate: absorve energia do ambiente por 1d4+1 turnos aumentando danos em 2d4 e ganha 1 elemento a mais para fundir nas magias grátis No final explode em direção aleatória causando 4d6 de dano e aplica os efeitos do elemento"
             ],
             evolucao: {
                 senha: "fogo",
@@ -1940,7 +1940,7 @@ const dadosCapital = {
             </table>
             </div>
 
-            <h4 style="color:#ffd700; text-align:center; margin-top:20px; border-bottom:1px solid #555; padding-bottom:5px;">🌪️ Combinações Diferentes Mais 1 Mana</h4>
+            <h4 style="color:#ffd700; text-align:center; margin-top:20px; border-bottom:1px solid #555; padding-bottom:5px;">🌪️ Combinações Diferentes</h4>
             <div style="overflow-x:auto;">
             <table class="tabela-banco" style="font-size:10.5px; width:100%; text-align:center;">
                 <tr><th>Nv</th><th>Fogo+Água Vapor</th><th>Fogo+Terra Magma</th><th>Fogo+Ar Raio</th><th>Água+Terra Lama</th><th>Água+Ar Nevasca</th><th>Terra+Ar Areia</th></tr>
@@ -1952,7 +1952,7 @@ const dadosCapital = {
             </table>
             </div>
 
-            <h4 style="color:#ffd700; text-align:center; margin-top:20px; border-bottom:1px solid #555; padding-bottom:5px;">💥 Combinações Iguais Mais 1 Mana</h4>
+            <h4 style="color:#ffd700; text-align:center; margin-top:20px; border-bottom:1px solid #555; padding-bottom:5px;">💥 Combinações Iguais</h4>
             <div style="overflow-x:auto;">
             <table class="tabela-banco" style="font-size:11px; width:100%; text-align:center;">
                 <tr><th>Nv</th><th>Fogo+Fogo</th><th>Água+Água</th><th>Terra+Terra</th><th>Ar+Ar</th></tr>
@@ -1988,25 +1988,35 @@ const dadosCapital = {
             raca: "Elfa Negra",
             classe: "Bruxa", 
             foto: "Liésty.jpg",
-            desc: "Sobrevivente solitária de uma destruição brutal, esta elfa negra trocou a companhia dos vivos pelo silêncio de sua cabana na floresta, onde sua natureza sombria e suas artes arcanas servem como barreira contra um mundo que ela aprendeu a desprezar.",
+            desc: "Sobrevivente solitária de uma destruição brutal esta elfa negra trocou a companhia dos vivos pelo silêncio de sua cabana na floresta onde sua natureza sombria e suas artes arcanas servem como barreira contra um mundo que ela aprendeu a desprezar",
             stats: [2, 2, 3, 3, 3, 3, 2, 2], // For, Sab, Int, Man, Des, Con, Pre, Car
-            hab_raca: "<b>🔥 Vontade Ardente:</b> Ataque em área de chamas (2d6*Nv + 1d4*Nv).",
-            passivas: ["📚 Conhecimento das Eras: Ganha +3 em testes de História, Arcanismo e Investigação."],
+            hab_raca: "<b>🔥 Vontade Ardente:</b> Ataque em área de chamas causando 2d6*Nv+1d4*Nv <br><br><b>📖 Diário Brúxico:</b> A leitura concede +3 em qualquer teste de Arcanismo, História e Ocultismo. Em combate Liésty pode fazer um Sacrifício de Sangue sofrendo 1d4 de dano de vida para recuperar 1 ponto de Mana. Ela também possui a Conjuração Contínua onde ao invés de usar o feitiço no turno ela começa a murmurar e solta no próximo turno dobrando o dano e ganhando +2 no acerto. Ela pode continuar conjurando por até 3 turnos se quiser aumentando o multiplicador de dano e somando mais +2 no acerto por turno. O ato de ficar conjurando não gasta mana. Não pode ficar conjurando em ultimate",
+            passivas: [
+                "🦇 Vínculo Familiar: Pode invocar um familiar que assume a forma de gato, corvo, sapo, rato ou aranha. Liésty pode ver através dos sentidos dele. Durante o combate, o familiar ajuda um aliado dando +1 em todo teste para acerto ou atrapalha um inimigo dando -1 no acerto. Se morto só pode ser invocado novamente quando a luta acabar",
+                "🦠 Praga Alastrante: Sempre que um inimigo morre enquanto sofre de um efeito negativo causado por Liésty o efeito salta para o inimigo mais próximo reiniciando a duração. O novo alvo atingido também sofre 1d6 de dano psicológico pelo terror"
+            ],
             ativas: [],
             magias: [
-                "🔥 Chama Contínua (Nível 0): 1d4 de dano + Queimando",
-                "🖐️ Mão Arcana (Nível 0): Manipula objetos à distância",
-                "🕸️ Teia (Nível 1): Prende adversários",
-                "🤢 Raio Adoecente (Nível 1): 1d6 de dano + Adoecido",
-                "🧪 Espirro Ácido (Nível 1): 2d4 de dano perfurante",
-                "☄️ Bola de Fogo Menor (Nível 1): 1d6 de dano + Queimando",
-                "🛡️ Escudo de Mana (Nível 2): Absorve 3d6 de dano por 1d2 turnos"
+                "🗣️ Sussurros Sombrios Nível 0: Cria ilusões sonoras e visuais de no máximo o tamanho de uma pessoa para enganar ou atrair inimigos em um raio de até 10 metros",
+                "🕯️ Fogo Fátuo Nível 0: Cria chama espectral que causa 1d4 de dano necrótico e diminui o acerto do alvo em -1 no próximo turno",
+                "🔮 Luz Tétrica Nível 0: Cria fonte de luz pálida flutuante que ilumina o caminho em um raio de 5 metros sendo magicamente invisível para criaturas inimigas. Se usada em combate, inimigos iluminados por ela tem seu ataque reduzido em -1 por 1d4 turnos",
+                "🤢 Miasma Maligno Nível 1: Arremessa bolha de gás tóxico causando 1d6 de dano de veneno e deixando o alvo cego por 1d2 turnos",
+                "🦴 Agulhas de Osso Nível 1: Dispara lascas afiadas causando 2d4 de dano perfurante e ignorando magias de escudo fracas do alvo e diminui o CA em -1 por 1d2 turnos",
+                "🧟 Toque da Peste Nível 1: Mãos apodrecidas brotam do chão debaixo do alvo. Ao tocar nele apodrecem a área causando 1d6+1d6 de dano por 1d2 turnos O alvo recebe 1 de dano extra de todas as fontes de dano enquanto o efeito durar",
+                "🕸️ Teia Nível 1: Cria uma teia mágica que prende e imobiliza os adversários",
+                "🦅 Enxame de Corvos Nível 2: Invoca corvos espectrais que perseguem incondicionalmente (sempre acertam) causando 3d4 de dano e diminuindo em 1 o acerto do inimigo por 1d4 turno",
+                "🌑 Manto de Sombras Nível 2: Névoa densa escura que absorve 4d6 de dano físico ou mágico do usuário. Para usar em alguém precisa tocar na pessoa. Enquanto o manto estiver funcionando o deslocamento aumenta em 4 metros",
+                "🩸 Roubo de Vitalidade Nível 2: Drena a essência vital de um inimigo causando 2d6 de dano necrótico e curando Liésty exatamente na mesma quantidade de dano e diminui o deslocamento do alvo pela metade por 1d2 turnos",
+                "👁️ Visão do Além Nível 3: Projeta um corpo astral que atravessa paredes caso não exista barreiras mágicas e é invisível. O corpo não pode se afastar além de 50 metros. Ao desfazer a magia, pode escolher voltar para o corpo ou teleportar o corpo físico para o local do astral. Em combate serve de teletransporte rápido de 20 metros",
+                "🩸 Maldição do Sangue Frio Nível 3: Amaldiçoa um alvo único causando 3d6 de dano necrótico. O alvo perde totalmente a capacidade de ser curado por magias ou poções por 2 turnos",
+                "🕳️ Ritual do Abismo Nível 4: Cria poço de magia negra em uma área Todos os inimigos dentro sofrem 3d6 de dano necrótico e são puxados violentamente para o centro perdendo a capacidade de locomoção no próximo turno",
+                "🎭 Teatro dos Pesadelos Ultimate: Cobre uma área de 10 metros quadrados por 1d4+1 turnos Inimigos veem piores fobias são atacados por familiares sofrendo 2d6 de dano psíquico por turno. Acertos dos alvos diminuem em -2. Aliados ganham camuflagem e vantagem para acertar. Todos os efeitos de condições de outras magias não contam turnos na duração dessa magia"
             ],
             evolucao: {
                 senha: "diario",
                 classeNova: "Bruxa",
                 desbloqueado: true,
-                lore: "Liésty viveu por um mês na vila das bruxas. Durante esse tempo ela escreveu um diário anotando tudo o que aprendeu entre elas e o que viu na biblioteca local. Certa noite o livro começou a se mexer sozinho. Quando ela foi investigar percebeu que o objeto possuía vida própria. As páginas se revelaram contendo muito mais informações do que ela havia escrito originalmente detalhando segredos de magia negra e artes arcaicas de magia antiga. Com esse conhecimento em mãos ela abraçou o novo poder.<br><br><img src='livro_bruxa.png' style='width: 100%; border-radius: 5px;'>"
+                lore: "Liésty viveu por um mês na vila das bruxas Durante esse tempo ela escreveu um diário anotando tudo o que aprendeu entre elas e o que viu na biblioteca local Certa noite o livro começou a se mexer sozinho Quando ela foi investigar percebeu que o objeto possuía vida própria As páginas se revelaram contendo muito mais informações do que ela havia escrito originalmente detalhando segredos de magia negra e artes arcaicas de magia antiga Com esse conhecimento em mãos ela abraçou o novo poder<br><br><img src='livro_bruxa.png' style='width: 100%; border-radius: 5px;'>"
             }
         }
     ],
