@@ -3714,70 +3714,70 @@ function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoEx
             criarPontoLocal([884, 1094], "Muralha", "Elfos");
             criarPontoLocal([882, 1271], "Muralha", "Elfos");
         }
-        if (nomeDoMapa === 'Deserto.jpg') {
-    // Capital do Deserto
-    const btnLeilao = criarBtn("🔍 Descobrir", "abrirModalSenha('leilao', 'abrirLeilaoMiragens()', 'funcao')", "#2E8B57");
-    criarPontoLocal([240, 762], "Capital do Deserto", "Zha Ruk", "Capital deserto.png", true, btnLeilao);
-    
-    criarPontoLocal([1314, 588], "Vilarejo", "Ghovar", "Vila deserto.png", true);
-    criarPontoLocal([1422, 1582], "Vilarejo", "Ghovar", "Vila de areia.png", true);
-    
-    // Minerações
-    criarPontoLocal([1256, 126], "Mineração", "Ghovar");
-    criarPontoLocal([1436, 112], "Mineração", "Abandonada");
-    criarPontoLocal([1362, 400], "Mineração", "Ghovar");
-    criarPontoLocal([1247, 730], "Mineração", "Ghovar");
-    criarPontoLocal([1213, 846], "Mineração", "Ghovar");
-    criarPontoLocal([1408, 1727], "Mineração", "Abandonada");
-    criarPontoLocal([1363, 1855], "Mineração", "Ghovar");
-    criarPontoLocal([1217, 1298], "Mineração", "Abandonada");
-    criarPontoLocal([1149, 1784], "Mineração", "Abandonada");
-    criarPontoLocal([1049, 1809], "Mineração", "Abandonada");
-    criarPontoLocal([1142, 1921], "Mineração", "Abandonada");
-    criarPontoLocal([693, 1510], "Mineração", "Ghovar");
-    criarPontoLocal([871, 1533], "Mineração", "Ghovar");
-    criarPontoLocal([786, 1775], "Mineração", "Ghovar");
-    criarPontoLocal([1032, 365], "Mineração", "Ghovar");
-    criarPontoLocal([990, 617], "Mineração", "Ghovar");
-    criarPontoLocal([808, 580], "Mineração", "Ghovar");
-    criarPontoLocal([813, 399], "Mineração", "Ghovar");
-    criarPontoLocal([475, 566], "Mineração", "Abandonada");
-    criarPontoLocal([326, 539], "Mineração", "Abandonada");
-    criarPontoLocal([401, 376], "Mineração", "Ghovar");
+       if (nomeDoMapa === 'Deserto.jpg') {
+        
+        // Capital do Deserto com a senha do Leilao e a foto restaurada
+        const btnLeilao = criarBtn("🔍 Descobrir", "abrirModalSenha('leilao', 'abrirLeilaoMiragens()', 'funcao')", "#2E8B57")
+        criarPontoLocal([240, 762], "Capital do Deserto", "Zha Ruk", "Capital deserto.png", true, btnLeilao)
+        
+        criarPontoLocal([1314, 588], "Vilarejo", "Ghovar", "Vila deserto.png", true)
+        criarPontoLocal([1422, 1582], "Vilarejo", "Ghovar", "Vila de areia.png", true)
+        
+        // Minerações
+        criarPontoLocal([1256, 126], "Mineração", "Ghovar")
+        criarPontoLocal([1436, 112], "Mineração", "Abandonada")
+        criarPontoLocal([1362, 400], "Mineração", "Ghovar")
+        criarPontoLocal([1247, 730], "Mineração", "Ghovar")
+        criarPontoLocal([1213, 846], "Mineração", "Ghovar")
+        criarPontoLocal([1408, 1727], "Mineração", "Abandonada")
+        criarPontoLocal([1363, 1855], "Mineração", "Ghovar")
+        criarPontoLocal([1217, 1298], "Mineração", "Abandonada")
+        criarPontoLocal([1149, 1784], "Mineração", "Abandonada")
+        criarPontoLocal([1049, 1809], "Mineração", "Abandonada")
+        criarPontoLocal([1142, 1921], "Mineração", "Abandonada")
+        criarPontoLocal([693, 1510], "Mineração", "Ghovar")
+        criarPontoLocal([871, 1533], "Mineração", "Ghovar")
+        criarPontoLocal([786, 1775], "Mineração", "Ghovar")
+        criarPontoLocal([1032, 365], "Mineração", "Ghovar")
+        criarPontoLocal([990, 617], "Mineração", "Ghovar")
+        criarPontoLocal([808, 580], "Mineração", "Ghovar")
+        criarPontoLocal([813, 399], "Mineração", "Ghovar")
+        criarPontoLocal([475, 566], "Mineração", "Abandonada")
+        criarPontoLocal([326, 539], "Mineração", "Abandonada")
+        criarPontoLocal([401, 376], "Mineração", "Ghovar")
 
-    criarPontoLocal([1082, 1619], "Cidade", "Samum", "Cidade anã.png", true);
-    criarPontoLocal([1434, 312], "Cidade", "Samum", "Cidade deserto.png", true);
-    criarPontoLocal([1082, 146], "Cidade", "Samum", "Cidade deserto 2.png", true);
-    criarPontoLocal([752, 536], "Cidade", "Samum", "Cidade enterrada 2.png", true);
-    criarPontoLocal([148, 170], "Cidade", "Samum");
+        criarPontoLocal([1082, 1619], "Cidade", "Samum", "Cidade anã.png", true)
+        criarPontoLocal([1434, 312], "Cidade", "Samum", "Cidade deserto.png", true)
+        criarPontoLocal([1082, 146], "Cidade", "Samum", "Cidade deserto 2.png", true)
+        criarPontoLocal([752, 536], "Cidade", "Samum", "Cidade enterrada 2.png", true)
+        criarPontoLocal([148, 170], "Cidade", "Samum")
 
-    // A Cidade Armadilha que leva para Alcova
-    const btnArmadilha = criarBtn("🔍 Descobrir", "abrirModalSenha('navio', 'eventoNavioPrisao()', 'funcao')", "#2E8B57");
-    criarPontoLocal([188, 1910], "Cidade", "Samum", null, true, btnArmadilha);
+        // Loja dos Dhen Rak agora na Cidade Samum [188, 1910]
+        const btnDhenRak = criarBtn("🔍 Descobrir", "abrirModalSenha('ladroes', 'abrirMercadoDhenRak()', 'funcao')", "#2E8B57")
+        criarPontoLocal([188, 1910], "Cidade", "Samum", null, true, btnDhenRak)
 
-    // A Cidade Anã
-    const btnAna = criarBtn("🔍 Descobrir", "abrirModalSenha('anao', 'abrirMenuDungeon()', 'funcao')", "#2E8B57");
-    criarPontoLocal([920, 662], "Ruínas", "Atarim", "paisagem.png", true, btnAna);
-    
-    criarPontoLocal([1394, 814], "Ruínas", "Atarim", "Entrada deserto.png", true);
-    criarPontoLocal([660, 1652], "Ruínas", "Atarim");
-    criarPontoLocal([1310, 1502], "Ruínas", "Atarim");
+        // A Armadilha que leva para Alcova agora isolada nas areias [1308, 1888]
+        const btnArmadilha = criarBtn("🔍 Descobrir", "abrirModalSenha('navio', 'eventoNavioPrisao()', 'funcao')", "#2E8B57")
+        criarPontoLocal([1308, 1888], "Ué", "Parece não haver nada aqui", null, false, btnArmadilha)
 
-    // Acampamento Dhen Rak oculto pelo deserto
-    const btnDhenRak = criarBtn("🔍 Descobrir", "abrirModalSenha('ladroes', 'abrirMercadoDhenRak()', 'funcao')", "#2E8B57");
-    criarPontoLocal([1308, 1888], "Ué", "Parece não haver nada aqui", null, false, btnDhenRak);
+        // A Cidade Anã apontando para paisagem.png e ocultando a "Ver Foto" original
+        const btnAna = criarBtn("🔍 Descobrir", "abrirModalSenha('anao', 'balagar.png', 'imagem')", "#2E8B57")
+        criarPontoLocal([920, 662], "Ruínas", "Atarim", null, true, btnAna)
+        
+        criarPontoLocal([1394, 814], "Ruínas", "Atarim", "Entrada deserto.png", true)
+        criarPontoLocal([660, 1652], "Ruínas", "Atarim")
+        criarPontoLocal([1310, 1502], "Ruínas", "Atarim")
 
-    // O Castelo da Depressão
-    const btnDepressao = criarBtn("🔍 Descobrir", "abrirModalSenha('tristeza', 'eventoCasteloDepressao()', 'funcao')", "#2E8B57");
-    criarPontoLocal([1394, 915], "Castelo", "Zha Ruk", "Castelo deserto 2.png", true, btnDepressao);
-    
-    criarPontoLocal([792, 912], "Castelo", "Zha Ruk", "Castelo deserto 1.png", true);
-    criarPontoLocal([332, 1278], "Castelo", "Zha Ruk");
-    criarPontoLocal([1020, 1188], "Castelo", "Zha Ruk");
-    criarPontoLocal([1210, 1118], "Torre de Vigia", "Zha Ruk");
-    criarPontoLocal([1432, 1196], "Torre de Vigia", "Zha Ruk");
-
-}
+        // O Castelo da Depressão com a Masmorra própria do deserto
+        const btnDepressao = criarBtn("🔍 Descobrir", "abrirModalSenha('tristeza', 'abrirMenuDungeonDeserto()', 'funcao')", "#2E8B57")
+        criarPontoLocal([1394, 915], "Castelo", "Zha Ruk", "Castelo deserto 2.png", true, btnDepressao)
+        
+        criarPontoLocal([792, 912], "Castelo", "Zha Ruk", "Castelo deserto 1.png", true)
+        criarPontoLocal([332, 1278], "Castelo", "Zha Ruk")
+        criarPontoLocal([1020, 1188], "Castelo", "Zha Ruk")
+        criarPontoLocal([1210, 1118], "Torre de Vigia", "Zha Ruk")
+        criarPontoLocal([1432, 1196], "Torre de Vigia", "Zha Ruk")
+    }
          if (nomeDoMapa === 'Lago.jpg') {
             criarPontoLocal([970, 1152], "Templo do Lago", "Guardiões do Templo", "Templo do lago.png", true);
             const btnPanteao = criarBtn("⚡ Panteão", "menuDeuses()", "#4682B4");
@@ -4581,18 +4581,28 @@ function liberarSala() {
             atualizarBotaoMedidor('medindo');
         }
     }
-    // Adicione estas funções junto das outras funções do jogo
-const dadosDhenRak = [
-    { item: "Cantil de Água Pura", preco: "15 Moedas de Ouro", desc: "Água limpa desviada dos nobres Zha Ruk Essencial para manter a sanidade nas dunas" },
-    { item: "Mapa de Rotas de Areia", preco: "40 Moedas de Ouro", desc: "Revela caminhos ocultos que evitam as tempestades mortais e as patrulhas do império" },
-    { item: "Fragmento Anão Enferrujado", preco: "80 Moedas de Ouro", desc: "Uma relíquia menor furtada das escavações que emana uma magia esquecida" }
-];
+// Novos itens para o mercado dos Dhen Rak
+
+// Nova função para mostrar avisos de história com animação
+function mostrarAvisoNarrativo(titulo, texto, acaoBotaoTexto, acaoBotaoFunc) {
+    fecharModais();
+    const container = document.getElementById('conteudo-menu-capital');
+    const modal = document.getElementById('modal-capital');
+    document.getElementById('titulo-menu-capital').innerText = titulo;
+    modal.style.display = 'flex';
+    container.innerHTML = `
+        <div style="animation: fadeIn 1s ease-in-out; text-align: center; padding: 20px;">
+            <p style="font-size: 18px; color: #ddd; line-height: 1.6; font-style: italic;">"${texto}"</p>
+            <button onclick="${acaoBotaoFunc}" class="btn-popup" style="margin-top: 20px; background: #8b0000; font-size: 16px; padding: 10px 20px; width: 100%; border: 2px solid #ff4444;">${acaoBotaoTexto}</button>
+        </div>
+    `;
+}
 
 function abrirMercadoDhenRak() {
     const container = document.getElementById('conteudo-menu-capital');
     document.getElementById('titulo-menu-capital').innerText = "Tenda Clandestina Dhen Rak";
     document.getElementById('modal-capital').style.display = 'flex';
-    let html = `<p style="color:#ffdead; text-align:center; font-style:italic;">Não fazemos perguntas Apenas aceitamos ouro</p>`;
+    let html = `<p style="color:#ffdead; text-align:center; font-style:italic;">Achados e perdidos do deserto com descontos imperdíveis.</p>`;
     dadosDhenRak.forEach(i => {
         html += `<div class="spell-item" style="border-left-color: #cd853f;">
             <b style="color:#f39c12;">${i.item}</b> 
@@ -4603,28 +4613,169 @@ function abrirMercadoDhenRak() {
     container.innerHTML = html;
 }
 
-function abrirLeilaoMiragens() {
+function irParaAlcova() {
+    fecharModais();
+    abrirMapaProvincia('Alcova.jpg');
+}
+
+function eventoNavioPrisao() {
+    mostrarAvisoNarrativo(
+        "A Emboscada", 
+        "O ar se enche de um gás esverdeado e a escuridão toma conta. Seus corpos ficam pesados e a última coisa que escutam é o som de correntes. Vocês caíram em uma armadilha armada pelos mercadores de água e agora estão no porão de um navio pirata em movimento rumo ao desconhecido.", 
+        "Acordar no Navio Prisão", 
+        "irParaAlcova()"
+    );
+}
+
+// --- DADOS DA MASMORRA EXCLUSIVA DO DESERTO ---
+const dadosMasmorraDeserto = [
+    { sala: 0, titulo: "Os Portões de Areia", fotos: ["portoes_deserto.png"], cor: "#cd853f" },
+    { sala: 1, titulo: "O Poço da Fome", fotos: ["poco_deserto.png"], cor: "#a0522d" },
+    { sala: 2, titulo: "O Salão dos Lamentos", fotos: ["salao_tristeza.png"], cor: "#8b4513" },
+    { sala: 3, titulo: "O Trono da Depressão", fotos: ["trono_depressao.png"], cor: "#4b0082" }
+];
+
+let salaMaximoLiberadaDeserto = 0;
+
+function abrirMenuDungeonDeserto() {
+    const modal = document.getElementById('modal-capital');
     const container = document.getElementById('conteudo-menu-capital');
-    document.getElementById('titulo-menu-capital').innerText = "O Leilão do Bazar";
-    document.getElementById('modal-capital').style.display = 'flex';
+    const titulo = document.getElementById('titulo-menu-capital');
+    
+    modal.style.display = 'flex';
+    titulo.innerText = "🌪️ A Masmorra da Tristeza";
+    
     container.innerHTML = `
-        <div class="detalhe-box" style="border-color: #ffd700;">
-            <h3 style="color: #ffd700; text-align: center; margin-top: 0;">Evento Exclusivo</h3>
-            <p style="font-size: 15px; color: #ddd;">A alta sociedade Samum e Zha Ruk gasta fortunas aqui enquanto a periferia seca O item principal da noite é um registro de escavação que aponta para as Ruínas Atarim</p>
-            <p style="color: #cd853f; font-weight: bold; text-align: center;">Lance mínimo 500 Moedas de Ouro ou intimidação extrema</p>
+        <div style="background: rgba(205, 133, 63, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #cd853f;">
+            <p style="color:#fff; margin:0; font-size: 13px;">Exploração Atual <strong>Sala ${salaMaximoLiberadaDeserto}</strong></p>
+        </div>
+        <div class="torre-wrapper">
+            <div class="torre-container">
+                ${dadosMasmorraDeserto.slice().reverse().map(s => {
+                    const bloqueado = s.sala > salaMaximoLiberadaDeserto;
+                    const classeSala = bloqueado ? 'andar-bloqueado' : (s.sala === salaMaximoLiberadaDeserto ? 'andar-item andar-atual' : 'andar-item');
+                    return `
+                        <div class="${classeSala}" style="border-left-color: ${s.cor}" ${!bloqueado ? `onclick="detalharSalaDeserto(${s.sala})"` : ''}>
+                            <span class="andar-numero">${s.sala}</span>
+                            <span class="andar-titulo">${bloqueado ? '🔒 Local Oculto' : s.titulo}</span>
+                            <span class="andar-sage">${bloqueado ? "A areia esconde o caminho." : "Toque para investigar."}</span>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+        <div style="margin-top: 30px; text-align: center; border-top: 1px dashed #444; padding-top: 10px;">
+            <button onclick="liberarSalaDeserto()" style="background: rgba(205, 133, 63, 0.2); border: 1px solid #cd853f; color: #ffdead; font-size: 11px; cursor: pointer; padding: 5px 15px; border-radius: 4px;">
+                ⚙️ MESTRE Liberar Próxima Sala
+            </button>
         </div>
     `;
 }
 
-function eventoNavioPrisao() {
-    fecharModais();
-    alert("O ar se enche de um gás esverdeado e a escuridão toma conta Vossos corpos ficam pesados e a última coisa que escutam é o som de correntes Vocês caíram em uma armadilha e acordam no porão de um navio pirata em movimento rumo ao desconhecido");
-    abrirMapaProvincia('Alcova.jpg');
+function detalharSalaDeserto(num) {
+    const s = dadosMasmorraDeserto.find(item => item.sala === num);
+    const container = document.getElementById('conteudo-menu-capital');
+    
+    const htmlFotos = s.fotos.map(foto => `
+        <img src="${foto}" 
+             onclick="verImagemEstatica('${foto}', function(){ restaurarMapaMenu(); document.getElementById('modal-capital').style.display='flex'; detalharSalaDeserto(${num}); })" 
+             style="display: block; margin: 0 auto 15px auto; max-width: 100%; height: auto; max-height: 450px; border-radius: 6px; border: 2px solid ${s.cor}; box-shadow: 0 4px 15px rgba(0,0,0,0.6); cursor: zoom-in;">
+    `).join('');
+
+    container.innerHTML = `
+        <button onclick="abrirMenuDungeonDeserto()" class="btn-popup" style="margin-bottom:20px; background:#444; width:100%;">⬅ Voltar às Salas</button>
+        <div style="text-align:center;">
+            <h2 style="color:${s.cor}; margin-top:0; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 20px;">${s.titulo}</h2>
+            <div style="padding-bottom: 10px;">
+                ${htmlFotos}
+            </div>
+        </div>
+    `;
 }
 
-function eventoCasteloDepressao() {
-    fecharModais();
-    alert("O ar é pesado e sufocante A tristeza drena vossa energia vital e apaga qualquer pingo de esperança Preparem as rolagens de sanidade");
+function liberarSalaDeserto() {
+    if (salaMaximoLiberadaDeserto < dadosMasmorraDeserto.length - 1) {
+        salaMaximoLiberadaDeserto++;
+        abrirMenuDungeonDeserto();
+    }
+}
+const dadosLeilao = [
+    { nome: "Registro de Escavação Atarim", lance: "50.000 Moedas de Ouro", foto: "mapa_atarim.png" },
+    { nome: "Cálice das Lágrimas Secas", lance: "15.000 Moedas de Ouro", foto: "calice_areia.png" },
+    { nome: "Diadema do Falso Oásis", lance: "40.000 Moedas de Ouro", foto: "diadema_oasis.png" },
+    { nome: "Estátua do Rei Zha Ruk", lance: "25.000 Moedas de Ouro", foto: "estatua_zha.png" }
+]
+
+let itemLeilaoAtual = 0
+
+function abrirLeilaoMiragens() {
+    itemLeilaoAtual = 0
+    renderizarLeilao()
+}
+
+function renderizarLeilao() {
+    const container = document.getElementById('conteudo-menu-capital')
+    document.getElementById('titulo-menu-capital').innerText = "O Leilão do Bazar"
+    document.getElementById('modal-capital').style.display = 'flex'
+    
+    const item = dadosLeilao[itemLeilaoAtual]
+    
+    let btnProximo = ""
+    if (itemLeilaoAtual < dadosLeilao.length - 1) {
+        btnProximo = `<button onclick="passarItemLeilao()" class="btn-popup" style="background: #2E8B57; width: 100%; margin-top: 15px;">Próximo Item</button>`
+    } else {
+        btnProximo = `<button onclick="fecharModais()" class="btn-popup" style="background: #8b0000; width: 100%; margin-top: 15px;">Fim do Leilão</button>`
+    }
+
+    container.innerHTML = `
+        <button onclick="document.getElementById('modal-capital').style.display='none'" class="btn-popup" style="margin-bottom:15px; border:none; background:#444; width:100%;">Voltar</button>
+        <div class="detalhe-box" style="border-color: #ffd700; text-align: center;">
+            <h3 style="color: #ffd700; margin-top: 0;">${item.nome}</h3>
+            <img src="${item.foto}" style="width: 100%; max-width: 250px; border-radius: 8px; margin: 10px 0; border: 2px solid #cd853f;">
+            <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 5px; margin: 15px 0;">
+                <p style="color: #ddd; margin: 0 0 5px 0;">Lance Inicial</p>
+                <h2 style="color: #ff4444; margin: 0;">${item.lance}</h2>
+            </div>
+            ${btnProximo}
+        </div>
+    `
+}
+
+function passarItemLeilao() {
+    itemLeilaoAtual++
+    renderizarLeilao()
+}
+
+const dadosDhenRak = [
+    { item: "Corda de Seda de Aranha", preco: "5 Moedas de Ouro", desc: "Uma corda fina e incrivelmente resistente. Suporta até duas toneladas de peso." },
+    { item: "Poção de Suor Frio", preco: "8 Moedas de Ouro", desc: "Reduz a temperatura corporal. Anula os efeitos do calor extremo por 4 horas seguidas." },
+    { item: "Óculos de Areia Escura", preco: "10 Moedas de Ouro", desc: "Protege os olhos contra tempestades de areia e anula cegueira causada por luz forte." },
+    { item: "Pote de Areia Sussurrante", preco: "12 Moedas de Ouro", desc: "Um vidro contendo areia mágica. Se aberto, ela repete os últimos sons que ouviu no ambiente." },
+    { item: "Cantil de Água Pura", preco: "15 Moedas de Ouro", desc: "Água limpa desviada dos nobres Zha Ruk. Essencial para manter a sanidade nas dunas." },
+    { item: "Amuleto do Lagarto Seco", preco: "25 Moedas de Ouro", desc: "Aquece o corpo durante as noites geladas e reduz a necessidade de beber água pela metade." },
+    { item: "Luneta Rachada", preco: "30 Moedas de Ouro", desc: "Permite enxergar no escuro perfeitamente, mas a visão fica inteiramente em tons de vermelho." },
+    { item: "Mapa de Rotas de Areia", preco: "40 Moedas de Ouro", desc: "Revela caminhos ocultos que evitam as tempestades mortais e as patrulhas do império." },
+    { item: "Bússola do Cachaceiro", preco: "45 Moedas de Ouro", desc: "Uma bússola que nunca aponta para o norte. Ela aponta sempre para a taverna mais próxima." },
+    { item: "Manto de Areia Movediça", preco: "60 Moedas de Ouro", desc: "Garante vantagens furtivas no deserto. Quem usa parece um pequeno redemoinho de areia." },
+    { item: "Fragmento Anão Enferrujado", preco: "80 Moedas de Ouro", desc: "Uma relíquia furtada das escavações que emana uma magia esquecida." },
+    { item: "Anel do Oásis Falso", preco: "120 Moedas de Ouro", desc: "Cria ilusões de água para atrair ou enlouquecer inimigos que estão sedentos." }
+]
+
+function abrirMercadoDhenRak() {
+    const container = document.getElementById('conteudo-menu-capital')
+    document.getElementById('titulo-menu-capital').innerText = "Tenda Clandestina Dhen Rak"
+    document.getElementById('modal-capital').style.display = 'flex'
+    
+    let html = `<p style="color:#ffdead; text-align:center; font-style:italic;">Achados e perdidos do deserto com descontos imperdíveis.</p>`
+    
+    dadosDhenRak.forEach(i => {
+        html += `<div class="spell-item" style="border-left-color: #cd853f;">
+            <b style="color:#f39c12;">${i.item}</b> 
+            <span style="float:right; color:#ffd700; font-weight:bold;">${i.preco}</span>
+            <br><small style="color:#ccc; display:block; margin-top:5px;">${i.desc}</small>
+        </div>`
+    })
+    container.innerHTML = html
 }
     carregarMapaPrincipal();
     </script>
