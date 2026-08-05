@@ -1809,6 +1809,7 @@ listaBoatos[37] = { id: 38, texto: "Dizem que goblins de toda Tarre estão se ju
 listaBoatos[40] = { id: 41, texto: "Dizem que o poder da amizade não é real", descoberto: true };
 listaBoatos[42] = { id: 43, texto: "Dizem que vulcões estão surgindo em Tarre", descoberto: true };
 listaBoatos[43] = { id: 44, texto: "Dizem que existe uma vila onde sempre chove", descoberto: true };
+listaBoatos[49] = { id: 50, texto: "Dizem que o verdadeiro tesouro são os amigos que você faz durante o caminho", descoberto: true };
 listaBoatos[50] = { id: 51, texto: "Dizem que a pessoa que tirou a espada é o novo herói que vai salvar o mundo.", descoberto: true };
 listaBoatos[54] = { id: 55, texto: "Dizem que a terceira calamidade foi uma guerra continental que envolveu todas as províncias", descoberto: true };
 listaBoatos[56] = { id: 57, texto: "Dizem que as nuvens sobre a Espinha do Gigante são, na verdade, fumaça de cidades voadoras escondidas.", descoberto: true };
@@ -1818,6 +1819,7 @@ listaBoatos[60] = { id: 61, texto: "Dizem que a capital foi construída sobre o 
 listaBoatos[67] = { id: 68, texto: "Dizem que os Machinas que voltaram não são os originais, mas sim cópias feitas de metal e memórias falsas.", descoberto: true };
 listaBoatos[70] = { id: 71, texto: "Dizem que as fadas na Floresta dos Sonhos sequestram pessoas para usá-las como peças em um jogo de xadrez eterno.", descoberto: true };
 listaBoatos[71] = { id: 72, texto: "Dizem que se você ouvir o sino da Torre do Relógio bater 12 vezes, o tempo vai parar para você para sempre.", descoberto: true };
+listaBoatos[89] = { id: 90, texto: "Dizem que o deserto esconde uma pirâmide invertida que desce até o centro do mundo.", descoberto: true };
 listaBoatos[97] = { id: 98, texto: "Dizem que as flores vermelhas que nascem perto do Coliseu crescem onde o sangue de um herói foi derramado.", descoberto: true };
 listaBoatos[98] = { id: 99, texto: "Dizem que o autor do mundo às vezes esquece onde colocou itens importantes, por isso eles aparecem em lugares aleatórios.", descoberto: true };
 listaBoatos[99] = { id: 100, texto: "Dizem que existe um 101º boato que reveals o segredo para se tornar um deus, mas ninguém nunca o ouviu. E dizem que tudo o que você ouviu até agora pode ser uma mentira inventada para te manter longe da verdade.", descoberto: true };/**
@@ -1884,7 +1886,7 @@ const dadosCapital = {
                 "☀️ Raio Solar Nível 3: Conjura um feixe de luz que causa 3d4+2 de dano mágico. Mortos vivos sofrem dano dobrado.",
                 "🛡️ Florescer Protetor Nível 3: Abençoa um aliado, fazendo ele receber 5 a menos de dano de qualquer fonte por 1d2+2 turnos.",
                 "🌳 Árvore da Vida Nível 4: Faz crescer uma árvore mágica. Todos os aliados num raio de 6 metros recuperam 2d6 de vida por turno. A árvore dura 1d2+1 turnos.",
-                "🌺 Aura da Colheita Ultimate: Ela e um outro aliado escolhido por ela ficam revestidos por uma aura da floresta, com folhas e flores crescendo da pele. Eles recuperam 3d4 de vida por turno e aliados próximos a 4 metros de distância recuperam 1d6 por 1d4+1 turnos. Alvos dentro da aura ganham +2 em todos os testes."
+                "🌺 Aura da Colheita Ultimate: Ela e um outro aliado escolhido por ela ficam revestidos por uma aura da floresta, com folhas e flores crescendo da pele. Eles recuperam 3d4 de vida por turno e aliados próximos a 4 metros de distância recuperam 2d4 por 1d4+1 turnos. Alvos dentro da aura ganham +2 em todos os testes."
             ],
             evolucao: {
                 senha: "liora",
@@ -1900,15 +1902,28 @@ const dadosCapital = {
             foto: "Valkia.png",
             desc: "Embora aparente seriedade inicial, logo revela uma natureza vibrante e impetuosa, movida pelo desejo de provar sua evolução enquanto exalta constantemente os nomes de Ryuiki e Daruin.",
             stats: [6, 2, 1, 0, 3, 3, 8, 0], // For, Sab, Int, Man, Des, Con, Pre, Car
-            hab_raca: "<b>✨ Aura Protetora:</b> Remove estados negativos e cura ¼ da vida do alvo.",
-            passivas: [],
-            ativas: [],
+            hab_raca: "<b>✨ Aura Protetora:</b> Remove estados negativos e cura 1/4 da vida do alvo. <br><br><b>🗡️ Espada das Trevas Lâmina Sanguissedenta:</b> A arma causa 2d6+Força de dano. A espada absorve a vitalidade, curando Valkia em metade do dano causado. Ao usar habilidades ativas, Valkia pode escolher sacrificar seus próprios pontos de vida, perdendo 1d6 de vida para adicionar +2d4 de dano extra ao ataque.",
+            passivas: [
+                "🗡️ Lâmina do Desespero: Quando está com menos da metade da vida máxima, ela ganha +1d6 de dano extra em seus ataques. Quando sua vida cai abaixo de um quarto da vida total, o bônus de dano aumenta para +2d4.",
+                "🩸 Sangue Fervente: Quanto mais próxima da morte, mais perigosa ela fica. Para cada 10 pontos de vida que Valkia perde, seu dano base aumenta em +1.",
+                "👼 Sacrifício de Sangue: Sempre que um aliado a até 6 metros for sofrer dano, ela pode absorver metade do ataque, recebendo metade do dano no lugar do aliado. O dano sofrido alimenta a espada, garantindo +1 de dano no próximo ataque de Valkia contra o inimigo específico que realizou o ataque."
+            ],
+            ativas: [
+                "⚔️ Estocada Sombria: Um ataque preciso focado em perfurar os órgãos vitais. Causa o dano normal da arma. O sangue inimigo cura Valkia em 100% do dano total causado neste ataque ao invés do roubo de vida padrão da espada.",
+                "⛓️ Abraço das Trevas: Valkia projeta uma mão de pura escuridão que agarra um inimigo a até 8 metros de distância. O alvo é puxado violentamente para um quadrado adjacente a ela e sofre 1d6 de dano.",
+                "⚖️ Condenação: Um golpe pesado de cima para baixo. Causa o dano da arma +2d4. Se Valkia estiver com menos da metade da sua vida máxima, este ataque ignora 3 pontos de armadura física do inimigo.",
+                "🛡️ Escudo de Sangue: Valkia perde 1d6 de vida para criar uma barreira de sangue endurecido. A barreira absorve os próximos 3d6 de dano recebido e dura por 2 turnos.",
+                "😱 Aura de Pânico: Valkia libera uma aura em uma área de 4 metros ao seu redor naquele turno. Os inimigos na área ficam aterrorizados e são obrigados a focar seus ataques nela nos próximos 1d2+1 turnos. Se um inimigo afetado não atacar Valkia, ela ganha um ataque de oportunidade livre contra ele. Se Valkia sacrificar 1d6 de vida, os inimigos afetados também sofrem uma redução de 2 pontos de dano em seus ataques durante esse turno.",
+                "🩸 Corte do Crepúsculo: Um ataque sombrio concentrado. Causa o dano da arma +1d8 de dano extra e deixa o alvo com o deslocamento reduzido pela metade por 1 turno.",
+                "🌪️ Dança da Morte: Um ataque giratório devastador. Causa o dano da arma +1d6 a todos os inimigos em um raio de 2 metros ao redor de Valkia.",
+                "🌑 Julgamento da Lâmina Negra Ultimate: Valkia avança e perfura um alvo único, causando 3d6 de dano base. O jogador pode optar por continuar sacrificando 1d6 da própria vida sucessivas vezes no mesmo turno para adicionar +2d4 de dano para cada sacrifício até o alvo morrer ou ela parar. Todo o dano total causado por este ataque é convertido em cura para recuperar a vida de Valkia."
+            ],
             magias: [],
             evolucao: {
                 senha: "espadas",
                 classeNova: "Cavaleira das Trevas",
                 desbloqueado: true,
-                lore: "Durante a noite, o descanso de Valkia foi invadido por uma presença esmagadora. Em seus sonhos, um ser celestial distorcido meio anjo meio demônio surgiu, identificando Valkia como sua filha e revelando segredos dolorosos de seu passado oculto. Antes de desaparecer na névoa do sonho, sua mãe cravou duas espadas diante dela uma irradiando pura luz sagrada e a outra consumida em trevas absolutas, questionando qual seria o caminho que Valkia escolheria trilhar.<br><br><img src='anja_demonio.png' style='width: 100%; border-radius: 5px; margin-bottom: 10px;'><br><img src='espadas_valkia.png' style='width: 100%; border-radius: 5px;'>"
+                lore: "Durante a noite, o descanso de Valkia foi invadido por uma presença esmagadora. Em seus sonhos, um ser celestial distorcido, meio anjo meio demônio, surgiu, identificando Valkia como sua filha e revelando segredos dolorosos de seu passado oculto. Antes de desaparecer na névoa do sonho, sua mãe cravou duas espadas diante dela, uma irradiando pura luz sagrada e a outra consumida em trevas absolutas, questionando qual seria o caminho que Valkia escolheria trilhar.<br><br><img src='anja_demonio.png' style='width: 100%; border-radius: 5px; margin-bottom: 10px;'><br><img src='espadas_valkia.png' style='width: 100%; border-radius: 5px;'>"
             }
         },
         {
@@ -2045,7 +2060,7 @@ const dadosCapital = {
                 senha: "mascara",
                 classeNova: "Cavaleiro das Trevas",
                 desbloqueado: true,
-                lore: "Thorgar foi consumido por um pesadelo. A antiga cidade de onde fora exilado ardia em um inferno de cinzas. Correndo por todos os lados, criaturas miúdas de orelhas pontudas, usando máscaras brancas e facas de abate, gargalhavam enquanto esfaqueavam e queimavam tudo. Thorga olhou para sua própria mão e percebeu que empunhava uma faca ensanguentada. De repente, o caos cessou. As criaturas o encararam e caminharam em sua direção. Uma delas estendeu uma máscara branca e sussurrou para ele pegar, pois havia deixado cair. Thorgar despertou arfando, com a máscara física materializada em suas mãos.<br><br><img src='demonios1.png' style='width: 100%; border-radius: 5px;'>"
+                lore: "Thorga foi consumido por um pesadelo. A antiga cidade de onde fora exilado ardia em um inferno de cinzas. Correndo por todos os lados, criaturas miúdas de orelhas pontudas, usando máscaras brancas e facas de abate, gargalhavam enquanto esfaqueavam e queimavam tudo. Thorga olhou para sua própria mão e percebeu que empunhava uma faca ensanguentada. De repente, o caos cessou. As criaturas o encararam e caminharam em sua direção. Uma delas estendeu uma máscara branca e sussurrou para ele pegar, pois havia deixado cair. Thorgar despertou arfando, com a máscara física materializada em suas mãos.<br><br><img src='demonios1.png' style='width: 100%; border-radius: 5px;'>"
             }
         },
         { 
@@ -2295,7 +2310,32 @@ Depois foram a uma cripta atrás da casa desceram a escadaria e encontraram o pr
             {
                 titulo: "Capítulo 4: Desconhecido",
                 texto: `Aventura em progresso...`
+            },
+            {
+                titulo: "Capítulo 5: Desconhecido",
+                texto: `Aventura em progresso...`
+            },
+            {
+                titulo: "Capítulo 6: Desconhecido",
+                texto: `Aventura em progresso...`
+            },
+            {
+                titulo: "Capítulo 7: Desconhecido",
+                texto: `Aventura em progresso...`
+            },
+            {
+                titulo: "Capítulo 8: Desconhecido",
+                texto: `Aventura em progresso...`
+            },
+            {
+                titulo: "Capítulo 9: Desconhecido",
+                texto: `Aventura em progresso...`
+            },
+            {
+                titulo: "Capítulo 10: Desconhecido",
+                texto: `Aventura em progresso...`
             }
+
         ],
 // ... dentro de dadosCapital ...
         bestiario: [
@@ -2610,12 +2650,12 @@ const dadosServicos = {
         lore: '"Poção é pra quem não tem tempo de dormir", diz o alquimista.',
         categorias: {
             "Recuperação e Estados": [
-                { nome: "Poção de Cura Menor", preco: "1 Moeda de Ouro e 50 de Prata", desc: "Recupera 2d6 + 2 de Vida." },
-                { nome: "Poção de Mana Menor", preco: "1 Moeda de Ouro e 50 de Prata", desc: "Recupera 1d6 + 2 de Mana." },
+                { nome: "Poção de Cura Menor", preco: "2 Moedas de Ouros", desc: "Recupera 2d6 + 2 de Vida." },
+                { nome: "Poção de Mana Menor", preco: "2 Moedas de Ouros", desc: "Recupera 1d6 + 2 de Mana." },
                 { nome: "Poção de Cura Média", preco: "4 Moedas de Ouro", desc: "Recupera 4d6 + 4 de Vida." },
                 { nome: "Poção de Mana Média", preco: "4 Moedas de Ouro", desc: "Recupera 2d6 + 3 de Mana." },
                 { nome: "Antídoto Comum", preco: "1 Moeda de Ouro", desc: "Cura venenos e estado Adoecido." },
-                { nome: "Poção de Fôlego Renovado", preco: "2 Moedas de Ouro e 50 de Prata", desc: "Remove estado Cansado (beber não gasta turno)." }
+                { nome: "Poção de Fôlego Renovado", preco: "2 Moedas de Ouro e 50 de Prata", desc: "Remove estado Cansado." }
             ],
             "Combate e Utilitários": [
                 { nome: "Estimulante de Combate", preco: "2 Moedas de Ouro", desc: "Recupera 2 usos de habilidades ativas." },
@@ -2670,7 +2710,8 @@ const dadosServicos = {
                 { nome: "Amuleto do Eco Mental", preco: "13 Moedas de Ouro", desc: "1x/dia: Re-conjura magia sem gastar mana." },
                 { nome: "Lanterna de Almas", preco: "8 Moedas de Ouro", desc: "Revela pegadas mágicas recentes (2h)." },
                 { nome: "Bolsa de Dimensão de Bolso", preco: "16 Moedas de Ouro", desc: "Carrega até 50kg extras sem peso." },
-                { nome: "Apito de Invocação", preco: "7 Moedas de Ouro", desc: "Sopre para invocar criatura aleatória." }
+                { nome: "Apito de Invocação", preco: "7 Moedas de Ouro", desc: "Sopre para invocar criatura aleatória." },
+                { nome: "Anel da vitalidade", preco: "8 Moedas de Ouro", desc: "O usuário ganha +5 pontos de vida." }
             ]
         }
     },
@@ -3673,53 +3714,70 @@ function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoEx
             criarPontoLocal([884, 1094], "Muralha", "Elfos");
             criarPontoLocal([882, 1271], "Muralha", "Elfos");
         }
-         if (nomeDoMapa === 'Deserto.jpg') {
-            criarPontoLocal([240, 762], "Capital do Deserto", "Zha-Ruk", "Capital deserto.png", true);
-            criarPontoLocal([1314, 588], "Vilarejo", "Ghovar", "Vila deserto.png", true);
-            criarPontoLocal([1422, 1582], "Vilarejo", "Ghovar", "Vila de areia.png", true);
-            criarPontoLocal( [1256, 126], "Mineração", "Ghovar");
-            criarPontoLocal( [1436, 112], "Mineração", "Abandonada");
-            criarPontoLocal( [1362, 400], "Mineração", "Ghovar");
-            criarPontoLocal( [1247, 730], "Mineração", "Ghovar");
-            criarPontoLocal( [1213, 846], "Mineração", "Ghovar");
-            criarPontoLocal( [1256, 126], "Mineração", "Ghovar");
-            criarPontoLocal( [1408, 1727], "Mineração", "Abandonada");
-            criarPontoLocal( [1363, 1855], "Mineração", "Ghovar");
-            criarPontoLocal( [1217, 1298], "Mineração", "Abandonada");
-            criarPontoLocal( [1149, 1784], "Mineração", "Abandonada");
-            criarPontoLocal(  [1049, 1809], "Mineração", "Abandonada");
-            criarPontoLocal( [1142, 1921], "Mineração", "Abandonada");
-            criarPontoLocal( [693, 1510], "Mineração", "Ghovar");
-            criarPontoLocal( [871, 1533], "Mineração", "Ghovar");
-            criarPontoLocal( [786, 1775], "Mineração", "Ghovar");
-            criarPontoLocal( [1032, 365], "Mineração", "Ghovar");
-            criarPontoLocal( [990, 617], "Mineração", "Ghovar");
-            criarPontoLocal(  [808, 580], "Mineração", "Ghovar");
-            criarPontoLocal(  [813, 399], "Mineração", "Ghovar");
-            criarPontoLocal( [475, 566], "Mineração", "Abandonada");
-            criarPontoLocal( [326, 539], "Mineração", "Abandonada");
-            criarPontoLocal( [401, 376], "Mineração", "Ghovar");
-        
-            criarPontoLocal([1082, 1619], "Cidade", "Samum", "Cidade anã.png", true);
-            criarPontoLocal([1434, 312], "Cidade", "Samum", "Cidade deserto.png", true);
-            criarPontoLocal([1082, 146], "Cidade", "Samum", "Cidade deserto 2.png", true);
-            criarPontoLocal( [752, 536], "Cidade", "Samum", "Cidade enterrada 2.png", true);
-            criarPontoLocal( [148, 170], "Cidade", "Samum");
-            criarPontoLocal( [188, 1910], "Cidade", "Samum");
+        if (nomeDoMapa === 'Deserto.jpg') {
+    // Capital do Deserto
+    const btnLeilao = criarBtn("🔍 Descobrir", "abrirModalSenha('leilao', 'abrirLeilaoMiragens()', 'funcao')", "#2E8B57");
+    criarPontoLocal([240, 762], "Capital do Deserto", "Zha Ruk", "Capital deserto.png", true, btnLeilao);
+    
+    criarPontoLocal([1314, 588], "Vilarejo", "Ghovar", "Vila deserto.png", true);
+    criarPontoLocal([1422, 1582], "Vilarejo", "Ghovar", "Vila de areia.png", true);
+    
+    // Minerações
+    criarPontoLocal([1256, 126], "Mineração", "Ghovar");
+    criarPontoLocal([1436, 112], "Mineração", "Abandonada");
+    criarPontoLocal([1362, 400], "Mineração", "Ghovar");
+    criarPontoLocal([1247, 730], "Mineração", "Ghovar");
+    criarPontoLocal([1213, 846], "Mineração", "Ghovar");
+    criarPontoLocal([1408, 1727], "Mineração", "Abandonada");
+    criarPontoLocal([1363, 1855], "Mineração", "Ghovar");
+    criarPontoLocal([1217, 1298], "Mineração", "Abandonada");
+    criarPontoLocal([1149, 1784], "Mineração", "Abandonada");
+    criarPontoLocal([1049, 1809], "Mineração", "Abandonada");
+    criarPontoLocal([1142, 1921], "Mineração", "Abandonada");
+    criarPontoLocal([693, 1510], "Mineração", "Ghovar");
+    criarPontoLocal([871, 1533], "Mineração", "Ghovar");
+    criarPontoLocal([786, 1775], "Mineração", "Ghovar");
+    criarPontoLocal([1032, 365], "Mineração", "Ghovar");
+    criarPontoLocal([990, 617], "Mineração", "Ghovar");
+    criarPontoLocal([808, 580], "Mineração", "Ghovar");
+    criarPontoLocal([813, 399], "Mineração", "Ghovar");
+    criarPontoLocal([475, 566], "Mineração", "Abandonada");
+    criarPontoLocal([326, 539], "Mineração", "Abandonada");
+    criarPontoLocal([401, 376], "Mineração", "Ghovar");
 
-            criarPontoLocal( [1394, 814], "Ruínas", "Atarim", "Entrada deserto.png", true);
-            criarPontoLocal( [920, 662], "Ruínas", "Atarim", "paisagem.png", true);
-            criarPontoLocal( [660, 1652], "Ruínas", "Atarim");
-            criarPontoLocal(  [1310, 1502], "Ruínas", "Atarim");
+    criarPontoLocal([1082, 1619], "Cidade", "Samum", "Cidade anã.png", true);
+    criarPontoLocal([1434, 312], "Cidade", "Samum", "Cidade deserto.png", true);
+    criarPontoLocal([1082, 146], "Cidade", "Samum", "Cidade deserto 2.png", true);
+    criarPontoLocal([752, 536], "Cidade", "Samum", "Cidade enterrada 2.png", true);
+    criarPontoLocal([148, 170], "Cidade", "Samum");
 
-            criarPontoLocal( [792, 912], "Castelo", "Zha-Ruk", "Castelo deserto 1.png", true);
-            criarPontoLocal( [1394, 915], "Castelo", "Zha-Ruk", "Castelo deserto 2.png", true);
-            criarPontoLocal( [332, 1278], "Castelo", "Zha-Ruk");
-            criarPontoLocal( [1020, 1188], "Castelo", "Zha-Ruk");
-            criarPontoLocal( [1210, 1118], "Torre de Vigia", "Zha-Ruk");
-            criarPontoLocal(  [1432, 1196], "Torre de Vigia", "Zha-Ruk");
+    // A Cidade Armadilha que leva para Alcova
+    const btnArmadilha = criarBtn("🔍 Descobrir", "abrirModalSenha('navio', 'eventoNavioPrisao()', 'funcao')", "#2E8B57");
+    criarPontoLocal([188, 1910], "Cidade", "Samum", null, true, btnArmadilha);
 
-        }
+    // A Cidade Anã
+    const btnAna = criarBtn("🔍 Descobrir", "abrirModalSenha('anao', 'abrirMenuDungeon()', 'funcao')", "#2E8B57");
+    criarPontoLocal([920, 662], "Ruínas", "Atarim", "paisagem.png", true, btnAna);
+    
+    criarPontoLocal([1394, 814], "Ruínas", "Atarim", "Entrada deserto.png", true);
+    criarPontoLocal([660, 1652], "Ruínas", "Atarim");
+    criarPontoLocal([1310, 1502], "Ruínas", "Atarim");
+
+    // Acampamento Dhen Rak oculto pelo deserto
+    const btnDhenRak = criarBtn("🔍 Descobrir", "abrirModalSenha('ladroes', 'abrirMercadoDhenRak()', 'funcao')", "#2E8B57");
+    criarPontoLocal([1308, 1888], "Ué", "Parece não haver nada aqui", null, false, btnDhenRak);
+
+    // O Castelo da Depressão
+    const btnDepressao = criarBtn("🔍 Descobrir", "abrirModalSenha('tristeza', 'eventoCasteloDepressao()', 'funcao')", "#2E8B57");
+    criarPontoLocal([1394, 915], "Castelo", "Zha Ruk", "Castelo deserto 2.png", true, btnDepressao);
+    
+    criarPontoLocal([792, 912], "Castelo", "Zha Ruk", "Castelo deserto 1.png", true);
+    criarPontoLocal([332, 1278], "Castelo", "Zha Ruk");
+    criarPontoLocal([1020, 1188], "Castelo", "Zha Ruk");
+    criarPontoLocal([1210, 1118], "Torre de Vigia", "Zha Ruk");
+    criarPontoLocal([1432, 1196], "Torre de Vigia", "Zha Ruk");
+
+}
          if (nomeDoMapa === 'Lago.jpg') {
             criarPontoLocal([970, 1152], "Templo do Lago", "Guardiões do Templo", "Templo do lago.png", true);
             const btnPanteao = criarBtn("⚡ Panteão", "menuDeuses()", "#4682B4");
@@ -3773,7 +3831,7 @@ function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoEx
             criarPontoLocal( [291, 1628], "Cidade", "Desconhecido");
             criarPontoLocal( [1311, 391], "Cidade", "Desconhecido", "Cidade alcova.jpg", true);
             const btnDescobrir = criarBtn("🔍 Descobrir", "abrirModalSenha('mar', 'Mar.jpg')", "#2E8B57");
-            criarPontoLocal([1052, 540], "Cidade", "Desconhecido", "Alcova.png", true, btnDescobrir);
+            criarPontoLocal([1052, 540], "Cidade", "Desconhecido", "Alc\ova.png", true, btnDescobrir);
             criarPontoLocal( [1131, 688], "Cidade", "Desconhecido", "Alcova 2.png", true);
             criarPontoLocal( [1189, 1455], "Cidade", "Desconhecido", "Alcova 3.png", true);
             criarPontoLocal( [1317, 1679], "Cidade", "Desconhecido");
@@ -4523,7 +4581,51 @@ function liberarSala() {
             atualizarBotaoMedidor('medindo');
         }
     }
-    // Inicialização
+    // Adicione estas funções junto das outras funções do jogo
+const dadosDhenRak = [
+    { item: "Cantil de Água Pura", preco: "15 Moedas de Ouro", desc: "Água limpa desviada dos nobres Zha Ruk Essencial para manter a sanidade nas dunas" },
+    { item: "Mapa de Rotas de Areia", preco: "40 Moedas de Ouro", desc: "Revela caminhos ocultos que evitam as tempestades mortais e as patrulhas do império" },
+    { item: "Fragmento Anão Enferrujado", preco: "80 Moedas de Ouro", desc: "Uma relíquia menor furtada das escavações que emana uma magia esquecida" }
+];
+
+function abrirMercadoDhenRak() {
+    const container = document.getElementById('conteudo-menu-capital');
+    document.getElementById('titulo-menu-capital').innerText = "Tenda Clandestina Dhen Rak";
+    document.getElementById('modal-capital').style.display = 'flex';
+    let html = `<p style="color:#ffdead; text-align:center; font-style:italic;">Não fazemos perguntas Apenas aceitamos ouro</p>`;
+    dadosDhenRak.forEach(i => {
+        html += `<div class="spell-item" style="border-left-color: #cd853f;">
+            <b style="color:#f39c12;">${i.item}</b> 
+            <span style="float:right; color:#ffd700; font-weight:bold;">${i.preco}</span>
+            <br><small style="color:#ccc; display:block; margin-top:5px;">${i.desc}</small>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function abrirLeilaoMiragens() {
+    const container = document.getElementById('conteudo-menu-capital');
+    document.getElementById('titulo-menu-capital').innerText = "O Leilão do Bazar";
+    document.getElementById('modal-capital').style.display = 'flex';
+    container.innerHTML = `
+        <div class="detalhe-box" style="border-color: #ffd700;">
+            <h3 style="color: #ffd700; text-align: center; margin-top: 0;">Evento Exclusivo</h3>
+            <p style="font-size: 15px; color: #ddd;">A alta sociedade Samum e Zha Ruk gasta fortunas aqui enquanto a periferia seca O item principal da noite é um registro de escavação que aponta para as Ruínas Atarim</p>
+            <p style="color: #cd853f; font-weight: bold; text-align: center;">Lance mínimo 500 Moedas de Ouro ou intimidação extrema</p>
+        </div>
+    `;
+}
+
+function eventoNavioPrisao() {
+    fecharModais();
+    alert("O ar se enche de um gás esverdeado e a escuridão toma conta Vossos corpos ficam pesados e a última coisa que escutam é o som de correntes Vocês caíram em uma armadilha e acordam no porão de um navio pirata em movimento rumo ao desconhecido");
+    abrirMapaProvincia('Alcova.jpg');
+}
+
+function eventoCasteloDepressao() {
+    fecharModais();
+    alert("O ar é pesado e sufocante A tristeza drena vossa energia vital e apaga qualquer pingo de esperança Preparem as rolagens de sanidade");
+}
     carregarMapaPrincipal();
     </script>
 </body>
