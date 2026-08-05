@@ -1856,22 +1856,41 @@ listaBoatos[99] = { id: 100, texto: "Dizem que existe um 101º boato que reveals
 
 const dadosCapital = {
     esquadrao: [
-        { 
+       { 
             nome: "Lythael Serindë", 
-            classe: "Sacerdote", 
             raca: "Elfa alta",
+            classe: "Sacerdote", 
             foto: "Lythael.png",
-            desc: "Uma guardiã serena e observadora, cuja gentileza externa esconde uma força inabalável dedicada a proteger e valorizar toda forma de vida.", 
+            desc: "Uma guardiã serena e observadora, cuja gentileza externa esconde uma força inabalável, dedicada a proteger e valorizar toda forma de vida.",
             stats: [1, 5, 4, 6, 1, 3, 2, 2], // For, Sab, Int, Man, Des, Con, Pre, Car
-            hab_raca: "<b>🧘 Meditação:</b> Recupera 1d4 + Nível de Mana 1x ao dia.",
-            passivas: [],
+            hab_raca: "<b>🧘 Meditação:</b> Recupera 1d4+Nível de Mana 1x ao dia. <br><br><b>🌸 Rosas de Liora:</b> No início de cada combate, Liora desabrocha 4 rosas douradas. Lythael pode consumir uma rosa ao conjurar qualquer feitiço para dobrar o valor curado ou dobrar o dano causado naquele turno. Quando as rosas acabarem, ela pode recuperar uma rosa se curar 20 de vida de um aliado. Enquanto permanecer ao menos uma rosa no combate, para toda cura que Lythael realiza com sucesso acaba ela se auto cura em 1d4",
+            passivas: [
+                "🌳 Aura da Floresta: Aliados a até 6 metros de distância recebem +2 em testes de resistência, seja física ou mental, e recebem dano reduzido em 4 para venenos ou queimaduras.",
+                "✨ Florescer da Vida: Sempre que utilizar uma habilidade de cura em um aliado com menos da metade da vida, o alvo recupera 1d6+2 de vida adicional.",
+                "👁️ Olhar Clínico: O Curandeiro consegue enxergar a vida de todos os aliados e inimigos apenas ao olhar para eles. Ele também identifica instantaneamente se alguém está sob efeito de uma condição negativa, como sono, paralisia ou fraqueza, sem precisar de testes."
+            ],
             ativas: [],
-            magias: ["Luz", "Solo Sagrado"],
+            magias: [
+                "☀️ Luz Natural Nível 0: Cria uma luz mágica flutuante que ilumina o ambiente ao redor. Aliados iluminados por ela recebem +1 para fazer ataques.",
+                "🍃 Cura Menor Nível 0: Cura 1d6 de vida de um alvo.",
+                "🌱 Raízes Sensoriais Nível 0: Sente movimentos em regiões próximas e pode ficar ativa no ambiente utilizado, sentindo as vibrações sem precisar detectar apenas quando é conjurada.",
+                "🤲 Curar Ferimentos Nível 1: Cura ferimentos de um aliado que possa ver em 2d4 de vida.",
+                "🗣️ Palavra de Cura Nível 1: Cura ferimentos de aliados a até 4 metros de distância em 2d6 de vida.",
+                "✨ Espinho Luminoso Nível 1: Atira um projétil luminoso que causa 2d4 de dano mágico. Mortos vivos sofrem o dobro de dano.",
+                "🌿 Prisão de Vinhas Nível 1: Imobiliza os pés de um inimigo, prendendo ele no lugar. Causa 1d4 de dano por turno e fica ativa por 1d2+1 turnos.",
+                "🙏 Bênção Intermediária Nível 2: Melhora os atributos de um alvo em +2 por 1d4+1 turnos.",
+                "🌸 Pétalas Guiadas Nível 2: Uma corrente de luz salta entre até 3 aliados, curando 2d4 de vida em cada.",
+                "🛡️ Aura de Espinhos Nível 2: Concede um casulo de cascas a um aliado que absorve 3d4 de dano e causa 1d6 de dano em qualquer inimigo que atacar o escudo de perto, por 1d4 turnos.",
+                "☀️ Raio Solar Nível 3: Conjura um feixe de luz que causa 3d4+2 de dano mágico. Mortos vivos sofrem dano dobrado.",
+                "🛡️ Florescer Protetor Nível 3: Abençoa um aliado, fazendo ele receber 5 a menos de dano de qualquer fonte por 1d2+2 turnos.",
+                "🌳 Árvore da Vida Nível 4: Faz crescer uma árvore mágica. Todos os aliados num raio de 6 metros recuperam 2d6 de vida por turno. A árvore dura 1d2+1 turnos.",
+                "🌺 Aura da Colheita Ultimate: Ela e um outro aliado escolhido por ela ficam revestidos por uma aura da floresta, com folhas e flores crescendo da pele. Eles recuperam 3d4 de vida por turno e aliados próximos a 4 metros de distância recuperam 1d6 por 1d4+1 turnos. Alvos dentro da aura ganham +2 em todos os testes."
+            ],
             evolucao: {
                 senha: "liora",
                 classeNova: "Sacerdote",
                 desbloqueado: true,
-                lore: "Lythael guardava consigo uma semente mágica de sua terra natal. Em uma noite silenciosa, a semente começou a brilhar e floresceu, revelando uma rosa dourada cintilante. O ser manifestou-se apresentando-se como Liora, filha do deus Terraria. Reconhecendo a nobreza e a pureza profunda no coração da elfa, Liora pediu sua ajuda para reencontrar seus irmãos perdidos pelo mundo. Firmando um pacto de amizade, a flor metamorfoseou-se em um poderoso cajado divino nas mãos de Lythael.<br><br><div style='display:flex; gap:10px;'><img src='liora.png' style='width: 48%; border-radius: 5px;'><img src='liora_2.png' style='width: 48%; border-radius: 5px;'></div>"
+                lore: "Lythael guardava consigo uma semente mágica de sua terra natal. Em uma noite silenciosa, a semente começou a brilhar e floresceu, revelando uma rosa dourada cintilante. O ser se manifestou se apresentando como Liora, filha do deus Terraria. Reconhecendo a nobreza e a pureza profunda no coração da elfa, Liora pediu sua ajuda para reencontrar seus irmãos perdidos pelo mundo. Firmando um pacto de amizade, a flor se metamorfoseou em um poderoso cajado divino nas mãos de Lythael.<br><br><div style='display:flex; gap:10px;'><img src='liora.png' style='width: 48%; border-radius: 5px;'><img src='liora_2.png' style='width: 48%; border-radius: 5px;'></div>"
             }
         },
         { 
@@ -1916,9 +1935,9 @@ const dadosCapital = {
                 "💨 Rajada Elemental Nível 2: feixe concentrado que causa 2d4 de dano e aplica efeito elemental",
                 "⚡ Ricochete Elemental Nível 2: ataque que salta entre até três inimigos num raio de 3 metros causando 1d6 de dano",
                 "🧱 Parede Elemental Nível 2: barreira densa ou fluida de 6 metros de largura e 4 metros de altura dependendo do elemento dura 1d4+1 turnos",
-                "🌧️ Nuvem Tempestuosa Nível 3: invoca nuvem que chove na área de 4 metros quadrados e no turno seguinte lança raio causando 3d4 de dano elétrico nos molhados sem escolha de elemento",
+                "🌧️ Nuvem Tempestuosa Nível 3: invoca nuvem que chove na área de 2x2 quadrados e no turno seguinte lança raio causando 3d4 de dano elétrico nos molhados sem escolha de elemento",
                 "🌪️ Controle Elemental Intermediário Nível 3: move matéria de tamanho médio do cenário para soterrar afogar ou afastar alvos violentamente",
-                "🌋 Devastação Elemental Nível 4: junta dois elementos focado em uma área de 6 metros quadrados causa 2d6 de dano e modifica o terreno",
+                "🌋 Devastação Elemental Nível 4: junta dois elementos focado em uma área de 3x3 quadrados causa 2d6 de dano e modifica o terreno",
                 "✨ Avatar da Natureza Ultimate: absorve energia do ambiente por 1d4+1 turnos aumentando danos em 2d4 e ganha 1 elemento a mais para fundir nas magias grátis No final explode em direção aleatória causando 4d6 de dano e aplica os efeitos do elemento"
             ],
             evolucao: {
@@ -1965,22 +1984,68 @@ const dadosCapital = {
             </div>
             `
         },
-        { 
+       { 
+            nome: "Balon Blacktide", 
+            raca: "Meio Demônio",
+            classe: "Arqueiro", 
+            foto: "Balon.jpg",
+            desc: "Das lições da nobreza aos naufrágios da pirataria, este meio demônio de poucas palavras carrega no sobrenome a marca de sua sobrevivência e, na alma, o conflito eterno entre o sangue amaldiçoado e a luz que busca guiar seu caminho.",
+            stats: [3, 2, 1, 0, 6, 2, 4, 1], // For, Sab, Int, Man, Des, Con, Pre, Car
+            hab_raca: "<b>💢 Fúria Demoníaca:</b> Entra em fúria por (n+1) turnos (+4 For/Des, -4 Int/Sab/Prec). <br><br><b>🏹 Arco da Maré Negra:</b> A arma causa 2d4+Precisão de dano e ignora 1 de CA. O arco concede +3 de Mana ao usuário e habilita o uso de magias especiais ligadas à água. Sempre que houver qualquer fonte de água por perto, como poças, chuva ou mar, Balon puxa o líquido para formar flechas mágicas de água. Essas flechas causam +1d6 de dano e ignoram +1 de CA. <br><br><b>🔱 Ira do Leviatã Ultimate:</b> Atira uma flecha mágica para o alto, começa a chover e um peixe gigante feito de água surge do céu e ataca em uma área de 6x6 quadrados. Todos os inimigos na área sofrem 4d6 de dano perfurante, são derrubados no chão, e o terreno se torna inundado, cortando o deslocamento de todos pela metade por 2 turnos.",
+            passivas: [
+                "🌫️ Passos da Névoa: Ganha +3 em testes para se esconder e seus passos se tornam completamente silenciosos ao andar sobre superfícies molhadas ou na chuva. Além disso, consegue andar poucos passos acima da superfície da água antes de afundar.",
+                "👁️ Instinto Predatório: Balon nunca pode ser surpreendido enquanto estiver acordado e recebe um bônus permanente de +3 em testes de iniciativa, garantindo que aja primeiro na maioria dos combates.",
+                "🌊 Ritmo da Maré: O segundo turno atacado seguido no mesmo alvo recebe +2 no acerto e causa +2d4 de dano extra. O terceiro turno de ataque seguido no mesmo inimigo recebe +3 no acerto, causa +3d4 de dano extra e derruba o alvo no chão. Após o terceiro acerto, o ciclo reinicia."
+            ],
+            ativas: [
+                "🏹 Tiro Triplo: Dispara três projéteis rapidamente. Realiza três testes de Precisão. Cada acerto causa o dano normal da arma +1d4.",
+                "🎯 Foco do Predador: Utiliza sua ação para mirar intensamente. O próximo ataque ignora penalidades de distância, recebe +3 de bônus no teste de Precisão e causa +1d4 de dano extra.",
+                "🤸 Salto Acrobático: Realiza uma manobra de esquiva que pode ser usada como reação a ataques para desviar. É uma ação bônus e não gasta a ação do turno. Ele se move metade do deslocamento sem sofrer ataques de oportunidade e recebe +3 em Destreza para desviar de golpes ou armadilhas naquele turno, podendo pular por cima de inimigos ou obstáculos.",
+                "💨 Bomba de Fumaça: Cria uma cortina de fumaça densa em uma área de 4x4 quadrados. A fumaça causa 1d4 de dano por turno para alvos dentro dela e dura 1d2+1 turnos. Produz 2 bombas por vez.",
+                "☄️ Tiro Penetrante: Um disparo focado com +3 no acerto que atravessa as defesas, ignorando escudos ou barreiras mágicas de baixo nível. Causa o dano normal da arma e atinge todos os inimigos que estiverem exatamente atrás do alvo em linha reta.",
+                "☠️ Flecha Tóxica: O disparo causa o dano normal da arma +1d6 de dano de veneno por 2 turnos. O veneno paralisa os músculos, reduzindo o deslocamento do inimigo pela metade durante o efeito."
+            ],
+            magias: [
+                "🌊 Correnteza Nível 1: O arco dispara uma rajada mágica em formato de cone cobrindo até 3 quadrados à frente. Todos os inimigos na área sofrem 2d4 de dano, são empurrados 6 metros para trás e todas as chamas na área são apagadas.",
+                "🌋 Gêiser Nível 1: Atira uma flecha no chão, fazendo um gêiser explodir debaixo do alvo. Causa o dano normal da arma +1d6 de dano de concussão e joga o inimigo 4 metros para o ar, fazendo ele receber +1d4 de dano de queda ao cair.",
+                "⚓ Tiro Âncora Nível 2: Dispara uma flecha pesada feita de água condensada que causa o dano normal da arma e crava o alvo no chão. O inimigo fica imobilizado por 1d2+1 turnos e criaturas voadoras são forçadas a pousar imediatamente."
+            ],
+            evolucao: {
+                senha: "mare",
+                classeNova: "Arqueiro",
+                desbloqueado: true,
+                lore: "No meio da noite a porta de Balon foi esmurrada. Era Liam, o filho de seu antigo patrão e alguém que Balon considerava um irmão. Liam trouxe um aviso urgente. O pirata Capitão Thorne, que Balon matou no passado, tinha um filho. Esse herdeiro assumiu a frota e busca vingança. Liam invadiu o navio inimigo para descobrir os planos e conseguiu fugir por pouco. Ele não saiu de mãos vazias e entregou a Balon o item que roubou da cabine do herdeiro: O Arco da Maré Negra. Com a caçada declarada, Balon agora empunha a arma do próprio inimigo para o embate final.<br><br><img src='mare_negra.png' style='width: 100%; border-radius: 5px;'>"
+            }
+        },
+       { 
             nome: "Thorga Punho de Ferro", 
             raca: "Anão",
             classe: "Cavaleiro das Trevas", 
             foto: "Thorga.jpg",
             desc: "Exilado injustamente das forjas ancestrais, Thorga é um mercenário impetuoso que rejeita a autoridade de reis e deuses, lutando pela pura emoção da batalha e para provar que sua força basta por si só.",
             stats: [8, 1, 1, 0, 2, 6, 2, 2], // For, Sab, Int, Man, Des, Con, Pre, Car
-            hab_raca: "<b>🛡️ Pele de aço:</b> Uma vez por dia, reduz o dano de um ataque pela metade.",
-            passivas: [],
-            ativas: [],
+            hab_raca: "<b>🛡️ Pele de aço:</b> Uma vez por dia, reduz o dano de um ataque pela metade. <br><br><b>🎭 Máscara do Riso Sangrento:</b> Ao equipar a máscara, a arma de Thorga recebe +1d6 de dano base e ignora 1 de CA inimiga. A máscara se alimenta da violência. Sempre que Thorga causa dano, ele ganha 2 Marcas de Sangue, e se abater o alvo, ganha 4 Marcas. O limite máximo é 10 Marcas. Ao usar habilidades ativas, ele pode gastar essas marcas para receber +1d4 de dano extra ou +1 no acerto por cada marca consumida. A máscara devora a vitalidade derramada, permitindo que Thorga gaste 3 Marcas de Sangue a qualquer momento como ação livre para recuperar +1d8 de vida instantaneamente.",
+            passivas: [
+                "🛡️ Força de Vontade: Quando o guerreiro está com menos da metade da vida máxima, ele recebe +2 em todos os testes de resistência e recebe uma redução fixa de 2 pontos de dano contra qualquer ataque.",
+                "🩸 Prazer na Dor: Thorga sorri ao ser ferido. Sempre que um inimigo causa dano a Thorga, o próximo ataque que ele fizer contra esse mesmo inimigo recebe +1d6 de dano extra.",
+                "😤 Instinto Predatório: O cheiro de sangue o instiga. Ele ganha +4 metros de deslocamento ao se mover na direção de inimigos com a vida abaixo da metade ou na direção de inimigos que tiveram ele como alvo de ataque no turno anterior."
+            ],
+            ativas: [
+                "⚔️ Corte Perfurante: Realiza um golpe de estocada focado. Causa o dano da arma e ignora 2 de armadura física do alvo.",
+                "🛡️ Postura Defensiva: Se fecha em guarda. Até o seu próximo turno, ele reduz todo dano físico recebido em 4, mas deve ficar imóvel.",
+                "🏃‍♂️ Investida Impactante: Avança rapidamente e dá uma ombrada no alvo, causando +1d6 de dano. O alvo faz um teste de resistência física e, se falhar, é jogado para trás e fica atordoado por 1 turno.",
+                "🌬️ Fôlego Renovado: Respira fundo e recupera +1d8 de vida no meio do combate. Não gasta a ação principal do turno para usar e concede 1 Marca de Sangue no momento do uso.",
+                "💪 Fúria Sanguinária: Habilidade de fortalecimento. Thorga flexiona os músculos, ganhando +2 de dano e +1 de armadura por 2 turnos. O jogador pode gastar Marcas de Sangue no uso. Cada marca gasta adiciona +1 no bônus de dano e aumenta a duração da habilidade em +1 turno.",
+                "🌪️ Corte Ascendente: Golpeia de baixo para cima, causando o dano da arma +1d6 e lançando o alvo no ar.",
+                "🩸 Carnificina: Um ataque brutal focado em aniquilar. Causa o dano da arma +2d4. Se este ataque abater o inimigo, Thorga recupera 1 uso diário de suas habilidades ativas.",
+                "🎭 Irmãos de Sangue Ultimate: Thorga sacrifica a quantidade de marcas que quiser para invocar das sombras 2 criaturas mascaradas idênticas a ele. Os irmãos copiam perfeitamente todas as habilidades e ataques de Thorga no turno e duram um número de turnos igual às marcas sacrificadas. O dano recebido por qualquer um dos três é dividido igualmente entre todos, e a cura recebida também. Todos os danos causados pelas cópias geram Marcas de Sangue para o Thorga original."
+            ],
             magias: [],
             evolucao: {
                 senha: "mascara",
                 classeNova: "Cavaleiro das Trevas",
                 desbloqueado: true,
-                lore: "Thorgar foi consumido por um pesadelo a antiga cidade de onde fora exilado ardia em um inferno de cinzas. Correndo por todos os lados, criaturas miúdas de orelhas pontudas, usando máscaras brancas e facas de abate, gargalhavam enquanto esfaqueavam e queimavam tudo. Thorga olhou para sua própria mão e percebeu que empunhava uma faca ensanguentada. De repente, o caos cessou. As criaturas o encararam e caminharam em sua direção. Uma delas estendeu uma máscara branca e sussurrou 'Você deixou cair... irmão'. Thorgar despertou arfando, com a máscara física materializada em suas mãos.<br><br><img src='demonios1.png' style='width: 100%; border-radius: 5px;'>"
+                lore: "Thorgar foi consumido por um pesadelo. A antiga cidade de onde fora exilado ardia em um inferno de cinzas. Correndo por todos os lados, criaturas miúdas de orelhas pontudas, usando máscaras brancas e facas de abate, gargalhavam enquanto esfaqueavam e queimavam tudo. Thorga olhou para sua própria mão e percebeu que empunhava uma faca ensanguentada. De repente, o caos cessou. As criaturas o encararam e caminharam em sua direção. Uma delas estendeu uma máscara branca e sussurrou para ele pegar, pois havia deixado cair. Thorgar despertou arfando, com a máscara física materializada em suas mãos.<br><br><img src='demonios1.png' style='width: 100%; border-radius: 5px;'>"
             }
         },
         { 
@@ -2010,7 +2075,7 @@ const dadosCapital = {
                 "👁️ Visão do Além Nível 3: Projeta um corpo astral que atravessa paredes caso não exista barreiras mágicas e é invisível. O corpo não pode se afastar além de 50 metros. Ao desfazer a magia, pode escolher voltar para o corpo ou teleportar o corpo físico para o local do astral. Em combate serve de teletransporte rápido de 20 metros",
                 "🩸 Maldição do Sangue Frio Nível 3: Amaldiçoa um alvo único causando 3d6 de dano necrótico. O alvo perde totalmente a capacidade de ser curado por magias ou poções por 2 turnos",
                 "🕳️ Ritual do Abismo Nível 4: Cria poço de magia negra em uma área Todos os inimigos dentro sofrem 3d6 de dano necrótico e são puxados violentamente para o centro perdendo a capacidade de locomoção no próximo turno",
-                "🎭 Teatro dos Pesadelos Ultimate: Cobre uma área de 10 metros quadrados por 1d4+1 turnos Inimigos veem piores fobias são atacados por familiares sofrendo 2d6 de dano psíquico por turno. Acertos dos alvos diminuem em -2. Aliados ganham camuflagem e vantagem para acertar. Todos os efeitos de condições de outras magias não contam turnos na duração dessa magia"
+                "🎭 Teatro dos Pesadelos Ultimate: Cobre uma área de 5x5 quadrados por 1d4+1 turnos Inimigos veem piores fobias são atacados por familiares sofrendo 2d6 de dano psíquico por turno. Acertos dos alvos diminuem em -2. Aliados ganham camuflagem e vantagem para acertar. Todos os efeitos de condições de outras magias não contam turnos na duração dessa magia"
             ],
             evolucao: {
                 senha: "diario",
