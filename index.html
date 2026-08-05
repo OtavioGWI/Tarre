@@ -4212,78 +4212,139 @@ function processarCliqueMedicao(latlng) {
  * Abre modal com tabela de resultados
  */
 function calcularResultados() {
-        // Validação mínima
-        if (!pontosRota || pontosRota.length < 2) {
-            alert('Coloque pelo menos 2 pontos para calcular a rota.');
+    if (!pontosRota || pontosRota.length < 2) {
+        alert('Coloque pelo menos 2 pontos para calcular a rota.')
+        return;
+    }
+
+    try {
+        let distanciaTotalPixels = 0;
+
+        for (let i = 0; i < pontosRota.length - 1; i++) {
+            distanciaTotalPixels += map.distance(pontosRota[i], pontosRota[i+1]);
+        }
+
+        const distanciaReal = distanciaTotalPixels * fatorEscala; 
+        const kmPorDiaPe = 30;
+
+        const diasPe = (distanciaReal / kmPorDiaPe).toFixed(1);
+        const diasMontariaLenta = (distanciaReal / (kmPorDiaPe * 1.5)).toFixed(1); 
+        const diasMontariaNormal = (distanciaReal / (kmPorDiaPe * 2.0)).toFixed(1); 
+        const diasMontariaRapida = (distanciaReal / (kmPorDiaPe * 4.0)).toFixed(1); 
+
+        const taxaOuro = 2.5; 
+        const tarifaPorKmPrata = 2.5; 
+
+        const custoBase = Math.round(taxaOuro * 10000); 
+        const custoPorKm = Math.round(tarifaPorKmPrata * 100); 
+
+        let custoTotalBronze = Math.floor(custoBase + (distanciaReal * custoPorKm));
+
+        const golds = Math.floor(custoTotalBronze / 10000);
+        custoTotalBronze %= 10000;
+        const silvers = Math.floor(custoTotalBronze / 100);
+        const bronzes = custoTotalBronze % 100;
+
+        let html = `
+            <p><strong>Rota Total:</strong> ${distanciaReal.toFixed(1)} km (aprox).</p>
+            <table class="tabela-viagem">
+                <tr><th>Método</th><th>Tempo Total</th></tr>
+                <tr><td>🚶 A Pé</td><td>${diasPe} dias</td></tr>
+                <tr><td>🐴 Mula ou Burro</td><td>${diasMontariaLenta} dias</td></tr>
+                <tr><td>🐎 Cavalo</td><td>${diasMontariaNormal} dias</td></tr>
+                <tr><td>⚡ Montaria Especial</td><td>${diasMontariaRapida} dias</td></tr>
+            </table>
+
+            <hr style="border: 0; border-top: 1px solid #444; margin: 15px 0;">
+            <h4 style="color: #87CEEB;">🔮 Transporte Imperial Seguro</h4>
+            <p>Taxa fixa de <strong>2.5 ouro</strong> e <strong>2.5 prata por km</strong> aplicada automaticamente.</p>
+            <p><strong>Valor Total:</strong><br>
+            <span class="destaque-gold">${golds} Ouro</span>, 
+            <span class="destaque-silver">${silvers} Prata</span>, 
+            <span class="destaque-bronze">${bronzes} Bronze</span>.
+            </p>
+            <button onclick="animarViagem()" class="btn-popup" style="background: #2E8B57; width: 100%; margin-top: 15px; font-size: 16px; padding: 10px;">🏇 Realizar Viagem</button>
+        `;
+
+        document.getElementById('resultado-viagem').innerHTML = html;
+        document.getElementById('modal-viagem').style.display = 'flex';
+
+        cancelarModoMedicao();
+    } catch (err) {
+        console.error('Erro ao calcular rota:', err);
+        alert('Erro ao calcular a rota');
+    }
+}
+
+function animarViagem() {
+    document.getElementById('modal-viagem').style.display = 'none';
+
+    if (!pontosRota || pontosRota.length < 2) return;
+
+    const iconCavalo = L.divIcon({
+        html: '<div class="cavalo-animado" style="font-size: 35px; filter: drop-shadow(0 0 5px black);">🐎</div>',
+        className: 'marcador-emoji',
+        iconSize: [35, 35],
+        iconAnchor: [17, 25]
+    });
+
+    const cavalo = L.marker(pontosRota[0], { icon: iconCavalo, zIndexOffset: 9999 }).addTo(map);
+
+    let indexAtual = 0;
+    
+    // AQUI ESTÁ A VELOCIDADE Diminua este valor para ir mais devagar ou aumente para ir mais rápido
+    const velocidadePixelsFrame = 3; 
+
+    function moverProximoPonto() {
+        if (indexAtual >= pontosRota.length - 1) {
+            setTimeout(() => {
+                map.removeLayer(cavalo);
+                grupoRota.clearLayers();
+                pontosRota = [];
+            }, 1000);
             return;
         }
 
-        try {
-            let distanciaTotalPixels = 0;
-
-            // Soma distância de todos os segmentos (Leaflet retorna unidades do CRS -- aqui pixels)
-            for (let i = 0; i < pontosRota.length - 1; i++) {
-                distanciaTotalPixels += map.distance(pontosRota[i], pontosRota[i+1]);
+        const p1 = pontosRota[indexAtual];
+        const p2 = pontosRota[indexAtual + 1];
+        const distancia = map.distance(p1, p2);
+        
+        const elementoIcone = cavalo.getElement();
+        if (elementoIcone) {
+            const divCavalo = elementoIcone.querySelector('.cavalo-animado');
+            if (divCavalo) {
+                divCavalo.style.transform = p2.lng > p1.lng ? 'scaleX(-1)' : 'scaleX(1)';
             }
-
-            // --- CÁLCULOS ---
-            const distanciaReal = distanciaTotalPixels * fatorEscala; // km
-
-            // CALIBRAÇÃO: 30 km/dia é ritmo padrão de marcha RPG
-            const kmPorDiaPe = 30;
-
-            const diasPe = (distanciaReal / kmPorDiaPe).toFixed(1);
-            const diasMontariaLenta = (distanciaReal / (kmPorDiaPe * 1.5)).toFixed(1); // Mula
-            const diasMontariaNormal = (distanciaReal / (kmPorDiaPe * 2.0)).toFixed(1); // Cavalo
-            const diasMontariaRapida = (distanciaReal / (kmPorDiaPe * 4.0)).toFixed(1); // Voo
-
-            // ECONOMIA: 2.5 Ouro taxa + 2.5 Prata/km
-            // Conversão interna para bronze (unidade inteira): 1 Ouro = 100 Prata = 10000 Bronze
-            const taxaOuro = 2.5; // ouro (flat)
-            const tarifaPorKmPrata = 2.5; // prata por km
-
-            const custoBase = Math.round(taxaOuro * 10000); // em bronze
-            const custoPorKm = Math.round(tarifaPorKmPrata * 100); // em bronze/km
-
-            let custoTotalBronze = Math.floor(custoBase + (distanciaReal * custoPorKm));
-
-            // Conversão de Moedas
-            const golds = Math.floor(custoTotalBronze / 10000);
-            custoTotalBronze %= 10000;
-            const silvers = Math.floor(custoTotalBronze / 100);
-            const bronzes = custoTotalBronze % 100;
-
-            // Monta o HTML do Resultado (valores arredondados de forma legível)
-            let html = `
-                <p><strong>Rota Total:</strong> ${distanciaReal.toFixed(1)} km (aprox).</p>
-                <table class="tabela-viagem">
-                    <tr><th>Método</th><th>Tempo Total</th></tr>
-                    <tr><td>🚶 A Pé</td><td>${diasPe} dias</td></tr>
-                    <tr><td>🐴 Mula/Burro (Montaria Lenta)</td><td>${diasMontariaLenta} dias</td></tr>
-                    <tr><td>🐎 Cavalo (Montaria Normal)</td><td>${diasMontariaNormal} dias</td></tr>
-                    <tr><td>⚡ Montaria Especial (Montaria Rápida)</td><td>${diasMontariaRapida} dias</td></tr>
-                </table>
-
-                <hr>
-                <h4 style="color: #87CEEB;">🔮 Transporte Imperial Seguro</h4>
-                <p>Taxa fixa de <strong>2.5 ouro</strong> + <strong>2.5 prata/km</strong> aplicada automaticamente.</p>
-                <p><strong>Valor Total:</strong><br>
-                <span class="destaque-gold">${golds} Ouro</span>, 
-                <span class="destaque-silver">${silvers} Prata</span>, 
-                <span class="destaque-bronze">${bronzes} Bronze</span>.
-                </p>
-            `;
-
-            document.getElementById('resultado-viagem').innerHTML = html;
-            document.getElementById('modal-viagem').style.display = 'flex';
-
-            // Sai do modo de medição, mas MANTÉM O DESENHO na tela para verem
-            cancelarModoMedicao();
-        } catch (err) {
-            console.error('Erro ao calcular rota:', err);
-            alert('Erro ao calcular a rota — veja o console para detalhes.');
         }
+
+        let progresso = 0;
+        let passo = velocidadePixelsFrame / distancia;
+
+        if (distancia === 0) {
+            indexAtual++;
+            moverProximoPonto();
+            return;
+        }
+
+        function frameAnimacao() {
+            progresso += passo;
+            if (progresso >= 1) {
+                cavalo.setLatLng(p2);
+                indexAtual++;
+                moverProximoPonto();
+            } else {
+                const latAtual = p1.lat + (p2.lat - p1.lat) * progresso;
+                const lngAtual = p1.lng + (p2.lng - p1.lng) * progresso;
+                cavalo.setLatLng([latAtual, lngAtual]);
+                requestAnimationFrame(frameAnimacao);
+            }
+        }
+        
+        frameAnimacao();
     }
+
+    moverProximoPonto();
+}
 
     let chartInstance = null; // Armazena o gráfico para poder destruí-lo antes de criar outro
 
