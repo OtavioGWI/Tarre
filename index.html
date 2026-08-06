@@ -1456,7 +1456,7 @@ function criarBtn(texto, acao, corBarra = '#8b4513') {
     let medindo = false;                  // Modo de cálculo de rotas ativo
     let pontosRota = [];                  // Coordenadas dos pontos da rota
 
-
+    let chartInstance = null;
     
 
     // --- FUNÇÕES DE NAVEGAÇÃO E SISTEMA ---
@@ -4863,8 +4863,8 @@ function abrirStatsPersonagem(index) {
     container.innerHTML = `
         <button onclick="menuCapital('esquadrao')" class="btn-popup" style="margin-bottom: 20px; background: #444; width: 100%;">Voltar ao Esquadrão</button>
         
-        <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1px solid #555; width: 280px; height: 280px; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
-            <canvas id="radarChart" width="260" height="260"></canvas>
+        <div style="position: relative; width: 260px; height: 260px; margin: 0 auto; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1px solid #555;">
+            <canvas id="radarChart"></canvas>
         </div>
 
         <div id="lista-stats-manual" style="margin-top: 20px;"></div>
@@ -4872,9 +4872,7 @@ function abrirStatsPersonagem(index) {
 
     setTimeout(() => {
         try {
-            const canvas = document.getElementById('radarChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
+            const ctx = document.getElementById('radarChart').getContext('2d');
             if (chartInstance) { chartInstance.destroy(); }
             chartInstance = new Chart(ctx, {
                 type: 'radar',
@@ -4889,8 +4887,8 @@ function abrirStatsPersonagem(index) {
                     }]
                 },
                 options: {
-                    responsive: false,
-                    animation: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         r: {
                             angleLines: { color: '#444' },
@@ -4907,7 +4905,7 @@ function abrirStatsPersonagem(index) {
         } catch (err) {
             console.error("Erro ao renderizar gráfico radar:", err);
         }
-    }, 80);
+    }, 50);
 
     const divListas = document.getElementById('lista-stats-manual');
     let html = "";
