@@ -591,11 +591,11 @@
     
     .nuvem-branca-esq, .nuvem-branca-dir {
         position: absolute;
-        top: -10vh; /* Puxa um pouco para cima para não faltar no topo */
-        width: 120vw; 
-        height: 120vh;
+        top: -25vh; 
+        width: 130vw; 
+        height: 150vh;
         background-image: url('nuvem.png');
-        background-size: cover; /* Esse é o segredo para a imagem não achatar e manter a proporção real */
+        background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -603,18 +603,17 @@
     }
     
     .nuvem-branca-esq {
-        left: -20vw;
+        left: -25vw;
         transform: translateX(-120%); 
     }
     
     .nuvem-branca-dir {
-        right: -20vw;
+        right: -25vw;
         transform: translateX(120%) rotateY(180deg);
     }
 
-    /* Agora elas avançam ainda mais para o centro sobrepondo tudo */
-    .fechar-nuvens .nuvem-branca-esq { transform: translateX(30%); }
-    .fechar-nuvens .nuvem-branca-dir { transform: translateX(-30%) rotateY(180deg); }
+    .fechar-nuvens .nuvem-branca-esq { transform: translateX(35%); }
+    .fechar-nuvens .nuvem-branca-dir { transform: translateX(-35%) rotateY(180deg); }
 
     </style>
 </head>
