@@ -2639,13 +2639,10 @@ function menuCapital(tipo) {
                     ${criarBtn("☠️ Procurados", "menuCapital('procurados')", "#8b0000")}
                 </section>
                 <section>
-                
-            <section>
-                <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">ℹ️ INFORMAÇÕES</div>
+                    <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">ℹ️ INFORMAÇÕES</div>
                     ${criarBtn("📚 Biblioteca Imperial", "abrirBiblioteca()", "#483D8B")}
                     ${criarBtn("💼 Serviços", "menuServicos('menu')", "#ffd700")}
                     ${criarBtn("📸 Ver Cidade", "verImagemEstatica('Capital.png', () => { restaurarMapaMenu(); menuCapital('hub'); })", "#5F9EA0")}
-                </section>
                 </section>
             </div>`;
         return;
@@ -2675,7 +2672,6 @@ function menuCapital(tipo) {
         dadosCapital.esquadrao.forEach((item, index) => {
             let img = item.foto ? `<img src="${item.foto}" class="foto-lista" onclick="verImagemPersonagem('${item.foto}')" style="cursor: zoom-in;">` : `<div class="foto-placeholder">?</div>`;
             
-            // Lógica do botão de evolução baseado no status de desbloqueio
             let btnEvolucao = "";
             if (item.evolucao && item.evolucao.senha !== "???") {
                 if (item.evolucao.desbloqueado) {
@@ -2700,20 +2696,20 @@ function menuCapital(tipo) {
                 </div>`;
         });
     } else if (tipo === 'procurados') {
-            titulo.innerText = "☠️ Criminosos Procurados";
-            container.innerHTML = btnVoltar;
-            dadosCapital.procurados.forEach(p => {
-                let img = p.foto ? `<img src="${p.foto}" class="foto-lista" onclick="verImagemPersonagem('${p.foto}')">` : `<div class="foto-placeholder">?</div>`;
-                container.innerHTML += `
-                    <div class="item-menu">
-                        ${img}
-                        <div class="texto-item">
-                            <h4>${p.nome}</h4>
-                            <span class="recompensa">Recompensa: ${p.recompensa}</span>
-                            <p>${p.desc}</p>
-                        </div>
-                    </div>`;
-            });
+        titulo.innerText = "☠️ Criminosos Procurados";
+        container.innerHTML = btnVoltar;
+        dadosCapital.procurados.forEach(p => {
+            let img = p.foto ? `<img src="${p.foto}" class="foto-lista" onclick="verImagemPersonagem('${p.foto}')">` : `<div class="foto-placeholder">?</div>`;
+            container.innerHTML += `
+                <div class="item-menu">
+                    ${img}
+                    <div class="texto-item">
+                        <h4>${p.nome}</h4>
+                        <span class="recompensa">Recompensa: ${p.recompensa}</span>
+                        <p>${p.desc}</p>
+                    </div>
+                </div>`;
+        });
     } else if (tipo === 'lendas') {
         titulo.innerText = "🏛️ Heróis Lendários";
         container.innerHTML = btnVoltar + `<p style="text-align:center; color:#aaa; font-style:italic;">"Bravos membros da campanha que derrotou o primeiro Rei Demônio"</p>`;
@@ -2731,10 +2727,9 @@ function menuCapital(tipo) {
             `<p>Obs: Todo o dinheiro, itens e criaturas guardadas pelo banco imperial possui garantia total</p>` +
             `<p>Obs 2: Não existe melhoramento de pacote, se for trocar seu pacote será com o preço integral</p>` +
             `</div>`;
-   } else if (tipo === 'boatos') {
+    } else if (tipo === 'boatos') {
         titulo.innerText = "🗣️ Boatos";
         
-        // Transformamos a div em um <label>. Assim, clicar no texto também marca o quadradinho.
         let htmlTop = btnVoltar + `
             <label style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 5px; border: 1px solid #444; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer;">
                 <input type="checkbox" id="filtro-boatos" onchange="alternarFiltroBoatos()" style="transform: scale(1.5); cursor: pointer; accent-color: #cd853f; margin-left: 5px;">
@@ -2747,7 +2742,6 @@ function menuCapital(tipo) {
         
         dadosCapital.boatos.forEach(b => {
             const txt = b.descoberto ? b.texto : "??????????";
-            // Adiciona a classe 'boato-desconhecido' para podermos esconder via JavaScript
             const classeOculta = b.descoberto ? 'boato-descoberto' : 'boato-desconhecido';
             container.innerHTML += `<div class="boato-item ${classeOculta}"><span class="boato-numero">#${b.id}</span><span class="boato-texto">"${txt}"</span></div>`;
         });
@@ -2761,7 +2755,6 @@ function menuCapital(tipo) {
         });
     }
 }
-
 
 const dadosServicos = {
     alquimia: {
@@ -4859,6 +4852,200 @@ function iniciarNeve() {
 function pararNeve() {
     const container = document.getElementById('neve-efeito');
     if (container) container.remove();
+}
+function abrirStatsPersonagem(index) {
+    const p = dadosCapital.esquadrao[index];
+    const container = document.getElementById('conteudo-menu-capital');
+    const titulo = document.getElementById('titulo-menu-capital');
+    
+    titulo.innerText = `Estatísticas ${p.nome}`;
+    
+    container.innerHTML = `
+        <button onclick="menuCapital('esquadrao')" class="btn-popup" style="margin-bottom: 20px; background: #444; width: 100%;">Voltar ao Esquadrão</button>
+        
+        <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1px solid #555; width: 280px; height: 280px; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
+            <canvas id="radarChart" width="260" height="260"></canvas>
+        </div>
+
+        <div id="lista-stats-manual" style="margin-top: 20px;"></div>
+    `;
+
+    setTimeout(() => {
+        try {
+            const canvas = document.getElementById('radarChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (chartInstance) { chartInstance.destroy(); }
+            chartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['FOR', 'SAB', 'INT', 'MAN', 'DES', 'CON', 'PRE', 'CAR'],
+                    datasets: [{
+                        data: p.stats,
+                        fill: true,
+                        backgroundColor: 'rgba(135, 206, 235, 0.3)',
+                        borderColor: '#87CEEB',
+                        pointBackgroundColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#444' },
+                            grid: { color: '#444' },
+                            pointLabels: { color: '#ffdead', font: { size: 10 } },
+                            ticks: { display: false },
+                            suggestedMin: 0, 
+                            suggestedMax: 10
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        } catch (err) {
+            console.error("Erro ao renderizar gráfico radar:", err);
+        }
+    }, 80);
+
+    const divListas = document.getElementById('lista-stats-manual');
+    let html = "";
+
+    if (p.hab_raca) {
+        html += `<div class="spell-level">🧬 Traços Especiais</div>`;
+        html += `<div class="spell-item">${p.hab_raca}</div>`;
+    }
+
+    if (p.passivas && p.passivas.length > 0) {
+        html += `<div class="spell-level">✨ Habilidades Passivas</div>`;
+        p.passivas.forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
+    }
+
+    if (p.ativas && p.ativas.length > 0) {
+        html += `<div class="spell-level">🛡️ Habilidades Ativas</div>`;
+        p.ativas.forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
+    }
+
+    if (p.magias && p.magias.length > 0) {
+        let magiasPorNivel = {
+            "Geral": [], "0": [], "1": [], "2": [], "3": [], "4": [], "Ultimate": []
+        };
+        
+        p.magias.forEach(h => {
+            if (h.match(/Nível 0/i)) magiasPorNivel["0"].push(h.replace(/Nível 0\s*/i, ""));
+            else if (h.match(/Nível 1/i)) magiasPorNivel["1"].push(h.replace(/Nível 1\s*/i, ""));
+            else if (h.match(/Nível 2/i)) magiasPorNivel["2"].push(h.replace(/Nível 2\s*/i, ""));
+            else if (h.match(/Nível 3/i)) magiasPorNivel["3"].push(h.replace(/Nível 3\s*/i, ""));
+            else if (h.match(/Nível 4/i)) magiasPorNivel["4"].push(h.replace(/Nível 4\s*/i, ""));
+            else if (h.match(/Ultimate/i)) magiasPorNivel["Ultimate"].push(h.replace(/Ultimate\s*/i, ""));
+            else magiasPorNivel["Geral"].push(h);
+        });
+
+        if (magiasPorNivel["Geral"].length > 0) {
+            html += `<div class="spell-level">🔮 Magias Gerais</div>`;
+            magiasPorNivel["Geral"].forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
+        }
+        for (let i = 0; i <= 4; i++) {
+            if (magiasPorNivel[i].length > 0) {
+                html += `<div class="spell-level">✨ Magia Nível ${i}</div>`;
+                magiasPorNivel[i].forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
+            }
+        }
+        if (magiasPorNivel["Ultimate"].length > 0) {
+            html += `<div class="spell-level">🌟 Ultimate</div>`;
+            magiasPorNivel["Ultimate"].forEach(h => html += `<div class="spell-item"><b>${h}</b></div>`);
+        }
+    }
+
+    divListas.innerHTML = html;
+
+    if (p.htmlExtra) {
+        divListas.innerHTML += p.htmlExtra;
+    }
+}
+function desbloquearEvolucao(index) {
+    // Altera o estado dinamicamente e injeta o novo nome da classe
+    dadosCapital.esquadrao[index].evolucao.desbloqueado = true;
+    dadosCapital.esquadrao[index].classe = dadosCapital.esquadrao[index].evolucao.classeNova;
+    
+    // Abre a tela de lore direto após acertar a senha
+    verEvolucao(index);
+}
+function verEvolucao(index) {
+    const p = dadosCapital.esquadrao[index];
+    const ev = p.evolucao;
+    const container = document.getElementById('conteudo-menu-capital');
+    const titulo = document.getElementById('titulo-menu-capital');
+
+    titulo.innerText = `✨ O Despertar de ${p.nome}`;
+
+    container.innerHTML = `
+        <button onclick="menuCapital('esquadrao')" class="btn-popup" style="margin-bottom: 20px; background: #444; width: 100%;">⬅ Voltar ao Esquadrão</button>
+        <div class="detalhe-box" style="border-color: #da70d6;">
+            <h3 style="color: #da70d6; text-align: center; margin-top: 0; margin-bottom: 20px; text-transform: uppercase;">Nova Classe: ${ev.classeNova}</h3>
+            <div style="font-size: 15px; line-height: 1.6; color: #ddd; white-space: pre-wrap; text-align: justify; padding: 10px;">${ev.lore}</div>
+        </div>
+    `;
+}
+// --- SISTEMA DE MERCADO NEGRO (ALCOVA) ---
+const dadosMercadoNegro = {
+    substancias: [
+        { item: "🧪 Veneno de Krait", preco: "12 Moedas de Ouro", desc: "Altamente letal. Adiciona 2d6 de dano de veneno por 3 turnos (Teste de Resistência anula)." },
+        { item: "💉 Soro da Fúria Cega", preco: "15 Moedas de Ouro", desc: "Consumível. Dobra o dano físico, mas o usuário perde a habilidade de distinguir amigos de inimigos." },
+        { item: "🌫️ Gás Alucinógeno", preco: "20 Moedas de Ouro", desc: "Item de arremesso. Deixa todos na área de 3m Confusos por 1d4 turnos." }
+    ],
+    equipamentos: [
+        { item: "🗡️ Adaga com Serrote", preco: "18 Moedas de Ouro", desc: "Dano 1d6+2. Impossibilita a cura natural do ferimento até que um médico trate a ferida." },
+        { item: "🧤 Luvas de Gatuno Imperial", preco: "25 Moedas de Ouro", desc: "Roubadas da guarda. Concedem vantagem em testes de Furtividade e Prestidigitação." },
+        { item: "🧥 Capa de Sombras", preco: "40 Moedas de Ouro", desc: "Permite se fundir a sombras uma vez por dia, ficando invisível enquanto estiver no escuro." }
+    ],
+    proibidos: [
+        { item: "📜 Mapa de Rotas de Contrabando", preco: "30 Moedas de Ouro", desc: "Revela atalhos no mar. Diminui o tempo de viagem na Alcova pela metade." },
+        { item: "💀 Crânio de Invocação Proibida", preco: "60 Moedas de Ouro", desc: "Consumível. Invoca um espectro que luta ao seu lado por 3 turnos, mas drena 1d8 de vida do usuário ao expirar." },
+        { item: "💎 Joia da Alma Aprisionada", preco: "100 Moedas de Ouro", desc: "Dizem que contém a essência de um herói antigo. Pode ser usada para barganhar com demônios ou fortalecer uma arma (decisão do Mestre)." }
+    ]
+};
+
+function abrirMercadoNegro() {
+    const container = document.getElementById('conteudo-menu-capital');
+    const modal = document.getElementById('modal-capital');
+    document.getElementById('titulo-menu-capital').innerText = "💀 Mercado Negro";
+    modal.style.display = 'flex';
+    
+    container.innerHTML = `
+        <p style="color:#ff4444; font-style:italic; text-align:center; margin-bottom:15px;">"Aqui o ouro fala mais alto que a lei."</p>
+        <div class="biblio-nav">
+            <div class="rpg-card-small" onclick="menuMercado('substancias')"><span>🧪</span><strong>Substâncias</strong></div>
+            <div class="rpg-card-small" onclick="menuMercado('equipamentos')"><span>🗡️</span><strong>Ilegais</strong></div>
+            <div class="rpg-card-small" onclick="menuMercado('prohibidos')"><span>🔮</span><strong>Proibidos</strong></div>
+        </div>
+    `;
+}
+
+function menuMercado(categoria) {
+    const container = document.getElementById('conteudo-menu-capital');
+    const btnVoltar = `<button onclick="abrirMercadoNegro()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Voltar ao Beco</button>`;
+    
+    const categoriaChave = categoria === 'prohibidos' ? 'proibidos' : categoria;
+    const titulos = {
+        substancias: "Venenos e Elixires Proibidos",
+        equipamentos: "Armas e Trajes de Crime",
+        proibidos: "Artefatos Ocultos"
+    };
+
+    let html = btnVoltar + `<div class="detalhe-box"><h4 style="color:#ff4444; margin-top:0;">🛒 ${titulos[categoriaChave]}</h4>`;
+    
+    dadosMercadoNegro[categoriaChave].forEach(i => {
+        html += `
+            <div class="spell-item" style="border-left-color: #ff4444;">
+                <b style="color:#f39c12;">${i.item}</b> 
+                <span style="float:right; color:#ffd700; font-weight:bold;">${i.preco}</span>
+                <br><small style="color:#ccc; display:block; margin-top:5px;">${i.desc}</small>
+            </div>`;
+    });
+    
+    container.innerHTML = html + `</div>`;
 }
 // INICIALIZAÇÃO DO JOGO
 carregarMapaPrincipal();
