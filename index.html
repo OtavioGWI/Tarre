@@ -4648,7 +4648,6 @@ function iniciarBarcosAlcova() {
     pararBarcosAlcova();
     if (mapaAtualAtivo !== 'Alcova.jpg') return;
 
-    // Definição das rotas dos 3 barcos (com o acréscimo de +15 na primeira posição)
     const rotaBarco1 = [
         [1255, 432], [1299, 552], [1275, 680], [1279, 796], 
         [1199, 846], [1083, 838], [1015, 786], [991, 634], 
@@ -4658,7 +4657,6 @@ function iniciarBarcosAlcova() {
         [1283, 802], [1259, 690], [1285, 556], [1255, 432]
     ];
 
-    // Barco 2: Vai até o final e faz o caminho inverso antes de reiniciar
     const rotaBarco2Base = [
         [591, 368], [633, 504], [661, 644], [739, 796], 
         [849, 928], [947, 930], [1021, 892], [1011, 784], [1009, 620]
@@ -4673,7 +4671,13 @@ function iniciarBarcosAlcova() {
         [1003, 882], [1101, 1004], [1105, 1194], [1019, 1364], [793, 1364]
     ];
 
-    const rotasBarcos = [rotaBarco1, rotaBarco2, rotaBarco3];
+    const rotaBarco4 = [
+        [643, 1764], [923, 1770], [1035, 1686], [1191, 1702], 
+        [1019, 1676], [1045, 1492], [1101, 1464], [1045, 1436], 
+        [1009, 1360], [661, 1366], [593, 1594], [643, 1764]
+    ];
+
+    const rotasBarcos = [rotaBarco1, rotaBarco2, rotaBarco3, rotaBarco4];
 
     rotasBarcos.forEach(rota => {
         if (rota.length < 2) return;
@@ -4751,7 +4755,6 @@ function pararBarcosAlcova() {
     animacoesBarcosIDs.forEach(id => cancelAnimationFrame(id));
     animacoesBarcosIDs = [];
 }
-
 // INICIALIZAÇÃO DO JOGO
 carregarMapaPrincipal();
     </script>
