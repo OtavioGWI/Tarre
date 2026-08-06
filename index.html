@@ -3596,10 +3596,10 @@ function abrirMapaProvincia(arquivo) {
     inicializarMapa(arquivo, cfg.largura, cfg.altura, cfg.minZoom, cfg.maxZoom);
 
     // 2. DEPOIS os barcos são chamados com o mapa já ativo e pronto
-    if (arquivo === 'Alcova.jpg') {
-        iniciarBarcosAlcova();
+   if (arquivo === 'Alcova.jpg' || arquivo === 'Deserto.jpg') {
+        iniciarBarcos();
     } else {
-        pararBarcosAlcova();
+        pararBarcos();
     }
 
     document.getElementById('lista-botoes-provincia').style.display = 'none';
@@ -4644,40 +4644,58 @@ function liberarSalaDeserto() {
 let barcosAtivos = [];
 let animacoesBarcosIDs = [];
 
-function iniciarBarcosAlcova() {
-    pararBarcosAlcova();
-    if (mapaAtualAtivo !== 'Alcova.jpg') return;
+function iniciarBarcos() {
+    pararBarcos();
+    if (mapaAtualAtivo !== 'Alcova.jpg' && mapaAtualAtivo !== 'Deserto.jpg') return;
 
-    const rotaBarco1 = [
-        [1255, 432], [1299, 552], [1275, 680], [1279, 796], 
-        [1199, 846], [1083, 838], [1015, 786], [991, 634], 
-        [829, 500], [641, 330], [429, 424], [301, 402], 
-        [431, 568], [475, 726], [573, 722], [681, 666], 
-        [831, 934], [1001, 904], [1011, 786], [1153, 856], 
-        [1283, 802], [1259, 690], [1285, 556], [1255, 432]
-    ];
+    let rotasBarcos = [];
 
-    const rotaBarco2Base = [
-        [591, 368], [633, 504], [661, 644], [739, 796], 
-        [849, 928], [947, 930], [1021, 892], [1011, 784], [1009, 620]
-    ];
-    const rotaBarco2 = [...rotaBarco2Base, ...rotaBarco2Base.slice(1, -1).reverse()];
+    if (mapaAtualAtivo === 'Alcova.jpg') {
+        const rotaBarco1 = [
+            [1255, 432], [1299, 552], [1275, 680], [1279, 796], 
+            [1199, 846], [1083, 838], [1015, 786], [991, 634], 
+            [829, 500], [641, 330], [429, 424], [301, 402], 
+            [431, 568], [475, 726], [573, 722], [681, 666], 
+            [831, 934], [1001, 904], [1011, 786], [1153, 856], 
+            [1283, 802], [1259, 690], [1285, 556], [1255, 432]
+        ];
 
-    const rotaBarco3 = [
-        [793, 1364], [655, 1370], [593, 1592], [637, 1734], 
-        [685, 1772], [909, 1766], [1035, 1710], [1183, 1704], 
-        [1025, 1674], [1033, 1502], [1109, 1474], [1027, 1396], 
-        [1105, 1184], [1075, 944], [1003, 870], [1023, 606], 
-        [1003, 882], [1101, 1004], [1105, 1194], [1019, 1364], [793, 1364]
-    ];
+        const rotaBarco2Base = [
+            [591, 368], [633, 504], [661, 644], [739, 796], 
+            [849, 928], [947, 930], [1021, 892], [1011, 784], [1009, 620]
+        ];
+        const rotaBarco2 = [...rotaBarco2Base, ...rotaBarco2Base.slice(1, -1).reverse()];
 
-    const rotaBarco4 = [
-        [643, 1764], [923, 1770], [1035, 1686], [1191, 1702], 
-        [1019, 1676], [1045, 1492], [1101, 1464], [1045, 1436], 
-        [1009, 1360], [661, 1366], [593, 1594], [643, 1764]
-    ];
+        const rotaBarco3 = [
+            [793, 1364], [655, 1370], [593, 1592], [637, 1734], 
+            [685, 1772], [909, 1766], [1035, 1710], [1183, 1704], 
+            [1025, 1674], [1033, 1502], [1109, 1474], [1027, 1396], 
+            [1105, 1184], [1075, 944], [1003, 870], [1023, 606], 
+            [1003, 882], [1101, 1004], [1105, 1194], [1019, 1364], [793, 1364]
+        ];
 
-    const rotasBarcos = [rotaBarco1, rotaBarco2, rotaBarco3, rotaBarco4];
+        const rotaBarco4 = [
+            [643, 1764], [923, 1770], [1035, 1686], [1191, 1702], 
+            [1019, 1676], [1045, 1492], [1101, 1464], [1045, 1436], 
+            [1009, 1360], [661, 1366], [593, 1594], [643, 1764]
+        ];
+
+        rotasBarcos = [rotaBarco1, rotaBarco2, rotaBarco3, rotaBarco4];
+
+    } else if (mapaAtualAtivo === 'Deserto.jpg') {
+        const rotaDeserto1Base = [
+            [118, 1984], [30, 1782], [90, 1060],
+            [220, 1008], [290, 1110], [378, 1082], [378, 1082], 
+            [464, 1150], [566, 1090], [686, 1114], [764, 1102], [894, 1044], 
+            [1012, 1092], [1158, 1042], [1268, 1010], [1414, 1050]
+        ];
+        
+        const rotaDeserto1 = [...rotaDeserto1Base, ...rotaDeserto1Base.slice(1, -1).reverse()];
+        const rotaDeserto2Base = [...rotaDeserto1Base].reverse();
+        const rotaDeserto2 = [...rotaDeserto2Base, ...rotaDeserto2Base.slice(1, -1).reverse()];
+
+        rotasBarcos = [rotaDeserto1, rotaDeserto2];
+    }
 
     rotasBarcos.forEach(rota => {
         if (rota.length < 2) return;
@@ -4698,7 +4716,7 @@ function iniciarBarcosAlcova() {
         let animId;
 
         function animarBarcoLoop() {
-            if (mapaAtualAtivo !== 'Alcova.jpg') return;
+            if (mapaAtualAtivo !== 'Alcova.jpg' && mapaAtualAtivo !== 'Deserto.jpg') return;
 
             const p1 = rota[pontoIndex];
             const p2 = rota[(pontoIndex + 1) % rota.length]; 
@@ -4749,7 +4767,7 @@ function iniciarBarcosAlcova() {
     });
 }
 
-function pararBarcosAlcova() {
+function pararBarcos() {
     barcosAtivos.forEach(b => map.removeLayer(b));
     barcosAtivos = [];
     animacoesBarcosIDs.forEach(id => cancelAnimationFrame(id));
