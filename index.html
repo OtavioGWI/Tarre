@@ -1618,6 +1618,10 @@ window.addEventListener('orientationchange', handleResizeMap, { passive: true })
         mapaAtualAtivo = 'continente';
         fatorEscala = 0.23; // Escala do continente
 
+        // Limpeza de efeitos climáticos ao voltar ao continente
+        pararNeve();
+        pararCalor();
+
         // Limpeza: Remove rota anterior e cancela modo de medição se ativo
         if (medindo) cancelarModoMedicao();
         grupoRota.clearLayers();
@@ -1633,7 +1637,6 @@ window.addEventListener('orientationchange', handleResizeMap, { passive: true })
         if (marcadorTempCoords) { map.removeLayer(marcadorTempCoords); marcadorTempCoords = null; }
         inicializarMapa(configContinental.arquivo, configContinental.largura, configContinental.altura, configContinental.minZoom, configContinental.maxZoom);
         adicionarMarcadoresPrincipais();
-        // Visibilidade de menu mobile já foi aplicada via helper
     }
 
 /**
