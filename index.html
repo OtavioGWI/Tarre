@@ -577,7 +577,7 @@
         100% { background-position: -150px center; } 
     }
 
-    /* ANIMACAO DE NUVENS COM IMAGEM REAL */
+    /* ANIMACAO DE NUVENS COM IMAGEM REAL (EXTRA GRANDES) */
     #transicao-nuvens {
         position: fixed;
         top: 0; left: 0;
@@ -591,9 +591,9 @@
     
     .nuvem-branca-esq, .nuvem-branca-dir {
         position: absolute;
-        top: -25vh; 
-        width: 130vw; 
-        height: 150vh;
+        top: -40vh; 
+        width: 150vw; 
+        height: 180vh;
         background-image: url('nuvem.png');
         background-size: cover;
         background-position: center;
@@ -603,18 +603,18 @@
     }
     
     .nuvem-branca-esq {
-        left: -25vw;
+        left: -30vw;
         transform: translateX(-120%); 
     }
     
     .nuvem-branca-dir {
-        right: -25vw;
+        right: -30vw;
         transform: translateX(120%) rotateY(180deg);
     }
 
-    .fechar-nuvens .nuvem-branca-esq { transform: translateX(35%); }
-    .fechar-nuvens .nuvem-branca-dir { transform: translateX(-35%) rotateY(180deg); }
-
+    .fechar-nuvens .nuvem-branca-esq { transform: translateX(45%); }
+    .fechar-nuvens .nuvem-branca-dir { transform: translateX(-45%) rotateY(180deg); }
+    
     </style>
 </head>
 <body>
