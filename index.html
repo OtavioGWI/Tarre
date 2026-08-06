@@ -2699,6 +2699,21 @@ function menuCapital(tipo) {
                     </div>
                 </div>`;
         });
+    } else if (tipo === 'procurados') {
+            titulo.innerText = "☠️ Criminosos Procurados";
+            container.innerHTML = btnVoltar;
+            dadosCapital.procurados.forEach(p => {
+                let img = p.foto ? `<img src="${p.foto}" class="foto-lista" onclick="verImagemPersonagem('${p.foto}')">` : `<div class="foto-placeholder">?</div>`;
+                container.innerHTML += `
+                    <div class="item-menu">
+                        ${img}
+                        <div class="texto-item">
+                            <h4>${p.nome}</h4>
+                            <span class="recompensa">Recompensa: ${p.recompensa}</span>
+                            <p>${p.desc}</p>
+                        </div>
+                    </div>`;
+            });
     } else if (tipo === 'lendas') {
         titulo.innerText = "🏛️ Heróis Lendários";
         container.innerHTML = btnVoltar + `<p style="text-align:center; color:#aaa; font-style:italic;">"Bravos membros da campanha que derrotou o primeiro Rei Demônio"</p>`;
