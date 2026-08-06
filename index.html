@@ -84,6 +84,7 @@
       .leaflet-control-zoom a { width: 44px; height: 44px; line-height: 44px; font-size: 20px; }
       .leaflet-control-zoom { box-shadow: 0 2px 8px rgba(0,0,0,0.35); border-radius: 10px; }
     }
+    #map-container { height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; z-index: 1; }
 
     /* MENU LATERAL (PRETO) */
     #menu-provincias {
@@ -1620,7 +1621,6 @@ window.addEventListener('orientationchange', handleResizeMap, { passive: true })
 
         // Limpeza de efeitos climáticos ao voltar ao continente
         pararNeve();
-        pararCalor();
 
         // Limpeza: Remove rota anterior e cancela modo de medição se ativo
         if (medindo) cancelarModoMedicao();
