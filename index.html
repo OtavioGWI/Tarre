@@ -1553,18 +1553,18 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
                 autoClose: false     
             }).openPopup();
 
+            marcadorTempCoords.bindPopup(`<b>📍 Coordenadas</b><br>[${y}, ${x}]`, {
+                closeOnClick: false, 
+                autoClose: false     
+            }).openPopup();
+
             marcadorTempCoords.on('popupclose', function() {
                 map.removeLayer(marcadorTempCoords);
                 marcadorTempCoords = null;
             });
         }
     });
-    map.on('popupclose', function() {
-                if (!transicaoEmAndamento) {
-                    zoomOutPadrao();
-        }
-    });
-}
+} 
 
 /**
  * Alterna visibilidade do menu no mobile (< 600px)
@@ -1643,28 +1643,6 @@ window.addEventListener('orientationchange', handleResizeMap, { passive: true })
  * Adiciona marcadores das 5 províncias principais + locais especiais
  * Chamada por: inicialização e botão voltar do mapa
  */
-    /**
- * Inicia o voo para a capital da província atual antes de voltar ao continente
- */
-function animarVoltaContinente(provincia) {
-    if (map) map.closePopup();
-
-    const coordCapital = coordsCapitaisProvincias[provincia];
-    
-    if (coordCapital) {
-        // 1. Voa para a capital da província atual
-        map.flyTo(coordCapital, 2, { animate: true, duration: 1.2 });
-        
-        // 2. Espera o voo terminar e troca o mapa
-        setTimeout(() => {
-            carregarMapaPrincipal(provincia);
-        }, 1300);
-    } else {
-        // Se não tiver capital mapeada, volta direto
-        carregarMapaPrincipal(provincia);
-    }
-}
-
 /**
  * Carrega o mapa do continente (vista inicial do jogo)
  * Agora aceita "provinciaOrigem" para nascer dando zoom-out do ponto exato
@@ -3703,8 +3681,24 @@ const coordsCapitaisProvincias = {
     'Alcova.jpg': [846, 1002]  // Coordenada customizada solicitada
 };
 
+// Função para recolher o menu no celular antes das animações
+function fecharMenuMobileForcado() {
+    if (window.innerWidth <= 600) {
+        const listaProv = document.getElementById('lista-botoes-provincia');
+        const listaFerr = document.getElementById('lista-ferramentas-regiao');
+        const seta = document.getElementById('seta-menu');
+        
+        if (listaProv) listaProv.style.display = 'none';
+        if (listaFerr) listaFerr.style.display = 'none';
+        if (seta) seta.innerHTML = '▼';
+    }
+}
+
 function abrirMapaProvincia(arquivo) {
-    // Fecha qualquer popup aberto (como o do marcador) para não travar a animação de voo
+    // 1. Esconde o menu no mobile para não tampar a visão do voo
+    fecharMenuMobileForcado();
+
+    // 2. Fecha qualquer popup aberto (como o do marcador) para não travar a animação
     if (map) map.closePopup();
 
     // Se estamos no continente e a província tem coordenadas mapeadas, fazemos a animação
@@ -3724,6 +3718,29 @@ function abrirMapaProvincia(arquivo) {
     } else {
         // Se estivermos nos Planos ou mudando entre sub-mapas, carrega direto sem voo
         carregarProvincia(arquivo);
+    }
+}
+
+function animarVoltaContinente(provincia) {
+    // 1. Esconde o menu no mobile para não tampar a visão do voo
+    fecharMenuMobileForcado();
+
+    // 2. Fecha popups
+    if (map) map.closePopup();
+
+    const coordCapital = coordsCapitaisProvincias[provincia];
+    
+    if (coordCapital) {
+        // Voa para a capital da província atual
+        map.flyTo(coordCapital, 2, { animate: true, duration: 1.2 });
+        
+        // Espera o voo terminar e troca o mapa
+        setTimeout(() => {
+            carregarMapaPrincipal(provincia);
+        }, 1300);
+    } else {
+        // Se não tiver capital mapeada, volta direto
+        carregarMapaPrincipal(provincia);
     }
 }
 
@@ -3850,21 +3867,118 @@ function verImagemEstatica(arquivo, callbackVoltar = null) {
  *   3. Back button no fullscreen -> restaura mapa + reabre popup (se suportado)
  * @param {string} nomeDoMapa - Nome do arquivo PNG a popular com marcadores
  */
+function adicionarMarcadoresPrincipais() {
+    const iconP = ICON_80;
+    const iconG = ICON_120;
+
+    function criarPonto(coord, nome, arg3, arg4, arg5) {
+        let descricao = "", arquivo = "", tipo = "", grande = false;
+        if (arg3 && (arg3.includes('.png') || arg3.includes('.jpg') || arg3.includes('.webp') || arg3 === null)) {
+            arquivo = arg3; tipo = arg4; grande = arg5 || false;
+        } else {
+            descricao = arg3; arquivo = arg4; tipo = arg5;
+        }
+
+        // opacity: 0 com interactive: true permite clicar normalmente na área do marcador invisível
+        const m = L.marker(coord, { 
+            icon: grande ? iconG : iconP, 
+            opacity: 0, 
+            interactive: true 
+        }).addTo(map);
+        
+        m.on('click', function() { pontoFocoZoom = coord; });
+        
+        let botoes = `<div style="margin-top:10px; display:flex; flex-direction:column;">`;
+
+        if (nome === "Capital Imperial") {
+            botoes += criarBtn("🏛️ Acessar Painel Imperial", "menuCapital('hub')", "#DAA520", true);
+        }
+        else if (nome === "Cidade Sagrada") {
+            if (arquivo) botoes += criarBtn("📸 Ver Cidade", `verImagemEstatica('${arquivo}')`, "#5F9EA0", true);
+            botoes += criarBtn("⚡ Panteão", "menuDeuses()", "#4682B4", true);
+        }
+        else if (nome === "Torre dos Sábios") {
+            if (arquivo) botoes += criarBtn("📸 Ver Exterior", `verImagemEstatica('${arquivo}')`, "#5F9EA0", true);
+            botoes += criarBtn("🔮 Acessar Interior", `abrirModalSenha('fofoca', 'abrirMenuTorre()', 'funcao')`, "#9370DB", true);
+        }
+        else if (nome === "Ilha Paradisíaca") {
+            if (arquivo) botoes += criarBtn("📸 Ver Ilha", `verImagemEstatica('${arquivo}')`, "#5F9EA0", true);
+            botoes += criarBtn("📦 Importação", "abrirImportacaoIlha()", "#FF8C00", true);
+        }
+        else {
+            if (arquivo) {
+                if (tipo === 'mapa') botoes += criarBtn("🗺️ Explorar Província", `abrirMapaProvincia('${arquivo}')`, "#8b4513", true);
+                else if (tipo === 'imagem') botoes += criarBtn("📸 Ver Foto", `verImagemEstatica('${arquivo}')`, "#5F9EA0", true);
+            }
+            
+            if (nome === "Pântano" || nome === "Floresta dos Sonhos") {
+                let senha = (nome === "Pântano") ? "Seita" : "perdido";
+                botoes += criarBtn("🔍 Descobrir", `abrirModalSenha('${senha}', 'bloqueado.jpg', 'imagem')`, "#2E8B57", true);
+            }
+        }
+
+        botoes += `</div>`;
+        m.bindPopup(`<div style="text-align:center;"><b>${nome}</b><br><small style="color:#ccc;">${descricao}</small>${botoes}</div>`, { autoPan: false });
+    }
+
+    // PONTOS
+    criarPonto([824, 2330], "Deserto","A Origem do Mundo", "Deserto.jpg", 'mapa');
+    criarPonto([3850, 3580], "Hukmal'tep", "O Inverno Absoluto","Hukmal_tep.jpg", 'mapa');
+    criarPonto([2902, 5464], "Blat'khyr", "O Berço da Magia", "Blat_khyr.jpg", 'mapa');
+    criarPonto([1118, 4346], "Lago", "O Solo Abençoado", "Lago.jpg", 'mapa');
+    criarPonto([1356, 3284], "Alcova","O Lar dos Piratas", "Alcova.jpg", 'mapa');
+    criarPonto([2250, 4258], "Espinha do Gigante", "As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
+    criarPonto([2142, 4378], "Espinha do Gigante","As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
+    
+    criarPonto([2370, 3767], "Capital Imperial", "A Casa do Império", "Capital.png", 'imagem');
+    criarPonto([1648, 4438], "Cidade Sagrada", "Cidade Santa.png", 'imagem');
+    criarPonto([2862, 2890], "Torre dos Sábios", "Torre dos Sabios.png", 'imagem');
+    criarPonto([1188, 5574], "Ilha Paradisíaca", "ilha 2.png", 'imagem');
+    
+    criarPonto([1830, 2322], "Vilarejo", "cidade da raça lá.png", 'imagem');
+    criarPonto([2114, 3854], "Vilarejo", "vilarejo.png", 'imagem');
+    criarPonto([2142, 3254], "Vilarejo", "vilarejo 2.jpg", 'imagem');
+    criarPonto([1758, 4620], "Vilarejo", "vilarejo 3.jpg", 'imagem');
+    
+    criarPonto([2252, 2880], "Pântano", "pantano.png", 'imagem');
+    criarPonto([2138, 2890], "Pântano", "pantano.png", 'imagem');
+    criarPonto([2228, 3032], "Pântano", "pantano.png", 'imagem');
+    criarPonto([2220, 2656], "Pântano", "pantano.png", 'imagem');
+    
+    criarPonto([2232, 3936], "Vilarejo", "Sem detalhes", 'none');
+    criarPonto([2300, 3400], "Vilarejo", "Sem detalhes", 'none');
+    criarPonto([1830, 4354], "Vilarejo", "Sem detalhes", 'none');
+    criarPonto([1630, 3054], "Vilarejo", "Sem detalhes", 'none');
+    criarPonto([1640, 6736], "Monstro Marinho", "Eu não queria estar nesse barco", 'none');
+    criarPonto([2516, 996], "Monstro Marinho", "Oxi, uma tainha gigante", 'none');
+    criarPonto([412, 460], "Nuvens", "É igual algodão-doce", 'none');
+    criarPonto([2464, 4974], "Ilha de Blat'khyr", "Cadê?", "Ilha.png", 'imagem');
+    
+    criarPonto([1838, 3526], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
+    criarPonto([1750, 3320], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
+    criarPonto([1536, 3634], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
+    criarPonto([2070, 3642], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
+    
+    criarPonto([3912, 1780], "Inverno Desolado", "O inverno está chegando...", 'none', true);
+}
 function adicionarMarcadoresLocais(nomeDoMapa) {
     const iconP = ICON_50;
     const iconG = ICON_100;
 
     function criarPontoLocal(coord, nome, info, foto = null, grande = false, botaoExtra = null) {
         const m = L.marker(coord, {icon: grande ? iconG : iconP, opacity: 0}).addTo(map);
-        
-        // AGORA SÓ SALVAMOS O PONTO, NÃO VOAMOS DIRETO!
+    
+        // AGORA SÓ SALVAMOS A COORDENADA. A CÂMERA FICA PARADA!
         m.on('click', function() { pontoFocoZoom = coord; });
 
         let htmlBotoes = `<div style="margin-top: 8px; display:flex; flex-direction:column;">`;
+        
         if (foto) htmlBotoes += criarBtn("📸 Ver Foto", `verImagemEstatica('${foto}')`, "#5F9EA0", true);
         if (botaoExtra) htmlBotoes += botaoExtra; 
+        
         htmlBotoes += `</div>`;
-        m.bindPopup(`<div style="text-align:center;"><b>${nome}</b><br><small style="color:#ccc;">${info}</small>${htmlBotoes}</div>`);
+        // autoPan: false garante que o mapa NÃO se mexa sozinho
+        m.bindPopup(`<div style="text-align:center;"><b>${nome}</b><br><small style="color:#ccc;">${info}</small>${htmlBotoes}</div>`, { autoPan: false });
     }
 
     if (nomeDoMapa === 'Hukmal_tep.jpg') {
@@ -4073,13 +4187,16 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
 
         function criarPontoNexus(coord, nome, descricao, chaveTexto, arquivoMapa) {
             const m = L.marker(coord, {icon: iconMega, opacity: 0}).addTo(map); 
+            
+            // SÓ SALVA A COORDENADA. SEM VOAR SOZINHO!
             m.on('click', function() { pontoFocoZoom = coord; selecaoAtual = chaveTexto; });
 
             let botoes = "";
             if (arquivoMapa) {
                 botoes = criarBtn("🗺️ Entrar no Plano", `abrirMapaProvincia('${arquivoMapa}')`, "#483D8B", true);
             }
-            m.bindPopup(`<div style="text-align:center; width: 180px;"><b>${nome}</b><br><small style="color:#ccc;">${descricao}</small><div style="margin-top:10px;">${botoes}</div></div>`);
+            // autoPan: false para ficar suave
+            m.bindPopup(`<div style="text-align:center; width: 180px;"><b>${nome}</b><br><small style="color:#ccc;">${descricao}</small><div style="margin-top:10px;">${botoes}</div></div>`, { autoPan: false });
         }
 
         criarPontoNexus([806, 214], "Plano Divino", "A morada da luz eterna.", "divino", "Plano Divino.png");
@@ -4091,12 +4208,14 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
 
         const m = L.marker([246, 558], {icon: iconMega, opacity: 0}).addTo(map);
         const btnVoltar = criarBtn("🌍 Voltar ao Continente", "carregarMapaPrincipal()", "#2E8B57", true);
-        m.bindPopup(`<div style="text-align:center; width: 180px;"><b>Plano Mortal</b><br><small style="color:#ccc;">O mundo material de Arton.</small><div style="margin-top:10px;">${btnVoltar}</div></div>`);
         
         m.on('click', function() { 
             selecaoAtual = 'mortal'; 
             pontoFocoZoom = [246, 558];
         });
+        
+        // autoPan: false para ficar suave
+        m.bindPopup(`<div style="text-align:center; width: 180px;"><b>Plano Mortal</b><br><small style="color:#ccc;">O mundo material de Arton.</small><div style="margin-top:10px;">${btnVoltar}</div></div>`, { autoPan: false });
     }
 
     const btnVoltarNexus = criarBtn("↩ Voltar ao Nexus", "abrirMapaProvincia('Planos.jpg')", "#aeb6bf", true);
@@ -4110,118 +4229,6 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
     if (nomeDoMapa === 'Plano Espiritual.png') {
         criarPontoLocal([100, 100], "Saída do Fluxo", "Portal de volta para a Grande Roda.", null, true, btnVoltarNexus);
     }
-}
-// --- 7. MARCADORES DO CONTINENTE ---
-/**
- * ADICIONA MARCADORES DO MAPA CONTINENTAL
- * 5 Províncias + 3 Locais Especiais (Capital, Cidade Sagrada, Torre)
- * 
- * Fluxo de clique:
- *   - Província (ex: Hukmal_tep) -> abrirMapaProvincia(arquivo)
- *   - Capital Imperial -> popup com 8 botões (lendas, banco, esquadrão, etc)
- *   - Cidade Sagrada -> popup com Panteão
- *   - Torre dos Sábios -> senha 'fofoca' para acessar interior
- * 
- * Sistema de ícones:
- *   - iconP: Normal (80x80)
- *   - iconG: Grande/importante (120x120)
- * 
- * FUNÇÃO INTERNA: criarPonto()
- *   Polimórfica, infere tipo de popup a partir dos argumentos
- *   Tipo 1: criarPonto([y,x], "Nome", "desc", "arquivo.png", 'mapa')
- *   Tipo 2: criarPonto([y,x], "Nome", "desc", "arquivo.png", 'imagem')
- *   Tipo 3: criarPonto([y,x], "Nome", null, 'none', true) -> apenas placeholder
- */
-    function adicionarMarcadoresPrincipais() {
-    const iconP = ICON_80;
-    const iconG = ICON_120;
-
-    function criarPonto(coord, nome, arg3, arg4, arg5) {
-        let descricao = "", arquivo = "", tipo = "", grande = false;
-        if (arg3 && (arg3.includes('.png') || arg3.includes('.jpg') || arg3.includes('.webp') || arg3 === null)) {
-            arquivo = arg3; tipo = arg4; grande = arg5 || false;
-        } else {
-            descricao = arg3; arquivo = arg4; tipo = arg5;
-        }
-
-        const m = L.marker(coord, { icon: grande ? iconG : iconP, opacity: 0 }).addTo(map);
-        
-        // AGORA SÓ SALVAMOS O PONTO, NÃO VOAMOS DIRETO!
-        m.on('click', function() { pontoFocoZoom = coord; });
-        
-        let botoes = `<div style="margin-top:10px; display:flex; flex-direction:column;">`;
-
-        // O parâmetro 'true' avisa que esses botões vão dar Zoom In!
-        if (nome === "Capital Imperial") {
-            botoes += criarBtn("🏛️ Acessar Painel Imperial", "menuCapital('hub')", "#DAA520", true);
-        }
-        else if (nome === "Cidade Sagrada") {
-            if (arquivo) botoes += criarBtn("📸 Ver Cidade", `verImagemEstatica('${arquivo}')`, "#5F9EA0", true);
-            botoes += criarBtn("⚡ Panteão", "menuDeuses()", "#4682B4", true);
-        }
-        else if (nome === "Torre dos Sábios") {
-            if (arquivo) botoes += criarBtn("📸 Ver Exterior", `verImagemEstatica('${arquivo}')`, "#5F9EA0", true);
-            botoes += criarBtn("🔮 Acessar Interior", `abrirModalSenha('fofoca', 'abrirMenuTorre()', 'funcao')`, "#9370DB", true);
-        }
-        else if (nome === "Ilha Paradisíaca") {
-            if (arquivo) botoes += criarBtn("📸 Ver Ilha", `verImagemEstatica('${arquivo}')`, "#5F9EA0", true);
-            botoes += criarBtn("📦 Importação", "abrirImportacaoIlha()", "#FF8C00", true);
-        }
-        else {
-            if (arquivo) {
-                if (tipo === 'mapa') botoes += criarBtn("🗺️ Explorar Província", `abrirMapaProvincia('${arquivo}')`, "#8b4513", true);
-                else if (tipo === 'imagem') botoes += criarBtn("📸 Ver Foto", `verImagemEstatica('${arquivo}')`, "#5F9EA0", true);
-            }
-            
-            if (nome === "Pântano" || nome === "Floresta dos Sonhos") {
-                let senha = (nome === "Pântano") ? "Seita" : "perdido";
-                botoes += criarBtn("🔍 Descobrir", `abrirModalSenha('${senha}', 'bloqueado.jpg', 'imagem')`, "#2E8B57", true);
-            }
-        }
-
-        botoes += `</div>`;
-        m.bindPopup(`<div style="text-align:center;"><b>${nome}</b><br><small style="color:#ccc;">${descricao}</small>${botoes}</div>`);
-    }
-
-    // PONTOS
-    criarPonto([824, 2330], "Deserto","A Origem do Mundo", "Deserto.jpg", 'mapa');
-    criarPonto([3850, 3580], "Hukmal'tep", "O Inverno Absoluto","Hukmal_tep.jpg", 'mapa');
-    criarPonto([2902, 5464], "Blat'khyr", "O Berço da Magia", "Blat_khyr.jpg", 'mapa');
-    criarPonto([1118, 4346], "Lago", "O Solo Abençoado", "Lago.jpg", 'mapa');
-    criarPonto([1356, 3284], "Alcova","O Lar dos Piratas", "Alcova.jpg", 'mapa');
-    criarPonto([2250, 4258], "Espinha do Gigante", "As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
-    criarPonto([2142, 4378], "Espinha do Gigante","As Terras Altas", "Espinha do Gigante.jpg", 'mapa', true);
-    
-    criarPonto([2370, 3767], "Capital Imperial", "A Casa do Império", "Capital.png", 'imagem');
-    criarPonto([1648, 4438], "Cidade Sagrada", "Cidade Santa.png", 'imagem');
-    criarPonto([2862, 2890], "Torre dos Sábios", "Torre dos Sabios.png", 'imagem');
-    criarPonto([1188, 5574], "Ilha Paradisíaca", "ilha 2.png", 'imagem');
-    
-    criarPonto([1830, 2322], "Vilarejo", "cidade da raça lá.png", 'imagem');
-    criarPonto([2114, 3854], "Vilarejo", "vilarejo.png", 'imagem');
-    criarPonto([2142, 3254], "Vilarejo", "vilarejo 2.jpg", 'imagem');
-    criarPonto([1758, 4620], "Vilarejo", "vilarejo 3.jpg", 'imagem');
-    
-    criarPonto([2252, 2880], "Pântano", "pantano.png", 'imagem');
-    criarPonto([2138, 2890], "Pântano", "pantano.png", 'imagem');
-    criarPonto([2228, 3032], "Pântano", "pantano.png", 'imagem');
-    criarPonto([2220, 2656], "Pântano", "pantano.png", 'imagem');
-    
-    criarPonto([2232, 3936], "Vilarejo", "Sem detalhes", 'none');
-    criarPonto([2300, 3400], "Vilarejo", "Sem detalhes", 'none');
-    criarPonto([1830, 4354], "Vilarejo", "Sem detalhes", 'none');
-    criarPonto([1630, 3054], "Vilarejo", "Sem detalhes", 'none');
-    criarPonto([1640, 6736], "Monstro Marinho", "Eu não queria estar nesse barco", 'none');
-    criarPonto([2516, 996], "Monstro Marinho", "Oxi, uma tainha gigante", 'none');
-    criarPonto([412, 460], "Nuvens", "É igual algodão-doce", 'none');
-    criarPonto([2464, 4974], "Ilha de Blat'khyr", "Cadê?", "Ilha.png", 'imagem');
-    
-    criarPonto([1838, 3526], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
-    criarPonto([1750, 3320], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
-    criarPonto([1536, 3634], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
-    criarPonto([2070, 3642], "Floresta dos Sonhos", "floresta dos sonhos.png", 'imagem');
-    
-    criarPonto([3912, 1780], "Inverno Desolado", "O inverno está chegando...", 'none', true);
 }
     
 
