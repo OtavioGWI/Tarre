@@ -5362,31 +5362,25 @@ function mudarCorPing(novaCor, tipo) {
 // ==========================================
 // 1. SISTEMA DE ANIMAÇÃO DE VIAGEM (CAVALO)
 // ==========================================
-let rotasCompartilhadasAtivas = {};
-let dadosRotasCompartilhadasGlobais = {};
+function recarregarRotasCompartilhadasDoMapa() {
+    // Função mantida vazia apenas para compatibilidade com o carregamento do mapa
+}
+let rotaAtivaLayer = null;
 
 if (db) {
-    db.ref('rotasCompartilhadas').on('value', (snapshot) => {
-        dadosRotasCompartilhadasGlobais = snapshot.val() || {};
-        recarregarRotasCompartilhadasDoMapa();
-    });
-}
-
-function recarregarRotasCompartilhadasDoMapa() {
-    for (let key in rotasCompartilhadasAtivas) {
-        if (map) map.removeLayer(rotasCompartilhadasAtivas[key]);
-        delete rotasCompartilhadasAtivas[key];
-    }
-    for (let key in dadosRotasCompartilhadasGlobais) {
-        const dados = dadosRotasCompartilhadasGlobais[key];
-        if (!dados || !dados.pontos) continue;
-        if (dados.mapa && dados.mapa !== mapaAtualAtivo) continue;
+    db.ref('rotaAtiva').on('value', (snapshot) => {
+        const dados = snapshot.val();
+        if (rotaAtivaLayer) {
+            if (map) map.removeLayer(rotaAtivaLayer);
+            rotaAtivaLayer = null;
+        }
+        if (!dados || !dados.pontos) return;
+        if (dados.mapa && dados.mapa !== mapaAtualAtivo) return;
 
         const grupoRotaCompartilhada = L.layerGroup().addTo(map);
         const latlngs = dados.pontos.map(p => L.latLng(p.lat, p.lng));
         const corLinha = dados.cor || '#e67e22';
 
-        // Linha tracejada
         L.polyline(latlngs, {
             color: corLinha,
             weight: 4,
@@ -5394,7 +5388,6 @@ function recarregarRotasCompartilhadasDoMapa() {
             dashArray: '10, 10'
         }).addTo(grupoRotaCompartilhada);
 
-        // Bolinhas/pontos visíveis para os outros usuários
         latlngs.forEach(latlng => {
             L.circleMarker(latlng, {
                 radius: 4,
@@ -5407,29 +5400,65 @@ function recarregarRotasCompartilhadasDoMapa() {
 
         const pontosStr = encodeURIComponent(JSON.stringify(dados.pontos));
         const corStr = encodeURIComponent(corLinha);
-        const keyStr = encodeURIComponent(key);
         
-        grupoRotaCompartilhada.bindPopup(`<div style="text-align:center;"><b>Rota de ${key}</b><br><button onclick="dispararViagemRemota('${pontosStr}', '${corStr}', '${keyStr}')" class="btn-popup" style="background:#2E8B57; margin-top:5px; padding:4px 8px; font-size:12px; cursor:pointer;">🏇 Realizar Viagem em Grupo</button></div>`);
+        grupoRotaCompartilhada.bindPopup(`<div style="text-align:center;"><b>Rota Compartilhada</b><br><button onclick="dispararViagemRemota('${pontosStr}', '${corStr}')" class="btn-popup" style="background:#2E8B57; margin-top:5px; padding:4px 8px; font-size:12px; cursor:pointer;">🏇 Realizar Viagem em Grupo</button></div>`);
 
-        rotasCompartilhadasAtivas[key] = grupoRotaCompartilhada;
-    }
+        rotaAtivaLayer = grupoRotaCompartilhada;
+    });
 }
 
 function compartilharViagem() {
-    if (!pontosRota || pontosRota.length < 2) return;
-    if (db && meuIdUsuario) {
+    console.log("Tentando compartilhar, pontosRota:", pontosRota);
+    if (!pontosRota || pontosRota.length < 2) {
+        console.warn("Rota inválida ou com menos de 2 pontos.");
+        return;
+    }
+    if (db) {
         const rotaSimples = pontosRota.map(p => ({ lat: p.lat, lng: p.lng }));
-        
-        // O .set() na raiz substitui todo o conteúdo anterior do banco e insere apenas a rota atual do usuário
-        db.ref('rotasCompartilhadas').set({
-            [meuIdUsuario]: {
-                cor: minhaCorUsuario,
-                mapa: mapaAtualAtivo,
-                pontos: rotaSimples
-            }
+        db.ref('rotaAtiva').set({
+            cor: minhaCorUsuario || '#e67e22',
+            mapa: mapaAtualAtivo,
+            pontos: rotaSimples
+        }).then(() => {
+            console.log("Rota enviada com sucesso ao Firebase!");
+        }).catch((err) => {
+            console.error("Erro do Firebase ao enviar rota:", err);
         });
+    } else {
+        console.error("Objeto 'db' do Firebase não está definido.");
     }
 }
+
+function animarViagem() {
+    document.getElementById('modal-viagem').style.display = 'none';
+    if (!pontosRota || pontosRota.length < 2) return;
+
+    dispararViagemGlobal(pontosRota, '#e67e22');
+
+    if (db) {
+        db.ref('rotaAtiva').remove();
+    }
+
+    setTimeout(() => {
+        grupoRota.clearLayers();
+        pontosRota = [];
+    }, 200);
+}
+
+window.dispararViagemRemota = function(pontosJson, cor) {
+    try {
+        const pontos = JSON.parse(decodeURIComponent(pontosJson));
+        dispararViagemGlobal(pontos, decodeURIComponent(cor));
+        
+        if (db) {
+            db.ref('rotaAtiva').remove();
+        }
+        
+        if (map) map.closePopup();
+    } catch (e) {
+        console.error("Erro ao disparar viagem remota", e);
+    }
+};
 
 function animarViagemComPontos(pontosArray, corCavalo) {
     if (!pontosArray || pontosArray.length < 2) return;
@@ -5529,22 +5558,6 @@ function dispararViagemGlobal(pontos, cor) {
     }
 }
 
-function animarViagem() {
-    document.getElementById('modal-viagem').style.display = 'none';
-    if (!pontosRota || pontosRota.length < 2) return;
-
-    dispararViagemGlobal(pontosRota, '#e67e22');
-
-    // Remove a rota compartilhada do usuário para sumir do mapa imediatamente
-    if (db && meuIdUsuario) {
-        db.ref('rotasCompartilhadas/' + meuIdUsuario).remove();
-    }
-
-    setTimeout(() => {
-        grupoRota.clearLayers();
-        pontosRota = [];
-    }, 200);
-}
 
 window.dispararViagemRemota = function(pontosJson, cor, rotaKey) {
     try {
