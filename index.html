@@ -1894,11 +1894,29 @@ function atualizarVisualBotao() {
 
     if (btnPinM) {
         btnPinM.innerHTML = iconeHtml;
-        modoPinGlobal ? btnPinM.classList.add('btn-ferramenta-ativa') : btnPinM.classList.remove('btn-ferramenta-ativa');
+        const pai = btnPinM.parentElement;
+        if (modoPinGlobal) {
+            btnPinM.classList.add('btn-ferramenta-ativa');
+            pai.style.backgroundColor = '#27ae60';
+            pai.style.borderColor = '#2ecc71';
+        } else {
+            btnPinM.classList.remove('btn-ferramenta-ativa');
+            pai.style.backgroundColor = 'transparent';
+            pai.style.borderColor = '#444';
+        }
     }
     if (btnPinP) {
         btnPinP.innerHTML = iconeHtml;
-        modoPinGlobal ? btnPinP.classList.add('btn-ferramenta-ativa') : btnPinP.classList.remove('btn-ferramenta-ativa');
+        const pai = btnPinP.parentElement;
+        if (modoPinGlobal) {
+            btnPinP.classList.add('btn-ferramenta-ativa');
+            pai.style.backgroundColor = '#27ae60';
+            pai.style.borderColor = '#2ecc71';
+        } else {
+            btnPinP.classList.remove('btn-ferramenta-ativa');
+            pai.style.backgroundColor = 'transparent';
+            pai.style.borderColor = '#444';
+        }
     }
 }
 
