@@ -5417,14 +5417,16 @@ function recarregarRotasCompartilhadasDoMapa() {
 
 function compartilharViagem() {
     if (!pontosRota || pontosRota.length < 2) return;
-    if (db) {
+    if (db && meuIdUsuario) {
         const rotaSimples = pontosRota.map(p => ({ lat: p.lat, lng: p.lng }));
-        db.ref('rotasCompartilhadas').remove().then(() => {
-            db.ref('rotasCompartilhadas/' + meuIdUsuario).set({
+        
+        // O .set() na raiz substitui todo o conteúdo anterior do banco e insere apenas a rota atual do usuário
+        db.ref('rotasCompartilhadas').set({
+            [meuIdUsuario]: {
                 cor: minhaCorUsuario,
                 mapa: mapaAtualAtivo,
                 pontos: rotaSimples
-            });
+            }
         });
     }
 }
