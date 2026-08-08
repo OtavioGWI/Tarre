@@ -728,7 +728,7 @@
         <button id="btn-coords-menu" class="botao-provincia" onclick="alternarCoordenadas()" style="color: #aaa;">📍 Coords Local: OFF</button>
         
         <div class="botao-provincia" style="display: flex; padding: 0; overflow: visible; align-items: center; border: 1px solid #444; margin: 5px 0; background: transparent;">
-    <button id="btn-pinglobal-menu" onclick="alternarPinGlobal()" style="flex: 1; background: transparent; border: none; color: inherit; padding: 10px; text-align: left; cursor: pointer; font-size: 14px;">🔵 Ping Online: OFF</button>
+    <button id="btn-pinglobal-menu" onclick="alternarPinGlobal()" style="flex: 1; background: transparent; border: none; color: inherit; padding: 10px; text-align: left; cursor: pointer; font-size: 14px;">Ping Online: OFF</button>
     <div style="position: relative; padding: 5px;">
         <button onclick="togglePaleta('menu')" id="preview-cor-menu" class="btn-paleta-seletor" title="Escolher cor"></button>
         <div id="dropdown-paleta-menu" style="display: none; position: absolute; right: 0; top: 45px; background: #1a1a1a; border: 1px solid #555; border-radius: 4px; padding: 6px; z-index: 3000; grid-template-columns: repeat(5, 1fr); gap: 4px; width: 110px; box-shadow: 0 4px 10px rgba(0,0,0,0.8);">
@@ -755,7 +755,7 @@
         <button id="btn-coords-prov" class="botao-provincia" onclick="alternarCoordenadas()">Coords Local: OFF</button>
        
         <div class="botao-provincia" style="display: flex; padding: 0; overflow: visible; align-items: center; border: 1px solid #444; margin: 5px 0; background: transparent;">
-    <button id="btn-pinglobal-prov" onclick="alternarPinGlobal()" style="flex: 1; background: transparent; border: none; color: inherit; padding: 10px; text-align: left; cursor: pointer; font-size: 14px;">🔵 Ping Online: OFF</button>
+    <button id="btn-pinglobal-prov" onclick="alternarPinGlobal()" style="flex: 1; background: transparent; border: none; color: inherit; padding: 10px; text-align: left; cursor: pointer; font-size: 14px;">Ping Online: OFF</button>
     <div style="position: relative; padding: 5px;">
         <button onclick="togglePaleta('prov')" id="preview-cor-prov" class="btn-paleta-seletor" title="Escolher cor"></button>
         <div id="dropdown-paleta-prov" style="display: none; position: absolute; right: 0; top: 45px; background: #1a1a1a; border: 1px solid #555; border-radius: 4px; padding: 6px; z-index: 3000; grid-template-columns: repeat(5, 1fr); gap: 4px; width: 110px; box-shadow: 0 4px 10px rgba(0,0,0,0.8);">
@@ -1890,7 +1890,7 @@ function atualizarVisualBotao() {
 
     const corAtual = minhaCorUsuario || '#3498db';
     const textoPing = modoPinGlobal ? "Ping Online: ON" : "Ping Online: OFF";
-    const iconeHtml = `<span style="display:inline-flex; align-items:center; vertical-align:middle; margin-right: 4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="${corAtual}" stroke="#000" stroke-width="1.2" style="filter: drop-shadow(0 0 1px rgba(0,0,0,0.8);"><circle cx="12" cy="8" r="5" /><path d="M12 13 L10 21 L12 22 L14 21 Z" /></svg></span> ${textoPing}`;
+    const iconeHtml = `<span style="display:inline-block; width:12px; height:12px; background-color:${corAtual}; border-radius:50%; margin-right:6px; vertical-align:middle; border:1px solid rgba(0,0,0,0.5);"></span> ${textoPing}`;
 
     if (btnPinM) {
         btnPinM.innerHTML = iconeHtml;
@@ -1976,6 +1976,7 @@ function recarregarPinsDoMapaAtual() {
             desenharPinGlobalNaTela(key, dbPings[key]);
         }
     }
+    recarregarRotasCompartilhadasDoMapa();
 }
     // ... (O resto do seu código: dadosProvincias, dadosCapital, etc. continua igual abaixo)
 
@@ -4669,6 +4670,7 @@ function calcularResultados() {
             <span class="destaque-bronze">${bronzes} Bronze</span>
             </p>
             <button onclick="animarViagem()" class="btn-popup" style="background: #2E8B57; width: 100%; margin-top: 15px; font-size: 16px; padding: 10px;">🏇 Realizar Viagem</button>
+            <button onclick="compartilharViagem()" class="btn-popup" style="background: #2980b9; width: 100%; margin-top: 10px; font-size: 16px; padding: 10px;">📡 Compartilhar Viagem</button>
         `
 
         document.getElementById('resultado-viagem').innerHTML = html
@@ -4681,79 +4683,6 @@ function calcularResultados() {
     }
 }
 
-// ==========================================
-// 1. SISTEMA DE ANIMAÇÃO DE VIAGEM (CAVALO)
-// ==========================================
-function animarViagem() {
-    document.getElementById('modal-viagem').style.display = 'none'
-
-    if (!pontosRota || pontosRota.length < 2) return
-
-  // Nova criação do ícone com tamanho 25px
-    const iconCavalo = L.divIcon({
-        html: '<div class="cavalo-animado"><div class="cavalo-sprite"></div></div>',
-        className: 'marcador-emoji',
-        iconSize: [25, 25],
-        iconAnchor: [12, 12]
-    });
-
-    const cavalo = L.marker(pontosRota[0], { icon: iconCavalo, zIndexOffset: 9999 }).addTo(map);
-
-    let indexAtual = 0;
-    const velocidadePixelsFrame = 3; 
-
-    function moverProximoPonto() {
-        if (indexAtual >= pontosRota.length - 1) {
-            // Tempo reduzido para a rota sumir rápido
-            setTimeout(() => {
-                map.removeLayer(cavalo);
-                grupoRota.clearLayers();
-                pontosRota = [];
-            }, 200); 
-            return;
-        }
-
-        const p1 = pontosRota[indexAtual];
-        const p2 = pontosRota[indexAtual + 1]
-        const distancia = map.distance(p1, p2)
-        
-        const elementoIcone = cavalo.getElement();
-        if (elementoIcone) {
-            const divCavalo = elementoIcone.querySelector('.cavalo-animado');
-            if (divCavalo) {
-                // Invertido para o cavalo correr na direção certa!
-                divCavalo.style.transform = p2.lng > p1.lng ? 'scaleX(-1)' : 'scaleX(1)';
-            }
-        }
-
-        let progresso = 0
-        let passo = velocidadePixelsFrame / distancia
-
-        if (distancia === 0) {
-            indexAtual++
-            moverProximoPonto()
-            return
-        }
-
-        function frameAnimacao() {
-            progresso += passo
-            if (progresso >= 1) {
-                cavalo.setLatLng(p2)
-                indexAtual++
-                moverProximoPonto()
-            } else {
-                const latAtual = p1.lat + (p2.lat - p1.lat) * progresso
-                const lngAtual = p1.lng + (p2.lng - p1.lng) * progresso
-                cavalo.setLatLng([latAtual, lngAtual])
-                requestAnimationFrame(frameAnimacao)
-            }
-        }
-        
-        frameAnimacao()
-    }
-
-    moverProximoPonto()
-}
 
 // ==========================================
 // 2. SISTEMA DE AVISOS E TRANSIÇÃO DE NUVENS
@@ -5387,6 +5316,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const previewProv = document.getElementById('preview-cor-prov');
     if (previewMenu) previewMenu.style.background = minhaCorUsuario;
     if (previewProv) previewProv.style.background = minhaCorUsuario;
+    atualizarVisualBotao();
 });
 
 function togglePaleta(tipo) {
@@ -5426,6 +5356,198 @@ function mudarCorPing(novaCor, tipo) {
     }
 
     atualizarVisualBotao();
+}
+
+
+// ==========================================
+// 1. SISTEMA DE ANIMAÇÃO DE VIAGEM (CAVALO)
+// ==========================================
+let rotasCompartilhadasAtivas = {};
+let dadosRotasCompartilhadasGlobais = {};
+
+if (db) {
+    db.ref('rotasCompartilhadas').on('value', (snapshot) => {
+        dadosRotasCompartilhadasGlobais = snapshot.val() || {};
+        recarregarRotasCompartilhadasDoMapa();
+    });
+}
+
+function recarregarRotasCompartilhadasDoMapa() {
+    for (let key in rotasCompartilhadasAtivas) {
+        if (map) map.removeLayer(rotasCompartilhadasAtivas[key]);
+        delete rotasCompartilhadasAtivas[key];
+    }
+    for (let key in dadosRotasCompartilhadasGlobais) {
+        const dados = dadosRotasCompartilhadasGlobais[key];
+        if (!dados || !dados.pontos) continue;
+        if (dados.mapa && dados.mapa !== mapaAtualAtivo) continue;
+
+        const latlngs = dados.pontos.map(p => [p.lat, p.lng]);
+        const polyline = L.polyline(latlngs, {
+            color: '#e67e22',
+            weight: 4,
+            opacity: 0.8,
+            dashArray: '10, 10'
+        }).addTo(map);
+
+        const pontosStr = encodeURIComponent(JSON.stringify(dados.pontos));
+        const corStr = encodeURIComponent('#e67e22');
+        const keyStr = encodeURIComponent(key);
+        
+        polyline.bindPopup(`<div style="text-align:center;"><b>Rota de ${key}</b><br><button onclick="dispararViagemRemota('${pontosStr}', '${corStr}', '${keyStr}')" class="btn-popup" style="background:#2E8B57; margin-top:5px; padding:4px 8px; font-size:12px; cursor:pointer;">🏇 Realizar Viagem em Grupo</button></div>`);
+
+        rotasCompartilhadasAtivas[key] = polyline;
+    }
+}
+
+function compartilharViagem() {
+    if (!pontosRota || pontosRota.length < 2) return;
+    if (db) {
+        const rotaSimples = pontosRota.map(p => ({ lat: p.lat, lng: p.lng }));
+        db.ref('rotasCompartilhadas').remove().then(() => {
+            db.ref('rotasCompartilhadas/' + meuIdUsuario).set({
+                cor: minhaCorUsuario,
+                mapa: mapaAtualAtivo,
+                pontos: rotaSimples
+            });
+        });
+    }
+}
+
+function animarViagemComPontos(pontosArray, corCavalo) {
+    if (!pontosArray || pontosArray.length < 2) return;
+
+    const corLinha = '#e67e22';
+    const tripGroup = L.layerGroup().addTo(map);
+    const latlngs = pontosArray.map(p => L.latLng(p.lat, p.lng));
+
+    L.polyline(latlngs, {
+        color: corLinha,
+        weight: 3,
+        dashArray: '5, 10',
+        opacity: 0.8
+    }).addTo(tripGroup);
+
+    latlngs.forEach(latlng => {
+        L.circleMarker(latlng, {
+            radius: 4,
+            color: corLinha,
+            weight: 1.5,
+            fillColor: '#ffffff',
+            fillOpacity: 1
+        }).addTo(tripGroup);
+    });
+
+    const iconCavalo = L.divIcon({
+        html: '<div class="cavalo-animado"><div class="cavalo-sprite" style="filter: drop-shadow(0 0 2px ' + corLinha + ');"></div></div>',
+        className: 'marcador-emoji',
+        iconSize: [25, 25],
+        iconAnchor: [12, 12]
+    });
+
+    const cavalo = L.marker(latlngs[0], { icon: iconCavalo, zIndexOffset: 9999 }).addTo(tripGroup);
+
+    let indexAtual = 0;
+    const velocidadePixelsFrame = 3;
+
+    function moverProximoPonto() {
+        if (indexAtual >= latlngs.length - 1) {
+            setTimeout(() => {
+                if (map && tripGroup) {
+                    map.removeLayer(tripGroup);
+                }
+            }, 250);
+            return;
+        }
+
+        const p1 = latlngs[indexAtual];
+        const p2 = latlngs[indexAtual + 1];
+        const distancia = map.distance(p1, p2);
+
+        const elementoIcone = cavalo.getElement();
+        if (elementoIcone) {
+            const divCavalo = elementoIcone.querySelector('.cavalo-animado');
+            if (divCavalo) {
+                divCavalo.style.transform = p2.lng > p1.lng ? 'scaleX(-1)' : 'scaleX(1)';
+            }
+        }
+
+        let progresso = 0;
+        let passo = distancia === 0 ? 1 : velocidadePixelsFrame / distancia;
+
+        if (distancia === 0) {
+            indexAtual++;
+            moverProximoPonto();
+            return;
+        }
+
+        function frameAnimacao() {
+            progresso += passo;
+            if (progresso >= 1) {
+                cavalo.setLatLng(p2);
+                indexAtual++;
+                moverProximoPonto();
+            } else {
+                const latAtual = p1.lat + (p2.lat - p1.lat) * progresso;
+                const lngAtual = p1.lng + (p2.lng - p1.lng) * progresso;
+                cavalo.setLatLng([latAtual, lngAtual]);
+                requestAnimationFrame(frameAnimacao);
+            }
+        }
+        frameAnimacao();
+    }
+
+    moverProximoPonto();
+}
+
+function dispararViagemGlobal(pontos, cor) {
+    if (db) {
+        db.ref('viagensAoVivo').push({
+            mapa: mapaAtualAtivo,
+            pontos: pontos.map(p => ({ lat: p.lat, lng: p.lng })),
+            cor: cor || minhaCorUsuario,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+    }
+}
+
+function animarViagem() {
+    document.getElementById('modal-viagem').style.display = 'none';
+    if (!pontosRota || pontosRota.length < 2) return;
+
+    dispararViagemGlobal(pontosRota, minhaCorUsuario);
+
+    setTimeout(() => {
+        grupoRota.clearLayers();
+        pontosRota = [];
+    }, 200);
+}
+
+window.dispararViagemRemota = function(pontosJson, cor, rotaKey) {
+    try {
+        const pontos = JSON.parse(decodeURIComponent(pontosJson));
+        const rKey = rotaKey ? decodeURIComponent(rotaKey) : null;
+        
+        dispararViagemGlobal(pontos, decodeURIComponent(cor));
+        
+        if (rKey && db) {
+            db.ref('rotasCompartilhadas/' + rKey).remove();
+        }
+        
+        if (map) map.closePopup();
+    } catch (e) {
+        console.error("Erro ao disparar viagem remota", e);
+    }
+};
+
+const tempoInicioClient = Date.now();
+if (db) {
+    db.ref('viagensAoVivo').on('child_added', (snapshot) => {
+        const viagem = snapshot.val();
+        if (viagem && viagem.mapa === mapaAtualAtivo && viagem.timestamp && (viagem.timestamp > tempoInicioClient - 5000)) {
+            animarViagemComPontos(viagem.pontos, viagem.cor);
+        }
+    });
 }
 
 precarregarImagens();
