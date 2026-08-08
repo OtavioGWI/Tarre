@@ -4688,7 +4688,7 @@ function calcularResultados() {
             <span class="destaque-bronze">${bronzes} Bronze</span>
             </p>
             <button onclick="animarViagem()" class="btn-popup" style="background: #2E8B57; width: 100%; margin-top: 15px; font-size: 16px; padding: 10px;">🏇 Realizar Viagem</button>
-            <button onclick="compartilharViagem()" class="btn-popup" style="background: #2980b9; width: 100%; margin-top: 10px; font-size: 16px; padding: 10px;">📡 Compartilhar Viagem</button>
+            <button onclick="compartilharViagem(this)" class="btn-popup" style="background: #2980b9; width: 100%; margin-top: 10px; font-size: 16px; padding: 10px;">📡 Compartilhar Viagem</button>
         `
 
         document.getElementById('resultado-viagem').innerHTML = html
@@ -5425,12 +5425,20 @@ if (db) {
     });
 }
 
-function compartilharViagem() {
+function compartilharViagem(btn) {
     console.log("Tentando compartilhar, pontosRota:", pontosRota);
     if (!pontosRota || pontosRota.length < 2) {
         console.warn("Rota inválida ou com menos de 2 pontos.");
         return;
     }
+
+    // Altera o visual do botão clicado
+    if (btn) {
+        btn.style.background = '#27ae60';
+        btn.innerHTML = '✅ Viagem Compartilhada';
+        btn.disabled = true;
+    }
+
     if (db) {
         const rotaSimples = pontosRota.map(p => ({ lat: p.lat, lng: p.lng }));
         db.ref('rotaAtiva').set({
@@ -5446,7 +5454,6 @@ function compartilharViagem() {
         console.error("Objeto 'db' do Firebase não está definido.");
     }
 }
-
 function animarViagem() {
     document.getElementById('modal-viagem').style.display = 'none';
     if (!pontosRota || pontosRota.length < 2) return;
@@ -5599,7 +5606,7 @@ if (db) {
     db.ref('viagensAoVivo').on('child_added', (snapshot) => {
         const viagem = snapshot.val();
         // Dispara a animação se a viagem ocorreu nos últimos 60 segundos ou se foi gerada após o carregamento da página
-        if (viagem && viagem.mapa === mapaAtualAtivo && viagem.clientTimestamp && (viagem.clientTimestamp >= tempoInicioClient - 60000)) {
+        if (viagem && viagem.mapa === mapaAtualAtivo && viagem.clientTimestamp && (viagem.clientTimestamp >= tempoInicioClient - 20000)) {
             animarViagemComPontos(viagem.pontos, viagem.cor);
         }
     });
