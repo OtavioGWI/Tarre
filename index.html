@@ -850,7 +850,7 @@ try {
     };
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
-
+    
     db.ref('pings').on('child_removed', (snapshot) => {
         const key = snapshot.key; delete dbPings[key]; 
         if (marcadoresGlobaisAtivos[key]) {
@@ -5580,8 +5580,8 @@ const tempoInicioClient = Date.now();
 if (db) {
     db.ref('viagensAoVivo').on('child_added', (snapshot) => {
         const viagem = snapshot.val();
-        // Usa clientTimestamp comparado com o relógio local para evitar erros de sincronização de fuso/servidor
-        if (viagem && viagem.mapa === mapaAtualAtivo && viagem.clientTimestamp && (viagem.clientTimestamp > tempoInicioClient - 5000)) {
+        // Dispara a animação se a viagem ocorreu nos últimos 60 segundos ou se foi gerada após o carregamento da página
+        if (viagem && viagem.mapa === mapaAtualAtivo && viagem.clientTimestamp && (viagem.clientTimestamp >= tempoInicioClient - 60000)) {
             animarViagemComPontos(viagem.pontos, viagem.cor);
         }
     });
