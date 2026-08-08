@@ -64,6 +64,9 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <!-- SDKs do Firebase (Versão Compatível) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>Mapa RPG Interativo 8K</title>
     <meta charset="utf-8" />
@@ -668,30 +671,42 @@
         50% { transform: translateY(50vh) translateX(15px); }
         100% { transform: translateY(110vh) translateX(-15px); }
     }
+    .btn-paleta-seletor {
+    width: 35px; 
+    height: 35px; 
+    border: 2px solid #555; 
+    cursor: pointer; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    background-color: #3498db; /* Cor padrão inicial */
+    margin: 0 auto;
+}
     
     </style>
 </head>
 <body>
     <div id="map-container">
-        <div id="map"></div>
+    <div id="map"></div>
+</div>
+
+<div id="modal-info" style="display: none;">
+    <div class="modal-conteudo">
+        <span class="fechar-modal" onclick="fecharModalInfo()">&times;</span>
+        <h2 id="titulo-provincia">Título</h2>
+        <div id="texto-provincia"></div>
     </div>
+</div>
 
-
-    <div id="modal-info" style="display: none;">
-        <div class="modal-conteudo">
-            <span class="fechar-modal" onclick="fecharModalInfo()">&times;</span>
-            <h2 id="titulo-provincia">Título</h2>
-            <div id="texto-provincia"></div>
+<div id="modal-capital">
+    <div class="modal-conteudo">
+        <span class="fechar-modal" onclick="fecharModais()">&times;</span>
+        <h2 id="titulo-menu-capital" style="color: #cd853f; border-bottom: 1px solid #555;">Capital</h2>
+        <div id="conteudo-menu-capital">
         </div>
     </div>
-    <div id="modal-capital">
-        <div class="modal-conteudo">
-            <span class="fechar-modal" onclick="fecharModais()">&times;</span>
-            <h2 id="titulo-menu-capital" style="color: #cd853f; border-bottom: 1px solid #555;">Capital</h2>
-            <div id="conteudo-menu-capital">
-                </div>
-        </div>
-    </div>
+</div>
 
 <div id="menu-provincias">
     <h3 onclick="alternarMenuMobile()">Menu Principal <span id="seta-menu">▼</span></h3>
@@ -710,51 +725,89 @@
 
         <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
         <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">FERRAMENTAS</div>
-        <button id="btn-coords-menu" class="botao-provincia" onclick="alternarCoordenadas()" style="color: #aaa;">📍 Coords: OFF</button>
+        <button id="btn-coords-menu" class="botao-provincia" onclick="alternarCoordenadas()" style="color: #aaa;">📍 Coords Local: OFF</button>
+        
+        <div class="botao-provincia" style="display: flex; padding: 0; overflow: visible; align-items: center; border: 1px solid #444; margin: 5px 0; background: transparent;">
+    <button id="btn-pinglobal-menu" onclick="alternarPinGlobal()" style="flex: 1; background: transparent; border: none; color: inherit; padding: 10px; text-align: left; cursor: pointer; font-size: 14px;">🔵 Ping Online: OFF</button>
+    <div style="position: relative; padding: 5px;">
+        <button onclick="togglePaleta('menu')" id="preview-cor-menu" class="btn-paleta-seletor" title="Escolher cor"></button>
+        <div id="dropdown-paleta-menu" style="display: none; position: absolute; right: 0; top: 45px; background: #1a1a1a; border: 1px solid #555; border-radius: 4px; padding: 6px; z-index: 3000; grid-template-columns: repeat(5, 1fr); gap: 4px; width: 110px; box-shadow: 0 4px 10px rgba(0,0,0,0.8);">
+            <span onclick="mudarCorPing('#3498db', 'menu')" style="width: 18px; height: 18px; background: #3498db; border-radius: 50%; cursor: pointer; display: block;" title="Azul claro"></span>
+            <span onclick="mudarCorPing('#1b4f72', 'menu')" style="width: 18px; height: 18px; background: #1b4f72; border-radius: 50%; cursor: pointer; display: block;" title="Azul escuro"></span>
+            <span onclick="mudarCorPing('#f1c40f', 'menu')" style="width: 18px; height: 18px; background: #f1c40f; border-radius: 50%; cursor: pointer; display: block;" title="Amarelo"></span>
+            <span onclick="mudarCorPing('#2ecc71', 'menu')" style="width: 18px; height: 18px; background: #2ecc71; border-radius: 50%; cursor: pointer; display: block;" title="Verde claro"></span>
+            <span onclick="mudarCorPing('#196f3d', 'menu')" style="width: 18px; height: 18px; background: #196f3d; border-radius: 50%; cursor: pointer; display: block;" title="Verde escuro"></span>
+            <span onclick="mudarCorPing('#e91e63', 'menu')" style="width: 18px; height: 18px; background: #e25886; border-radius: 50%; cursor: pointer; display: block;" title="Rosa"></span>
+            <span onclick="mudarCorPing('#9b59b6', 'menu')" style="width: 18px; height: 18px; background: #9b59b6; border-radius: 50%; cursor: pointer; display: block;" title="Roxo"></span>
+            <span onclick="mudarCorPing('#e67e22', 'menu')" style="width: 18px; height: 18px; background: #e67e22; border-radius: 50%; cursor: pointer; display: block;" title="Laranja"></span>
+            <span onclick="mudarCorPing('#ffffff', 'menu')" style="width: 18px; height: 18px; background: #ffffff; border-radius: 50%; cursor: pointer; display: block;" title="Branco"></span>
+            <span onclick="mudarCorPing('#000000', 'menu')" style="width: 18px; height: 18px; background: #000000; border-radius: 50%; cursor: pointer; display: block; border: 1px solid #777;" title="Preto"></span>
+        </div>
+    </div>
+</div>
+        
         <button id="btn-medidor" class="botao-provincia" onclick="ativarMedidor()" style="color: #90EE90; border-color: #2E8B57;">📏 Calculadora de Viagem</button>
     </div>
     
     <div id="lista-ferramentas-regiao" style="display: none;">
-        
-        
         <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MENU DA REGIÃO</div>
-        <button class="botao-provincia" onclick="abrirModalInfo()">📜 Detalhes da Região</button>
-        <button id="btn-coords-prov" class="botao-provincia" onclick="alternarCoordenadas()">📍 Coordenadas: OFF</button>
-        <button id="btn-medidor-prov" class="botao-provincia" onclick="ativarMedidor()">📏 Medir Rota</button>
-        <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
-        <button id="btn-voltar-dinamico" class="botao-provincia" onclick="carregarMapaPrincipal()" style="color: #ffdead; border-color: #ffdead;">⬅ Voltar ao Continente</button>
+        <button class="botao-provincia" onclick="abrirModalInfo()">Detalhes da Região</button>
+        <button id="btn-coords-prov" class="botao-provincia" onclick="alternarCoordenadas()">Coords Local: OFF</button>
+       
+        <div class="botao-provincia" style="display: flex; padding: 0; overflow: visible; align-items: center; border: 1px solid #444; margin: 5px 0; background: transparent;">
+    <button id="btn-pinglobal-prov" onclick="alternarPinGlobal()" style="flex: 1; background: transparent; border: none; color: inherit; padding: 10px; text-align: left; cursor: pointer; font-size: 14px;">🔵 Ping Online: OFF</button>
+    <div style="position: relative; padding: 5px;">
+        <button onclick="togglePaleta('prov')" id="preview-cor-prov" class="btn-paleta-seletor" title="Escolher cor"></button>
+        <div id="dropdown-paleta-prov" style="display: none; position: absolute; right: 0; top: 45px; background: #1a1a1a; border: 1px solid #555; border-radius: 4px; padding: 6px; z-index: 3000; grid-template-columns: repeat(5, 1fr); gap: 4px; width: 110px; box-shadow: 0 4px 10px rgba(0,0,0,0.8);">
+            <span onclick="mudarCorPing('#3498db', 'prov')" style="width: 18px; height: 18px; background: #3498db; border-radius: 50%; cursor: pointer; display: block;" title="Azul claro"></span>
+            <span onclick="mudarCorPing('#1b4f72', 'prov')" style="width: 18px; height: 18px; background: #1b4f72; border-radius: 50%; cursor: pointer; display: block;" title="Azul escuro"></span>
+            <span onclick="mudarCorPing('#f1c40f', 'prov')" style="width: 18px; height: 18px; background: #f1c40f; border-radius: 50%; cursor: pointer; display: block;" title="Amarelo"></span>
+            <span onclick="mudarCorPing('#2ecc71', 'prov')" style="width: 18px; height: 18px; background: #2ecc71; border-radius: 50%; cursor: pointer; display: block;" title="Verde claro"></span>
+            <span onclick="mudarCorPing('#196f3d', 'prov')" style="width: 18px; height: 18px; background: #196f3d; border-radius: 50%; cursor: pointer; display: block;" title="Verde escuro"></span>
+            <span onclick="mudarCorPing('#e91e63', 'prov')" style="width: 18px; height: 18px; background: #e25886; border-radius: 50%; cursor: pointer; display: block;" title="Rosa"></span>
+            <span onclick="mudarCorPing('#9b59b6', 'prov')" style="width: 18px; height: 18px; background: #9b59b6; border-radius: 50%; cursor: pointer; display: block;" title="Roxo"></span>
+            <span onclick="mudarCorPing('#e67e22', 'prov')" style="width: 18px; height: 18px; background: #e67e22; border-radius: 50%; cursor: pointer; display: block;" title="Laranja"></span>
+            <span onclick="mudarCorPing('#ffffff', 'prov')" style="width: 18px; height: 18px; background: #ffffff; border-radius: 50%; cursor: pointer; display: block;" title="Branco"></span>
+            <span onclick="mudarCorPing('#000000', 'prov')" style="width: 18px; height: 18px; background: #000000; border-radius: 50%; cursor: pointer; display: block; border: 1px solid #777;" title="Preto"></span>
+        </div>
     </div>
 </div>
+
+        <button id="btn-medidor-prov" class="botao-provincia" onclick="ativarMedidor()">Medir Rota</button>
+        <hr style="border: 0; border-top: 1px solid #555; margin: 10px 0;">
+        <button id="btn-voltar-dinamico" class="botao-provincia" onclick="carregarMapaPrincipal()" style="color: #ffdead; border-color: #ffdead;">Voltar ao Continente</button>
+    </div>
+</div> 
 
 <div id="provincia-container">
     <img id="img-provincia" src="">
 </div>
 
 <div id="modal-senha" style="display: none; position: fixed; z-index: 6000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); align-items: center; justify-content: center;">
-        <div class="modal-conteudo" style="width: 400px; text-align: center;">
-            <h3 style="color: #cd853f;">🔒 Área Bloqueada</h3>
-            <p>Qual a palavra de passe?</p>
-            
-            <input type="text" id="input-senha-rpg" placeholder="Digite a senha..." 
-                   style="width: 80%; padding: 10px; margin-bottom: 20px; background: #222; border: 1px solid #8b4513; color: white; font-size: 16px; text-align: center;">
-            
-            <br>
-            <button class="btn-popup" onclick="verificarSenha()" style="background: #2E8B57; font-size: 16px; margin-right: 10px;">🔓 Tentar</button>
-            <button class="btn-popup" onclick="fecharModalSenha()" style="background: #8b0000; font-size: 16px;">❌ Cancelar</button>
-            
-            <p id="msg-erro-senha" style="color: #ff4444; display: none; font-size: 14px; margin-top: 10px;">
-                Senha incorreta. Por favor AGUARDE descobrirem a senha.
-            </p>
-        </div>
+    <div class="modal-conteudo" style="width: 400px; text-align: center;">
+        <h3 style="color: #cd853f;">🔒 Área Bloqueada</h3>
+        <p>Qual a palavra de passe?</p>
+        
+        <input type="text" id="input-senha-rpg" placeholder="Digite a senha..." 
+               style="width: 80%; padding: 10px; margin-bottom: 20px; background: #222; border: 1px solid #8b4513; color: white; font-size: 16px; text-align: center;">
+        
+        <br>
+        <button class="btn-popup" onclick="verificarSenha()" style="background: #2E8B57; font-size: 16px; margin-right: 10px;">🔓 Tentar</button>
+        <button class="btn-popup" onclick="fecharModalSenha()" style="background: #8b0000; font-size: 16px;">❌ Cancelar</button>
+        
+        <p id="msg-erro-senha" style="color: #ff4444; display: none; font-size: 14px; margin-top: 10px;">
+            Senha incorreta. Por favor AGUARDE descobrirem a senha.
+        </p>
     </div>
+</div>
 
 <div id="modal-viagem" style="display: none; position: fixed; z-index: 6000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); align-items: center; justify-content: center;">
-        <div class="modal-conteudo" style="max-width: 500px;">
-            <span class="fechar-modal" onclick="document.getElementById('modal-viagem').style.display='none'">&times;</span>
-            <h3 style="color: #90EE90;">📊 Relatório de Viagem</h3>
-            <div id="resultado-viagem"></div>
-        </div>
+    <div class="modal-conteudo" style="max-width: 500px;">
+        <span class="fechar-modal" onclick="document.getElementById('modal-viagem').style.display='none'">&times;</span>
+        <h3 style="color: #90EE90;">📊 Relatório de Viagem</h3>
+        <div id="resultado-viagem"></div>
     </div>
+</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -767,11 +820,48 @@
  * Suporta: navegação entre províncias, sistema de combate cosmológico (múltiplos planos),
  * banco imperial, bestiário, histórico de aventuras, senhas, cálculo de rotas */
 
-// Variável de controle: qual o andar máximo que o grupo já liberou?
-// --- SISTEMA DA VILA DAS BRUXAS - FORJA DO SACRIFÍCIO ---
-// --- SISTEMA DA VILA DAS BRUXAS - FORJA DO SACRIFÍCIO ---
-// --- SISTEMA DA VILA DAS BRUXAS - FORJA DO SACRIFÍCIO ---
-// --- SISTEMA DA VILA DAS BRUXAS - FORJA DO SACRIFÍCIO ---
+let db = null;
+let meuIdUsuario = localStorage.getItem('rpg_user_id');
+if (!meuIdUsuario) {
+    meuIdUsuario = 'jogador_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('rpg_user_id', meuIdUsuario);
+}
+
+let dbPings = {}; 
+let marcadoresGlobaisAtivos = {}; 
+
+const iconCoordsGlobal = L.divIcon({
+    html: '<div style="font-size: 24px; filter: drop-shadow(0 0 2px black) hue-rotate(210deg);">📍</div>',
+    className: 'marcador-emoji',
+    iconSize: [30, 30],
+    iconAnchor: [15, 25],
+    popupAnchor: [0, -20]
+});
+
+try {
+    const firebaseConfig = {
+        apiKey: "AIzaSyDsS6MXa-upbq4GtwgUc5nFg6hi3j6KiIc",
+        authDomain: "rpg-tarre.firebaseapp.com",
+        databaseURL: "https://rpg-tarre-default-rtdb.firebaseio.com",
+        projectId: "rpg-tarre",
+        storageBucket: "rpg-tarre.firebasestorage.app",
+        messagingSenderId: "1017484269954",
+        appId: "1:1017484269954:web:21463bd9e66aeae109179b"
+    };
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+
+    db.ref('pings').on('child_removed', (snapshot) => {
+        const key = snapshot.key; delete dbPings[key]; 
+        if (marcadoresGlobaisAtivos[key]) {
+            if (map) map.removeLayer(marcadoresGlobaisAtivos[key]);
+            delete marcadoresGlobaisAtivos[key];
+        }
+    });
+} catch (error) {
+    console.warn("Servidor offline. Mapa rodando no modo local.");
+}
+
 const dadosForjaBruxas = {
     ofertas: [
         { nome: "Morfose: Magia Aumentada", custo: "❌ 5 HP Máximo", desc: "Todas as suas magias ou efeitos de dano passam a causar +1d6 de dano extra permanente." },
@@ -1367,7 +1457,6 @@ function subirAndar() {
  */
     let map; 
     let mapaAtualAtivo = 'continente';     // 'continente', 'Hukmal_tep.jpg', 'Planos.jpg', etc
-    let modoCoordenadas = false;           // true = cliques mostram coordenadas
     let marcadorTempCoords = null;         // Armazena popup de coordenadas atual
     let fatorEscala = 0.23;                // Varia por mapa: 0.23 continental, 0.13 províncias, 0.5 planos
     let menuAtualAberto = null;            // 'banco', 'bestiario', 'esquadrao', 'deuses', etc (essencial para voltar)
@@ -1493,11 +1582,11 @@ function zoomOutPadrao() {
 }
 
 function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicial = null) {
-    if (map) { map.remove(); } 
+    if (map) { map.remove() } 
 
-    const limitesImagem = [[0, 0], [altura, largura]];
-    const padding = 1500; 
-    const limitesNavegacao = [[-padding, -padding], [altura + padding, largura + padding]];
+    const limitesImagem = [[0, 0], [altura, largura]]
+    const padding = 1500 
+    const limitesNavegacao = [[-padding, -padding], [altura + padding, largura + padding]]
     
     map = L.map('map', {
         crs: L.CRS.Simple,
@@ -1507,74 +1596,80 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
         maxBoundsViscosity: 0.5,     
         tap: false,
         zoomControl: false,
-        zoomAnimation: true // Importante para animações suaves
-    });
+        zoomAnimation: true
+    })
 
-    grupoRota.addTo(map);
-    L.control.zoom({ position: 'topleft' }).addTo(map);
-    L.imageOverlay(arquivo, limitesImagem).addTo(map);
+    recarregarPinsDoMapaAtual()
+
+    grupoRota.addTo(map)
+    L.control.zoom({ position: 'topleft' }).addTo(map)
+    L.imageOverlay(arquivo, limitesImagem).addTo(map)
     
-    ultimaImagemBounds = limitesImagem;
+    ultimaImagemBounds = limitesImagem
 
-    // LÓGICA DE CÂMERA: Se houver uma coordenada inicial, inicia perto e dá zoom-out
     if (coordInicial) {
-        map.setView(coordInicial, 2, { animate: false }); // Nasce perto (Zoom 2)
-        
+        map.setView(coordInicial, 2, { animate: false }) 
         setTimeout(() => {
             if (map) {
-                map.flyToBounds(limitesImagem, { 
-                    animate: true, 
-                    duration: 1.8 // Duração do "Voo" de revelação da província
-                });
+                map.flyToBounds(limitesImagem, { animate: true, duration: 1.8 })
             }
-        }, 600); // 600ms de suspense observando a capital
+        }, 600) 
     } else {
-        map.fitBounds(limitesImagem); // Comportamento padrão normal
+        map.fitBounds(limitesImagem) 
     }
 
-    setTimeout(() => { try { map.invalidateSize(); } catch (err) { /* noop */ } }, 120);
-    atualizarVisibilidadeMenuMobile();
+    setTimeout(() => { try { map.invalidateSize() } catch (err) { } }, 120)
+    atualizarVisibilidadeMenuMobile()
     
-    // Listener de cliques do mapa
     map.on('click', function(e) {
         if (medindo) {
-            processarCliqueMedicao(e.latlng);
+            processarCliqueMedicao(e.latlng)
+            return
+        }
+
+        // Verificação restaurada para o pino global funcionar apenas quando ativado
+        if (modoPinGlobal) {
+            const novoPin = {
+                lat: e.latlng.lat,
+                lng: e.latlng.lng,
+                mapa: mapaAtualAtivo,
+                cor: minhaCorUsuario
+            };
+            
+            if (db) {
+                db.ref('pings/' + meuIdUsuario).set(novoPin);
+            }
             return;
         }
 
         if (modoCoordenadas) {
-            // Se já existe um pino no mapa, nós o destruímos completamente antes de criar outro
             if (marcadorTempCoords) {
-                map.removeLayer(marcadorTempCoords);
-                marcadorTempCoords = null;
+                map.removeLayer(marcadorTempCoords)
+                marcadorTempCoords = null
             }
 
-            const y = e.latlng.lat.toFixed(0);
-            const x = e.latlng.lng.toFixed(0);
+            const y = e.latlng.lat.toFixed(0)
+            const x = e.latlng.lng.toFixed(0)
 
-            // Cria o novo pino no local clicado
             marcadorTempCoords = L.marker(e.latlng, { 
                 icon: iconCoords,
                 zIndexOffset: 1000 
-            }).addTo(map);
+            }).addTo(map)
             
-            // Adiciona o balão e impede que feche sozinho ao clicar no mapa
             marcadorTempCoords.bindPopup(`<b>📍 Coordenadas</b><br>[${y}, ${x}]`, {
                 closeOnClick: false, 
                 autoClose: false     
-            }).openPopup();
+            }).openPopup()
 
-            // Ao clicar no 'X', remove do mapa e limpa a memória
             marcadorTempCoords.on('popupclose', function(event) {
-                map.removeLayer(event.target);
+                map.removeLayer(event.target)
                 if (marcadorTempCoords === event.target) {
-                    marcadorTempCoords = null;
+                    marcadorTempCoords = null
                 }
-            });
+            })
         }
-    });
-} 
-
+    })
+}
 /**
  * Alterna visibilidade do menu no mobile (< 600px)
  * Mostra/esconde a lista de províncias ou ferramentas conforme clique
@@ -1753,26 +1848,157 @@ function verificarSenha() {
     const inputPass = document.getElementById('input-senha-rpg');
     if (inputPass) inputPass.addEventListener("keypress", e => e.key === "Enter" && verificarSenha());
 // Ativa/desativa modo de coordenadas
+let modoCoordenadas = false;
+let modoPinGlobal = false;
+
 function alternarCoordenadas() {
     if (!modoCoordenadas && medindo) cancelarModoMedicao();
+    if (!modoCoordenadas && modoPinGlobal) alternarPinGlobal(); // Desliga o azul se ligar o vermelho
+    
     modoCoordenadas = !modoCoordenadas;
     const container = document.getElementById('map-container');
     atualizarVisualBotao();
 
-    if (modoCoordenadas) {
-        container.classList.add('mapa-intangivel');
-    } else {
-        container.classList.remove('mapa-intangivel');
+    modoCoordenadas ? container.classList.add('mapa-intangivel') : container.classList.remove('mapa-intangivel');
+}
+
+function alternarPinGlobal() {
+    if (!modoPinGlobal && medindo) cancelarModoMedicao();
+    if (!modoPinGlobal && modoCoordenadas) alternarCoordenadas(); // Desliga o vermelho se ligar o azul
+    
+    modoPinGlobal = !modoPinGlobal;
+    const container = document.getElementById('map-container');
+    atualizarVisualBotao();
+
+    modoPinGlobal ? container.classList.add('mapa-intangivel') : container.classList.remove('mapa-intangivel');
+}
+
+function atualizarVisualBotao() {
+    const btnCoordsM = document.getElementById('btn-coords-menu');
+    const btnCoordsP = document.getElementById('btn-coords-prov');
+    const btnPinM = document.getElementById('btn-pinglobal-menu');
+    const btnPinP = document.getElementById('btn-pinglobal-prov');
+    
+    if (btnCoordsM) {
+        btnCoordsM.innerHTML = modoCoordenadas ? "📍 Coords Local: ON" : "📍 Coords Local: OFF";
+        modoCoordenadas ? btnCoordsM.classList.add('btn-ferramenta-ativa') : btnCoordsM.classList.remove('btn-ferramenta-ativa');
+    }
+    if (btnCoordsP) {
+        btnCoordsP.innerHTML = modoCoordenadas ? "📍 Coords Local: ON" : "📍 Coords Local: OFF";
+        modoCoordenadas ? btnCoordsP.classList.add('btn-ferramenta-ativa') : btnCoordsP.classList.remove('btn-ferramenta-ativa');
+    }
+
+   const filtrosCor = {
+        '#3498db': 'hue-rotate(200deg) saturate(1.5)',                  // Azul claro
+        '#1b4f72': 'hue-rotate(210deg) brightness(0.6) saturate(1.5)',  // Azul escuro
+        '#f1c40f': 'hue-rotate(85deg) saturate(4) brightness(1.6)',      // Amarelo
+        '#2ecc71': 'hue-rotate(110deg) saturate(1.8) brightness(1.1)',   // Verde claro
+        '#196f3d': 'hue-rotate(110deg) brightness(0.5) saturate(1.5)',  // Verde escuro
+        '#e91e63': 'hue-rotate(310deg) saturate(1.3)',                  // Rosa
+        '#9b59b6': 'hue-rotate(315deg) saturate(2) brightness(0.9)',     // Roxo
+        '#e67e22': 'hue-rotate(40deg) saturate(3.5) brightness(1.2)',    // Laranja
+        '#ffffff': 'brightness(0) invert(1)',                           // Branco
+        '#000000': 'brightness(0)'                                      // Preto
+    };
+    
+    const filtroCss = filtrosCor[minhaCorUsuario] || 'hue-rotate(0deg)';
+    const textoPing = modoPinGlobal ? "Ping Online: ON" : "Ping Online: OFF";
+    const iconeHtml = `<span style="display:inline-block; filter: ${filtroCss}; transform: scale(0.9); margin-right: 4px;">📍</span> ${textoPing}`;
+
+    if (btnPinM) {
+        btnPinM.innerHTML = iconeHtml;
+        modoPinGlobal ? btnPinM.classList.add('btn-ferramenta-ativa') : btnPinM.classList.remove('btn-ferramenta-ativa');
+    }
+    if (btnPinP) {
+        btnPinP.innerHTML = iconeHtml;
+        modoPinGlobal ? btnPinP.classList.add('btn-ferramenta-ativa') : btnPinP.classList.remove('btn-ferramenta-ativa');
     }
 }
-// Sincroniza visual dos botões de coordenadas
-function atualizarVisualBotao() {
-    const botoes = [document.getElementById('btn-coords-menu'), document.getElementById('btn-coords-prov')];
-    botoes.forEach(btn => {
-        if (!btn) return;
-        btn.innerHTML = modoCoordenadas ? "📍 Coords: ON" : "📍 Coords: OFF";
-        modoCoordenadas ? btn.classList.add('btn-ferramenta-ativa') : btn.classList.remove('btn-ferramenta-ativa');
+
+// ==========================================
+// SINCRONIZAÇÃO EM TEMPO REAL (FIREBASE)
+// ==========================================
+db.ref('pings').on('child_changed', (snapshot) => {
+    const key = snapshot.key;
+    const dados = snapshot.val();
+    dbPings[key] = dados;
+    
+    if (marcadoresGlobaisAtivos[key]) {
+        marcadoresGlobaisAtivos[key].removendoPorAtualizacao = true;
+        if (map) map.removeLayer(marcadoresGlobaisAtivos[key]);
+        delete marcadoresGlobaisAtivos[key];
+    }
+    
+    if (dados.mapa === mapaAtualAtivo && map) {
+        desenharPinGlobalNaTela(key, dados);
+    }
+});
+
+function desenharPinGlobalNaTela(key, dados) {
+    const isMeuPin = (key === meuIdUsuario);
+    const titulo = isMeuPin ? "🔵 Meu Ponto" : "🔵 Ponto da Equipe";
+    const corPin = dados.cor || '#3498db';
+
+    if (marcadoresGlobaisAtivos[key]) {
+        if (map) map.removeLayer(marcadoresGlobaisAtivos[key]);
+        delete marcadoresGlobaisAtivos[key];
+    }
+
+    // Mapeamento das cores escolhidas para os filtros CSS do emoji
+    const filtrosCor = {
+        '#3498db': 'hue-rotate(210deg)',                  // Azul claro
+        '#1b4f72': 'hue-rotate(210deg) brightness(0.4)',  // Azul escuro
+        '#f1c40f': 'hue-rotate(50deg) saturate(2)',       // Amarelo
+        '#2ecc71': 'hue-rotate(100deg) saturate(2)',      // Verde claro
+        '#196f3d': 'hue-rotate(100deg) brightness(0.4)',  // Verde escuro
+        '#e91e63': 'hue-rotate(320deg) saturate(1.5)',    // Rosa
+        '#9b59b6': 'hue-rotate(270deg) saturate(1.5)',    // Roxo
+        '#e67e22': 'hue-rotate(25deg) saturate(2)',       // Laranja
+        '#ffffff': 'brightness(0) invert(1)',             // Branco
+        '#000000': 'brightness(0)'                        // Preto
+    };
+
+    const filtroCss = filtrosCor[corPin] || 'hue-rotate(0deg)';
+
+    const iconeCustomizado = L.divIcon({
+        html: `<div style="font-size: 26px; filter: drop-shadow(0 0 2px black) ${filtroCss};">📍</div>`,
+        className: 'marcador-emoji',
+        iconSize: [30, 30],
+        iconAnchor: [15, 25],
+        popupAnchor: [0, -20]
     });
+
+    const m = L.marker([dados.lat, dados.lng], { 
+        icon: iconeCustomizado,
+        zIndexOffset: isMeuPin ? 1001 : 1000 
+    }).addTo(map);
+    
+    let botaoApagar = isMeuPin ? `<br><button onclick="apagarMeuPin('${key}')" class="btn-popup" style="background:#8b0000; margin-top:5px; padding:4px 8px; font-size:12px; cursor:pointer;">❌ Apagar Ping</button>` : '';
+
+    m.bindPopup(`<b>${titulo}</b><br>[${dados.lat.toFixed(0)}, ${dados.lng.toFixed(0)}]${botaoApagar}`, {
+        closeOnClick: false,
+        autoClose: false
+    }).openPopup();
+
+    marcadoresGlobaisAtivos[key] = m;
+}
+function apagarMeuPin(key) {
+    if (db) {
+        db.ref('pings/' + key).remove();
+    }
+    if (marcadoresGlobaisAtivos[key]) {
+        if (map) map.removeLayer(marcadoresGlobaisAtivos[key]);
+        delete marcadoresGlobaisAtivos[key];
+    }
+}
+
+function recarregarPinsDoMapaAtual() {
+    marcadoresGlobaisAtivos = {}; 
+    for (let key in dbPings) {
+        if (dbPings[key].mapa === mapaAtualAtivo) {
+            desenharPinGlobalNaTela(key, dbPings[key]);
+        }
+    }
 }
     // ... (O resto do seu código: dadosProvincias, dadosCapital, etc. continua igual abaixo)
 
@@ -5164,7 +5390,68 @@ function menuMercado(categoria) {
     
     container.innerHTML = html + `</div>`;
 }
-// INICIALIZAÇÃO DO JOGO
+// --- PRÉ-CARREGAMENTO DAS IMAGENS ---
+function precarregarImagens() {
+    const mapas = [
+        'Hukmal_tep.jpg', 'Blat_khyr.jpg', 'Deserto.jpg', 'Lago.jpg', 'Alcova.jpg', 
+        'Planos.jpg', 'Plano Divino.png', 'Plano Demoníaco.png', 'Plano Espiritual.png', 
+        'Espinha do Gigante.jpg', 'Mar.jpg'
+    ];
+    mapas.forEach(src => {
+        const img = new Image();
+        img.src = src; // Força o navegador a colocar a imagem no cache
+    });
+}
+
+let minhaCorUsuario = localStorage.getItem('rpg_user_color') || '#3498db';
+
+window.addEventListener('DOMContentLoaded', () => {
+    const previewMenu = document.getElementById('preview-cor-menu');
+    const previewProv = document.getElementById('preview-cor-prov');
+    if (previewMenu) previewMenu.style.background = minhaCorUsuario;
+    if (previewProv) previewProv.style.background = minhaCorUsuario;
+});
+
+function togglePaleta(tipo) {
+    const drop = document.getElementById('dropdown-paleta-' + tipo);
+    if (drop) {
+        drop.style.display = drop.style.display === 'grid' ? 'none' : 'grid';
+    }
+}
+
+function mudarCorPing(novaCor, tipo) {
+    minhaCorUsuario = novaCor;
+    localStorage.setItem('rpg_user_color', novaCor);
+
+    const previewMenu = document.getElementById('preview-cor-menu');
+    const previewProv = document.getElementById('preview-cor-prov');
+    if (previewMenu) previewMenu.style.background = novaCor;
+    if (previewProv) previewProv.style.background = novaCor;
+
+    const dropMenu = document.getElementById('dropdown-paleta-menu');
+    const dropProv = document.getElementById('dropdown-paleta-prov');
+    if (dropMenu) dropMenu.style.display = 'none';
+    if (dropProv) dropProv.style.display = 'none';
+
+    if (marcadoresGlobaisAtivos[meuIdUsuario]) {
+        const pinoAtual = marcadoresGlobaisAtivos[meuIdUsuario];
+        const latLngAtual = pinoAtual.getLatLng();
+        desenharPinGlobalNaTela(meuIdUsuario, {
+            lat: latLngAtual.lat,
+            lng: latLngAtual.lng,
+            mapa: mapaAtualAtivo,
+            cor: novaCor
+        });
+    }
+
+    if (db) {
+        db.ref('pings/' + meuIdUsuario).update({ cor: novaCor });
+    }
+
+    atualizarVisualBotao();
+}
+
+precarregarImagens();
 carregarMapaPrincipal();
     </script>
 </body>
