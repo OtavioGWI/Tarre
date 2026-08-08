@@ -5402,14 +5402,19 @@ function recarregarRotasCompartilhadasDoMapa() {
 
 function compartilharViagem() {
     if (!pontosRota || pontosRota.length < 2) return;
-    if (db) {
+    if (db && meuIdUsuario) {
         const rotaSimples = pontosRota.map(p => ({ lat: p.lat, lng: p.lng }));
-        db.ref('rotasCompartilhadas').remove().then(() => {
-            db.ref('rotasCompartilhadas/' + meuIdUsuario).set({
-                cor: minhaCorUsuario,
-                mapa: mapaAtualAtivo,
-                pontos: rotaSimples
-            });
+        
+        // Define diretamente a rota do usuário. Como usamos o meuIdUsuario como chave, 
+        // ela substitui a rota anterior do mesmo usuário instantaneamente.
+        db.ref('rotasCompartilhadas/' + meuIdUsuario).set({
+            cor: minhaCorUsuario,
+            mapa: mapaAtualAtivo,
+            pontos: rotaSimples
+        }).then(() => {
+            alert("Rota compartilhada com sucesso!");
+        }).catch((err) => {
+            console.error("Erro ao compartilhar rota:", err);
         });
     }
 }
