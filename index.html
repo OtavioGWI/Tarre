@@ -5382,39 +5382,49 @@ function recarregarRotasCompartilhadasDoMapa() {
         if (!dados || !dados.pontos) continue;
         if (dados.mapa && dados.mapa !== mapaAtualAtivo) continue;
 
-        const latlngs = dados.pontos.map(p => [p.lat, p.lng]);
-        const polyline = L.polyline(latlngs, {
-            color: '#e67e22',
+        const grupoRotaCompartilhada = L.layerGroup().addTo(map);
+        const latlngs = dados.pontos.map(p => L.latLng(p.lat, p.lng));
+        const corLinha = dados.cor || '#e67e22';
+
+        // Linha tracejada
+        L.polyline(latlngs, {
+            color: corLinha,
             weight: 4,
             opacity: 0.8,
             dashArray: '10, 10'
-        }).addTo(map);
+        }).addTo(grupoRotaCompartilhada);
+
+        // Bolinhas/pontos visíveis para os outros usuários
+        latlngs.forEach(latlng => {
+            L.circleMarker(latlng, {
+                radius: 4,
+                color: corLinha,
+                weight: 1.5,
+                fillColor: '#ffffff',
+                fillOpacity: 1
+            }).addTo(grupoRotaCompartilhada);
+        });
 
         const pontosStr = encodeURIComponent(JSON.stringify(dados.pontos));
-        const corStr = encodeURIComponent('#e67e22');
+        const corStr = encodeURIComponent(corLinha);
         const keyStr = encodeURIComponent(key);
         
-        polyline.bindPopup(`<div style="text-align:center;"><b>Rota de ${key}</b><br><button onclick="dispararViagemRemota('${pontosStr}', '${corStr}', '${keyStr}')" class="btn-popup" style="background:#2E8B57; margin-top:5px; padding:4px 8px; font-size:12px; cursor:pointer;">🏇 Realizar Viagem em Grupo</button></div>`);
+        grupoRotaCompartilhada.bindPopup(`<div style="text-align:center;"><b>Rota de ${key}</b><br><button onclick="dispararViagemRemota('${pontosStr}', '${corStr}', '${keyStr}')" class="btn-popup" style="background:#2E8B57; margin-top:5px; padding:4px 8px; font-size:12px; cursor:pointer;">🏇 Realizar Viagem em Grupo</button></div>`);
 
-        rotasCompartilhadasAtivas[key] = polyline;
+        rotasCompartilhadasAtivas[key] = grupoRotaCompartilhada;
     }
 }
 
 function compartilharViagem() {
     if (!pontosRota || pontosRota.length < 2) return;
-    if (db && meuIdUsuario) {
+    if (db) {
         const rotaSimples = pontosRota.map(p => ({ lat: p.lat, lng: p.lng }));
-        
-        // Define diretamente a rota do usuário. Como usamos o meuIdUsuario como chave, 
-        // ela substitui a rota anterior do mesmo usuário instantaneamente.
-        db.ref('rotasCompartilhadas/' + meuIdUsuario).set({
-            cor: minhaCorUsuario,
-            mapa: mapaAtualAtivo,
-            pontos: rotaSimples
-        }).then(() => {
-            alert("Rota compartilhada com sucesso!");
-        }).catch((err) => {
-            console.error("Erro ao compartilhar rota:", err);
+        db.ref('rotasCompartilhadas').remove().then(() => {
+            db.ref('rotasCompartilhadas/' + meuIdUsuario).set({
+                cor: minhaCorUsuario,
+                mapa: mapaAtualAtivo,
+                pontos: rotaSimples
+            });
         });
     }
 }
@@ -5510,7 +5520,8 @@ function dispararViagemGlobal(pontos, cor) {
         db.ref('viagensAoVivo').push({
             mapa: mapaAtualAtivo,
             pontos: pontos.map(p => ({ lat: p.lat, lng: p.lng })),
-            cor: cor || minhaCorUsuario,
+            cor: cor || '#e67e22',
+            clientTimestamp: Date.now(),
             timestamp: firebase.database.ServerValue.TIMESTAMP
         });
     }
@@ -5520,7 +5531,12 @@ function animarViagem() {
     document.getElementById('modal-viagem').style.display = 'none';
     if (!pontosRota || pontosRota.length < 2) return;
 
-    dispararViagemGlobal(pontosRota, minhaCorUsuario);
+    dispararViagemGlobal(pontosRota, '#e67e22');
+
+    // Remove a rota compartilhada do usuário para sumir do mapa imediatamente
+    if (db && meuIdUsuario) {
+        db.ref('rotasCompartilhadas/' + meuIdUsuario).remove();
+    }
 
     setTimeout(() => {
         grupoRota.clearLayers();
@@ -5549,7 +5565,8 @@ const tempoInicioClient = Date.now();
 if (db) {
     db.ref('viagensAoVivo').on('child_added', (snapshot) => {
         const viagem = snapshot.val();
-        if (viagem && viagem.mapa === mapaAtualAtivo && viagem.timestamp && (viagem.timestamp > tempoInicioClient - 5000)) {
+        // Usa clientTimestamp comparado com o relógio local para evitar erros de sincronização de fuso/servidor
+        if (viagem && viagem.mapa === mapaAtualAtivo && viagem.clientTimestamp && (viagem.clientTimestamp > tempoInicioClient - 5000)) {
             animarViagemComPontos(viagem.pontos, viagem.cor);
         }
     });
