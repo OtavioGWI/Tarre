@@ -719,12 +719,32 @@
     }
     @keyframes girarBussola { 100% { transform: rotate(360deg); } }
     
+    /* SISTEMA DE CLIMA */
+    #efeito-noite {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(5, 10, 30, 0.55); pointer-events: none;
+        z-index: 499; display: none; transition: background 1s ease;
+    }
+    .chuva-container {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        pointer-events: none; z-index: 500; overflow: hidden;
+    }
+    .gota-chuva {
+        position: absolute; width: 1.5px; height: 70px;
+        background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.4));
+        animation: cairChuva linear infinite;
+    }
+    @keyframes cairChuva {
+        0% { transform: translateY(-100px) rotate(10deg); }
+        100% { transform: translateY(105vh) rotate(10deg); }
+    }
     </style>
 </head>
 <body>
     <div id="map-container">
     <div id="map"></div>
 </div>
+<div id="efeito-noite"></div>
 
 <div id="modal-info" style="display: none;">
     <div class="modal-conteudo">
@@ -1838,7 +1858,7 @@ function carregarMapaPrincipal(provinciaOrigem = null) {
     fatorEscala = 0.23; // Escala do continente
 
     // Limpeza de efeitos climáticos ao voltar ao continente
-    pararNeve();
+    aplicarClimaNaTela(climaAtual);
 
     // Limpeza: Remove rota anterior e cancela modo de medição se ativo
     if (medindo) cancelarModoMedicao();
@@ -4089,6 +4109,7 @@ function animarVoltaContinente(provincia) {
 
 function carregarProvincia(arquivo) {
     mapaAtualAtivo = arquivo;
+    aplicarClimaNaTela(climaAtual);
     
     // --- LIMPEZA DE ROTA ---
     if (medindo) cancelarModoMedicao();
@@ -4118,9 +4139,9 @@ function carregarProvincia(arquivo) {
         pararBarcos();
     }
     if (arquivo === 'Hukmal_tep.jpg') {
-        iniciarNeve();
+        aplicarClimaNaTela(climaAtual);
     } else {
-        pararNeve();
+        aplicarClimaNaTela(climaAtual);
     }
 
     document.getElementById('lista-botoes-provincia').style.display = 'none';
@@ -5186,16 +5207,68 @@ function pararBarcos() {
     animacoesBarcosIDs.forEach(id => cancelAnimationFrame(id));
     animacoesBarcosIDs = [];
 }
-function iniciarNeve() {
-    pararNeve();
-    if (mapaAtualAtivo !== "Hukmal_tep.jpg") return;
+let climaAtual = 'normal';
 
+function alterarClima(tipo) {
+    if (db) db.ref('climaGlobal').set(tipo);
+}
+
+if (db) {
+    db.ref('climaGlobal').on('value', (snapshot) => {
+        aplicarClimaNaTela(snapshot.val() || 'normal');
+    });
+}
+
+function aplicarClimaNaTela(clima) {
+    climaAtual = clima;
+    
+    // Limpeza de todos os efeitos antes de aplicar o novo
+    pararNeve();
+    pararChuva();
+    document.getElementById('efeito-noite').style.display = 'none';
+
+    if (clima === 'noite') {
+        document.getElementById('efeito-noite').style.display = 'block';
+    } else if (clima === 'chuva') {
+        iniciarChuva();
+    } else if (clima === 'neve') {
+        iniciarNeveGlobal();
+    } else {
+        // Modo Normal: Mantém o ecossistema base (apenas Hukmal'tep neva nativamente)
+        if (mapaAtualAtivo === 'Hukmal_tep.jpg') iniciarNeveGlobal();
+    }
+}
+
+function iniciarChuva() {
+    pararChuva();
+    const container = document.createElement('div');
+    container.id = 'chuva-efeito';
+    container.className = 'chuva-container';
+    document.body.appendChild(container);
+
+    for (let i = 0; i < 70; i++) {
+        const gota = document.createElement('div');
+        gota.className = 'gota-chuva';
+        gota.style.left = Math.random() * 100 + 'vw';
+        gota.style.animationDuration = (Math.random() * 0.2 + 0.3) + 's';
+        gota.style.animationDelay = (Math.random() * 1) + 's';
+        container.appendChild(gota);
+    }
+}
+
+function pararChuva() {
+    const container = document.getElementById('chuva-efeito');
+    if (container) container.remove();
+}
+
+function iniciarNeveGlobal() {
+    pararNeve();
     const container = document.createElement('div');
     container.id = 'neve-efeito';
     container.className = 'neve-container';
     document.body.appendChild(container);
 
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 20; i++) {
         const ehFloco = Math.random() > 0.6; 
         const p = document.createElement('div');
         
@@ -5213,7 +5286,6 @@ function iniciarNeve() {
             p.style.width = tamanho + 'px';
             p.style.height = tamanho + 'px';
         }
-
         container.appendChild(p);
     }
 }
@@ -5755,7 +5827,7 @@ function abrirMenuMestre(aba = 'principal') {
             <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">SISTEMA</div>
             <button id="btn-foco-mestre" class="botao-provincia" onclick="alternarFocoMestre()">👁️ Forçar Foco: OFF</button>
             <button id="btn-bloqueio-mapa" class="botao-provincia" onclick="alternarBloqueioMapa()">🗺️ Bloquear Mapa: OFF</button>
-            <button class="botao-provincia" onclick="abrirMenuMestre('masmorras')" style="color: #87ceeb; border-color: #4682b4;">🏰 Controlar Masmorras</button>
+            <button class="botao-provincia" onclick="abrirMenuMestre('controles')" style="color: #87ceeb; border-color: #4682b4;">⚙️ Controles do Mundo</button>
             
             <hr style="border: 0; border-top: 1px solid #555; margin: 15px 0 10px 0;">
             <button class="botao-provincia" onclick="fecharMenuMestre()" style="color: #aaa; border-color: #555; text-align: center;">🔒 Travar Painel</button>
@@ -5769,10 +5841,19 @@ function abrirMenuMestre(aba = 'principal') {
                 btnMestre.classList.add('btn-ferramenta-ativa');
             }
         }
-    } else if (aba === 'masmorras') {
-        // (O CÓDIGO DAS MASMORRAS CONTINUA O MESMO AQUI)
+    } else if (aba === 'controles') {
         conteudo.innerHTML = `
-            <h3 style="text-align: center; margin-top: 0; color: #ff4444; border-bottom: 1px solid #555; padding-bottom: 10px;">🏰 Masmorras</h3>
+            <h3 style="text-align: center; margin-top: 0; color: #ff4444; border-bottom: 1px solid #555; padding-bottom: 10px;">⚙️ Controles</h3>
+            
+            <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">CLIMA GLOBAL</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 20px;">
+                <button class="botao-provincia" onclick="alterarClima('normal')" style="margin:0; text-align:center;">☀️ Normal</button>
+                <button class="botao-provincia" onclick="alterarClima('noite')" style="margin:0; text-align:center;">🌙 Noite</button>
+                <button class="botao-provincia" onclick="alterarClima('chuva')" style="margin:0; text-align:center;">🌧️ Chuva</button>
+                <button class="botao-provincia" onclick="alterarClima('neve')" style="margin:0; text-align:center;">❄️ Neve</button>
+            </div>
+
+            <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MASMORRAS</div>
             <div style="margin-bottom: 15px;">
                 <span style="color: #ffd700; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Torre dos Sábios</span>
                 <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
