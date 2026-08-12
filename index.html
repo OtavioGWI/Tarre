@@ -1653,15 +1653,18 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
     
     ultimaImagemBounds = limitesImagem
 
+    // CORREÇÃO: Verifica se o Mestre ordenou o bloqueio da animação padrão de afastamento
     if (coordInicial) {
         map.setView(coordInicial, 2, { animate: false }) 
         setTimeout(() => {
-            if (map) {
+            if (map && !window.bloquearAnimacaoInicial) {
                 map.flyToBounds(limitesImagem, { animate: true, duration: 1.8 })
             }
         }, 600) 
     } else {
-        map.fitBounds(limitesImagem) 
+        if (!window.bloquearAnimacaoInicial) {
+            map.fitBounds(limitesImagem) 
+        }
     }
 
     setTimeout(() => { try { map.invalidateSize() } catch (err) { } }, 120)
@@ -1669,14 +1672,22 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
     
     map.on('click', function(e) {
         if (medindo) {
-            processarCliqueMedicao(e.latlng)
-            return
+            processarCliqueMedicao(e.latlng);
+            return;
         }
 
-        // BLOCO DO MESTRE: Pings
+        // BLOCO DO MESTRE: Coloca as infinitas caveiras/tesouros/pings
         if (typeof modoPingMestre !== 'undefined' && modoPingMestre) {
-            // ... (código existente dos pings)
-            return;
+            const chaveUnica = meuIdUsuario + '_mestre_' + Date.now();
+            const novoPinMestre = {
+                lat: e.latlng.lat,
+                lng: e.latlng.lng,
+                mapa: mapaAtualAtivo,
+                tipo: modoPingMestre, 
+                autor: 'mestre'
+            };
+            if (db) db.ref('pings/' + chaveUnica).set(novoPinMestre);
+            return; 
         }
 
         // BLOCO DO MESTRE: Câmera Sincronizada
@@ -1689,25 +1700,11 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
                     clientTimestamp: Date.now()
                 });
             }
-            alternarFocoMestre(); // Desliga sozinho após 1 clique para você voltar a navegar livremente
+            alternarFocoMestre(); // Desliga sozinho após 1 clique
             return; 
         }
 
-        // --- ADICIONE ESTE BLOCO AQUI ---
-        if (typeof modoPingMestre !== 'undefined' && modoPingMestre) {
-            const chaveUnica = meuIdUsuario + '_mestre_' + Date.now(); // Gera ID único para não apagar o ping anterior
-            const novoPinMestre = {
-                lat: e.latlng.lat,
-                lng: e.latlng.lng,
-                mapa: mapaAtualAtivo,
-                tipo: modoPingMestre, // 'normal', 'caveira', 'tesouro'
-                autor: 'mestre'
-            };
-            if (db) db.ref('pings/' + chaveUnica).set(novoPinMestre);
-            return; // Retorna para você continuar colocando vários pings sem a ferramenta desligar
-        }
-
-        // Verificação restaurada para o pino global funcionar apenas quando ativado
+        // Verificação do pino global dos jogadores
         if (modoPinGlobal) {
             const novoPin = {
                 lat: e.latlng.lat,
@@ -1715,40 +1712,34 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
                 mapa: mapaAtualAtivo,
                 cor: minhaCorUsuario
             };
-            
-            if (db) {
-                db.ref('pings/' + meuIdUsuario).set(novoPin);
-            }
+            if (db) db.ref('pings/' + meuIdUsuario).set(novoPin);
             return;
         }
 
+        // Verificação de ferramentas de coordenadas
         if (modoCoordenadas) {
             if (marcadorTempCoords) {
-                map.removeLayer(marcadorTempCoords)
-                marcadorTempCoords = null
+                map.removeLayer(marcadorTempCoords);
+                marcadorTempCoords = null;
             }
-
-            const y = e.latlng.lat.toFixed(0)
-            const x = e.latlng.lng.toFixed(0)
-
+            const y = e.latlng.lat.toFixed(0);
+            const x = e.latlng.lng.toFixed(0);
             marcadorTempCoords = L.marker(e.latlng, { 
                 icon: iconCoords,
                 zIndexOffset: 1000 
-            }).addTo(map)
-            
+            }).addTo(map);
             marcadorTempCoords.bindPopup(`<b>📍 Coordenadas</b><br>[${y}, ${x}]`, {
                 closeOnClick: false, 
                 autoClose: false     
-            }).openPopup()
-
+            }).openPopup();
             marcadorTempCoords.on('popupclose', function(event) {
-                map.removeLayer(event.target)
+                map.removeLayer(event.target);
                 if (marcadorTempCoords === event.target) {
-                    marcadorTempCoords = null
+                    marcadorTempCoords = null;
                 }
-            })
+            });
         }
-    })
+    });
 }
 /**
  * Alterna visibilidade do menu no mobile (< 600px)
@@ -5740,9 +5731,21 @@ function abrirMenuMestre() {
         <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">CÂMERA GLOBAL</div>
         <button id="btn-foco-mestre" class="botao-provincia" onclick="alternarFocoMestre()">👁️ Forçar Foco: OFF</button>
         
+        <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">SISTEMA</div>
+        <button id="btn-bloqueio-mapa" class="botao-provincia" onclick="alternarBloqueioMapa()">🗺️ Bloquear Mapa: OFF</button>
+        
         <hr style="border: 0; border-top: 1px solid #555; margin: 15px 0 10px 0;">
         <button class="botao-provincia" onclick="fecharMenuMestre()" style="color: #aaa; border-color: #555; text-align: center;">🔒 Travar Painel</button>
     `;
+
+    // Garante que o botão fique verde se você abrir o painel com o bloqueio já ativado
+    if (typeof estadoBloqueio !== 'undefined' && estadoBloqueio) {
+        const btnMestre = document.getElementById('btn-bloqueio-mapa');
+        if (btnMestre) {
+            btnMestre.innerHTML = "🗺️ Bloquear Mapa: ON";
+            btnMestre.classList.add('btn-ferramenta-ativa');
+        }
+    }
 }
 
 function fecharMenuMestre() {
@@ -5882,6 +5885,72 @@ if (db) {
                 executarFocoForcado(dados.mapa, dados.lat, dados.lng);
             }
         }
+    });
+}
+// ==========================================
+// SISTEMA DE BLOQUEIO DE MAPA (TELA PRETA)
+// ==========================================
+let estadoBloqueio = false;
+
+function alternarBloqueioMapa() {
+    if (db) {
+        db.ref('mapaBloqueado').set(!estadoBloqueio);
+    }
+}
+
+function aplicarTelaDeBloqueio(bloqueado) {
+    estadoBloqueio = bloqueado;
+    
+    // Injeta a tela preta no HTML de forma invisível (caso não exista)
+    let tela = document.getElementById('tela-bloqueio');
+    if (!tela) {
+        tela = document.createElement('div');
+        tela.id = 'tela-bloqueio';
+        tela.style.cssText = "display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #050505; z-index: 9998; align-items: center; justify-content: center; flex-direction: column; color: #ff4444; font-family: serif; user-select: none;";
+        tela.innerHTML = `
+            <h1 style="font-size: 2.5rem; text-transform: uppercase; letter-spacing: 5px; margin-bottom: 10px; text-shadow: 0 0 10px red;">Sinal Perdido</h1>
+            <p style="font-size: 1.2rem; color: #aaa; font-style: italic;">Você está sem acesso ao mapa de Tarre.</p>
+        `;
+        document.body.appendChild(tela);
+    }
+
+    const btnMestre = document.getElementById('btn-bloqueio-mapa');
+    const menuMestre = document.getElementById('menu-mestre');
+
+    if (bloqueado) {
+        // 1. Eleva o menu do mestre (z-index 9999) para que ele supere a tela preta (z-index 9998)
+        if (menuMestre) menuMestre.style.zIndex = '9999';
+
+        // 2. Fecha à força tudo que os jogadores possam estar lendo por trás da tela
+        fecharModais(true);
+        fecharPopupSeguro();
+        document.getElementById('modal-viagem').style.display = 'none';
+        document.getElementById('modal-senha').style.display = 'none';
+
+        // 3. Cobre o mapa
+        tela.style.display = 'flex';
+
+        // 4. Atualiza o botão no seu painel
+        if (btnMestre) {
+            btnMestre.innerHTML = "🗺️ Bloquear Mapa: ON";
+            btnMestre.classList.add('btn-ferramenta-ativa');
+        }
+    } else {
+        // Remove a escuridão
+        tela.style.display = 'none';
+        
+        // Retorna o botão ao estado normal
+        if (btnMestre) {
+            btnMestre.innerHTML = "🗺️ Bloquear Mapa: OFF";
+            btnMestre.classList.remove('btn-ferramenta-ativa');
+        }
+    }
+}
+
+// Ouvinte Implacável: Garante que os jogadores que derem F5 voltem para a tela preta
+if (db) {
+    db.ref('mapaBloqueado').on('value', (snapshot) => {
+        aplicarTelaDeBloqueio(snapshot.val() || false);
     });
 }
 
