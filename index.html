@@ -1471,22 +1471,7 @@ function abrirMenuTorre() {
             </div>
         </div>
 
-        <div style="margin-top: 30px; text-align: center; border-top: 1px dashed #444; padding-top: 10px;">
-            <button onclick="subirAndar()" style="background: rgba(139, 69, 19, 0.3); border: 1px solid #8b4513; color: #cd853f; font-size: 11px; cursor: pointer; padding: 5px 15px; border-radius: 4px;">
-                ⚙️ MESTRE: Desbloquear Próximo Andar
-            </button>
-        </div>
     `;
-}
-
-function subirAndar() {
-    if (andarMaximoLiberado < 12) {
-        andarMaximoLiberado++;
-        abrirMenuTorre(); // Atualiza a interface da torre
-        alert("A névoa se dissipou! O " + andarMaximoLiberado + "º andar agora está acessível.");
-    } else {
-        alert("A torre já está totalmente desbloqueada!");
-    }
 }
 
 
@@ -5009,11 +4994,6 @@ function abrirMenuDungeon(id = 'hukmal') {
                 }).join('')}
             </div>
         </div>
-        <div style="margin-top: 30px; text-align: center; border-top: 1px dashed #444; padding-top: 10px;">
-            <button onclick="liberarSala()" style="background: rgba(30, 144, 255, 0.2); border: 1px solid #1e90ff; color: #87ceeb; font-size: 11px; cursor: pointer; padding: 5px 15px; border-radius: 4px;">
-                ⚙️ MESTRE: Liberar Próxima Sala
-            </button>
-        </div>
     `;
 }
 
@@ -5045,14 +5025,6 @@ function zoomFotoDungeon(arquivo, salaNum) {
         document.getElementById('modal-capital').style.display = 'flex'; 
         detalharSala(salaNum); 
     });
-}
-
-function liberarSala() {
-    const d = registroDungeons[dungeonAtiva];
-    if (d.progresso < d.dados.length - 1) {
-        d.progresso++;
-        abrirMenuDungeon(dungeonAtiva);
-    }
 }
 let barcosAtivos = [];
 let animacoesBarcosIDs = [];
@@ -5712,39 +5684,73 @@ if (db) {
     });
 }
 
-function abrirMenuMestre() {
+function abrirMenuMestre(aba = 'principal') {
     document.getElementById('btn-login-mestre').style.display = 'none';
-    
     const conteudo = document.getElementById('conteudo-mestre');
     conteudo.style.display = 'block';
     
-    conteudo.innerHTML = `
-        <h3 style="text-align: center; margin-top: 0; color: #ff4444; border-bottom: 1px solid #555; padding-bottom: 10px;">👑 Mestre</h3>
+    if (aba === 'principal') {
+        conteudo.innerHTML = `
+            <h3 style="text-align: center; margin-top: 0; color: #ff4444; border-bottom: 1px solid #555; padding-bottom: 10px;">👑 Mestre</h3>
+            
+            <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MARCADORES LIVRES</div>
+            <button id="btn-ping-mestre-normal" class="botao-provincia" onclick="alternarPingMestre('normal')">🔴 Ponto do Mestre: OFF</button>
+            <button id="btn-ping-mestre-caveira" class="botao-provincia" onclick="alternarPingMestre('caveira')">💀 Ponto de Ameaça: OFF</button>
+            <button id="btn-ping-mestre-tesouro" class="botao-provincia" onclick="alternarPingMestre('tesouro')">💎 Ponto de Interesse: OFF</button>
+            
+            <button class="botao-provincia" onclick="limparTodosPings()" style="color: #ff4444; border-color: #8b0000; margin-top: 20px;">🗑️ Limpar Todos os Pings</button>
+            
+            <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">SISTEMA</div>
+            <button id="btn-foco-mestre" class="botao-provincia" onclick="alternarFocoMestre()">👁️ Forçar Foco: OFF</button>
+            <button id="btn-bloqueio-mapa" class="botao-provincia" onclick="alternarBloqueioMapa()">🗺️ Bloquear Mapa: OFF</button>
+            <button class="botao-provincia" onclick="abrirMenuMestre('masmorras')" style="color: #87ceeb; border-color: #4682b4;">🏰 Controlar Masmorras</button>
+            
+            <hr style="border: 0; border-top: 1px solid #555; margin: 15px 0 10px 0;">
+            <button class="botao-provincia" onclick="fecharMenuMestre()" style="color: #aaa; border-color: #555; text-align: center;">🔒 Travar Painel</button>
+        `;
         
-        <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MARCADORES LIVRES</div>
-        <button id="btn-ping-mestre-normal" class="botao-provincia" onclick="alternarPingMestre('normal')">🔴 Ponto do Mestre: OFF</button>
-        <button id="btn-ping-mestre-caveira" class="botao-provincia" onclick="alternarPingMestre('caveira')">💀 Ponto de Ameaça: OFF</button>
-        <button id="btn-ping-mestre-tesouro" class="botao-provincia" onclick="alternarPingMestre('tesouro')">💎 Ponto de Interesse: OFF</button>
-        
-        <button class="botao-provincia" onclick="limparTodosPings()" style="color: #ff4444; border-color: #8b0000; margin-top: 20px;">🗑️ Limpar Todos os Pings</button>
-        
-        <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">CÂMERA GLOBAL</div>
-        <button id="btn-foco-mestre" class="botao-provincia" onclick="alternarFocoMestre()">👁️ Forçar Foco: OFF</button>
-        
-        <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">SISTEMA</div>
-        <button id="btn-bloqueio-mapa" class="botao-provincia" onclick="alternarBloqueioMapa()">🗺️ Bloquear Mapa: OFF</button>
-        
-        <hr style="border: 0; border-top: 1px solid #555; margin: 15px 0 10px 0;">
-        <button class="botao-provincia" onclick="fecharMenuMestre()" style="color: #aaa; border-color: #555; text-align: center;">🔒 Travar Painel</button>
-    `;
-
-    // Garante que o botão fique verde se você abrir o painel com o bloqueio já ativado
-    if (typeof estadoBloqueio !== 'undefined' && estadoBloqueio) {
-        const btnMestre = document.getElementById('btn-bloqueio-mapa');
-        if (btnMestre) {
-            btnMestre.innerHTML = "🗺️ Bloquear Mapa: ON";
-            btnMestre.classList.add('btn-ferramenta-ativa');
+        atualizarBotoesMestre();
+        if (typeof estadoBloqueio !== 'undefined' && estadoBloqueio) {
+            const btnMestre = document.getElementById('btn-bloqueio-mapa');
+            if (btnMestre) {
+                btnMestre.innerHTML = "🗺️ Bloquear Mapa: ON";
+                btnMestre.classList.add('btn-ferramenta-ativa');
+            }
         }
+    } else if (aba === 'masmorras') {
+        conteudo.innerHTML = `
+            <h3 style="text-align: center; margin-top: 0; color: #ff4444; border-bottom: 1px solid #555; padding-bottom: 10px;">🏰 Masmorras</h3>
+            
+            <div style="margin-bottom: 15px;">
+                <span style="color: #ffd700; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Torre dos Sábios</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
+                    <button onclick="alterarProgresso('torre', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
+                    <span id="visor-torre" style="color: white; font-weight: bold;">Andar: ${andarMaximoLiberado}</span>
+                    <button onclick="alterarProgresso('torre', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <span style="color: #add8e6; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Hukmal'tep (Gelo)</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
+                    <button onclick="alterarProgresso('hukmal', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
+                    <span id="visor-hukmal" style="color: white; font-weight: bold;">Sala: ${registroDungeons['hukmal'].progresso}</span>
+                    <button onclick="alterarProgresso('hukmal', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <span style="color: #cd853f; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Deserto (Tristeza)</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
+                    <button onclick="alterarProgresso('deserto', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
+                    <span id="visor-deserto" style="color: white; font-weight: bold;">Sala: ${registroDungeons['deserto'].progresso}</span>
+                    <button onclick="alterarProgresso('deserto', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
+                </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #555; margin: 20px 0 10px 0;">
+            <button class="botao-provincia" onclick="abrirMenuMestre('principal')" style="color: #aaa; border-color: #555; text-align: center;">⬅ Voltar ao Painel</button>
+        `;
     }
 }
 
@@ -5952,6 +5958,52 @@ if (db) {
     db.ref('mapaBloqueado').on('value', (snapshot) => {
         aplicarTelaDeBloqueio(snapshot.val() || false);
     });
+}
+
+// ==========================================
+// CONTROLE SINCRONIZADO DE MASMORRAS
+// ==========================================
+if (db) {
+    db.ref('progressoDungeons').on('value', (snapshot) => {
+        const dados = snapshot.val();
+        if (dados) {
+            // Atualiza as variáveis globais
+            if (dados.torre !== undefined) andarMaximoLiberado = dados.torre;
+            if (dados.hukmal !== undefined) registroDungeons['hukmal'].progresso = dados.hukmal;
+            if (dados.deserto !== undefined) registroDungeons['deserto'].progresso = dados.deserto;
+            
+            // Se algum jogador estiver com o painel aberto na hora, atualiza a visão dele
+            const modalAberto = document.getElementById('modal-capital');
+            const titulo = document.getElementById('titulo-menu-capital');
+            if (modalAberto && modalAberto.style.display === 'flex' && titulo) {
+                if (titulo.innerText.includes("Torre dos Sábios")) abrirMenuTorre();
+                else if (titulo.innerText.includes("Masmorra Congelada")) abrirMenuDungeon('hukmal');
+                else if (titulo.innerText.includes("Masmorra da Tristeza")) abrirMenuDungeon('deserto');
+            }
+            
+            // Atualiza os visores no Painel do Mestre (se estiver na aba)
+            const vTorre = document.getElementById('visor-torre');
+            const vHukmal = document.getElementById('visor-hukmal');
+            const vDeserto = document.getElementById('visor-deserto');
+            
+            if(vTorre) vTorre.innerText = `Andar: ${andarMaximoLiberado}`;
+            if(vHukmal) vHukmal.innerText = `Sala: ${registroDungeons['hukmal'].progresso}`;
+            if(vDeserto) vDeserto.innerText = `Sala: ${registroDungeons['deserto'].progresso}`;
+        }
+    });
+}
+
+function alterarProgresso(tipo, delta) {
+    if (!db) return;
+    
+    if (tipo === 'torre') {
+        let novo = andarMaximoLiberado + delta;
+        if (novo >= 1 && novo <= 12) db.ref('progressoDungeons/torre').set(novo);
+    } else {
+        let d = registroDungeons[tipo];
+        let novo = d.progresso + delta;
+        if (novo >= 0 && novo < d.dados.length) db.ref('progressoDungeons/' + tipo).set(novo);
+    }
 }
 
 precarregarImagens();
