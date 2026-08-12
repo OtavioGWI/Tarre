@@ -1631,11 +1631,11 @@ function zoomOutPadrao() {
 }
 
 function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicial = null) {
-    if (map) { map.remove() } 
+    if (map) { map.remove(); } 
 
-    const limitesImagem = [[0, 0], [altura, largura]]
-    const padding = 1500 
-    const limitesNavegacao = [[-padding, -padding], [altura + padding, largura + padding]]
+    const limitesImagem = [[0, 0], [altura, largura]];
+    const padding = 1500; 
+    const limitesNavegacao = [[-padding, -padding], [altura + padding, largura + padding]];
     
     map = L.map('map', {
         crs: L.CRS.Simple,
@@ -1646,27 +1646,35 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
         tap: false,
         zoomControl: false,
         zoomAnimation: true
-    })
+    });
 
-    recarregarPinsDoMapaAtual()
+    recarregarPinsDoMapaAtual();
 
-    grupoRota.addTo(map)
-    L.control.zoom({ position: 'topleft' }).addTo(map)
-    L.imageOverlay(arquivo, limitesImagem).addTo(map)
+    grupoRota.addTo(map);
+    L.control.zoom({ position: 'topleft' }).addTo(map);
+    L.imageOverlay(arquivo, limitesImagem).addTo(map);
     
-    ultimaImagemBounds = limitesImagem
+    ultimaImagemBounds = limitesImagem;
 
-    // CORREÇÃO: Verifica se o Mestre ordenou o bloqueio da animação padrão de afastamento
-    if (coordInicial) {
-        map.setView(coordInicial, 2, { animate: false }) 
-        setTimeout(() => {
-            if (map && !window.bloquearAnimacaoInicial) {
-                map.flyToBounds(limitesImagem, { animate: true, duration: 1.8 })
-            }
-        }, 600) 
+    // Força uma atualização imediata para evitar tela cinza
+    try { map.invalidateSize(); } catch(e){}
+
+    // CORREÇÃO: Se o mestre travou a tela para focar, usamos um centro matemático absoluto seguro
+    if (window.bloquearAnimacaoInicial) {
+        const centroSeguro = coordInicial ? coordInicial : [altura / 2, largura / 2];
+        map.setView(centroSeguro, minZoom, { animate: false });
     } else {
-    
-        map.fitBounds(limitesImagem, { animate: !window.bloquearAnimacaoInicial });
+        // Fluxo normal de jogo
+        if (coordInicial) {
+            map.setView(coordInicial, 2, { animate: false });
+            setTimeout(() => {
+                if (map && !window.bloquearAnimacaoInicial) {
+                    map.flyToBounds(limitesImagem, { animate: true, duration: 1.8 });
+                }
+            }, 600);
+        } else {
+            map.fitBounds(limitesImagem, { animate: false });
+        }
     }
 
     setTimeout(() => { try { map.invalidateSize(); } catch (err) { } }, 120);
@@ -1680,15 +1688,11 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
 
         // BLOCO DO MESTRE: Pings e Setas
         if (typeof modoPingMestre !== 'undefined' && modoPingMestre) {
-            
-            // Lógica de Seta (2 Cliques)
             if (modoPingMestre === 'seta') {
                 if (!pontoOrigemSeta) {
-                    // Primeiro clique: Marca a origem
                     pontoOrigemSeta = e.latlng;
                     marcadorOrigemTemp = L.circleMarker(e.latlng, { radius: 5, color: '#ff4444', fillColor: '#ff4444', fillOpacity: 1 }).addTo(map);
                 } else {
-                    // Segundo clique: Dispara para o Firebase
                     const chaveUnica = meuIdUsuario + '_seta_' + Date.now();
                     const novaSeta = {
                         lat1: pontoOrigemSeta.lat, lng1: pontoOrigemSeta.lng,
@@ -1697,14 +1701,12 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
                     };
                     if (db) db.ref('setas/' + chaveUnica).set(novaSeta);
                     
-                    // Limpa para desenhar a próxima
                     pontoOrigemSeta = null;
                     if (marcadorOrigemTemp) { map.removeLayer(marcadorOrigemTemp); marcadorOrigemTemp = null; }
                 }
                 return;
             }
 
-            // Lógica de Pings normais (1 Clique)
             const chaveUnica = meuIdUsuario + '_mestre_' + Date.now();
             const novoPinMestre = {
                 lat: e.latlng.lat,
@@ -1727,43 +1729,25 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
                     clientTimestamp: Date.now()
                 });
             }
-            alternarFocoMestre(); // Desliga sozinho após 1 clique
+            alternarFocoMestre(); 
             return; 
         }
 
-        // Verificação do pino global dos jogadores
         if (modoPinGlobal) {
-            const novoPin = {
-                lat: e.latlng.lat,
-                lng: e.latlng.lng,
-                mapa: mapaAtualAtivo,
-                cor: minhaCorUsuario
-            };
+            const novoPin = { lat: e.latlng.lat, lng: e.latlng.lng, mapa: mapaAtualAtivo, cor: minhaCorUsuario };
             if (db) db.ref('pings/' + meuIdUsuario).set(novoPin);
             return;
         }
 
-        // Verificação de ferramentas de coordenadas
         if (modoCoordenadas) {
-            if (marcadorTempCoords) {
-                map.removeLayer(marcadorTempCoords);
-                marcadorTempCoords = null;
-            }
+            if (marcadorTempCoords) { map.removeLayer(marcadorTempCoords); marcadorTempCoords = null; }
             const y = e.latlng.lat.toFixed(0);
             const x = e.latlng.lng.toFixed(0);
-            marcadorTempCoords = L.marker(e.latlng, { 
-                icon: iconCoords,
-                zIndexOffset: 1000 
-            }).addTo(map);
-            marcadorTempCoords.bindPopup(`<b>📍 Coordenadas</b><br>[${y}, ${x}]`, {
-                closeOnClick: false, 
-                autoClose: false     
-            }).openPopup();
+            marcadorTempCoords = L.marker(e.latlng, { icon: iconCoords, zIndexOffset: 1000 }).addTo(map);
+            marcadorTempCoords.bindPopup(`<b>📍 Coordenadas</b><br>[${y}, ${x}]`, { closeOnClick: false, autoClose: false }).openPopup();
             marcadorTempCoords.on('popupclose', function(event) {
                 map.removeLayer(event.target);
-                if (marcadorTempCoords === event.target) {
-                    marcadorTempCoords = null;
-                }
+                if (marcadorTempCoords === event.target) { marcadorTempCoords = null; }
             });
         }
     });
@@ -5949,7 +5933,6 @@ function exibirBussolaNaTela(dados) {
 // CÂMERA SINCRONIZADA DO MESTRE
 // ==========================================
 function executarFocoForcado(mapaDestino, lat, lng) {
-    // 1. Fecha menus, popups e imagens à força
     fecharModais(true);
     fecharPopupSeguro();
     document.getElementById('modal-viagem').style.display = 'none';
@@ -5957,10 +5940,9 @@ function executarFocoForcado(mapaDestino, lat, lng) {
     
     restaurarMapaMenu({ restoreMenuIfContinent: true, ignorarZoomOut: true });
 
-    // Trava a animação padrão inicial do mapa para não interromper o voo do Mestre
+    // Trava a animação padrão do mapa para não dar tela cinza nem interromper o Mestre
     window.bloquearAnimacaoInicial = true; 
 
-    // 2. Define o nível de zoom, o marcador e o recuo automático
     const focarNoPonto = () => {
         const iconFoco = L.divIcon({
             html: '<div style="font-size: 60px; filter: drop-shadow(0 0 15px #ff4444); animation: pulsoMagico 1s infinite;">🎯</div>',
@@ -5973,16 +5955,16 @@ function executarFocoForcado(mapaDestino, lat, lng) {
 
         if(map) map.flyTo([lat, lng], 1.5, { animate: true, duration: 1.5 });
 
-        // Aguarda o voo (1.5s) + Visualização (2s) = 3.5 segundos
+        // Aguarda a viagem terminar (1.5s) + 2s de leitura = 3.5s
         setTimeout(() => {
             if (map && marcadorTemp) map.removeLayer(marcadorTemp);
-            zoomOutPadrao(); 
-            // Libera a trava do mapa apenas AQUI, quando o show do Mestre já acabou
+            
+            // Só libera a trava do mapa na hora exata de afastar a visão geral!
             window.bloquearAnimacaoInicial = false; 
+            zoomOutPadrao(); 
         }, 3500); 
     };
 
-    // 3. Verifica se precisa puxar o jogador de outra província
     if (mapaAtualAtivo === mapaDestino) {
         focarNoPonto(); 
     } else {
@@ -5992,7 +5974,8 @@ function executarFocoForcado(mapaDestino, lat, lng) {
             } else {
                 carregarProvincia(mapaDestino);
             }
-            // Espera o mapa ser montado na tela e dispara o foco e o alvo
+            
+            // Permite 400ms para a engine construir o cenário com as coordenadas seguras
             setTimeout(focarNoPonto, 400);
         });
     }
