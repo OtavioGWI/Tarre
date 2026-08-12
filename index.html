@@ -1665,13 +1665,12 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
             }
         }, 600) 
     } else {
-        if (!window.bloquearAnimacaoInicial) {
-            map.fitBounds(limitesImagem) 
-        }
+    
+        map.fitBounds(limitesImagem, { animate: !window.bloquearAnimacaoInicial });
     }
 
-    setTimeout(() => { try { map.invalidateSize() } catch (err) { } }, 120)
-    atualizarVisibilidadeMenuMobile()
+    setTimeout(() => { try { map.invalidateSize(); } catch (err) { } }, 120);
+    atualizarVisibilidadeMenuMobile();
     
     map.on('click', function(e) {
         if (medindo) {
