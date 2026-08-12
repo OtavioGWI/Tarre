@@ -798,7 +798,7 @@
 
 <!-- NOVO MENU DO MESTRE (TOTALMENTE INDEPENDENTE) -->
 <div id="menu-mestre" class="apenas-desktop">
-    <button id="btn-login-mestre" class="botao-provincia" onclick="abrirModalSenha('mestre', 'abrirMenuMestre()', 'funcao')" style="color: #ff4444; border-color: #8b0000; text-align: center;">
+    <button id="btn-login-mestre" class="botao-provincia" onclick="abrirModalSenha('123', 'abrirMenuMestre()', 'funcao')" style="color: #ff4444; border-color: #8b0000; text-align: center;">
         👑 Painel do Mestre
     </button>
     
@@ -811,6 +811,12 @@
         <button class="botao-provincia" onclick="fecharMenuMestre()" style="color: #aaa; border-color: #555; text-align: center;">
             🔒 Travar Painel
         </button>
+        <button class="botao-provincia" onclick="limparTodosPings()" style="color: #ff4444; border-color: #8b0000; margin-top: 20px;">🗑️ Limpar Todos os Pings</button>
+        
+        <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">CÂMERA GLOBAL</div>
+        <button id="btn-foco-mestre" class="botao-provincia" onclick="alternarFocoMestre()">👁️ Forçar Foco: OFF</button>
+        
+        <hr style="border: 0; border-top: 1px solid #555; margin: 15px 0 10px 0;">
     </div>
 </div>
 
@@ -1667,6 +1673,40 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
             return
         }
 
+        // BLOCO DO MESTRE: Pings
+        if (typeof modoPingMestre !== 'undefined' && modoPingMestre) {
+            // ... (código existente dos pings)
+            return;
+        }
+
+        // BLOCO DO MESTRE: Câmera Sincronizada
+        if (typeof modoFocoMestre !== 'undefined' && modoFocoMestre) {
+            if (db) {
+                db.ref('focoCamera').set({
+                    mapa: mapaAtualAtivo,
+                    lat: e.latlng.lat,
+                    lng: e.latlng.lng,
+                    clientTimestamp: Date.now()
+                });
+            }
+            alternarFocoMestre(); // Desliga sozinho após 1 clique para você voltar a navegar livremente
+            return; 
+        }
+
+        // --- ADICIONE ESTE BLOCO AQUI ---
+        if (typeof modoPingMestre !== 'undefined' && modoPingMestre) {
+            const chaveUnica = meuIdUsuario + '_mestre_' + Date.now(); // Gera ID único para não apagar o ping anterior
+            const novoPinMestre = {
+                lat: e.latlng.lat,
+                lng: e.latlng.lng,
+                mapa: mapaAtualAtivo,
+                tipo: modoPingMestre, // 'normal', 'caveira', 'tesouro'
+                autor: 'mestre'
+            };
+            if (db) db.ref('pings/' + chaveUnica).set(novoPinMestre);
+            return; // Retorna para você continuar colocando vários pings sem a ferramenta desligar
+        }
+
         // Verificação restaurada para o pino global funcionar apenas quando ativado
         if (modoPinGlobal) {
             const novoPin = {
@@ -1892,6 +1932,7 @@ let modoCoordenadas = false;
 let modoPinGlobal = false;
 
 function alternarCoordenadas() {
+    if (typeof modoPingMestre !== 'undefined' && modoPingMestre) alternarPingMestre(modoPingMestre);
     if (!modoCoordenadas && medindo) cancelarModoMedicao();
     if (!modoCoordenadas && modoPinGlobal) alternarPinGlobal(); // Desliga o azul se ligar o vermelho
     
@@ -1903,6 +1944,7 @@ function alternarCoordenadas() {
 }
 
 function alternarPinGlobal() {
+    if (typeof modoPingMestre !== 'undefined' && modoPingMestre) alternarPingMestre(modoPingMestre);
     if (!modoPinGlobal && medindo) cancelarModoMedicao();
     if (!modoPinGlobal && modoCoordenadas) alternarCoordenadas(); // Desliga o vermelho se ligar o azul
     
@@ -1963,13 +2005,12 @@ function atualizarVisualBotao() {
 // ==========================================
 // SINCRONIZAÇÃO EM TEMPO REAL (FIREBASE)
 // ==========================================
-db.ref('pings').on('child_changed', (snapshot) => {
+function tratarPing(snapshot) {
     const key = snapshot.key;
     const dados = snapshot.val();
     dbPings[key] = dados;
     
     if (marcadoresGlobaisAtivos[key]) {
-        marcadoresGlobaisAtivos[key].removendoPorAtualizacao = true;
         if (map) map.removeLayer(marcadoresGlobaisAtivos[key]);
         delete marcadoresGlobaisAtivos[key];
     }
@@ -1977,15 +2018,38 @@ db.ref('pings').on('child_changed', (snapshot) => {
     if (dados.mapa === mapaAtualAtivo && map) {
         desenharPinGlobalNaTela(key, dados);
     }
-});
+}
+
+// Agora escutamos os dois eventos!
+db.ref('pings').on('child_added', tratarPing);
+db.ref('pings').on('child_changed', tratarPing);
 
 
 function desenharPinGlobalNaTela(key, dados) {
-    const isMeuPin = (key === meuIdUsuario);
-    const corPin = dados.cor || '#3498db';
+    // Agora verifica se a chave COMEÇA com o seu ID, pois o mestre tem chaves únicas
+    const isMeuPin = key.startsWith(meuIdUsuario) || key === meuIdUsuario;
+    let corPin = dados.cor || '#3498db';
     
-    const iconeTituloHtml = `<svg width="12" height="12" viewBox="0 0 24 24" fill="${corPin}" stroke="#000" stroke-width="1.5" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"/></svg>`;
-    const titulo = isMeuPin ? `${iconeTituloHtml} Meu Ponto` : `${iconeTituloHtml} Ponto da Equipe`;
+    let iconeSvg = '';
+    let tituloPopup = '';
+
+    // Verifica que tipo de ícone renderizar
+    if (dados.autor === 'mestre') {
+        if (dados.tipo === 'caveira') {
+            iconeSvg = `<div style="font-size: 26px; filter: drop-shadow(0 0 4px red);">💀</div>`;
+            tituloPopup = "💀 Ameaça Detectada";
+        } else if (dados.tipo === 'tesouro') {
+            iconeSvg = `<div style="font-size: 26px; filter: drop-shadow(0 0 4px gold);">💎</div>`;
+            tituloPopup = "💎 Ponto de Interesse";
+        } else {
+            iconeSvg = `<svg width="30" height="30" viewBox="0 0 24 24" fill="#ff0000" stroke="#000" stroke-width="1.2" style="filter: drop-shadow(0 0 4px black);"><circle cx="12" cy="8" r="5" /><path d="M12 13 L10 21 L12 22 L14 21 Z" /></svg>`;
+            tituloPopup = "🔴 Ponto do Mestre";
+        }
+    } else {
+        iconeSvg = `<svg width="30" height="30" viewBox="0 0 24 24" fill="${corPin}" stroke="#000" stroke-width="1.2" style="filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));"><circle cx="12" cy="8" r="5" /><path d="M12 13 L10 21 L12 22 L14 21 Z" /></svg>`;
+        const iconeTituloHtml = `<svg width="12" height="12" viewBox="0 0 24 24" fill="${corPin}" stroke="#000" stroke-width="1.5" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"/></svg>`;
+        tituloPopup = isMeuPin ? `${iconeTituloHtml} Meu Ponto` : `${iconeTituloHtml} Ponto da Equipe`;
+    }
 
     if (marcadoresGlobaisAtivos[key]) {
         if (map) map.removeLayer(marcadoresGlobaisAtivos[key]);
@@ -1993,13 +2057,10 @@ function desenharPinGlobalNaTela(key, dados) {
     }
 
     const iconeCustomizado = L.divIcon({
-        html: `<svg width="30" height="30" viewBox="0 0 24 24" fill="${corPin}" stroke="#000" stroke-width="1.2" style="filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));">
-            <circle cx="12" cy="8" r="5" />
-            <path d="M12 13 L10 21 L12 22 L14 21 Z" />
-        </svg>`,
+        html: iconeSvg,
         className: 'marcador-emoji',
         iconSize: [30, 30],
-        iconAnchor: [12, 22],
+        iconAnchor: [15, 25],
         popupAnchor: [0, -20]
     });
 
@@ -2010,7 +2071,7 @@ function desenharPinGlobalNaTela(key, dados) {
     
     let botaoApagar = isMeuPin ? `<br><button onclick="apagarMeuPin('${key}')" class="btn-popup" style="background:#8b0000; margin-top:5px; padding:4px 8px; font-size:12px; cursor:pointer;">❌ Apagar Ping</button>` : '';
 
-    m.bindPopup(`<div style="text-align: center;"><b>${titulo}</b><br>[${dados.lat.toFixed(0)}, ${dados.lng.toFixed(0)}]${botaoApagar}</div>`, {
+    m.bindPopup(`<div style="text-align: center;"><b>${tituloPopup}</b><br>[${dados.lat.toFixed(0)}, ${dados.lng.toFixed(0)}]${botaoApagar}</div>`, {
         closeOnClick: false,
         autoClose: false
     }).openPopup();
@@ -3863,12 +3924,12 @@ function fecharModalSenha(ignorarZoomOut) {
     }
 }
 
-// Substitua a função restaurarMapaMenu
+
 function restaurarMapaMenu(options = {}) {
     const container = document.getElementById('provincia-container');
     const mapa = document.getElementById('map-container');
     const menu = document.getElementById('menu-provincias');
-    const menuMestre = document.getElementById('menu-mestre'); // Referência do novo menu
+    const menuMestre = document.getElementById('menu-mestre'); 
 
     if (container) container.style.display = 'none';
     if (mapa) mapa.style.display = 'block';
@@ -3876,14 +3937,17 @@ function restaurarMapaMenu(options = {}) {
     if (options.restoreMenuIfContinent) {
         if (mapaAtualAtivo === 'continente') {
             if (menu) menu.style.display = 'block';
-            if (menuMestre) menuMestre.style.display = 'block'; // Volta o menu
+            if (menuMestre) menuMestre.style.display = 'block'; 
         }
     } else {
         if (menu) menu.style.display = 'block';
-        if (menuMestre) menuMestre.style.display = 'block'; // Volta o menu
+        if (menuMestre) menuMestre.style.display = 'block'; 
     }
     
-    setTimeout(() => { zoomOutPadrao(); }, 50); 
+    // CORREÇÃO: Só dá o zoom out automático se não mandarmos ignorar!
+    if (options.ignorarZoomOut !== true) {
+        setTimeout(() => { zoomOutPadrao(); }, 50); 
+    }
 }
 
 window.fecharModalInfo = fecharModais; // Compatibilidade com onclick
@@ -5659,12 +5723,166 @@ if (db) {
 
 function abrirMenuMestre() {
     document.getElementById('btn-login-mestre').style.display = 'none';
-    document.getElementById('conteudo-mestre').style.display = 'block';
+    
+    const conteudo = document.getElementById('conteudo-mestre');
+    conteudo.style.display = 'block';
+    
+    conteudo.innerHTML = `
+        <h3 style="text-align: center; margin-top: 0; color: #ff4444; border-bottom: 1px solid #555; padding-bottom: 10px;">👑 Mestre</h3>
+        
+        <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MARCADORES LIVRES</div>
+        <button id="btn-ping-mestre-normal" class="botao-provincia" onclick="alternarPingMestre('normal')">🔴 Ponto do Mestre: OFF</button>
+        <button id="btn-ping-mestre-caveira" class="botao-provincia" onclick="alternarPingMestre('caveira')">💀 Ponto de Ameaça: OFF</button>
+        <button id="btn-ping-mestre-tesouro" class="botao-provincia" onclick="alternarPingMestre('tesouro')">💎 Ponto de Interesse: OFF</button>
+        
+        <button class="botao-provincia" onclick="limparTodosPings()" style="color: #ff4444; border-color: #8b0000; margin-top: 20px;">🗑️ Limpar Todos os Pings</button>
+        
+        <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">CÂMERA GLOBAL</div>
+        <button id="btn-foco-mestre" class="botao-provincia" onclick="alternarFocoMestre()">👁️ Forçar Foco: OFF</button>
+        
+        <hr style="border: 0; border-top: 1px solid #555; margin: 15px 0 10px 0;">
+        <button class="botao-provincia" onclick="fecharMenuMestre()" style="color: #aaa; border-color: #555; text-align: center;">🔒 Travar Painel</button>
+    `;
 }
 
 function fecharMenuMestre() {
     document.getElementById('conteudo-mestre').style.display = 'none';
     document.getElementById('btn-login-mestre').style.display = 'block';
+}
+
+let modoPingMestre = false; // Guarda se está em 'normal', 'caveira', 'tesouro' ou false
+
+function alternarPingMestre(tipo) {
+    if (typeof modoFocoMestre !== 'undefined' && modoFocoMestre) alternarFocoMestre();
+    if (modoPingMestre === tipo) {
+        modoPingMestre = false; // Se clicou no que já estava ativado, desliga
+        document.getElementById('map-container').classList.remove('mapa-intangivel');
+    } else {
+        // Desliga as outras ferramentas normais para evitar conflito
+        if (medindo) cancelarModoMedicao();
+        if (modoCoordenadas) alternarCoordenadas();
+        if (modoPinGlobal) alternarPinGlobal();
+        
+        modoPingMestre = tipo;
+        document.getElementById('map-container').classList.add('mapa-intangivel'); // Deixa clicar por cima de outros ícones
+    }
+    atualizarBotoesMestre();
+}
+
+
+let modoFocoMestre = false;
+
+function alternarFocoMestre() {
+    if (modoFocoMestre) {
+        modoFocoMestre = false;
+        document.getElementById('map-container').classList.remove('mapa-intangivel');
+    } else {
+        // Desliga as outras ferramentas para não dar conflito
+        if (medindo) cancelarModoMedicao();
+        if (modoCoordenadas) alternarCoordenadas();
+        if (modoPinGlobal) alternarPinGlobal();
+        if (typeof modoPingMestre !== 'undefined' && modoPingMestre) alternarPingMestre(modoPingMestre);
+        
+        modoFocoMestre = true;
+        document.getElementById('map-container').classList.add('mapa-intangivel');
+    }
+    atualizarBotoesMestre();
+}
+
+// Atualize sua função atualizarBotoesMestre para incluir o botão de foco
+function atualizarBotoesMestre() {
+    const btnN = document.getElementById('btn-ping-mestre-normal');
+    const btnC = document.getElementById('btn-ping-mestre-caveira');
+    const btnT = document.getElementById('btn-ping-mestre-tesouro');
+    const btnFoco = document.getElementById('btn-foco-mestre'); // NOVO
+    
+    if(btnN) {
+        btnN.innerHTML = modoPingMestre === 'normal' ? "🔴 Ponto do Mestre: ON" : "🔴 Ponto do Mestre: OFF";
+        modoPingMestre === 'normal' ? btnN.classList.add('btn-ferramenta-ativa') : btnN.classList.remove('btn-ferramenta-ativa');
+    }
+    if(btnC) {
+        btnC.innerHTML = modoPingMestre === 'caveira' ? "💀 Ponto de Ameaça: ON" : "💀 Ponto de Ameaça: OFF";
+        modoPingMestre === 'caveira' ? btnC.classList.add('btn-ferramenta-ativa') : btnC.classList.remove('btn-ferramenta-ativa');
+    }
+    if(btnT) {
+        btnT.innerHTML = modoPingMestre === 'tesouro' ? "💎 Ponto de Interesse: ON" : "💎 Ponto de Interesse: OFF";
+        modoPingMestre === 'tesouro' ? btnT.classList.add('btn-ferramenta-ativa') : btnT.classList.remove('btn-ferramenta-ativa');
+    }
+    if(btnFoco) { // NOVO
+        btnFoco.innerHTML = modoFocoMestre ? "👁️ Forçar Foco: ON" : "👁️ Forçar Foco: OFF";
+        modoFocoMestre ? btnFoco.classList.add('btn-ferramenta-ativa') : btnFoco.classList.remove('btn-ferramenta-ativa');
+    }
+}
+
+function limparTodosPings() {
+    if (db) db.ref('pings').remove();
+}
+
+// ==========================================
+// CÂMERA SINCRONIZADA DO MESTRE
+// ==========================================
+function executarFocoForcado(mapaDestino, lat, lng) {
+    // 1. Fecha menus, popups e imagens à força
+    fecharModais(true);
+    fecharPopupSeguro();
+    document.getElementById('modal-viagem').style.display = 'none';
+    document.getElementById('modal-senha').style.display = 'none';
+    
+    // Manda restaurar os menus e ignorar o zoom out inicial para não conflitar com a animação
+    restaurarMapaMenu({ restoreMenuIfContinent: true, ignorarZoomOut: true });
+
+    // 2. Define o nível de zoom, o marcador e o recuo automático
+    const focarNoPonto = () => {
+        // Cria um símbolo de Alvo gigante e pulsante
+        const iconFoco = L.divIcon({
+            html: '<div style="font-size: 60px; filter: drop-shadow(0 0 15px #ff4444); animation: pulsoMagico 1s infinite;">🎯</div>',
+            className: 'marcador-emoji',
+            iconSize: [60, 60],
+            iconAnchor: [30, 30]
+        });
+        
+        // Adiciona o alvo no mapa para chamar a atenção
+        const marcadorTemp = L.marker([lat, lng], { icon: iconFoco, zIndexOffset: 9999 }).addTo(map);
+
+        // Voa até o ponto exato (A animação de voo dura 1.5s)
+        if(map) map.flyTo([lat, lng], 1.5, { animate: true, duration: 1.5 });
+
+        // Aguarda a viagem terminar (1.5s) + 2 segundos de visualização = 3.5 segundos totais
+        setTimeout(() => {
+            if (map && marcadorTemp) map.removeLayer(marcadorTemp); // Apaga o alvo
+            zoomOutPadrao(); // A câmera volta sozinha para a visão ampla
+        }, 3500); 
+    };
+
+    // 3. Verifica se precisa puxar o jogador de outra província
+    if (mapaAtualAtivo === mapaDestino) {
+        focarNoPonto(); // Já está no mapa certo, executa o voo e o alvo
+    } else {
+        // Usa as nuvens para disfarçar o carregamento bruto do mapa alvo
+        animacaoNuvens(() => {
+            if (mapaDestino === 'continente') {
+                carregarMapaPrincipal();
+            } else {
+                carregarProvincia(mapaDestino);
+            }
+            // Espera o mapa ser montado na tela e dispara o foco e o alvo
+            setTimeout(focarNoPonto, 300);
+        });
+    }
+}
+
+const tempoInicioClientFoco = Date.now();
+if (db) {
+    db.ref('focoCamera').on('value', (snapshot) => {
+        const dados = snapshot.val();
+        // Apenas obedece se o comando foi disparado há menos de 2 segundos (evita repetição ao dar F5)
+        if (dados && dados.clientTimestamp && (dados.clientTimestamp >= tempoInicioClientFoco - 2000)) {
+            if (window.ultimoFocoProcessado !== dados.clientTimestamp) {
+                window.ultimoFocoProcessado = dados.clientTimestamp; // Evita loop no mesmo client
+                executarFocoForcado(dados.mapa, dados.lat, dados.lng);
+            }
+        }
+    });
 }
 
 precarregarImagens();
