@@ -5831,12 +5831,13 @@ function executarFocoForcado(mapaDestino, lat, lng) {
     document.getElementById('modal-viagem').style.display = 'none';
     document.getElementById('modal-senha').style.display = 'none';
     
-    // Manda restaurar os menus e ignorar o zoom out inicial para não conflitar com a animação
     restaurarMapaMenu({ restoreMenuIfContinent: true, ignorarZoomOut: true });
+
+    // Trava a animação padrão inicial do mapa para não interromper o voo do Mestre
+    window.bloquearAnimacaoInicial = true; 
 
     // 2. Define o nível de zoom, o marcador e o recuo automático
     const focarNoPonto = () => {
-        // Cria um símbolo de Alvo gigante e pulsante
         const iconFoco = L.divIcon({
             html: '<div style="font-size: 60px; filter: drop-shadow(0 0 15px #ff4444); animation: pulsoMagico 1s infinite;">🎯</div>',
             className: 'marcador-emoji',
@@ -5844,24 +5845,23 @@ function executarFocoForcado(mapaDestino, lat, lng) {
             iconAnchor: [30, 30]
         });
         
-        // Adiciona o alvo no mapa para chamar a atenção
         const marcadorTemp = L.marker([lat, lng], { icon: iconFoco, zIndexOffset: 9999 }).addTo(map);
 
-        // Voa até o ponto exato (A animação de voo dura 1.5s)
         if(map) map.flyTo([lat, lng], 1.5, { animate: true, duration: 1.5 });
 
-        // Aguarda a viagem terminar (1.5s) + 2 segundos de visualização = 3.5 segundos totais
+        // Aguarda o voo (1.5s) + Visualização (2s) = 3.5 segundos
         setTimeout(() => {
-            if (map && marcadorTemp) map.removeLayer(marcadorTemp); // Apaga o alvo
-            zoomOutPadrao(); // A câmera volta sozinha para a visão ampla
+            if (map && marcadorTemp) map.removeLayer(marcadorTemp);
+            zoomOutPadrao(); 
+            // Libera a trava do mapa apenas AQUI, quando o show do Mestre já acabou
+            window.bloquearAnimacaoInicial = false; 
         }, 3500); 
     };
 
     // 3. Verifica se precisa puxar o jogador de outra província
     if (mapaAtualAtivo === mapaDestino) {
-        focarNoPonto(); // Já está no mapa certo, executa o voo e o alvo
+        focarNoPonto(); 
     } else {
-        // Usa as nuvens para disfarçar o carregamento bruto do mapa alvo
         animacaoNuvens(() => {
             if (mapaDestino === 'continente') {
                 carregarMapaPrincipal();
@@ -5869,7 +5869,7 @@ function executarFocoForcado(mapaDestino, lat, lng) {
                 carregarProvincia(mapaDestino);
             }
             // Espera o mapa ser montado na tela e dispara o foco e o alvo
-            setTimeout(focarNoPonto, 300);
+            setTimeout(focarNoPonto, 400);
         });
     }
 }
