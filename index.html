@@ -738,6 +738,13 @@
         0% { transform: translateY(-100px) rotate(10deg); }
         100% { transform: translateY(105vh) rotate(10deg); }
     }
+    #cronometro-overlay {
+        position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+        z-index: 4000; background: rgba(0,0,0,0.85); border: 2px solid #cd853f;
+        border-radius: 8px; padding: 8px 20px; color: #ffd700; font-size: 20px;
+        font-weight: bold; display: none; box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        pointer-events: none; text-align: center; font-family: monospace;
+    }
     </style>
 </head>
 <body>
@@ -745,6 +752,7 @@
     <div id="map"></div>
 </div>
 <div id="efeito-noite"></div>
+<div id="cronometro-overlay"></div>
 
 <div id="modal-info" style="display: none;">
     <div class="modal-conteudo">
@@ -5796,9 +5804,7 @@ function abrirMenuMestre(aba = 'principal') {
     
     if (aba === 'principal') {
         conteudo.innerHTML = `
-            <h3 style="text-align: center; margin-top: 0; color: #ff4444; border-bottom: 1px solid #555; padding-bottom: 10px;">👑 Mestre</h3>
-            
-            <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MARCAÇÕES TÁTICAS</div>
+            <h3 style="text-align: center; margin-top: 0; color: #ff4444; border-bottom: 1px solid #555; padding-bottom: 5px;">👑 Mestre</h3>
             <select id="seletor-ferramenta-mestre" class="botao-provincia" style="background: #222; margin-bottom: 5px;" onchange="ativarFerramentaMestre(true)">
                 <option value="normal">🔴 Ponto do Mestre</option>
                 <option value="caveira">💀 Ponto de Ameaça</option>
@@ -5808,9 +5814,13 @@ function abrirMenuMestre(aba = 'principal') {
             <button id="btn-ferramenta-mestre" class="botao-provincia" onclick="ativarFerramentaMestre()">❌ Ferramenta OFF</button>
             <button class="botao-provincia" onclick="limparTodosPings()" style="color: #ff4444; border-color: #8b0000; margin-top: 10px;">🗑️ Limpar Marcações</button>
             
-            <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">BÚSSOLA GLOBAL</div>
-            <div style="display:flex; gap: 5px;">
-                <select id="select-bussola" class="botao-provincia" style="width: 60%; background: #222; text-align: center; margin: 0; font-size: 13px;">
+            <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">SISTEMA</div>
+            <button id="btn-foco-mestre" class="botao-provincia" onclick="alternarFocoMestre()">👁️ Forçar Foco: OFF</button>
+            <button id="btn-bloqueio-mapa" class="botao-provincia" onclick="alternarBloqueioMapa()">🗺️ Bloquear Mapa: OFF</button>
+            
+            <div style="font-size: 11px; color: #aaa; margin-top: 8px;">Bússola:</div>
+            <div style="display:flex; gap: 5px; margin-bottom: 5px;">
+                <select id="select-bussola" class="botao-provincia" style="width: 60%; background: #222; text-align: center; margin: 0; font-size: 12px;">
                     <option value="0">Norte</option>
                     <option value="45">Nordeste</option>
                     <option value="90">Leste</option>
@@ -5820,14 +5830,15 @@ function abrirMenuMestre(aba = 'principal') {
                     <option value="270">Oeste</option>
                     <option value="315">Noroeste</option>
                 </select>
-                <button class="botao-provincia" onclick="dispararBussola(false)" style="width: 40%; margin: 0; border-color: #cd853f; color: #ffdead;">Apontar</button>
+                <button class="botao-provincia" onclick="dispararBussola(false)" style="width: 40%; margin: 0; border-color: #cd853f; color: #ffdead; font-size: 12px;">Apontar</button>
             </div>
-            <button class="botao-provincia" onclick="dispararBussola(true)" style="margin-top: 5px; color: #aeb6bf;">🌀 Descontrolada</button>
-            
-            <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">SISTEMA</div>
-            <button id="btn-foco-mestre" class="botao-provincia" onclick="alternarFocoMestre()">👁️ Forçar Foco: OFF</button>
-            <button id="btn-bloqueio-mapa" class="botao-provincia" onclick="alternarBloqueioMapa()">🗺️ Bloquear Mapa: OFF</button>
-            <button class="botao-provincia" onclick="abrirMenuMestre('controles')" style="color: #87ceeb; border-color: #4682b4;">⚙️ Controles do Mundo</button>
+            <button class="botao-provincia" onclick="dispararBussola(true)" style="margin-top: 0; color: #aeb6bf; font-size: 12px;">🌀 Bússola Descontrolada</button>
+            <div style="font-size: 11px; color: #aaa; margin-top: 8px;">Cronômetro (segundos):</div>
+            <div style="display:flex; gap: 5px; margin-bottom: 5px;">
+                <input type="number" id="input-cronometro" placeholder="Seg." class="botao-provincia" style="width: 55%; background: #222; text-align: center; margin: 0; font-size: 12px;" value="60">
+                <button id="btn-acao-cronometro" class="botao-provincia" onclick="alternarCronometro()" style="width: 45%; margin: 0; border-color: #27ae60; color: #90EE90; font-size: 12px; text-align: center;">Iniciar</button>
+            </div>
+            <button class="botao-provincia" onclick="abrirMenuMestre('controles')" style="color: #87ceeb; border-color: #4682b4; margin-top: 10px;">⚙️ Controles do Mundo</button>
             
             <hr style="border: 0; border-top: 1px solid #555; margin: 15px 0 10px 0;">
             <button class="botao-provincia" onclick="fecharMenuMestre()" style="color: #aaa; border-color: #555; text-align: center;">🔒 Travar Painel</button>
@@ -5844,7 +5855,6 @@ function abrirMenuMestre(aba = 'principal') {
     } else if (aba === 'controles') {
         conteudo.innerHTML = `
             <h3 style="text-align: center; margin-top: 0; color: #ff4444; border-bottom: 1px solid #555; padding-bottom: 10px;">⚙️ Controles</h3>
-            
             <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">CLIMA GLOBAL</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 20px;">
                 <button class="botao-provincia" onclick="alterarClima('normal')" style="margin:0; text-align:center;">☀️ Normal</button>
@@ -5852,7 +5862,6 @@ function abrirMenuMestre(aba = 'principal') {
                 <button class="botao-provincia" onclick="alterarClima('chuva')" style="margin:0; text-align:center;">🌧️ Chuva</button>
                 <button class="botao-provincia" onclick="alterarClima('neve')" style="margin:0; text-align:center;">❄️ Neve</button>
             </div>
-
             <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MASMORRAS</div>
             <div style="margin-bottom: 15px;">
                 <span style="color: #ffd700; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Torre dos Sábios</span>
@@ -6268,6 +6277,102 @@ function limparTodosPings() {
         db.ref('pings').remove();
         db.ref('setas').remove(); // Apaga as setas junto com as marcações
     }
+}
+
+let intervaloTimerLocal = null;
+
+function alternarCronometro() {
+    if (!db) return;
+    
+    // Verifica se já está ativo checando o texto ou o estado atual no Firebase
+    db.ref('cronometroGlobal').once('value').then((snapshot) => {
+        const dados = snapshot.val();
+        const ativo = dados ? dados.ativo : false;
+
+        if (ativo) {
+            // Se já está rodando, encerra
+            db.ref('cronometroGlobal').set({ ativo: false });
+        } else {
+            // Se está parado, pega o valor do input e inicia
+            const input = document.getElementById('input-cronometro');
+            const segundos = parseInt(input ? input.value : 60) || 60;
+            const tempoFim = Date.now() + (segundos * 1000);
+
+            db.ref('cronometroGlobal').set({
+                fim: tempoFim,
+                ativo: true
+            });
+        }
+    });
+}
+
+function gerenciarCronometroGlobal(dados) {
+    let overlay = document.getElementById('cronometro-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'cronometro-overlay';
+        document.body.appendChild(overlay);
+    }
+
+    if (intervaloTimerLocal) {
+        clearInterval(intervaloTimerLocal);
+        intervaloTimerLocal = null;
+    }
+
+    const btnCron = document.getElementById('btn-acao-cronometro');
+    const inputCron = document.getElementById('input-cronometro');
+
+    if (!dados || !dados.ativo) {
+        overlay.style.display = 'none';
+        overlay.style.color = '#ffd700'; // Reseta para amarelo padrão
+        if (btnCron) {
+            btnCron.innerHTML = "Iniciar";
+            btnCron.style.borderColor = "#27ae60";
+            btnCron.style.color = "#90EE90";
+            btnCron.classList.remove('btn-ferramenta-ativa');
+        }
+        if (inputCron) inputCron.disabled = false;
+        return;
+    }
+
+    overlay.style.display = 'block';
+    if (btnCron) {
+        btnCron.innerHTML = "Encerrar";
+        btnCron.style.borderColor = "#8b0000";
+        btnCron.style.color = "#ff4444";
+        btnCron.classList.add('btn-ferramenta-ativa');
+    }
+    if (inputCron) inputCron.disabled = true;
+
+    const atualizarVisor = () => {
+        const restante = Math.max(0, Math.floor((dados.fim - Date.now()) / 1000));
+        const min = Math.floor(restante / 60);
+        const seg = restante % 60;
+        
+        overlay.innerText = `⏳ Tempo Restante: ${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
+
+        // Altera a cor para vermelho nos últimos 10 segundos
+        if (restante <= 10) {
+            overlay.style.color = '#ff4444';
+        } else {
+            overlay.style.color = '#ffd700';
+        }
+
+        if (restante <= 0) {
+            clearInterval(intervaloTimerLocal);
+            intervaloTimerLocal = null;
+            if (db) db.ref('cronometroGlobal').set({ ativo: false });
+        }
+    };
+
+    atualizarVisor();
+    intervaloTimerLocal = setInterval(atualizarVisor, 1000);
+}
+
+if (db) {
+    db.ref('cronometroGlobal').on('value', (snapshot) => {
+        gerenciarCronometroGlobal(snapshot.val());
+    });
 }
 precarregarImagens();
 carregarMapaPrincipal();
