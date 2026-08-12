@@ -2058,23 +2058,24 @@ db.ref('pings').on('child_changed', tratarPing);
 
 
 function desenharPinGlobalNaTela(key, dados) {
-    // Agora verifica se a chave COMEÇA com o seu ID, pois o mestre tem chaves únicas
     const isMeuPin = key.startsWith(meuIdUsuario) || key === meuIdUsuario;
     let corPin = dados.cor || '#3498db';
     
     let iconeSvg = '';
     let tituloPopup = '';
 
-    // Verifica que tipo de ícone renderizar
     if (dados.autor === 'mestre') {
         if (dados.tipo === 'caveira') {
-            iconeSvg = `<div style="font-size: 26px; filter: drop-shadow(0 0 4px red);">💀</div>`;
+            iconeSvg = `<div style="font-size: 26px;">💀</div>`;
             tituloPopup = "💀 Ameaça Detectada";
         } else if (dados.tipo === 'tesouro') {
-            iconeSvg = `<div style="font-size: 26px; filter: drop-shadow(0 0 4px gold);">💎</div>`;
-            tituloPopup = "💎 Ponto de Interesse";
+            iconeSvg = `<div style="font-size: 26px;">⭐</div>`;
+            tituloPopup = "⭐ Ponto de Interesse";
+        } else if (dados.tipo === 'local') {
+            iconeSvg = `<div style="font-size: 26px;">❌</div>`;
+            tituloPopup = "❌ Ponto X";
         } else {
-            iconeSvg = `<svg width="30" height="30" viewBox="0 0 24 24" fill="#ff0000" stroke="#000" stroke-width="1.2" style="filter: drop-shadow(0 0 4px black);"><circle cx="12" cy="8" r="5" /><path d="M12 13 L10 21 L12 22 L14 21 Z" /></svg>`;
+            iconeSvg = `<svg width="30" height="30" viewBox="0 0 24 24" fill="#ff0000" stroke="#000" stroke-width="1.2"><circle cx="12" cy="8" r="5" /><path d="M12 13 L10 21 L12 22 L14 21 Z" /></svg>`;
             tituloPopup = "🔴 Ponto do Mestre";
         }
     } else {
@@ -5808,7 +5809,8 @@ function abrirMenuMestre(aba = 'principal') {
             <select id="seletor-ferramenta-mestre" class="botao-provincia" style="background: #222; margin-bottom: 5px;" onchange="ativarFerramentaMestre(true)">
                 <option value="normal">🔴 Ponto do Mestre</option>
                 <option value="caveira">💀 Ponto de Ameaça</option>
-                <option value="tesouro">💎 Ponto de Interesse</option>
+                <option value="tesouro">⭐ Ponto de Interesse</option>
+                <option value="local">❌ Ponto X</option>
                 <option value="seta">↗️ Traçar Seta Tática</option>
             </select>
             <button id="btn-ferramenta-mestre" class="botao-provincia" onclick="ativarFerramentaMestre()">❌ Ferramenta OFF</button>
