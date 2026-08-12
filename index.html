@@ -116,7 +116,7 @@
     /* MENU DO MESTRE (ESQUERDA) */
     #menu-mestre {
         position: fixed;
-        top: 90px; /* Ajustado para não cobrir o zoom */
+        top: 20px;
         left: 20px;
         width: 220px;
         background: rgba(26, 26, 26, 0.95); 
@@ -700,6 +700,24 @@
     background-color: #3498db; /* Cor padrão inicial */
     margin: 0 auto;
 }
+
+/* SISTEMA DE BÚSSOLA */
+    .bussola-container {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        z-index: 9999; pointer-events: none; display: none;
+        width: 200px; height: 200px; background: rgba(0,0,0,0.7);
+        border: 4px solid #cd853f; border-radius: 50%;
+        justify-content: center; align-items: center;
+        box-shadow: 0 0 30px #cd853f;
+    }
+    .bussola-agulha {
+        width: 10px; height: 160px; background: linear-gradient(to bottom, #ff4444 50%, #ddd 50%);
+        border-radius: 5px; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .bussola-girando {
+        animation: girarBussola 0.5s linear infinite;
+    }
+    @keyframes girarBussola { 100% { transform: rotate(360deg); } }
     
     </style>
 </head>
@@ -1661,8 +1679,33 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
             return;
         }
 
-        // BLOCO DO MESTRE: Coloca as infinitas caveiras/tesouros/pings
+        // BLOCO DO MESTRE: Pings e Setas
         if (typeof modoPingMestre !== 'undefined' && modoPingMestre) {
+            
+            // Lógica de Seta (2 Cliques)
+            if (modoPingMestre === 'seta') {
+                if (!pontoOrigemSeta) {
+                    // Primeiro clique: Marca a origem
+                    pontoOrigemSeta = e.latlng;
+                    marcadorOrigemTemp = L.circleMarker(e.latlng, { radius: 5, color: '#ff4444', fillColor: '#ff4444', fillOpacity: 1 }).addTo(map);
+                } else {
+                    // Segundo clique: Dispara para o Firebase
+                    const chaveUnica = meuIdUsuario + '_seta_' + Date.now();
+                    const novaSeta = {
+                        lat1: pontoOrigemSeta.lat, lng1: pontoOrigemSeta.lng,
+                        lat2: e.latlng.lat, lng2: e.latlng.lng,
+                        mapa: mapaAtualAtivo, autor: 'mestre'
+                    };
+                    if (db) db.ref('setas/' + chaveUnica).set(novaSeta);
+                    
+                    // Limpa para desenhar a próxima
+                    pontoOrigemSeta = null;
+                    if (marcadorOrigemTemp) { map.removeLayer(marcadorOrigemTemp); marcadorOrigemTemp = null; }
+                }
+                return;
+            }
+
+            // Lógica de Pings normais (1 Clique)
             const chaveUnica = meuIdUsuario + '_mestre_' + Date.now();
             const novoPinMestre = {
                 lat: e.latlng.lat,
@@ -1908,9 +1951,10 @@ let modoCoordenadas = false;
 let modoPinGlobal = false;
 
 function alternarCoordenadas() {
-    if (typeof modoPingMestre !== 'undefined' && modoPingMestre) alternarPingMestre(modoPingMestre);
+    if (typeof modoPingMestre !== 'undefined' && modoPingMestre) { modoPingMestre = false; atualizarBotoesMestre(); }
+    if (typeof modoFocoMestre !== 'undefined' && modoFocoMestre) alternarFocoMestre();
     if (!modoCoordenadas && medindo) cancelarModoMedicao();
-    if (!modoCoordenadas && modoPinGlobal) alternarPinGlobal(); // Desliga o azul se ligar o vermelho
+    if (!modoCoordenadas && modoPinGlobal) alternarPinGlobal();
     
     modoCoordenadas = !modoCoordenadas;
     const container = document.getElementById('map-container');
@@ -1920,9 +1964,10 @@ function alternarCoordenadas() {
 }
 
 function alternarPinGlobal() {
-    if (typeof modoPingMestre !== 'undefined' && modoPingMestre) alternarPingMestre(modoPingMestre);
+   if (typeof modoPingMestre !== 'undefined' && modoPingMestre) { modoPingMestre = false; atualizarBotoesMestre(); }
+    if (typeof modoFocoMestre !== 'undefined' && modoFocoMestre) alternarFocoMestre();
     if (!modoPinGlobal && medindo) cancelarModoMedicao();
-    if (!modoPinGlobal && modoCoordenadas) alternarCoordenadas(); // Desliga o vermelho se ligar o azul
+    if (!modoPinGlobal && modoCoordenadas) alternarCoordenadas();
     
     modoPinGlobal = !modoPinGlobal;
     const container = document.getElementById('map-container');
@@ -5684,6 +5729,11 @@ if (db) {
     });
 }
 
+let modoPingMestre = false; 
+let modoFocoMestre = false;
+let pontoOrigemSeta = null;
+let marcadorOrigemTemp = null;
+
 function abrirMenuMestre(aba = 'principal') {
     document.getElementById('btn-login-mestre').style.display = 'none';
     const conteudo = document.getElementById('conteudo-mestre');
@@ -5693,12 +5743,31 @@ function abrirMenuMestre(aba = 'principal') {
         conteudo.innerHTML = `
             <h3 style="text-align: center; margin-top: 0; color: #ff4444; border-bottom: 1px solid #555; padding-bottom: 10px;">👑 Mestre</h3>
             
-            <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MARCADORES LIVRES</div>
-            <button id="btn-ping-mestre-normal" class="botao-provincia" onclick="alternarPingMestre('normal')">🔴 Ponto do Mestre: OFF</button>
-            <button id="btn-ping-mestre-caveira" class="botao-provincia" onclick="alternarPingMestre('caveira')">💀 Ponto de Ameaça: OFF</button>
-            <button id="btn-ping-mestre-tesouro" class="botao-provincia" onclick="alternarPingMestre('tesouro')">💎 Ponto de Interesse: OFF</button>
+            <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MARCAÇÕES TÁTICAS</div>
+            <select id="seletor-ferramenta-mestre" class="botao-provincia" style="background: #222; margin-bottom: 5px;" onchange="ativarFerramentaMestre(true)">
+                <option value="normal">🔴 Ponto do Mestre</option>
+                <option value="caveira">💀 Ponto de Ameaça</option>
+                <option value="tesouro">💎 Ponto de Interesse</option>
+                <option value="seta">↗️ Traçar Seta Tática</option>
+            </select>
+            <button id="btn-ferramenta-mestre" class="botao-provincia" onclick="ativarFerramentaMestre()">❌ Ferramenta OFF</button>
+            <button class="botao-provincia" onclick="limparTodosPings()" style="color: #ff4444; border-color: #8b0000; margin-top: 10px;">🗑️ Limpar Marcações</button>
             
-            <button class="botao-provincia" onclick="limparTodosPings()" style="color: #ff4444; border-color: #8b0000; margin-top: 20px;">🗑️ Limpar Todos os Pings</button>
+            <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">BÚSSOLA GLOBAL</div>
+            <div style="display:flex; gap: 5px;">
+                <select id="select-bussola" class="botao-provincia" style="width: 60%; background: #222; text-align: center; margin: 0; font-size: 13px;">
+                    <option value="0">Norte</option>
+                    <option value="45">Nordeste</option>
+                    <option value="90">Leste</option>
+                    <option value="135">Sudeste</option>
+                    <option value="180">Sul</option>
+                    <option value="225">Sudoeste</option>
+                    <option value="270">Oeste</option>
+                    <option value="315">Noroeste</option>
+                </select>
+                <button class="botao-provincia" onclick="dispararBussola(false)" style="width: 40%; margin: 0; border-color: #cd853f; color: #ffdead;">Apontar</button>
+            </div>
+            <button class="botao-provincia" onclick="dispararBussola(true)" style="margin-top: 5px; color: #aeb6bf;">🌀 Descontrolada</button>
             
             <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">SISTEMA</div>
             <button id="btn-foco-mestre" class="botao-provincia" onclick="alternarFocoMestre()">👁️ Forçar Foco: OFF</button>
@@ -5718,36 +5787,33 @@ function abrirMenuMestre(aba = 'principal') {
             }
         }
     } else if (aba === 'masmorras') {
+        // (O CÓDIGO DAS MASMORRAS CONTINUA O MESMO AQUI)
         conteudo.innerHTML = `
             <h3 style="text-align: center; margin-top: 0; color: #ff4444; border-bottom: 1px solid #555; padding-bottom: 10px;">🏰 Masmorras</h3>
-            
             <div style="margin-bottom: 15px;">
                 <span style="color: #ffd700; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Torre dos Sábios</span>
                 <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
                     <button onclick="alterarProgresso('torre', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
-                    <span id="visor-torre" style="color: white; font-weight: bold;">Andar: ${andarMaximoLiberado}</span>
+                    <span id="visor-torre" style="color: white; font-weight: bold;">Andar ${andarMaximoLiberado}</span>
                     <button onclick="alterarProgresso('torre', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
                 </div>
             </div>
-
             <div style="margin-bottom: 15px;">
-                <span style="color: #add8e6; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Hukmal'tep (Gelo)</span>
+                <span style="color: #add8e6; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Hukmal tep (Gelo)</span>
                 <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
                     <button onclick="alterarProgresso('hukmal', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
-                    <span id="visor-hukmal" style="color: white; font-weight: bold;">Sala: ${registroDungeons['hukmal'].progresso}</span>
+                    <span id="visor-hukmal" style="color: white; font-weight: bold;">Sala ${registroDungeons['hukmal'].progresso}</span>
                     <button onclick="alterarProgresso('hukmal', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
                 </div>
             </div>
-
             <div style="margin-bottom: 15px;">
                 <span style="color: #cd853f; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Deserto (Tristeza)</span>
                 <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
                     <button onclick="alterarProgresso('deserto', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
-                    <span id="visor-deserto" style="color: white; font-weight: bold;">Sala: ${registroDungeons['deserto'].progresso}</span>
+                    <span id="visor-deserto" style="color: white; font-weight: bold;">Sala ${registroDungeons['deserto'].progresso}</span>
                     <button onclick="alterarProgresso('deserto', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
                 </div>
             </div>
-
             <hr style="border: 0; border-top: 1px solid #555; margin: 20px 0 10px 0;">
             <button class="botao-provincia" onclick="abrirMenuMestre('principal')" style="color: #aaa; border-color: #555; text-align: center;">⬅ Voltar ao Painel</button>
         `;
@@ -5759,38 +5825,45 @@ function fecharMenuMestre() {
     document.getElementById('btn-login-mestre').style.display = 'block';
 }
 
-let modoPingMestre = false; // Guarda se está em 'normal', 'caveira', 'tesouro' ou false
+function ativarFerramentaMestre(forcarAtivar = false) {
+    const seletor = document.getElementById('seletor-ferramenta-mestre');
+    const tipoSelecionado = seletor.value;
 
-function alternarPingMestre(tipo) {
-    if (typeof modoFocoMestre !== 'undefined' && modoFocoMestre) alternarFocoMestre();
-    if (modoPingMestre === tipo) {
-        modoPingMestre = false; // Se clicou no que já estava ativado, desliga
+    // Reseta pontos de seta iniciados e inacabados
+    if (pontoOrigemSeta) {
+        pontoOrigemSeta = null;
+        if (marcadorOrigemTemp && map) { map.removeLayer(marcadorOrigemTemp); marcadorOrigemTemp = null; }
+    }
+
+    if (modoPingMestre && !forcarAtivar) {
+        modoPingMestre = false;
         document.getElementById('map-container').classList.remove('mapa-intangivel');
     } else {
-        // Desliga as outras ferramentas normais para evitar conflito
         if (medindo) cancelarModoMedicao();
         if (modoCoordenadas) alternarCoordenadas();
         if (modoPinGlobal) alternarPinGlobal();
+        if (typeof modoFocoMestre !== 'undefined' && modoFocoMestre) {
+            modoFocoMestre = false;
+            document.getElementById('map-container').classList.remove('mapa-intangivel');
+        }
         
-        modoPingMestre = tipo;
-        document.getElementById('map-container').classList.add('mapa-intangivel'); // Deixa clicar por cima de outros ícones
+        modoPingMestre = tipoSelecionado;
+        document.getElementById('map-container').classList.add('mapa-intangivel');
     }
     atualizarBotoesMestre();
 }
-
-
-let modoFocoMestre = false;
 
 function alternarFocoMestre() {
     if (modoFocoMestre) {
         modoFocoMestre = false;
         document.getElementById('map-container').classList.remove('mapa-intangivel');
     } else {
-        // Desliga as outras ferramentas para não dar conflito
         if (medindo) cancelarModoMedicao();
         if (modoCoordenadas) alternarCoordenadas();
         if (modoPinGlobal) alternarPinGlobal();
-        if (typeof modoPingMestre !== 'undefined' && modoPingMestre) alternarPingMestre(modoPingMestre);
+        if (typeof modoPingMestre !== 'undefined' && modoPingMestre) {
+            modoPingMestre = false; // Desliga ferramentas táticas corretamente
+        }
         
         modoFocoMestre = true;
         document.getElementById('map-container').classList.add('mapa-intangivel');
@@ -5798,34 +5871,80 @@ function alternarFocoMestre() {
     atualizarBotoesMestre();
 }
 
-// Atualize sua função atualizarBotoesMestre para incluir o botão de foco
 function atualizarBotoesMestre() {
-    const btnN = document.getElementById('btn-ping-mestre-normal');
-    const btnC = document.getElementById('btn-ping-mestre-caveira');
-    const btnT = document.getElementById('btn-ping-mestre-tesouro');
-    const btnFoco = document.getElementById('btn-foco-mestre'); // NOVO
+    const btnFerramenta = document.getElementById('btn-ferramenta-mestre');
+    const btnFoco = document.getElementById('btn-foco-mestre');
     
-    if(btnN) {
-        btnN.innerHTML = modoPingMestre === 'normal' ? "🔴 Ponto do Mestre: ON" : "🔴 Ponto do Mestre: OFF";
-        modoPingMestre === 'normal' ? btnN.classList.add('btn-ferramenta-ativa') : btnN.classList.remove('btn-ferramenta-ativa');
+    if (btnFerramenta) {
+        if (modoPingMestre) {
+            btnFerramenta.innerHTML = "✅ Ativo: Clique no mapa";
+            btnFerramenta.classList.add('btn-ferramenta-ativa');
+        } else {
+            btnFerramenta.innerHTML = "❌ Ferramenta OFF";
+            btnFerramenta.classList.remove('btn-ferramenta-ativa');
+        }
     }
-    if(btnC) {
-        btnC.innerHTML = modoPingMestre === 'caveira' ? "💀 Ponto de Ameaça: ON" : "💀 Ponto de Ameaça: OFF";
-        modoPingMestre === 'caveira' ? btnC.classList.add('btn-ferramenta-ativa') : btnC.classList.remove('btn-ferramenta-ativa');
-    }
-    if(btnT) {
-        btnT.innerHTML = modoPingMestre === 'tesouro' ? "💎 Ponto de Interesse: ON" : "💎 Ponto de Interesse: OFF";
-        modoPingMestre === 'tesouro' ? btnT.classList.add('btn-ferramenta-ativa') : btnT.classList.remove('btn-ferramenta-ativa');
-    }
-    if(btnFoco) { // NOVO
+    if (btnFoco) {
         btnFoco.innerHTML = modoFocoMestre ? "👁️ Forçar Foco: ON" : "👁️ Forçar Foco: OFF";
         modoFocoMestre ? btnFoco.classList.add('btn-ferramenta-ativa') : btnFoco.classList.remove('btn-ferramenta-ativa');
     }
 }
 
-function limparTodosPings() {
-    if (db) db.ref('pings').remove();
+// BÚSSOLA GLOBAL DO MESTRE
+function dispararBussola(descontrolada) {
+    if (!db) return;
+    const selectGraus = document.getElementById('select-bussola');
+    const graus = selectGraus ? selectGraus.value : 0;
+
+    db.ref('bussolaGlobal').set({
+        descontrolada: descontrolada,
+        graus: graus || 0,
+        timestamp: Date.now()
+    });
 }
+
+function exibirBussolaNaTela(dados) {
+    let container = document.getElementById('bussola-overlay');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'bussola-overlay';
+        container.className = 'bussola-container';
+        container.innerHTML = '<div id="bussola-agulha" class="bussola-agulha"></div>';
+        document.body.appendChild(container);
+    }
+
+    const agulha = document.getElementById('bussola-agulha');
+    container.style.display = 'flex';
+
+    if (dados.descontrolada) {
+        agulha.style.transition = 'none';
+        agulha.style.transform = 'none';
+        agulha.classList.add('bussola-girando');
+    } else {
+        agulha.classList.remove('bussola-girando');
+        
+        // Ponto de partida
+        let startDeg = 0;
+        // Se a direção for o Norte (0), começamos a agulha apontando para o Sul (180) para dar o efeito de girar e parar
+        if (parseInt(dados.graus) === 0) startDeg = 180;
+        
+        // 1. Desliga a transição e coloca no ponto de partida instantaneamente
+        agulha.style.transition = 'none';
+        agulha.style.transform = `rotate(${startDeg}deg)`;
+        
+        // 2. Força o navegador a recalcular a tela para a agulha registrar a posição inicial
+        void agulha.offsetWidth;
+        
+        // 3. Liga a transição suave e move para o ângulo final ordenado
+        agulha.style.transition = 'transform 1.2s cubic-bezier(0.25, 0.1, 0.25, 1)';
+        agulha.style.transform = `rotate(${dados.graus}deg)`;
+    }
+
+    // A bússola fica na tela por 4 segundos
+    setTimeout(() => { container.style.display = 'none'; }, 4000);
+}
+
+
 
 // ==========================================
 // CÂMERA SINCRONIZADA DO MESTRE
@@ -6006,6 +6125,87 @@ function alterarProgresso(tipo, delta) {
     }
 }
 
+const tempoInicioBussola = Date.now();
+if (db) {
+    db.ref('bussolaGlobal').on('value', (snapshot) => {
+        const dados = snapshot.val();
+        if (dados && dados.timestamp && dados.timestamp >= tempoInicioBussola - 2000) {
+            exibirBussolaNaTela(dados);
+        }
+    });
+}
+// ==========================================
+// RENDERIZADOR DE SETAS TÁTICAS
+// ==========================================
+let setasAtivas = {};
+
+function tratarSeta(snapshot) {
+    const key = snapshot.key;
+    const dados = snapshot.val();
+    
+    if (setasAtivas[key]) {
+        setasAtivas[key].forEach(layer => map.removeLayer(layer));
+        delete setasAtivas[key];
+    }
+    
+    if (dados.mapa === mapaAtualAtivo && map) {
+        desenharSetaNaTela(key, dados);
+    }
+}
+
+if (db) {
+    db.ref('setas').on('child_added', tratarSeta);
+    db.ref('setas').on('child_changed', tratarSeta);
+    db.ref('setas').on('child_removed', (snapshot) => {
+        const key = snapshot.key;
+        if (setasAtivas[key]) {
+            setasAtivas[key].forEach(layer => map.removeLayer(layer));
+            delete setasAtivas[key];
+        }
+    });
+}
+
+function desenharSetaNaTela(key, dados) {
+    const p1 = L.latLng(dados.lat1, dados.lng1);
+    const p2 = L.latLng(dados.lat2, dados.lng2);
+    
+    // Corpo da Seta
+    const linha = L.polyline([p1, p2], { color: '#ff4444', weight: 4, opacity: 0.8, dashArray: '5, 5' }).addTo(map);
+    
+    // Cálculo do ângulo da Cabeça da Seta
+    const dx = p2.lng - p1.lng;
+    const dy = p2.lat - p1.lat;
+    const angulo = Math.atan2(dx, dy) * (180 / Math.PI);
+    
+    const headIcon = L.divIcon({
+        html: `<div style="transform: rotate(${angulo}deg); font-size: 24px; color: #ff4444; filter: drop-shadow(0 0 2px black); line-height: 1; display:flex; justify-content:center; align-items:center;">▲</div>`,
+        className: 'seta-head marcador-emoji',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+    });
+    
+    const cabeca = L.marker(p2, { icon: headIcon, zIndexOffset: 900 }).addTo(map);
+    
+    // O Mestre pode apagar clicando nela
+    if (dados.autor === 'mestre') {
+        const popup = L.popup().setContent(`<div style="text-align:center;"><b>Seta Tática</b><br><button onclick="apagarSeta('${key}')" class="btn-popup" style="background:#8b0000; margin-top:5px; padding:4px 8px; font-size:12px; cursor:pointer;">❌ Apagar Seta</button></div>`);
+        cabeca.bindPopup(popup);
+        linha.bindPopup(popup);
+    }
+    
+    setasAtivas[key] = [linha, cabeca];
+}
+
+window.apagarSeta = function(key) {
+    if (db) db.ref('setas/' + key).remove();
+};
+
+function limparTodosPings() {
+    if (db) {
+        db.ref('pings').remove();
+        db.ref('setas').remove(); // Apaga as setas junto com as marcações
+    }
+}
 precarregarImagens();
 carregarMapaPrincipal();
     </script>
