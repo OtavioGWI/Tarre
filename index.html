@@ -755,14 +755,27 @@
     /* SISTEMA DE NOTIFICAÇÕES (TOAST) */
     #toast-notificacao {
         position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-        background: rgba(20, 20, 20, 0.95); border: 2px solid #8b008b;
-        color: #ffb6c1; padding: 15px 30px; border-radius: 8px; z-index: 9999;
+        background: rgba(20, 20, 20, 0.95); 
+        padding: 15px 30px; border-radius: 8px; z-index: 9999;
         font-size: 16px; font-weight: bold; text-align: center;
-        box-shadow: 0 0 20px rgba(139, 0, 139, 0.6);
         transition: top 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
         pointer-events: none;
     }
     .toast-visivel { top: 25px !important; }
+
+    /* Tema Roxo para Boatos */
+    .tema-boato {
+        border: 2px solid #8b008b;
+        color: #ffb6c1;
+        box-shadow: 0 0 20px rgba(139, 0, 139, 0.6);
+    }
+
+    /* Tema Laranja para Viagens */
+    .tema-viagem {
+        border: 2px solid #d35400;
+        color: #f39c12;
+        box-shadow: 0 0 20px rgba(211, 84, 0, 0.6);
+    }
     </style>
 </head>
 <body>
@@ -5706,6 +5719,7 @@ function compartilharViagem(btn) {
             // Dispara a Notificação Global na tela de todos os jogadores
             db.ref('notificacaoGlobal').set({
                 mensagem: "🗺️ Uma nova rota de viagem foi compartilhada com a equipe!",
+                tipo: 'viagem',
                 timestamp: Date.now()
             });
 
@@ -5745,7 +5759,7 @@ window.dispararViagemRemota = function(pontosJson, cor) {
     } catch (e) {
         console.error("Erro ao disparar viagem remota", e);
     }
-};
+}
 
 function animarViagemComPontos(pontosArray, corCavalo) {
     if (!pontosArray || pontosArray.length < 2) return;
@@ -5846,6 +5860,7 @@ function dispararViagemGlobal(pontos, cor) {
         // Opcional: Avisa quando a caravana começar a se mover
         db.ref('notificacaoGlobal').set({
             mensagem: "🏇 A viagem do esquadrão começou!",
+            tipo: 'viagem',
             timestamp: Date.now()
         });
     }
@@ -6427,10 +6442,10 @@ window.apagarSeta = function(key) {
 };
 
 function limparTodosPings() {
-    if (db) {
-        db.ref('pings').remove();
-        db.ref('setas').remove(); // Apaga as setas junto com as marcações
-    }
+    if (!db) return;
+    db.ref('pings').remove();
+    db.ref('setas').remove();
+    db.ref('rotaAtiva').remove(); // Apaga a viagem compartilhada presa
 }
 
 let intervaloTimerLocal = null;
@@ -6548,7 +6563,8 @@ function liberarBoato() {
     
     // Dispara a Notificação Global
     db.ref('notificacaoGlobal').set({
-        mensagem: `Um novo boato se espalha pelas ruas... (Boato #${id})`,
+        mensagem: `🗣️ Um novo boato se espalha pelas ruas... (Boato #${id})`,
+        tipo: 'boato',
         timestamp: Date.now()
     });
     
@@ -6560,11 +6576,19 @@ function removerBoato(id) {
     db.ref('boatosGlobais/' + id).remove();
 }
 
-function mostrarToastNotificacao(mensagem) {
+function mostrarToastNotificacao(mensagem, tipo = 'boato') {
     const toast = document.getElementById('toast-notificacao');
     if (!toast) return;
     
-    toast.innerHTML = '🗣️ ' + mensagem;
+    // Limpa os temas anteriores e aplica o correto
+    toast.className = ''; 
+    if (tipo === 'viagem') {
+        toast.classList.add('tema-viagem');
+    } else {
+        toast.classList.add('tema-boato');
+    }
+    
+    toast.innerHTML = mensagem;
     toast.classList.add('toast-visivel');
     
     // Remove depois de 5 segundos
@@ -6602,7 +6626,7 @@ if (db) {
     db.ref('notificacaoGlobal').on('value', (snapshot) => {
         const dados = snapshot.val();
         if (dados && dados.timestamp && dados.timestamp > tempoInicioNotificacao) {
-            mostrarToastNotificacao(dados.mensagem);
+            mostrarToastNotificacao(dados.mensagem, dados.tipo);
         }
     });
 }
