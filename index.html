@@ -2066,20 +2066,20 @@ function desenharPinGlobalNaTela(key, dados) {
 
     if (dados.autor === 'mestre') {
         if (dados.tipo === 'caveira') {
-            iconeSvg = `<div style="font-size: 26px;">💀</div>`;
+            iconeSvg = `<div style="font-size: 20px;">💀</div>`;
             tituloPopup = "💀 Ameaça Detectada";
         } else if (dados.tipo === 'tesouro') {
-            iconeSvg = `<div style="font-size: 26px;">⭐</div>`;
+            iconeSvg = `<div style="font-size: 20px;">⭐</div>`;
             tituloPopup = "⭐ Ponto de Interesse";
         } else if (dados.tipo === 'local') {
-            iconeSvg = `<div style="font-size: 26px;">❌</div>`;
+            iconeSvg = `<div style="font-size: 20px;">❌</div>`;
             tituloPopup = "❌ Ponto X";
         } else {
-            iconeSvg = `<svg width="30" height="30" viewBox="0 0 24 24" fill="#ff0000" stroke="#000" stroke-width="1.2"><circle cx="12" cy="8" r="5" /><path d="M12 13 L10 21 L12 22 L14 21 Z" /></svg>`;
+            iconeSvg = `<svg width="24" height="24" viewBox="0 0 24 24" fill="#ff0000" stroke="#000" stroke-width="1.2"><circle cx="12" cy="8" r="5" /><path d="M12 13 L10 21 L12 22 L14 21 Z" /></svg>`;
             tituloPopup = "🔴 Ponto do Mestre";
         }
     } else {
-        iconeSvg = `<svg width="30" height="30" viewBox="0 0 24 24" fill="${corPin}" stroke="#000" stroke-width="1.2" style="filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));"><circle cx="12" cy="8" r="5" /><path d="M12 13 L10 21 L12 22 L14 21 Z" /></svg>`;
+        iconeSvg = `<svg width="24" height="24" viewBox="0 0 24 24" fill="${corPin}" stroke="#000" stroke-width="1.2" style="filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));"><circle cx="12" cy="8" r="5" /><path d="M12 13 L10 21 L12 22 L14 21 Z" /></svg>`;
         const iconeTituloHtml = `<svg width="12" height="12" viewBox="0 0 24 24" fill="${corPin}" stroke="#000" stroke-width="1.5" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"/></svg>`;
         tituloPopup = isMeuPin ? `${iconeTituloHtml} Meu Ponto` : `${iconeTituloHtml} Ponto da Equipe`;
     }
@@ -2092,9 +2092,9 @@ function desenharPinGlobalNaTela(key, dados) {
     const iconeCustomizado = L.divIcon({
         html: iconeSvg,
         className: 'marcador-emoji',
-        iconSize: [30, 30],
-        iconAnchor: [15, 25],
-        popupAnchor: [0, -20]
+        iconSize: [24, 24],
+        iconAnchor: [12, 20],
+        popupAnchor: [0, -18]
     });
 
     const m = L.marker([dados.lat, dados.lng], { 
@@ -2104,13 +2104,15 @@ function desenharPinGlobalNaTela(key, dados) {
     
     let botaoApagar = isMeuPin ? `<br><button onclick="apagarMeuPin('${key}')" class="btn-popup" style="background:#8b0000; margin-top:5px; padding:4px 8px; font-size:12px; cursor:pointer;">❌ Apagar Ping</button>` : '';
 
+    // Removido o .openPopup() daqui para que o balão não abra automaticamente
     m.bindPopup(`<div style="text-align: center;"><b>${tituloPopup}</b><br>[${dados.lat.toFixed(0)}, ${dados.lng.toFixed(0)}]${botaoApagar}</div>`, {
         closeOnClick: false,
         autoClose: false
-    }).openPopup();
+    });
 
     marcadoresGlobaisAtivos[key] = m;
 }
+
 function apagarMeuPin(key) {
     if (db) {
         db.ref('pings/' + key).remove();
@@ -4975,7 +4977,7 @@ function renderizarLeilao() {
     }
 
     container.innerHTML = `
-        <button onclick="document.getElementById('modal-capital').style.display='none'" class="btn-popup" style="margin-bottom:15px; border:none; background:#444; width:100%;">Voltar</button>
+        <button onclick="fecharModais()" class="btn-popup" style="margin-bottom:15px; border:none; background:#444; width:100%;">Voltar</button>
         <div class="detalhe-box" style="border-color: #ffd700; text-align: center;">
             <h3 style="color: #ffd700; margin-top: 0;">${item.nome}</h3>
             <img src="${item.foto}" style="width: 100%; max-width: 250px; border-radius: 8px; margin: 10px 0; border: 2px solid #cd853f;">
