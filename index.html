@@ -106,11 +106,18 @@
 
     #menu-provincias h3 {
         text-align: center;
-        margin-top: 0;
+        margin: 0;
+        padding: 0;
         color: #cd853f;
-        border-bottom: 1px solid #555;
-        padding-bottom: 10px;
+        border-bottom: none; /* Remove a linha fixa do título */
         cursor: pointer;
+    }
+
+    /* Transfere a linha e o espaço para os blocos que somem */
+    #lista-botoes-provincia, #lista-ferramentas-regiao {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #555;
     }
 
     /* MENU DO MESTRE (ESQUERDA) */
@@ -166,7 +173,7 @@
         white-space: pre-wrap; /* Mantém parágrafos do texto */
     }
 
-    #seta-menu { display: none; }
+    #seta-menu { display: inline; margin-left: 5px; }
     #lista-botoes-provincia { display: block; }
 
 /* --- ESTILO DOS BOTÕES DOS POPUPS --- */
@@ -745,6 +752,17 @@
         font-weight: bold; display: none; box-shadow: 0 0 15px rgba(0,0,0,0.8);
         pointer-events: none; text-align: center; font-family: monospace;
     }
+    /* SISTEMA DE NOTIFICAÇÕES (TOAST) */
+    #toast-notificacao {
+        position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+        background: rgba(20, 20, 20, 0.95); border: 2px solid #8b008b;
+        color: #ffb6c1; padding: 15px 30px; border-radius: 8px; z-index: 9999;
+        font-size: 16px; font-weight: bold; text-align: center;
+        box-shadow: 0 0 20px rgba(139, 0, 139, 0.6);
+        transition: top 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        pointer-events: none;
+    }
+    .toast-visivel { top: 25px !important; }
     </style>
 </head>
 <body>
@@ -753,6 +771,7 @@
 </div>
 <div id="efeito-noite"></div>
 <div id="cronometro-overlay"></div>
+<div id="toast-notificacao"></div>
 
 <div id="modal-info" style="display: none;">
     <div class="modal-conteudo">
@@ -1785,49 +1804,39 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
  * Mostra/esconde a lista de províncias ou ferramentas conforme clique
  * Chamada por: onclick em h3 do menu
  */
+let menuPrincipalMinimizado = window.innerWidth <= 600;
+
 function alternarMenuMobile() {
-    if (window.innerWidth > 600) return;
-    const listaProv = document.getElementById('lista-botoes-provincia');
-    const listaFerramentas = document.getElementById('lista-ferramentas-regiao');
-    const seta = document.getElementById('seta-menu');
-    
-    // Identifica qual parte do menu está ativa para abrir/fechar
-    let listaAtiva = (mapaAtualAtivo === 'continente') ? listaProv : listaFerramentas;
-    
-    if (window.getComputedStyle(listaAtiva).display === 'none') {
-        listaAtiva.style.display = 'block';
-        seta.innerHTML = '▲';
-    } else {
-        listaAtiva.style.display = 'none';
-        seta.innerHTML = '▼';
-    }
+    // Agora o toggle funciona em qualquer dispositivo
+    menuPrincipalMinimizado = !menuPrincipalMinimizado;
+    atualizarVisibilidadeMenuMobile();
 }
 
-/**
- * Sincroniza visibilidade do menu conforme tamanho da tela
- * Desktop: mostra províncias OU ferramentas (depend do mapa)
- * Mobile (< 600px): esconde ambos por padrão (podem ser expandidos)
- * Chamada por: abrirMapaProvincia(), carregarMapaPrincipal(), window.resize
- */
 function atualizarVisibilidadeMenuMobile() {
     const listaProv = document.getElementById('lista-botoes-provincia');
     const listaFerramentas = document.getElementById('lista-ferramentas-regiao');
     const seta = document.getElementById('seta-menu');
 
-    if (window.innerWidth <= 600) {
-        if (listaProv) listaProv.style.display = 'none';
-        if (listaFerramentas) listaFerramentas.style.display = 'none';
-        if (seta) seta.innerHTML = '▼';
-        return;
+    // Atualiza a seta visualmente
+    if (seta) {
+        seta.innerHTML = menuPrincipalMinimizado ? '▼' : '▲';
     }
 
-    // Desktop/tablet: mostra a parte correta do menu dependendo do mapa ativo
+    // Gerencia o que aparece com base no mapa ativo e se o menu está recolhido
     if (mapaAtualAtivo === 'continente') {
-        if (listaProv) listaProv.style.display = 'block';
+        if (listaProv) listaProv.style.display = menuPrincipalMinimizado ? 'none' : 'block';
         if (listaFerramentas) listaFerramentas.style.display = 'none';
     } else {
         if (listaProv) listaProv.style.display = 'none';
-        if (listaFerramentas) listaFerramentas.style.display = 'block';
+        if (listaFerramentas) listaFerramentas.style.display = menuPrincipalMinimizado ? 'none' : 'block';
+    }
+}
+
+function fecharMenuMobileForcado() {
+    // Recolhe o menu apenas no celular ao viajar para não tampar o voo
+    if (window.innerWidth <= 600) {
+        menuPrincipalMinimizado = true;
+        atualizarVisibilidadeMenuMobile();
     }
 }
 
@@ -2295,40 +2304,116 @@ function recarregarPinsDoMapaAtual() {
  */
 
 // --- DADOS DA CAPITAL (COM FOTOS) ---
-// 1. Cria 100 boatos vazios automaticamente
-const listaBoatos = Array.from({ length: 100 }, (_, i) => ({
-    id: i + 1,
-    texto: "Boato ainda não ouvido...",
+
+const textosBoatos = [
+    `Dizem que A Bruxa nunca dorme, pois gasta cada segundo de sua vida eterna caçando feitiços tão proibidos e poderosos que poderiam apagar o nome de um deus da história.`,
+    `Dizem que O Palhaço não busca ouro ou poder, mas que é capaz de incendiar um reino inteiro apenas para ver as cores das chamas e se divertir com o caos.`,
+    `Dizem que A Prodígio despreza tudo o que é natural e vive trancada em sua oficina, obcecada em construir máquinas e invenções que superem a perfeição da criação divina.`,
+    `Dizem que O Druida não serve a nenhum rei e que as raízes da terra obedecem ao seu comando apenas para garantir que a natureza seja protegida de qualquer ameaça.`,
+    `Dizem que A Santa carrega o peso de cada vida em Tarre em suas orações e que sua única missão é pregar sua religião para proteger todas as raças vivas.`,
+    `Dizem que O Herói está preso a um código de honra tão antigo e rígido que ele prefere a morte a falhar em sua palavra ou em sua conduta moral.`,
+    `Dizem que O Sábio busca o conhecimento absoluto sobre o universo e que ele não parará até desvendar todos os segredos que os deuses tentaram esconder.`,
+    `Dizem que A Vidente enxerga todas as linhas do destino e, por puro tédio, decidiu apostar tudo o que possui — inclusive o futuro do mundo — em jogos de sorte.`,
+    `Dizem que A Feiticeira treina dia e noite em uma busca insaciável para se tornar a criatura mais forte do mundo, aprimorando seu poder muito além dos limites mortais.`,
+    `Dizem que O Espadachim viaja desafiando cada guerreiro lendário que encontra, pois sua única meta é ser reconhecido como o mestre de armas definitivo.`,
+    `Dizem que O Bardo conhece canções que podem fazer montanhas chorarem e que ele viaja pelo mundo apenas para mostrar sua arte e espalhar sua música.`,
+    `Dizem que O Invocador busca ter a maior diversidade de criaturas possíveis sob seu comando, viajando entre dimensões para capturar seres que ninguém mais viu.`,
+    `Dizem que existem ruínas de uma antiga civilização no deserto e que eles cultuavam os antigos deuses.`,
+    `Dizem que existem ilhas secretas no mar que não estão no mapa.`,
+    `Dizem que existe um panda mágico milenar que vaga pelo lago.`,
+    `Dizem que um bando de halflings vivem perto do deserto.`,
+    `Dizem que atrás da floresta dos sonhos existe umas ilhas onde a morte é uma benção.`,
+    `Dizem que durante a noite a floresta dos sonhos se torna a floresta dos pesadelos.`,
+    `Dizem que o pântano é repleto de animais exóticos que não deveriam existir em Tarre.`,
+    `Dizem que a cidade mais ao norte de Blat'Khyr é amaldiçoada.`,
+    `Dizem que o Vaticano está treinando um exército em segredo para tomar o controle do continente.`,
+    `Dizem que o lago das bênçãos é o lugar mais próximo dos deuses, por isso é pecado adentrá-lo.`,
+    `Dizem que a espinha do gigante é formada por vários gigantes que se solidificaram por ordem do gigante rei.`,
+    `Dizem que a torre dos sábios esconde conhecimentos importantes.`,
+    `Dizem que os bárbaros ao norte em Hukmal'tep estão tendo uma guerra entre si para descobrir quem será o governante.`,
+    `Dizem que existe uma arma escondida em algum lugar criada por antigos anciões anões para derrotarem os humanos em guerras passadas mas nunca foi encontrada.`,
+    `Dizem que o inverno está chegando do inverno desolado.`,
+    `Dizem que os mestiços do outro continente estão planejando invadir Tarre e escravizar todo mundo.`,
+    `Dizem que os orcs estão tentando ficar mais inteligentes para dominarem o continente.`,
+    `Dizem que existe uma planta secreta na floresta dos sonhos que cresce mais do que o céu.`,
+    `Dizem que quem tirar a espada lendária da pedra se torna rei.`,
+    `Dizem que um espírito de uma baleia assassina voadora chamada Jubarte vai nadando pela terra em busca de água dos corpos humanos pois foi proibida de ir ao mar.`,
+    `Dizem que existem criaturas da noite, lobisomens e vampiros que lutam quando escurece.`,
+    `Dizem que existe um outro mundo onde o ar é tóxico e apenas criaturas mágicas vivem nele.`,
+    `Dizem que portais para o submundo estão se abrindo por Tarre.`,
+    `Dizem que os elfos em Blat'Khyr estão tentando tomar controle da torre do sábio.`,
+    `Dizem que o fantasma da Bruxa vai retornar e se vingar de todo o império.`,
+    `Dizem que goblins de toda Tarre estão se juntando.`,
+    `Dizem que alguns machinas voltaram pra Tarre depois de ficarem muitos anos sumidos.`,
+    `Dizem que existe uma vila secreta que seus habitantes são treinados para serem ninjas.`,
+    `Dizem que o poder da amizade não é real.`,
+    `Dizem que pessoas de outros mundos estão reencarnando em Tarre.`,
+    `Dizem que vulcões estão surgindo em Tarre.`,
+    `Dizem que existe uma vila onde sempre chove.`,
+    `Dizem que o império esconde uma arma super poderosa.`,
+    `Dizem que a fúria do mar vai consumir toda a Tarre.`,
+    `Dizem que dentro da espinha do gigante existem uma caverna que dá no reino dos dragões.`,
+    `Dizem que quando você dorme sua alma vai pra outro mundo.`,
+    `Dizem que um mestre dos boatos espalha todos os boatos e se você o encontrar pode fazer qualquer pergunta.`,
+    `Dizem que o verdadeiro tesouro são os amigos que você faz durante o caminho.`,
+    `Dizem que a pessoa que tirou a espada é o novo herói que vai salvar o mundo.`,
+    `Dizem que já ocorreram 3 grandes calamidades desde a queda dos imortais em Tarre.`,
+    `Dizem que a primeira calamidade foi o primeiro Rei Demônio que tentou dominar o mundo mortal.`,
+    `Dizem que a segunda calamidade foi a Bruxa inventar os princípios da morte e tentar destruir tudo.`,
+    `Dizem que a terceira calamidade foi uma guerra continental que envolveu todas as províncias.`,
+    `Dizem que uma quarta calamidade vai aparecer em breve mas ninguém sabe exatamente o que é, talvez seja o aquecimento global.`,
+    `Dizem que as nuvens sobre a Espinha do Gigante são, na verdade, fumaça de cidades voadoras escondidas.`,
+    `Dizem que se você nadar até o fundo do Lago das Bênçãos, encontrará uma porta para o palácio de cristal de um deus esquecido.`,
+    `Dizem que as árvores na Floresta dos Sonhos sussurram os nomes de quem vai morrer no dia seguinte.`,
+    `Dizem que o Deserto já foi um oceano e que ainda existem barcos fantasmas navegando nas dunas.`,
+    `Dizem que a capital foi construída sobre o esqueleto de um dragão tão grande que suas costelas formam os alicerces do castelo.`,
+    `Dizem que existe um farol no fim do mundo que não ilumina o mar, mas sim o passado.`,
+    `Dizem que as estátuas da Praça Central da capital mudam de posição quando ninguém está olhando.`,
+    `Dizem que o Vaticano possui um mapa que mostra a localização exata de cada batida de coração no continente.`,
+    `Dizem que existe uma taverna que só aparece para quem está perdido e sem esperança.`,
+    `Dizem que o subsolo de Tarre é uma rede infinita de túneis criada por vermes gigantes que comem pedras preciosas.`,
+    `Dizem que o Inverno Desolado nunca acaba porque alguém roubou o coração do Espírito do Verão.`,
+    `Dizem que os Machinas que voltaram não são os originais, mas sim cópias feitas de metal e memórias falsas.`,
+    `Dizem que o Império está cobrando impostos tão altos para financiar a construção de uma muralha que cercará o sol.`,
+    `Dizem que existe uma doença que transforma o sangue das pessoas em ouro, matando-as lentamente.`,
+    `Dizem que as fadas na Floresta dos Sonhos sequestram pessoas para usá-las como peças em um jogo de xadrez eterno.`,
+    `Dizem que se você ouvir o sino da Torre do Relógio bater 12 vezes, o tempo vai parar para você para sempre.`,
+    `Dizem que a Quarta Calamidade não será um monstro, mas sim o esquecimento total de toda a magia.`,
+    `Dizem que os Goblins estão se juntando para abrir uma rede de franquias de fast-food de ratos.`,
+    `Dizem que o Mestre dos Boatos é, na verdade, uma pessoa extremamente inteligente, elegante e carismática.`,
+    `Dizem que o mundo é carregado nas costas de quatro elefantes que estão em cima de uma tartaruga gigante.`,
+    `Dizem que os Deuses abandonaram Tarre porque perderam o controle remoto do universo.`,
+    `Dizem que existe uma galinha na Província Élfica que bota ovos de puro cristal.`,
+    `Dizem que as armaduras pesadas do Império são tão desconfortáveis que os soldados lutam com raiva só para acabarem logo a guerra.`,
+    `Dizem que o verdadeiro vilão final é o cozinheiro da guilda que coloca ingredientes suspeitos na sopa.`,
+    `Dizem que o "Poder da Amizade" só funciona se você tiver um bônus de +5 em carisma.`,
+    `Dizem que os peixes do Rio da Capital têm rostos humanos e repetem as últimas palavras de quem morreu afogado.`,
+    `Dizem que existe um cavaleiro sem nome que guarda uma ponte que leva a lugar nenhum.`,
+    `Dizem que as moedas de ouro do antigo império são amaldiçoadas e desaparecem da sua bolsa se você não as gastar em 24 horas.`,
+    `Dizem que o Rei atual não é humano, mas sim um Machina de última geração disfarçado com pele sintética.`,
+    `Dizem que existe uma biblioteca subterrânea onde os livros se escrevem sozinhos contando o futuro de quem os lê.`,
+    `Dizem que se você olhar fixamente para o reflexo da lua em um balde de prata, poderá ver o rosto da Bruxa original.`,
+    `Dizem que os espantalhos nas fazendas de Tarre se levantam para caçar seres vivos no milharal.`,
+    `Dizem que os gatos da Capital são os verdadeiros informantes da Guilda de Mercenários.`,
+    `Dizem que o deserto esconde uma pirâmide invertida que desce até o centro do mundo.`,
+    `Dizem que o vinho da região da alcova é feito com lágrimas de sereias, por isso é tão viciante.`,
+    `Dizem que existe um dragão de metal que dorme no fundo de um vulcão inativo, esperando o sinal para despertar.`,
+    `Dizem que as montanhas de Tarre estão crescendo alguns centímetros por ano porque o mundo está "inflando".`,
+    `Dizem que existe um espelho em uma taverna suja que mostra como você seria se tivesse feito escolhas diferentes na vida.`,
+    `Dizem que as armaduras dos guardas reais possuem almas de criminosos presas nelas para garantir obediência eterna.`,
+    `Dizem que existe uma poção que permite que você mude de classe instantaneamente, mas ela custa metade da sua vida restante.`,
+    `Dizem que o sol de Tarre é, na verdade, um imenso farol construído pelos antigos deuses para vigiar os mortais.`,
+    `Dizem que as flores vermelhas que nascem perto do Coliseu crescem onde o sangue de um herói foi derramado.`,
+    `Dizem que o autor do mundo às vezes esquece onde colocou itens importantes, por isso eles aparecem em lugares aleatórios.`,
+    `Dizem que existe um 101º boato que revela o segredo para se tornar um deus, mas ninguém nunca o ouviu e Dizem que tudo o que você ouviu até agora pode ser uma mentira inventada para te manter longe da verdade.`
+];
+
+const listaBoatos = textosBoatos.map((texto, index) => ({
+    id: index + 1,
+    texto: texto,
     descoberto: false
 }));
 
-// 2. Define os Boatos descobertos
-listaBoatos[15] = { id: 16, texto: "Dizem que um bando de halflings vivem perto do deserto.", descoberto: true };
-listaBoatos[16] = { id: 17, texto: "Dizem que atrás da floresta dos sonhos existe umas ilhas onde a morte é uma benção", descoberto: true };
-listaBoatos[25] = { id: 26, texto: "Dizem que existe uma arma escondida em algum lugar criada por antigos anciões anões para derrotarem os humanos em guerras passadas mas nunca foi encontrada", descoberto: true };
-listaBoatos[29] = { id: 30, texto: "Dizem que existe uma planta secreta na floresta dos sonhos que cresce mais do que o céu", descoberto: true };
-listaBoatos[36] = { id: 37, texto: "Dizem que o fantasma da Bruxa vai retornar e se vingar de todo o império", descoberto: true };
-listaBoatos[37] = { id: 38, texto: "Dizem que goblins de toda Tarre estão se juntando", descoberto: true };
-listaBoatos[40] = { id: 41, texto: "Dizem que o poder da amizade não é real", descoberto: true };
-listaBoatos[42] = { id: 43, texto: "Dizem que vulcões estão surgindo em Tarre", descoberto: true };
-listaBoatos[43] = { id: 44, texto: "Dizem que existe uma vila onde sempre chove", descoberto: true };
-listaBoatos[49] = { id: 50, texto: "Dizem que o verdadeiro tesouro são os amigos que você faz durante o caminho", descoberto: true };
-listaBoatos[50] = { id: 51, texto: "Dizem que a pessoa que tirou a espada é o novo herói que vai salvar o mundo.", descoberto: true };
-listaBoatos[54] = { id: 55, texto: "Dizem que a terceira calamidade foi uma guerra continental que envolveu todas as províncias", descoberto: true };
-listaBoatos[56] = { id: 57, texto: "Dizem que as nuvens sobre a Espinha do Gigante são, na verdade, fumaça de cidades voadoras escondidas.", descoberto: true };
-listaBoatos[57] = { id: 58, texto: "Dizem que se você nadar até o fundo do Lago das Bênçãos, encontrará uma porta para o palácio de cristal de um deus esquecido.", descoberto: true };
-listaBoatos[58] = { id: 59, texto: "Dizem que as árvores na Floresta dos Sonhos sussurram os nomes de quem vai morrer no dia seguinte.", descoberto: true };
-listaBoatos[60] = { id: 61, texto: "Dizem que a capital foi construída sobre o esqueleto de um dragão tão grande que suas costelas formam os alicerces do castelo.", descoberto: true };
-listaBoatos[67] = { id: 68, texto: "Dizem que os Machinas que voltaram não são os originais, mas sim cópias feitas de metal e memórias falsas.", descoberto: true };
-listaBoatos[70] = { id: 71, texto: "Dizem que as fadas na Floresta dos Sonhos sequestram pessoas para usá-las como peças em um jogo de xadrez eterno.", descoberto: true };
-listaBoatos[71] = { id: 72, texto: "Dizem que se você ouvir o sino da Torre do Relógio bater 12 vezes, o tempo vai parar para você para sempre.", descoberto: true };
-listaBoatos[89] = { id: 90, texto: "Dizem que o deserto esconde uma pirâmide invertida que desce até o centro do mundo.", descoberto: true };
-listaBoatos[97] = { id: 98, texto: "Dizem que as flores vermelhas que nascem perto do Coliseu crescem onde o sangue de um herói foi derramado.", descoberto: true };
-listaBoatos[98] = { id: 99, texto: "Dizem que o autor do mundo às vezes esquece onde colocou itens importantes, por isso eles aparecem em lugares aleatórios.", descoberto: true };
-listaBoatos[99] = { id: 100, texto: "Dizem que existe um 101º boato que reveals o segredo para se tornar um deus, mas ninguém nunca o ouviu. E dizem que tudo o que você ouviu até agora pode ser uma mentira inventada para te manter longe da verdade.", descoberto: true };/**
- * DADOS GERAIS - Banco Imperial e Pantheon
- * Informações de investimentos, pacotes de seguro, e 12 deuses principais
- */
     const dadosGerais = {
         banco: [
             { nome: "Pacote Econômico", custo: "2 Moedas de Ouro", desc: "Poder enterrar em um canto e o gerente finge que não viu." },
@@ -4054,18 +4139,6 @@ const coordsCapitaisProvincias = {
     'Espinha do Gigante.jpg': [864, 854]
 };
 
-// Função para recolher o menu no celular antes das animações
-function fecharMenuMobileForcado() {
-    if (window.innerWidth <= 600) {
-        const listaProv = document.getElementById('lista-botoes-provincia');
-        const listaFerr = document.getElementById('lista-ferramentas-regiao');
-        const seta = document.getElementById('seta-menu');
-        
-        if (listaProv) listaProv.style.display = 'none';
-        if (listaFerr) listaFerr.style.display = 'none';
-        if (seta) seta.innerHTML = '▼';
-    }
-}
 
 function abrirMapaProvincia(arquivo) {
     // 1. Esconde o menu no mobile para não tampar a visão do voo
@@ -5629,6 +5702,13 @@ function compartilharViagem(btn) {
             pontos: rotaSimples
         }).then(() => {
             console.log("Rota enviada com sucesso ao Firebase!");
+            
+            // Dispara a Notificação Global na tela de todos os jogadores
+            db.ref('notificacaoGlobal').set({
+                mensagem: "🗺️ Uma nova rota de viagem foi compartilhada com a equipe!",
+                timestamp: Date.now()
+            });
+
         }).catch((err) => {
             console.error("Erro do Firebase ao enviar rota:", err);
         });
@@ -5762,6 +5842,12 @@ function dispararViagemGlobal(pontos, cor) {
             clientTimestamp: Date.now(),
             timestamp: firebase.database.ServerValue.TIMESTAMP
         });
+
+        // Opcional: Avisa quando a caravana começar a se mover
+        db.ref('notificacaoGlobal').set({
+            mensagem: "🏇 A viagem do esquadrão começou!",
+            timestamp: Date.now()
+        });
     }
 }
 
@@ -5799,52 +5885,75 @@ let modoFocoMestre = false;
 let pontoOrigemSeta = null;
 let marcadorOrigemTemp = null;
 
+let menuMestreMinimizado = false;
+
+function alternarMenuMestre() {
+    menuMestreMinimizado = !menuMestreMinimizado;
+    const interno = document.getElementById('conteudo-mestre-interno');
+    const seta = document.getElementById('seta-menu-mestre');
+    
+    if (interno) {
+        interno.style.display = menuMestreMinimizado ? 'none' : 'block';
+    }
+    if (seta) {
+        seta.innerHTML = menuMestreMinimizado ? '▼' : '▲';
+    }
+}
+
 function abrirMenuMestre(aba = 'principal') {
     document.getElementById('btn-login-mestre').style.display = 'none';
     const conteudo = document.getElementById('conteudo-mestre');
     conteudo.style.display = 'block';
     
+    const setaStr = menuMestreMinimizado ? '▼' : '▲';
+    const displayStr = menuMestreMinimizado ? 'none' : 'block';
+    
     if (aba === 'principal') {
         conteudo.innerHTML = `
-            <h3 style="text-align: center; margin-top: 0; color: #ff4444; border-bottom: 1px solid #555; padding-bottom: 5px;">👑 Mestre</h3>
-            <select id="seletor-ferramenta-mestre" class="botao-provincia" style="background: #222; margin-bottom: 5px;" onchange="ativarFerramentaMestre(true)">
-                <option value="normal">🔴 Ponto do Mestre</option>
-                <option value="caveira">💀 Ponto de Ameaça</option>
-                <option value="tesouro">⭐ Ponto de Interesse</option>
-                <option value="local">❌ Ponto X</option>
-                <option value="seta">↗️ Traçar Seta Tática</option>
-            </select>
-            <button id="btn-ferramenta-mestre" class="botao-provincia" onclick="ativarFerramentaMestre()">❌ Ferramenta OFF</button>
-            <button class="botao-provincia" onclick="limparTodosPings()" style="color: #ff4444; border-color: #8b0000; margin-top: 10px;">🗑️ Limpar Marcações</button>
+            <h3 onclick="alternarMenuMestre()" style="text-align: center; margin: 0; padding: 0; color: #ff4444; border-bottom: none; cursor: pointer;">
+                👑 Mestre <span id="seta-menu-mestre" style="font-size: 14px; margin-left: 5px;">${setaStr}</span>
+            </h3>
             
-            <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">SISTEMA</div>
-            <button id="btn-foco-mestre" class="botao-provincia" onclick="alternarFocoMestre()">👁️ Forçar Foco: OFF</button>
-            <button id="btn-bloqueio-mapa" class="botao-provincia" onclick="alternarBloqueioMapa()">🗺️ Bloquear Mapa: OFF</button>
-            
-            <div style="font-size: 11px; color: #aaa; margin-top: 8px;">Bússola:</div>
-            <div style="display:flex; gap: 5px; margin-bottom: 5px;">
-                <select id="select-bussola" class="botao-provincia" style="width: 60%; background: #222; text-align: center; margin: 0; font-size: 12px;">
-                    <option value="0">Norte</option>
-                    <option value="45">Nordeste</option>
-                    <option value="90">Leste</option>
-                    <option value="135">Sudeste</option>
-                    <option value="180">Sul</option>
-                    <option value="225">Sudoeste</option>
-                    <option value="270">Oeste</option>
-                    <option value="315">Noroeste</option>
+            <div id="conteudo-mestre-interno" style="display: ${displayStr}; border-top: 1px solid #555; padding-top: 12px; margin-top: 12px;">
+                <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MARCAÇÕES TÁTICAS</div>
+                <select id="seletor-ferramenta-mestre" class="botao-provincia" style="background: #222; margin-bottom: 5px;" onchange="ativarFerramentaMestre(true)">
+                    <option value="normal">🔴 Ponto do Mestre</option>
+                    <option value="caveira">💀 Ponto de Ameaça</option>
+                    <option value="tesouro">⭐ Ponto de Interesse</option>
+                    <option value="local">❌ Ponto X</option>
+                    <option value="seta">↗️ Traçar Seta Tática</option>
                 </select>
-                <button class="botao-provincia" onclick="dispararBussola(false)" style="width: 40%; margin: 0; border-color: #cd853f; color: #ffdead; font-size: 12px;">Apontar</button>
+                <button id="btn-ferramenta-mestre" class="botao-provincia" onclick="ativarFerramentaMestre()">❌ Ferramenta OFF</button>
+                <button class="botao-provincia" onclick="limparTodosPings()" style="color: #ff4444; border-color: #8b0000; margin-top: 10px;">🗑️ Limpar Marcações</button>
+                
+                <div style="color: #cd853f; font-size: 12px; margin: 15px 0 5px 0; text-align: center;">SISTEMA</div>
+                <button id="btn-foco-mestre" class="botao-provincia" onclick="alternarFocoMestre()">👁️ Forçar Foco: OFF</button>
+                <button id="btn-bloqueio-mapa" class="botao-provincia" onclick="alternarBloqueioMapa()">🗺️ Bloquear Mapa: OFF</button>
+                
+                <div style="font-size: 11px; color: #aaa; margin-top: 8px;">Bússola:</div>
+                <div style="display:flex; gap: 5px; margin-bottom: 5px;">
+                    <select id="select-bussola" class="botao-provincia" style="width: 60%; background: #222; text-align: center; margin: 0; font-size: 12px;">
+                        <option value="0">Norte</option>
+                        <option value="45">Nordeste</option>
+                        <option value="90">Leste</option>
+                        <option value="135">Sudeste</option>
+                        <option value="180">Sul</option>
+                        <option value="225">Sudoeste</option>
+                        <option value="270">Oeste</option>
+                        <option value="315">Noroeste</option>
+                    </select>
+                    <button class="botao-provincia" onclick="dispararBussola(false)" style="width: 40%; margin: 0; border-color: #cd853f; color: #ffdead; font-size: 12px;">Apontar</button>
+                </div>
+                <button class="botao-provincia" onclick="dispararBussola(true)" style="margin-top: 0; color: #aeb6bf; font-size: 12px;">🌀 Bússola Descontrolada</button>
+
+                <div style="font-size: 11px; color: #aaa; margin-top: 8px;">Cronômetro (segundos):</div>
+                <div style="display:flex; gap: 5px; margin-bottom: 5px;">
+                    <input type="number" id="input-cronometro" placeholder="Seg." class="botao-provincia" style="width: 55%; background: #222; text-align: center; margin: 0; font-size: 12px;" value="60">
+                    <button id="btn-acao-cronometro" class="botao-provincia" onclick="alternarCronometro()" style="width: 45%; margin: 0; border-color: #27ae60; color: #90EE90; font-size: 12px; text-align: center;">Iniciar</button>
+                </div>
+
+                <button class="botao-provincia" onclick="abrirMenuMestre('controles')" style="color: #87ceeb; border-color: #4682b4; margin-top: 10px;">⚙️ Controles do Mundo</button>
             </div>
-            <button class="botao-provincia" onclick="dispararBussola(true)" style="margin-top: 0; color: #aeb6bf; font-size: 12px;">🌀 Bússola Descontrolada</button>
-            <div style="font-size: 11px; color: #aaa; margin-top: 8px;">Cronômetro (segundos):</div>
-            <div style="display:flex; gap: 5px; margin-bottom: 5px;">
-                <input type="number" id="input-cronometro" placeholder="Seg." class="botao-provincia" style="width: 55%; background: #222; text-align: center; margin: 0; font-size: 12px;" value="60">
-                <button id="btn-acao-cronometro" class="botao-provincia" onclick="alternarCronometro()" style="width: 45%; margin: 0; border-color: #27ae60; color: #90EE90; font-size: 12px; text-align: center;">Iniciar</button>
-            </div>
-            <button class="botao-provincia" onclick="abrirMenuMestre('controles')" style="color: #87ceeb; border-color: #4682b4; margin-top: 10px;">⚙️ Controles do Mundo</button>
-            
-            <hr style="border: 0; border-top: 1px solid #555; margin: 15px 0 10px 0;">
-            <button class="botao-provincia" onclick="fecharMenuMestre()" style="color: #aaa; border-color: #555; text-align: center;">🔒 Travar Painel</button>
         `;
         
         atualizarBotoesMestre();
@@ -5857,41 +5966,83 @@ function abrirMenuMestre(aba = 'principal') {
         }
     } else if (aba === 'controles') {
         conteudo.innerHTML = `
-            <h3 style="text-align: center; margin-top: 0; color: #ff4444; border-bottom: 1px solid #555; padding-bottom: 10px;">⚙️ Controles</h3>
-            <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">CLIMA GLOBAL</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 20px;">
-                <button class="botao-provincia" onclick="alterarClima('normal')" style="margin:0; text-align:center;">☀️ Normal</button>
-                <button class="botao-provincia" onclick="alterarClima('noite')" style="margin:0; text-align:center;">🌙 Noite</button>
-                <button class="botao-provincia" onclick="alterarClima('chuva')" style="margin:0; text-align:center;">🌧️ Chuva</button>
-                <button class="botao-provincia" onclick="alterarClima('neve')" style="margin:0; text-align:center;">❄️ Neve</button>
-            </div>
-            <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MASMORRAS</div>
-            <div style="margin-bottom: 15px;">
-                <span style="color: #ffd700; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Torre dos Sábios</span>
-                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
-                    <button onclick="alterarProgresso('torre', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
-                    <span id="visor-torre" style="color: white; font-weight: bold;">Andar ${andarMaximoLiberado}</span>
-                    <button onclick="alterarProgresso('torre', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
+            <h3 onclick="alternarMenuMestre()" style="text-align: center; margin: 0; padding: 0; color: #ff4444; border-bottom: none; cursor: pointer;">
+                ⚙️ Controles <span id="seta-menu-mestre" style="font-size: 14px; margin-left: 5px;">${setaStr}</span>
+            </h3>
+            
+            <div id="conteudo-mestre-interno" style="display: ${displayStr}; border-top: 1px solid #555; padding-top: 12px; margin-top: 12px;">
+                <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">CLIMA GLOBAL</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 20px;">
+                    <button class="botao-provincia" onclick="alterarClima('normal')" style="margin:0; text-align:center;">☀️ Normal</button>
+                    <button class="botao-provincia" onclick="alterarClima('noite')" style="margin:0; text-align:center;">🌙 Noite</button>
+                    <button class="botao-provincia" onclick="alterarClima('chuva')" style="margin:0; text-align:center;">🌧️ Chuva</button>
+                    <button class="botao-provincia" onclick="alterarClima('neve')" style="margin:0; text-align:center;">❄️ Neve</button>
                 </div>
-            </div>
-            <div style="margin-bottom: 15px;">
-                <span style="color: #add8e6; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Hukmal tep (Gelo)</span>
-                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
-                    <button onclick="alterarProgresso('hukmal', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
-                    <span id="visor-hukmal" style="color: white; font-weight: bold;">Sala ${registroDungeons['hukmal'].progresso}</span>
-                    <button onclick="alterarProgresso('hukmal', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
+
+                <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">SOCIEDADE</div>
+                <button class="botao-provincia" onclick="abrirMenuMestre('boatos')" style="color: #ffb6c1; border-color: #8b008b; margin-bottom: 20px;">🗣️ Gerenciar Boatos</button>
+
+                <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MASMORRAS</div>
+                <div style="margin-bottom: 15px;">
+                    <span style="color: #ffd700; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Torre dos Sábios</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
+                        <button onclick="alterarProgresso('torre', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
+                        <span id="visor-torre" style="color: white; font-weight: bold;">Andar ${andarMaximoLiberado}</span>
+                        <button onclick="alterarProgresso('torre', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
+                    </div>
                 </div>
-            </div>
-            <div style="margin-bottom: 15px;">
-                <span style="color: #cd853f; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Deserto (Tristeza)</span>
-                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
-                    <button onclick="alterarProgresso('deserto', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
-                    <span id="visor-deserto" style="color: white; font-weight: bold;">Sala ${registroDungeons['deserto'].progresso}</span>
-                    <button onclick="alterarProgresso('deserto', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
+                <div style="margin-bottom: 15px;">
+                    <span style="color: #add8e6; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Hukmal tep (Gelo)</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
+                        <button onclick="alterarProgresso('hukmal', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
+                        <span id="visor-hukmal" style="color: white; font-weight: bold;">Sala ${registroDungeons['hukmal'].progresso}</span>
+                        <button onclick="alterarProgresso('hukmal', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
+                    </div>
                 </div>
+                <div style="margin-bottom: 15px;">
+                    <span style="color: #cd853f; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Deserto (Tristeza)</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
+                        <button onclick="alterarProgresso('deserto', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
+                        <span id="visor-deserto" style="color: white; font-weight: bold;">Sala ${registroDungeons['deserto'].progresso}</span>
+                        <button onclick="alterarProgresso('deserto', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
+                    </div>
+                </div>
+                
+                <button class="botao-provincia" onclick="abrirMenuMestre('principal')" style="color: #aaa; border-color: #555; text-align: center;">⬅ Voltar ao Painel</button>
             </div>
-            <hr style="border: 0; border-top: 1px solid #555; margin: 20px 0 10px 0;">
-            <button class="botao-provincia" onclick="abrirMenuMestre('principal')" style="color: #aaa; border-color: #555; text-align: center;">⬅ Voltar ao Painel</button>
+        `;
+    } else if (aba === 'boatos') {
+        let listaHtml = '';
+        Object.keys(boatosDescobertosAtivos).forEach(id => {
+            listaHtml += `
+                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.5); padding:6px; margin-bottom:5px; border:1px solid #444; border-radius:4px;">
+                    <span style="color:#ccc; font-size: 13px;">Boato #${id} liberado</span>
+                    <button onclick="removerBoato(${id})" style="background:#8b0000; color:white; border:none; padding:3px 10px; border-radius:3px; cursor:pointer; font-weight: bold;">X</button>
+                </div>
+            `;
+        });
+
+        if (!listaHtml) listaHtml = '<p style="color:#777; text-align:center; font-size:12px; margin-top: 20px;">Nenhum boato espalhado ainda.</p>';
+
+        conteudo.innerHTML = `
+            <h3 onclick="alternarMenuMestre()" style="text-align: center; margin: 0; padding: 0; color: #ffb6c1; border-bottom: none; cursor: pointer;">
+                🗣️ Boatos <span id="seta-menu-mestre" style="font-size: 14px; margin-left: 5px;">${setaStr}</span>
+            </h3>
+            
+            <div id="conteudo-mestre-interno" style="display: ${displayStr}; border-top: 1px solid #555; padding-top: 12px; margin-top: 12px;">
+                <p style="color:#aaa; font-size: 11px; text-align:center;">Digite o número do boato para revelá-lo.</p>
+                <div style="display:flex; gap: 5px; margin-bottom: 15px;">
+                    <input type="number" id="input-novo-boato" placeholder="Nº (1-100)" class="botao-provincia" style="width: 60%; background: #222; text-align: center; margin: 0; font-size: 13px;">
+                    <button class="botao-provincia" onclick="liberarBoato()" style="width: 40%; margin: 0; border-color: #27ae60; color: #90EE90; font-weight: bold;">Liberar</button>
+                </div>
+                
+                <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center; border-bottom: 1px dashed #555; padding-bottom: 5px;">PÚBLICO ATUALMENTE</div>
+                <div style="max-height: 220px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px;">
+                    ${listaHtml}
+                </div>
+                
+                <button class="botao-provincia" onclick="abrirMenuMestre('controles')" style="color: #aaa; border-color: #555; text-align: center;">⬅ Voltar aos Controles</button>
+            </div>
         `;
     }
 }
@@ -6375,6 +6526,84 @@ function gerenciarCronometroGlobal(dados) {
 if (db) {
     db.ref('cronometroGlobal').on('value', (snapshot) => {
         gerenciarCronometroGlobal(snapshot.val());
+    });
+}
+// ==========================================
+// SISTEMA GLOBAL DE BOATOS E NOTIFICAÇÕES
+// ==========================================
+let boatosDescobertosAtivos = {};
+
+function liberarBoato() {
+    if (!db) return;
+    const input = document.getElementById('input-novo-boato');
+    const id = parseInt(input.value);
+    
+    if (isNaN(id) || id < 1 || id > 100) {
+        alert("Insira um número válido (1 a 100).");
+        return;
+    }
+    
+    // Salva o ID no Firebase
+    db.ref('boatosGlobais/' + id).set(true);
+    
+    // Dispara a Notificação Global
+    db.ref('notificacaoGlobal').set({
+        mensagem: `Um novo boato se espalha pelas ruas... (Boato #${id})`,
+        timestamp: Date.now()
+    });
+    
+    input.value = '';
+}
+
+function removerBoato(id) {
+    if (!db) return;
+    db.ref('boatosGlobais/' + id).remove();
+}
+
+function mostrarToastNotificacao(mensagem) {
+    const toast = document.getElementById('toast-notificacao');
+    if (!toast) return;
+    
+    toast.innerHTML = '🗣️ ' + mensagem;
+    toast.classList.add('toast-visivel');
+    
+    // Remove depois de 5 segundos
+    setTimeout(() => {
+        toast.classList.remove('toast-visivel');
+    }, 5000);
+}
+
+// Ouvinte: Sincroniza a lista de Boatos
+if (db) {
+    db.ref('boatosGlobais').on('value', (snapshot) => {
+        boatosDescobertosAtivos = snapshot.val() || {};
+        
+        // 1. Atualiza silenciosamente a matriz de boatos do jogo
+        dadosCapital.boatos.forEach(b => {
+            b.descoberto = !!boatosDescobertosAtivos[b.id];
+        });
+
+        // 2. Se o Mestre estiver na tela de gerenciar boatos, recarrega a lista
+        const conteudo = document.getElementById('conteudo-mestre');
+        if (conteudo && conteudo.innerHTML.includes('🗣️ Boatos')) {
+            abrirMenuMestre('boatos');
+        }
+
+        // 3. Se um Jogador estiver com a aba de boatos aberta no menu da capital, recarrega para ele ver instantaneamente
+        if (typeof menuAtualAberto !== 'undefined' && menuAtualAberto === 'boatos') {
+            menuCapital('boatos');
+        }
+    });
+}
+
+// Ouvinte: Dispara a notificação visual na tela
+const tempoInicioNotificacao = Date.now();
+if (db) {
+    db.ref('notificacaoGlobal').on('value', (snapshot) => {
+        const dados = snapshot.val();
+        if (dados && dados.timestamp && dados.timestamp > tempoInicioNotificacao) {
+            mostrarToastNotificacao(dados.mensagem);
+        }
     });
 }
 precarregarImagens();
