@@ -1877,7 +1877,7 @@ function inicializarMapa(arquivo, largura, altura, minZoom, maxZoom, coordInicia
     recarregarPinsDoMapaAtual();
 
     grupoRota.addTo(map);
-    L.control.zoom({ position: 'topleft' }).addTo(map);
+    //L.control.zoom({ position: 'topleft' }).addTo(map);
     L.imageOverlay(arquivo, limitesImagem).addTo(map);
     
     ultimaImagemBounds = limitesImagem;
@@ -2066,7 +2066,7 @@ function carregarMapaPrincipal(provinciaOrigem = null) {
     document.getElementById('menu-provincias').style.display = 'block';
 
     atualizarVisibilidadeMenuMobile();
-    
+
     if (ehDispositivoMovel()) {
     const btnFs = document.getElementById('btn-toggle-fullscreen');
     if (btnFs) btnFs.style.display = 'flex';
