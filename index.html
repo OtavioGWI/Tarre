@@ -75,6 +75,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
+
+        
     /* --- ESTILOS GERAIS --- */
     
     /* Fundo Azul Escolhido (#4F686E) */
@@ -776,9 +778,124 @@
         color: #f39c12;
         box-shadow: 0 0 20px rgba(211, 84, 0, 0.6);
     }
+   /* TELA INICIAL MOBILE-FIRST */
+/* TELA INICIAL ULTRA-MODERNA (MOBILE-FIRST) */
+#tela-inicial {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: #08080c;
+    z-index: 21000;
+    display: flex; flex-direction: column;
+    transition: opacity 0.5s ease;
+    overflow: hidden;
+    font-family: sans-serif;
+}
+
+.fundo-animado {
+    position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(205, 133, 63, 0.15), transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(138, 43, 226, 0.08), transparent 40%);
+    animation: girarFundo 25s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes girarFundo {
+    100% { transform: rotate(360deg); }
+}
+
+.conteudo-inicial {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; justify-content: space-between;
+    height: 100%; padding: 40px 24px; box-sizing: border-box;
+}
+
+.topo-inicial {
+    display: flex; justify-content: flex-end;
+}
+
+.versao-badge {
+    color: #cd853f; font-size: 11px; font-weight: bold;
+    border: 1px solid rgba(205, 133, 63, 0.4); padding: 5px 12px; border-radius: 20px;
+    letter-spacing: 1.5px; background: rgba(0, 0, 0, 0.6);
+}
+
+.centro-inicial {
+    text-align: center;
+    margin-top: -15vh;
+}
+
+.titulo-rpg {
+    color: #fff; font-size: 52px; font-weight: 300; letter-spacing: 14px; margin: 0;
+    text-shadow: 0 0 25px rgba(205, 133, 63, 0.7), 0 4px 10px rgba(0,0,0,0.8);
+    margin-left: 14px; /* Compensa o letter-spacing para centralizar perfeito */
+}
+
+.subtitulo {
+    color: #cd853f; font-size: 13px; letter-spacing: 4px; margin-top: 12px; 
+    text-transform: uppercase; font-weight: bold;
+}
+
+.botoes-iniciais {
+    display: flex; flex-direction: column; gap: 16px;
+    width: 100%; max-width: 380px; margin: 0 auto;
+}
+
+.btn-primario, .btn-secundario {
+    width: 100%; padding: 18px; border-radius: 10px; font-size: 14px;
+    text-transform: uppercase; letter-spacing: 2px; font-weight: bold;
+    cursor: pointer; transition: all 0.2s ease;
+}
+
+.btn-primario {
+    background: linear-gradient(135deg, #a0522d, #cd853f);
+    color: #fff; border: none;
+    box-shadow: 0 8px 25px rgba(205, 133, 63, 0.3);
+}
+
+.btn-primario:active { 
+    transform: scale(0.96); 
+    box-shadow: 0 4px 12px rgba(205, 133, 63, 0.2); 
+}
+
+.btn-secundario {
+    background: rgba(255, 255, 255, 0.03); 
+    color: #aaa; 
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-secundario:active { 
+    background: rgba(255, 255, 255, 0.08); 
+    color: #fff; 
+    transform: scale(0.96);
+}
     </style>
 </head>
 <body>
+   <div id="tela-inicial">
+    <div class="fundo-animado"></div>
+    <div class="conteudo-inicial">
+        <div class="topo-inicial">
+            <span class="versao-badge">v2.0</span>
+        </div>
+        
+        <div class="centro-inicial">
+            <h1 class="titulo-rpg">TARRE</h1>
+            <p class="subtitulo">A Era do Pandemônio</p>
+        </div>
+        
+        <div class="botoes-iniciais">
+            <button class="btn-primario" onclick="iniciarCarregamentoTotal()">Adentrar o Mapa</button>
+            <button class="btn-secundario" onclick="abrirCreditos()">Créditos</button>
+        </div>
+    </div>
+</div>
+
+<div id="tela-carregamento" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #05050a; z-index: 20000; flex-direction: column; justify-content: center; align-items: center; opacity: 1;">
+    <h1 style="color: #cd853f; letter-spacing: 5px; font-family: sans-serif; text-shadow: 0 0 20px rgba(205,133,63,0.5); text-align: center; font-size: 28px; margin: 0 10px;">FORJANDO O MUNDO</h1>
+    <div style="width: 80%; max-width: 300px; height: 4px; background: #222; margin-top: 30px; border-radius: 2px; overflow: hidden; box-shadow: 0 0 10px rgba(255,255,255,0.1);">
+        <div id="barra-progresso" style="width: 0%; height: 100%; background: #cd853f; box-shadow: 0 0 15px #cd853f; transition: width 0.1s;"></div>
+    </div>
+    <div id="texto-porcentagem" style="color: #fff; font-size: 20px; font-weight: bold; margin-top: 15px; text-shadow: 0 0 10px rgba(255,255,255,0.5);">0%</div>
+</div>
     <div id="map-container">
     <div id="map"></div>
 </div>
@@ -898,11 +1015,6 @@
     </div>
 </div>
 
-<!-- CONTAINER QUE JÁ EXISTE NO SEU CÓDIGO -->
-<div id="provincia-container">
-    <img id="img-provincia" src="">
-</div>
-
 <div id="provincia-container">
     <img id="img-provincia" src="">
 </div>
@@ -927,7 +1039,7 @@
 
 <div id="modal-viagem" style="display: none; position: fixed; z-index: 6000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); align-items: center; justify-content: center;">
     <div class="modal-conteudo" style="max-width: 500px;">
-        <span class="fechar-modal" onclick="document.getElementById('modal-viagem').style.display='none'">&times;</span>
+        <span class="fechar-modal" onclick="fecharModalViagem()">&times;</span>
         <h3 style="color: #90EE90;">📊 Relatório de Viagem</h3>
         <div id="resultado-viagem"></div>
     </div>
@@ -5745,6 +5857,23 @@ function animarViagem() {
         pontosRota = [];
     }, 200);
 }
+function fecharModalViagem() {
+    document.getElementById('modal-viagem').style.display = 'none';
+    
+    // Apaga do Firebase para todos os jogadores
+    if (db) {
+        db.ref('rotaAtiva').remove();
+    }
+    
+    // Limpa a linha azul local da tela de quem desenhou
+    if (typeof grupoRota !== 'undefined') {
+        grupoRota.clearLayers();
+        pontosRota = [];
+    }
+    
+    // Restaura os botões de medição
+    cancelarModoMedicao();
+}
 
 window.dispararViagemRemota = function(pontosJson, cor) {
     try {
@@ -6619,6 +6748,88 @@ if (db) {
         }
     });
 }
+
+function iniciarCarregamentoTotal() {
+    const telaInicial = document.getElementById('tela-inicial');
+    const telaCarga = document.getElementById('tela-carregamento');
+    
+    // 1. Mostra a tela de carga preta IMEDIATAMENTE (ela fica escondida atrás da tela inicial via z-index)
+    telaCarga.style.display = 'flex';
+    
+    // 2. Some com a tela inicial suavemente, revelando a tela preta de carga
+    telaInicial.style.opacity = '0';
+    setTimeout(() => {
+        telaInicial.style.display = 'none';
+        processarCargaDeRecursos(); // Inicia os downloads do array de imagens
+    }, 500);
+}
+
+function processarCargaDeRecursos() {
+    let arrayImagens = [
+        'Mapa teste.png', 'Hukmal_tep.jpg', 'Blat_khyr.jpg', 'Deserto.jpg', 
+        'Lago.jpg', 'Alcova.jpg', 'Planos.jpg', 'Plano Divino.png', 
+        'Plano Demoníaco.png', 'Plano Espiritual.png', 'Espinha do Gigante.jpg', 'Mar.jpg'
+    ];
+
+    dadosGerais.deuses.forEach(d => { if(d.foto) arrayImagens.push(d.foto); });
+    dadosCapital.esquadrao.forEach(e => { if(e.foto) arrayImagens.push(e.foto); });
+    dadosCapital.procurados.forEach(p => { if(p.foto) arrayImagens.push(p.foto); });
+    dadosCapital.bestiario.forEach(b => { if(b.foto) arrayImagens.push(b.foto); });
+
+    const recursosUnicos = [...new Set(arrayImagens)];
+    
+    let carregadas = 0;
+    const total = recursosUnicos.length;
+    const visorTexto = document.getElementById('texto-porcentagem');
+    const barraProgresso = document.getElementById('barra-progresso');
+    const telaCarga = document.getElementById('tela-carregamento');
+
+    if (total === 0) {
+        finalizarCarga(telaCarga);
+        return;
+    }
+
+    recursosUnicos.forEach(caminho => {
+        const img = new Image();
+        img.src = caminho;
+        
+        img.onload = img.onerror = () => {
+            carregadas++;
+            const porcentagem = Math.floor((carregadas / total) * 100);
+            visorTexto.innerHTML = porcentagem + '%';
+            barraProgresso.style.width = porcentagem + '%';
+            
+            if (carregadas === total) {
+                // Ao chegar no 100%, dá um fôlego visual de 400ms antes de injetar o mapa pesado
+                setTimeout(() => finalizarCarga(telaCarga), 400);
+            }
+        };
+    });
+}
+
+function finalizarCarga(telaCarga) {
+    // 1. Dispara o renderizador do Leaflet de forma INVISÍVEL enquanto a tela preta está na frente
+    carregarMapaPrincipal();
+
+    // 2. Trava a tela preta por exatos 1200ms. Esse é o tempo que a RAM da máquina leva 
+    // para organizar a imagem gigante e injetar os marcadores no lugar certo.
+    setTimeout(() => {
+        // 3. Após a pausa, dissolve a tela preta revelando o mundo perfeitamente pronto
+        telaCarga.style.opacity = '0';
+        telaCarga.style.transition = 'opacity 0.8s ease';
+        
+        setTimeout(() => {
+            telaCarga.style.display = 'none';
+        }, 800);
+    }, 1200);
+}
+
+function abrirCreditos() {
+    alert("Sistema de créditos será implementado aqui.");
+}
+
+// Inicia o carregamento assim que o script é lido
+preCarregarMundo();
 
 // Ouvinte: Dispara a notificação visual na tela
 const tempoInicioNotificacao = Date.now();
