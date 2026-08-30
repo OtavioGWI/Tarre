@@ -779,123 +779,114 @@
         box-shadow: 0 0 20px rgba(211, 84, 0, 0.6);
     }
    /* TELA INICIAL MOBILE-FIRST */
-/* TELA INICIAL ULTRA-MODERNA (MOBILE-FIRST) */
-#tela-inicial {
+/* TELA CINEMATOGRÁFICA */
+#tela-cinematica {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: #08080c;
-    z-index: 21000;
-    display: flex; flex-direction: column;
-    transition: opacity 0.5s ease;
-    overflow: hidden;
-    font-family: sans-serif;
+    background: #000; z-index: 21000; overflow: hidden;
+    transition: opacity 1.2s ease;
 }
 
-.fundo-animado {
-    position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle at 50% 50%, rgba(205, 133, 63, 0.15), transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(138, 43, 226, 0.08), transparent 40%);
-    animation: girarFundo 25s linear infinite;
+.camada-cena {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100vw; 
+    height: 100vh;
+    opacity: 0; 
     pointer-events: none;
+    transition: opacity 1s ease;
+    object-fit: contain; /* Ajusta para mostrar o vídeo inteiro sem zoom agressivo em PCs */
+    background: #000; /* Garante fundo preto nas faixas que sobrarem */
 }
 
-@keyframes girarFundo {
-    100% { transform: rotate(360deg); }
+.video-fundo {
+    width: 100vw; 
+    height: 100vh;
+    object-fit: contain; /* Evita o corte e o zoom excessivo em monitores */
+    background: #000;
 }
 
-.conteudo-inicial {
-    position: relative; z-index: 1;
-    display: flex; flex-direction: column; justify-content: space-between;
-    height: 100%; padding: 40px 24px; box-sizing: border-box;
+/* Se preferir manter o cover apenas no celular onde a tela é vertical, usamos uma regra media query */
+@media only screen and (max-width: 600px) {
+    .camada-cena, .video-fundo {
+        object-fit: cover; /* No celular continua preenchendo a tela toda perfeitamente */
+    }
 }
 
-.topo-inicial {
-    display: flex; justify-content: flex-end;
+.camada-cena.ativa {
+    opacity: 1; pointer-events: auto;
 }
 
-.versao-badge {
-    color: #cd853f; font-size: 11px; font-weight: bold;
-    border: 1px solid rgba(205, 133, 63, 0.4); padding: 5px 12px; border-radius: 20px;
-    letter-spacing: 1.5px; background: rgba(0, 0, 0, 0.6);
+#hitbox-livro {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 35%;
+    cursor: pointer;
+    z-index: 10;
+    /* Se precisar ver a caixa para ajustar apague as barras da linha de baixo */
+    /* border: 2px solid red; background: rgba(255,0,0,0.3); */
 }
 
-.centro-inicial {
-    text-align: center;
-    margin-top: -15vh;
+#hitbox-porta {
+    position: absolute; bottom: 5%; left: 50%;
+    transform: translateX(-50%);
+    width: 40%; height: 35%;
+    cursor: pointer; z-index: 10;
 }
 
-.titulo-rpg {
-    color: #fff; font-size: 52px; font-weight: 300; letter-spacing: 14px; margin: 0;
-    text-shadow: 0 0 25px rgba(205, 133, 63, 0.7), 0 4px 10px rgba(0,0,0,0.8);
-    margin-left: 14px; /* Compensa o letter-spacing para centralizar perfeito */
+#ui-carregamento {
+    position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    z-index: 20;
 }
 
-.subtitulo {
-    color: #cd853f; font-size: 13px; letter-spacing: 4px; margin-top: 12px; 
-    text-transform: uppercase; font-weight: bold;
-}
 
-.botoes-iniciais {
-    display: flex; flex-direction: column; gap: 16px;
-    width: 100%; max-width: 380px; margin: 0 auto;
-}
-
-.btn-primario, .btn-secundario {
-    width: 100%; padding: 18px; border-radius: 10px; font-size: 14px;
-    text-transform: uppercase; letter-spacing: 2px; font-weight: bold;
-    cursor: pointer; transition: all 0.2s ease;
-}
-
-.btn-primario {
-    background: linear-gradient(135deg, #a0522d, #cd853f);
-    color: #fff; border: none;
-    box-shadow: 0 8px 25px rgba(205, 133, 63, 0.3);
-}
-
-.btn-primario:active { 
-    transform: scale(0.96); 
-    box-shadow: 0 4px 12px rgba(205, 133, 63, 0.2); 
-}
-
-.btn-secundario {
-    background: rgba(255, 255, 255, 0.03); 
-    color: #aaa; 
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.btn-secundario:active { 
-    background: rgba(255, 255, 255, 0.08); 
-    color: #fff; 
-    transform: scale(0.96);
-}
     </style>
 </head>
 <body>
-   <div id="tela-inicial">
-    <div class="fundo-animado"></div>
-    <div class="conteudo-inicial">
-        <div class="topo-inicial">
-            <span class="versao-badge">v2.0</span>
-        </div>
-        
-        <div class="centro-inicial">
-            <h1 class="titulo-rpg">TARRE</h1>
-            <p class="subtitulo">A Era do Pandemônio</p>
-        </div>
-        
-        <div class="botoes-iniciais">
-            <button class="btn-primario" onclick="iniciarCarregamentoTotal()">Adentrar o Mapa</button>
-            <button class="btn-secundario" onclick="abrirCreditos()">Créditos</button>
+   <div id="tela-cinematica">
+    <!-- Camada 1: Livro Fechado em Loop (Começa mutado para o navegador não bloquear o autoplay) -->
+    <div id="cena-livro-fechado" class="camada-cena ativa">
+        <video class="video-fundo" autoplay loop muted playsinline>
+            <source src="livro_fechado.mp4" type="video/mp4">
+        </video>
+        <div id="hitbox-livro" onclick="abrirLivro()"></div>
+    </div>
+
+    <!-- Camada 2: Livro Abrindo com SOM ATIVO -->
+    <video id="video-livro-abrindo" class="camada-cena" playsinline>
+        <source src="livro.mp4" type="video/mp4">
+    </video>
+
+    <!-- Camada 3: Floresta em Loop com SOM ATIVO -->
+    <div id="cena-floresta" class="camada-cena">
+        <video class="video-fundo" autoplay loop playsinline>
+            <source src="floresta.mp4" type="video/mp4">
+        </video>
+        <div id="hitbox-porta" onclick="iniciarTransicao()"></div>
+    </div>
+
+    <!-- Camada 4: Transição com SOM ATIVO -->
+    <video id="video-transicao" class="camada-cena" playsinline>
+        <source src="floresta_caverna.mp4" type="video/mp4">
+    </video>
+
+    <!-- Camada 5: Caverna em Loop + Carregamento com SOM ATIVO -->
+    <div id="cena-caverna" class="camada-cena">
+        <video class="video-fundo" autoplay loop playsinline>
+            <source src="caverna.mp4" type="video/mp4">
+        </video>
+        <div id="ui-carregamento">
+            <h2 style="color: #cd853f; text-shadow: 0 0 10px #000; font-size: 22px; letter-spacing: 4px; font-family: serif; margin: 0;">ATRAVESSANDO O PANDEMÔNIO</h2>
+            <div id="texto-porcentagem-epico" style="color: #fff; font-size: 32px; font-weight: bold; text-shadow: 0 0 15px rgba(255,255,255,0.8); margin-top: 10px;">0%</div>
         </div>
     </div>
 </div>
 
-<div id="tela-carregamento" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #05050a; z-index: 20000; flex-direction: column; justify-content: center; align-items: center; opacity: 1;">
-    <h1 style="color: #cd853f; letter-spacing: 5px; font-family: sans-serif; text-shadow: 0 0 20px rgba(205,133,63,0.5); text-align: center; font-size: 28px; margin: 0 10px;">FORJANDO O MUNDO</h1>
-    <div style="width: 80%; max-width: 300px; height: 4px; background: #222; margin-top: 30px; border-radius: 2px; overflow: hidden; box-shadow: 0 0 10px rgba(255,255,255,0.1);">
-        <div id="barra-progresso" style="width: 0%; height: 100%; background: #cd853f; box-shadow: 0 0 15px #cd853f; transition: width 0.1s;"></div>
-    </div>
-    <div id="texto-porcentagem" style="color: #fff; font-size: 20px; font-weight: bold; margin-top: 15px; text-shadow: 0 0 10px rgba(255,255,255,0.5);">0%</div>
-</div>
+
     <div id="map-container">
     <div id="map"></div>
 </div>
@@ -6749,22 +6740,85 @@ if (db) {
     });
 }
 
-function iniciarCarregamentoTotal() {
-    const telaInicial = document.getElementById('tela-inicial');
-    const telaCarga = document.getElementById('tela-carregamento');
+// ==========================================
+// MOTOR CINEMATOGRÁFICO DEFINITIVO
+// ==========================================
+
+let mapaCarregou100 = false;
+let tempoMinimoCavernaConcluido = false;
+
+// 1. Clicou no livro fechado: vai direto para o livro abrindo
+function abrirLivro() {
+    const cenaFechada = document.getElementById('cena-livro-fechado');
+    const videoAbrindo = document.getElementById('video-livro-abrindo');
     
-    // 1. Mostra a tela de carga preta IMEDIATAMENTE (ela fica escondida atrás da tela inicial via z-index)
-    telaCarga.style.display = 'flex';
-    
-    // 2. Some com a tela inicial suavemente, revelando a tela preta de carga
-    telaInicial.style.opacity = '0';
-    setTimeout(() => {
-        telaInicial.style.display = 'none';
-        processarCargaDeRecursos(); // Inicia os downloads do array de imagens
-    }, 500);
+    const videoLoop = cenaFechada.querySelector('video');
+    if (videoLoop) {
+        videoLoop.pause();
+        videoLoop.currentTime = 0;
+    }
+
+    cenaFechada.classList.remove('ativa');
+    videoAbrindo.classList.add('ativa');
+    videoAbrindo.muted = false;
+    videoAbrindo.currentTime = 0; 
+    videoAbrindo.play();
+
+    // Quando o livro terminar de abrir, exibe a floresta perfeitamente do zero
+    videoAbrindo.onended = () => {
+        videoAbrindo.classList.remove('ativa');
+        const cenaFloresta = document.getElementById('cena-floresta');
+        cenaFloresta.classList.add('ativa');
+        
+        const vidFl = cenaFloresta.querySelector('video');
+        if(vidFl) {
+            vidFl.pause();
+            vidFl.currentTime = 0; // REINICIA DO ZERO EXATO
+            vidFl.muted = false;
+            vidFl.play();
+        }
+    };
 }
 
-function processarCargaDeRecursos() {
+// 2. Clicou na porta da floresta: vai para a transição da caverna
+function iniciarTransicao() {
+    const cenaFloresta = document.getElementById('cena-floresta');
+    const videoTransicao = document.getElementById('video-transicao');
+    
+    const videoLoopFloresta = cenaFloresta.querySelector('video');
+    if (videoLoopFloresta) {
+        videoLoopFloresta.pause();
+        videoLoopFloresta.currentTime = 0;
+    }
+
+    cenaFloresta.classList.remove('ativa');
+    videoTransicao.classList.add('ativa');
+    videoTransicao.muted = false;
+    videoTransicao.currentTime = 0; 
+    videoTransicao.play();
+
+    videoTransicao.onended = () => {
+        videoTransicao.classList.remove('ativa');
+        const cenaCaverna = document.getElementById('cena-caverna');
+        cenaCaverna.classList.add('ativa');
+        
+        const vidCav = cenaCaverna.querySelector('video');
+        if(vidCav) {
+            vidCav.muted = false;
+            vidCav.currentTime = 0; 
+            vidCav.play();
+        }
+        
+        processarCargaEpica();
+
+        setTimeout(() => {
+            tempoMinimoCavernaConcluido = true;
+            verificarTerminoCinematica();
+        }, 5000);
+    };
+}
+
+function processarCargaEpica() {
     let arrayImagens = [
         'Mapa teste.png', 'Hukmal_tep.jpg', 'Blat_khyr.jpg', 'Deserto.jpg', 
         'Lago.jpg', 'Alcova.jpg', 'Planos.jpg', 'Plano Divino.png', 
@@ -6777,15 +6831,13 @@ function processarCargaDeRecursos() {
     dadosCapital.bestiario.forEach(b => { if(b.foto) arrayImagens.push(b.foto); });
 
     const recursosUnicos = [...new Set(arrayImagens)];
-    
     let carregadas = 0;
     const total = recursosUnicos.length;
-    const visorTexto = document.getElementById('texto-porcentagem');
-    const barraProgresso = document.getElementById('barra-progresso');
-    const telaCarga = document.getElementById('tela-carregamento');
+    const visorTexto = document.getElementById('texto-porcentagem-epico');
 
     if (total === 0) {
-        finalizarCarga(telaCarga);
+        mapaCarregou100 = true;
+        verificarTerminoCinematica();
         return;
     }
 
@@ -6796,53 +6848,73 @@ function processarCargaDeRecursos() {
         img.onload = img.onerror = () => {
             carregadas++;
             const porcentagem = Math.floor((carregadas / total) * 100);
-            visorTexto.innerHTML = porcentagem + '%';
-            barraProgresso.style.width = porcentagem + '%';
+            if(visorTexto) visorTexto.innerHTML = porcentagem + '%';
             
             if (carregadas === total) {
-                // Ao chegar no 100%, dá um fôlego visual de 400ms antes de injetar o mapa pesado
-                setTimeout(() => finalizarCarga(telaCarga), 400);
+                mapaCarregou100 = true;
+                verificarTerminoCinematica();
             }
         };
     });
 }
 
-function finalizarCarga(telaCarga) {
-    // 1. Dispara o renderizador do Leaflet de forma INVISÍVEL enquanto a tela preta está na frente
+function verificarTerminoCinematica() {
+    if (mapaCarregou100 && tempoMinimoCavernaConcluido) {
+        concluirTranscendencia();
+    }
+}
+
+// 3. FIM DA CINEMATOGRÁFICA: Constrói o mapa e MATA O ÁUDIO DA CAVERNA DE VEZ
+// 3. FIM DA CINEMATOGRÁFICA: Constrói o mapa, restaura o painel do mestre no PC e MATA O ÁUDIO
+function concluirTranscendencia() {
     carregarMapaPrincipal();
 
-    // 2. Trava a tela preta por exatos 1200ms. Esse é o tempo que a RAM da máquina leva 
-    // para organizar a imagem gigante e injetar os marcadores no lugar certo.
+    // Silencia e pausa ABSOLUTAMENTE TODOS os vídeos da tela cinemática
+    const todosOsVideos = document.querySelectorAll('#tela-cinematica video');
+    todosOsVideos.forEach(v => {
+        v.pause();
+        v.currentTime = 0;
+        v.muted = true;
+    });
+
+    // Garante que a camada da caverna suma e o vídeo pare de rodar som por trás
+    const cenaCaverna = document.getElementById('cena-caverna');
+    if (cenaCaverna) {
+        cenaCaverna.classList.remove('ativa');
+        const videoCaverna = cenaCaverna.querySelector('video');
+        if (videoCaverna) {
+            videoCaverna.pause();
+            videoCaverna.currentTime = 0;
+            videoCaverna.muted = true;
+        }
+    }
+
+    const telaCinematica = document.getElementById('tela-cinematica');
+    
     setTimeout(() => {
-        // 3. Após a pausa, dissolve a tela preta revelando o mundo perfeitamente pronto
-        telaCarga.style.opacity = '0';
-        telaCarga.style.transition = 'opacity 0.8s ease';
-        
+        telaCinematica.style.opacity = '0';
         setTimeout(() => {
-            telaCarga.style.display = 'none';
-        }, 800);
-    }, 1200);
-}
+            telaCinematica.style.display = 'none';
+            
+            // RESTAURA O PAINEL DO MESTRE NO COMPUTADOR (se a tela for maior que 600px)
+            const menuMestre = document.getElementById('menu-mestre');
+            if (menuMestre && window.innerWidth > 600) {
+                menuMestre.style.display = 'block';
+            }
+        }, 1000);
+    }, 200);
+}s
 
 function abrirCreditos() {
     alert("Sistema de créditos será implementado aqui.");
 }
 
-// Inicia o carregamento assim que o script é lido
-preCarregarMundo();
+document.getElementById('map-container').style.display = 'none';
+document.getElementById('menu-provincias').style.display = 'none';
+if(document.getElementById('menu-mestre')) document.getElementById('menu-mestre').style.display = 'none';
 
-// Ouvinte: Dispara a notificação visual na tela
-const tempoInicioNotificacao = Date.now();
-if (db) {
-    db.ref('notificacaoGlobal').on('value', (snapshot) => {
-        const dados = snapshot.val();
-        if (dados && dados.timestamp && dados.timestamp > tempoInicioNotificacao) {
-            mostrarToastNotificacao(dados.mensagem, dados.tipo);
-        }
-    });
-}
 precarregarImagens();
-carregarMapaPrincipal();
+
     </script>
 </body>
 </html>
