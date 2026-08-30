@@ -817,6 +817,51 @@
     opacity: 1; pointer-events: auto;
 }
 
+/* Remove o destaque azul/cinza de clique em telas touch de celular */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Centralização perfeita do texto de carregamento */
+#ui-carregamento {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100vw; 
+    height: 100vh;
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center;
+    z-index: 20;
+    text-align: center; /* Garante que o texto quebre e centralize corretamente */
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+#ui-carregamento h2 {
+    color: #cd853f; 
+    text-shadow: 0 0 10px #000; 
+    font-size: 20px; 
+    letter-spacing: 3px; 
+    font-family: serif; 
+    margin: 0;
+    width: 100%;
+}
+
+/* Ajuste da Hitbox da Porta (Subida para alinhar com a porta do vídeo) */
+#hitbox-porta {
+    position: absolute; 
+    bottom: 25%; /* Subiu de 5% para 25% para cobrir a porta mais acima */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40%; 
+    height: 35%;
+    cursor: pointer; 
+    z-index: 10;
+}
+
+/* Hitbox do Livro centralizada */
 #hitbox-livro {
     position: absolute;
     top: 50%;
@@ -826,42 +871,40 @@
     height: 35%;
     cursor: pointer;
     z-index: 10;
-    /* Se precisar ver a caixa para ajustar apague as barras da linha de baixo */
-    /* border: 2px solid red; background: rgba(255,0,0,0.3); */
 }
-
-#hitbox-porta {
-    position: absolute; bottom: 5%; left: 50%;
-    transform: translateX(-50%);
-    width: 40%; height: 35%;
-    cursor: pointer; z-index: 10;
+#versao-cinematica {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    color: #ffffff;
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    opacity: 0.15; /* Bem fraquinho e quase transparente */
+    z-index: 21050; /* Fica acima de todas as camadas de vídeo */
+    pointer-events: none; /* Garante que não interfira nos cliques */
+    user-select: none;
 }
-
-#ui-carregamento {
-    position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    z-index: 20;
-}
-
 
     </style>
 </head>
 <body>
    <div id="tela-cinematica">
-    <!-- Camada 1: Livro Fechado em Loop (Começa mutado para o navegador não bloquear o autoplay) -->
-    <div id="cena-livro-fechado" class="camada-cena ativa">
-        <video class="video-fundo" autoplay loop muted playsinline>
-            <source src="livro_fechado.mp4" type="video/mp4">
-        </video>
-        <div id="hitbox-livro" onclick="abrirLivro()"></div>
-    </div>
+    <!-- Camada 1: Livro Fechado -->
+<div id="cena-livro-fechado" class="camada-cena ativa">
+    <video id="video-livro-fechado" class="video-fundo" autoplay loop playsinline>
+        <source src="livro_fechado.mp4" type="video/mp4">
+    </video>
+    <div id="hitbox-livro" onclick="abrirLivro()"></div>
+</div>
 
-    <!-- Camada 2: Livro Abrindo com SOM ATIVO -->
+    <!-- Camada 2: Livro Abrindo -->
     <video id="video-livro-abrindo" class="camada-cena" playsinline>
         <source src="livro.mp4" type="video/mp4">
     </video>
 
-    <!-- Camada 3: Floresta em Loop com SOM ATIVO -->
+    <!-- Camada 3: Floresta -->
     <div id="cena-floresta" class="camada-cena">
         <video class="video-fundo" autoplay loop playsinline>
             <source src="floresta.mp4" type="video/mp4">
@@ -869,12 +912,12 @@
         <div id="hitbox-porta" onclick="iniciarTransicao()"></div>
     </div>
 
-    <!-- Camada 4: Transição com SOM ATIVO -->
+    <!-- Camada 4: Transição -->
     <video id="video-transicao" class="camada-cena" playsinline>
         <source src="floresta_caverna.mp4" type="video/mp4">
     </video>
 
-    <!-- Camada 5: Caverna em Loop + Carregamento com SOM ATIVO -->
+    <!-- Camada 5: Caverna -->
     <div id="cena-caverna" class="camada-cena">
         <video class="video-fundo" autoplay loop playsinline>
             <source src="caverna.mp4" type="video/mp4">
@@ -884,6 +927,9 @@
             <div id="texto-porcentagem-epico" style="color: #fff; font-size: 32px; font-weight: bold; text-shadow: 0 0 15px rgba(255,255,255,0.8); margin-top: 10px;">0%</div>
         </div>
     </div>
+
+    <!-- MARCA D'ÁGUA DA VERSÃO 2.0 -->
+    <div id="versao-cinematica">V2.0</div>
 </div>
 
 
@@ -5686,6 +5732,7 @@ function menuMercado(categoria) {
     container.innerHTML = html + `</div>`;
 }
 // --- PRÉ-CARREGAMENTO DAS IMAGENS ---
+
 function precarregarImagens() {
     const mapas = [
         'Hukmal_tep.jpg', 'Blat_khyr.jpg', 'Deserto.jpg', 'Lago.jpg', 'Alcova.jpg', 
@@ -5697,6 +5744,26 @@ function precarregarImagens() {
         img.src = src; // Força o navegador a colocar a imagem no cache
     });
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+    const videoFechado = document.querySelector('#cena-livro-fechado video');
+    if (videoFechado) {
+        // Inicia mutado para garantir que o autoplay funcione sem congelar
+        videoFechado.muted = true;
+        videoFechado.play().then(() => {
+            // Assim que o navegador permitir a reprodução, tentamos ligar o som
+            videoFechado.muted = false;
+        }).catch(() => {});
+
+        // Se o navegador bloquear o som, o primeiro clique em qualquer lugar da tela ativa o som e garante o play
+        document.body.addEventListener('click', () => {
+            if (videoFechado) {
+                videoFechado.muted = false;
+                videoFechado.play();
+            }
+        }, { once: true });
+    }
+});
 
 let minhaCorUsuario = localStorage.getItem('rpg_user_color') || '#3498db';
 
@@ -6748,23 +6815,27 @@ let mapaCarregou100 = false;
 let tempoMinimoCavernaConcluido = false;
 
 // 1. Clicou no livro fechado: vai direto para o livro abrindo
+// 1. Dispara instantaneamente ao clicar no livro fechado
 function abrirLivro() {
     const cenaFechada = document.getElementById('cena-livro-fechado');
     const videoAbrindo = document.getElementById('video-livro-abrindo');
     
+    // Pausa, zera o tempo e silencia o vídeo do livro fechado na hora
     const videoLoop = cenaFechada.querySelector('video');
     if (videoLoop) {
         videoLoop.pause();
         videoLoop.currentTime = 0;
+        videoLoop.muted = true;
     }
 
+    // Ativa a camada do livro abrindo
     cenaFechada.classList.remove('ativa');
     videoAbrindo.classList.add('ativa');
     videoAbrindo.muted = false;
     videoAbrindo.currentTime = 0; 
     videoAbrindo.play();
 
-    // Quando o livro terminar de abrir, exibe a floresta perfeitamente do zero
+    // Ao terminar o livro abrindo, revela a floresta interativa
     videoAbrindo.onended = () => {
         videoAbrindo.classList.remove('ativa');
         const cenaFloresta = document.getElementById('cena-floresta');
@@ -6773,7 +6844,7 @@ function abrirLivro() {
         const vidFl = cenaFloresta.querySelector('video');
         if(vidFl) {
             vidFl.pause();
-            vidFl.currentTime = 0; // REINICIA DO ZERO EXATO
+            vidFl.currentTime = 0; 
             vidFl.muted = false;
             vidFl.play();
         }
@@ -6903,7 +6974,7 @@ function concluirTranscendencia() {
             }
         }, 1000);
     }, 200);
-}s
+}
 
 function abrirCreditos() {
     alert("Sistema de créditos será implementado aqui.");
