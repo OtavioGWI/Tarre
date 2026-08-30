@@ -76,6 +76,7 @@
     
     <style>
 
+
         
     /* --- ESTILOS GERAIS --- */
     
@@ -890,6 +891,22 @@
     </style>
 </head>
 <body>
+
+    <!-- POPUP INICIAL DE TELA CHEIA (APENAS CELULAR) -->
+<div id="popup-tela-cheia" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: rgba(0,0,0,0.95); z-index: 30000; justify-content: center; align-items: center; font-family: serif; text-align: center; padding: 20px; box-sizing: border-box;">
+    <div style="background: #2c2c2c; border: 2px solid #cd853f; padding: 25px; border-radius: 10px; max-width: 320px; width: 100%; box-shadow: 0 0 20px rgba(205,133,63,0.5);">
+        <h3 style="color: #cd853f; margin-top: 0; font-size: 20px;">Modo Imersivo</h3>
+        <p style="color: #ddd; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">Para melhor experiência em dispositivos móveis, o aplicativo será exibido em tela cheia.</p>
+        <button onclick="iniciarComTelaCheia()" class="btn-popup" style="background: #2E8B57; width: 100%; font-size: 15px; padding: 12px;">Entrar em Tela Cheia</button>
+    </div>
+</div>
+
+<!-- BOTÃO FLUTUANTE DE TELA CHEIA NO MAPA (APENAS CELULAR - CANTO SUPERIOR ESQUERDO) -->
+<button id="btn-toggle-fullscreen" onclick="toggleFullscreenMobile()" style="display: none; position: fixed; top: 15px; left: 15px; z-index: 1500; background: rgba(26, 26, 26, 0.9); border: 2px solid #8b4513; color: #ffdead; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.5);">
+    ⛶
+</button>
+
+
    <div id="tela-cinematica">
     <!-- Camada 1: Livro Fechado -->
 <div id="cena-livro-fechado" class="camada-cena ativa">
@@ -2049,6 +2066,11 @@ function carregarMapaPrincipal(provinciaOrigem = null) {
     document.getElementById('menu-provincias').style.display = 'block';
 
     atualizarVisibilidadeMenuMobile();
+    
+    if (ehDispositivoMovel()) {
+    const btnFs = document.getElementById('btn-toggle-fullscreen');
+    if (btnFs) btnFs.style.display = 'flex';
+}
 
     if (marcadorTempCoords) { map.removeLayer(marcadorTempCoords); marcadorTempCoords = null; }
     
@@ -6814,28 +6836,24 @@ let mapaCarregou100 = false;
 let tempoMinimoCavernaConcluido = false;
 
 // 1. Clicou no livro fechado: vai direto para o livro abrindo com som
-// 1. Dispara instantaneamente ao clicar no livro fechado
 function abrirLivro() {
     const cenaFechada = document.getElementById('cena-livro-fechado');
     const videoAbrindo = document.getElementById('video-livro-abrindo');
     
-    // MATA COMPLETAMENTE O VÍDEO E O SOM DO LIVRO FECHADO NA HORA
     const videoLoop = cenaFechada.querySelector('video');
     if (videoLoop) {
         videoLoop.pause();
         videoLoop.currentTime = 0;
         videoLoop.muted = true;
-        videoLoop.src = ""; // Remove a fonte para garantir que nenhuma trilha fique presa em buffer
+        videoLoop.src = ""; // Elimina o buffer para o som não vazar
     }
 
-    // Ativa a camada do livro abrindo
     cenaFechada.classList.remove('ativa');
     videoAbrindo.classList.add('ativa');
     videoAbrindo.muted = false;
     videoAbrindo.currentTime = 0; 
     videoAbrindo.play();
 
-    // Ao terminar o livro abrindo, revela a floresta interativa do zero
     videoAbrindo.onended = () => {
         videoAbrindo.classList.remove('ativa');
         const cenaFloresta = document.getElementById('cena-floresta');
@@ -6975,9 +6993,76 @@ function concluirTranscendencia() {
     }, 200);
 }
 
-function abrirCreditos() {
-    alert("Sistema de créditos será implementado aqui.");
+// Verifica se o dispositivo é um celular/tablet baseado na largura da tela
+function ehDispositivoMovel() {
+    return window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+    const videoFechado = document.querySelector('#cena-livro-fechado video');
+    
+    if (ehDispositivoMovel()) {
+        // No celular: exibe o popup preto bloqueando o fundo até aceitar a tela cheia
+        const popup = document.getElementById('popup-tela-cheia');
+        if (popup) popup.style.display = 'flex';
+        if (videoFechado) videoFechado.pause(); // Mantém pausado até o clique no popup
+    } else {
+        // No PC: roda direto, com som liberado no primeiro clique em qualquer lugar
+        if (videoFechado) {
+            videoFechado.muted = true;
+            videoFechado.play().then(() => { videoFechado.muted = false; }).catch(() => {});
+            document.body.addEventListener('click', () => {
+                if (videoFechado) { videoFechado.muted = false; videoFechado.play(); }
+            }, { once: true });
+        }
+    }
+});
+
+// Ação disparada ao tocar no botão do popup no celular
+function iniciarComTelaCheia() {
+    const popup = document.getElementById('popup-tela-cheia');
+    if (popup) popup.style.display = 'none';
+
+    const docEl = document.documentElement;
+    if (docEl.requestFullscreen) {
+        docEl.requestFullscreen().catch(() => {});
+    } else if (docEl.webkitRequestFullscreen) {
+        docEl.webkitRequestFullscreen().catch(() => {});
+    }
+
+    // Inicia o vídeo do livro fechado com som após a permissão do usuário
+    const videoFechado = document.querySelector('#cena-livro-fechado video');
+    if (videoFechado) {
+        videoFechado.muted = false;
+        videoFechado.play();
+    }
+}
+
+// Alternância de tela cheia pelo botão flutuante no mapa (celular)
+function toggleFullscreenMobile() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const docEl = document.documentElement;
+        if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
+        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen().catch(() => {});
+    } else {
+        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen().catch(() => {});
+    }
+}
+
+// Exibe o botão de alternância assim que entra no mapa principal (em celulares)
+const funcaoOriginalCarregarMapaPrincipal = window.carregarMapaPrincipal || carregarMapaPrincipal;
+carregarMapaPrincipal = function(provinciaOrigem) {
+    if (typeof funcaoOriginalCarregarMapaPrincipal === 'function') {
+        funcaoOriginalCarregarMapaPrincipal(provinciaOrigem);
+    }
+    
+    // Se for celular, mostra o botão no canto superior esquerdo após a cinematográfica acabar
+    if (ehDispositivoMovel()) {
+        const btnFs = document.getElementById('btn-toggle-fullscreen');
+        if (btnFs) btnFs.style.display = 'flex';
+    }
+};
 
 document.getElementById('map-container').style.display = 'none';
 document.getElementById('menu-provincias').style.display = 'none';
