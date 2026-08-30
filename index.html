@@ -893,7 +893,7 @@
    <div id="tela-cinematica">
     <!-- Camada 1: Livro Fechado -->
 <div id="cena-livro-fechado" class="camada-cena ativa">
-    <video id="video-livro-fechado" class="video-fundo" autoplay loop playsinline>
+    <video class="video-fundo" autoplay loop muted playsinline>
         <source src="livro_fechado.mp4" type="video/mp4">
     </video>
     <div id="hitbox-livro" onclick="abrirLivro()"></div>
@@ -5745,25 +5745,6 @@ function precarregarImagens() {
     });
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-    const videoFechado = document.querySelector('#cena-livro-fechado video');
-    if (videoFechado) {
-        // Inicia mutado para garantir que o autoplay funcione sem congelar
-        videoFechado.muted = true;
-        videoFechado.play().then(() => {
-            // Assim que o navegador permitir a reprodução, tentamos ligar o som
-            videoFechado.muted = false;
-        }).catch(() => {});
-
-        // Se o navegador bloquear o som, o primeiro clique em qualquer lugar da tela ativa o som e garante o play
-        document.body.addEventListener('click', () => {
-            if (videoFechado) {
-                videoFechado.muted = false;
-                videoFechado.play();
-            }
-        }, { once: true });
-    }
-});
 
 let minhaCorUsuario = localStorage.getItem('rpg_user_color') || '#3498db';
 
@@ -6807,6 +6788,24 @@ if (db) {
     });
 }
 
+// Inicialização segura para contornar a restrição de autoplay com som dos navegadores
+window.addEventListener('DOMContentLoaded', () => {
+    const videoFechado = document.querySelector('#cena-livro-fechado video');
+    if (videoFechado) {
+        // O navegador exige 'muted' para o vídeo rodar sozinho ao abrir a página
+        videoFechado.muted = true;
+        videoFechado.play().catch(() => {});
+
+        // O primeiro clique em qualquer lugar da tela ativa o som do livro imediatamente
+        document.body.addEventListener('click', () => {
+            if (videoFechado) {
+                videoFechado.muted = false;
+                videoFechado.play();
+            }
+        }, { once: true });
+    }
+});
+
 // ==========================================
 // MOTOR CINEMATOGRÁFICO DEFINITIVO
 // ==========================================
@@ -6814,18 +6813,19 @@ if (db) {
 let mapaCarregou100 = false;
 let tempoMinimoCavernaConcluido = false;
 
-// 1. Clicou no livro fechado: vai direto para o livro abrindo
+// 1. Clicou no livro fechado: vai direto para o livro abrindo com som
 // 1. Dispara instantaneamente ao clicar no livro fechado
 function abrirLivro() {
     const cenaFechada = document.getElementById('cena-livro-fechado');
     const videoAbrindo = document.getElementById('video-livro-abrindo');
     
-    // Pausa, zera o tempo e silencia o vídeo do livro fechado na hora
+    // MATA COMPLETAMENTE O VÍDEO E O SOM DO LIVRO FECHADO NA HORA
     const videoLoop = cenaFechada.querySelector('video');
     if (videoLoop) {
         videoLoop.pause();
         videoLoop.currentTime = 0;
         videoLoop.muted = true;
+        videoLoop.src = ""; // Remove a fonte para garantir que nenhuma trilha fique presa em buffer
     }
 
     // Ativa a camada do livro abrindo
@@ -6835,7 +6835,7 @@ function abrirLivro() {
     videoAbrindo.currentTime = 0; 
     videoAbrindo.play();
 
-    // Ao terminar o livro abrindo, revela a floresta interativa
+    // Ao terminar o livro abrindo, revela a floresta interativa do zero
     videoAbrindo.onended = () => {
         videoAbrindo.classList.remove('ativa');
         const cenaFloresta = document.getElementById('cena-floresta');
@@ -6935,7 +6935,6 @@ function verificarTerminoCinematica() {
     }
 }
 
-// 3. FIM DA CINEMATOGRÁFICA: Constrói o mapa e MATA O ÁUDIO DA CAVERNA DE VEZ
 // 3. FIM DA CINEMATOGRÁFICA: Constrói o mapa, restaura o painel do mestre no PC e MATA O ÁUDIO
 function concluirTranscendencia() {
     carregarMapaPrincipal();
