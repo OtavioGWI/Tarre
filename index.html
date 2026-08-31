@@ -897,14 +897,17 @@
 </head>
 <body>
 
-<!-- POPUP INICIAL DE TELA CHEIA (APENAS CELULAR) -->
+<!-- POPUP INICIAL DE TELA CHEIA (AGORA PARA PC E CELULAR) -->
 <div id="popup-tela-cheia" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: rgba(0,0,0,0.95); z-index: 30000; justify-content: center; align-items: center; font-family: serif; text-align: center; padding: 20px; box-sizing: border-box;">
     <div style="background: #2c2c2c; border: 2px solid #cd853f; padding: 25px; border-radius: 10px; max-width: 320px; width: 100%; box-shadow: 0 0 20px rgba(205,133,63,0.5);">
-        <h3 style="color: #cd853f; margin-top: 0; font-size: 20px;">Modo Imersivo</h3>
-        <p style="color: #ddd; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">Para melhor experiência em dispositivos móveis, o aplicativo será exibido em tela cheia.</p>
+        <h3 style="color: #cd853f; margin-top: 0; font-size: 20px;">Início da Jornada</h3>
+        <p style="color: #ddd; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">Escolha como deseja iniciar sua experiência em Tarre.</p>
         
         <!-- Botão de Aceitar -->
         <button onclick="iniciarComTelaCheia()" class="btn-popup" style="background: #2E8B57; width: 100%; font-size: 15px; padding: 12px; margin-bottom: 10px;">Entrar em Tela Cheia</button>
+        
+        <!-- Botão de Pular a Cinemática -->
+        <button onclick="pularCinematica()" class="btn-popup" style="background: #b8860b; color: #fff; width: 100%; font-size: 14px; padding: 10px; margin-bottom: 10px; border: 1px solid #daa520;">Pular Cinemática Direto ao Mapa</button>
         
         <!-- Botão de Recusar -->
         <button onclick="recusarTelaCheia()" class="btn-popup" style="background: #444; color: #aaa; width: 100%; font-size: 13px; padding: 10px; border: 1px solid #555;">Continuar sem Tela Cheia</button>
@@ -6820,23 +6823,107 @@ if (db) {
     });
 }
 
-// Inicialização segura para contornar a restrição de autoplay com som dos navegadores
+// ==========================================
+// INICIALIZAÇÃO E CONTROLE DE TELA CHEIA (PC E MOBILE)
+// ==========================================
+
+// Verifica se o dispositivo é um celular/tablet baseado na largura da tela
+function ehDispositivoMovel() {
+    return window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+    // Exibe o popup para todos (PC e Celular)
+    const popup = document.getElementById('popup-tela-cheia');
+    if (popup) popup.style.display = 'flex';
+
+    // Garante que o vídeo do livro fechado fique pausado e silenciado até a escolha
     const videoFechado = document.querySelector('#cena-livro-fechado video');
     if (videoFechado) {
-        // O navegador exige 'muted' para o vídeo rodar sozinho ao abrir a página
+        videoFechado.pause();
         videoFechado.muted = true;
-        videoFechado.play().catch(() => {});
-
-        // O primeiro clique em qualquer lugar da tela ativa o som do livro imediatamente
-        document.body.addEventListener('click', () => {
-            if (videoFechado) {
-                videoFechado.muted = false;
-                videoFechado.play();
-            }
-        }, { once: true });
     }
 });
+
+// 1. Botão: Entrar em Tela Cheia (Inicia a cinematográfica)
+function iniciarComTelaCheia() {
+    const popup = document.getElementById('popup-tela-cheia');
+    if (popup) popup.style.display = 'none';
+
+    const docEl = document.documentElement;
+    if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
+    else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen().catch(() => {});
+
+    const videoFechado = document.querySelector('#cena-livro-fechado video');
+    if (videoFechado) {
+        videoFechado.muted = false;
+        videoFechado.play();
+    }
+}
+
+// 2. Botão: Continuar sem Tela Cheia (Inicia a cinematográfica normal)
+function recusarTelaCheia() {
+    const popup = document.getElementById('popup-tela-cheia');
+    if (popup) popup.style.display = 'none';
+
+    const videoFechado = document.querySelector('#cena-livro-fechado video');
+    if (videoFechado) {
+        videoFechado.muted = false;
+        videoFechado.play();
+    }
+}
+
+// 3. Botão: Pular Cinemática
+function pularCinematica() {
+    const popup = document.getElementById('popup-tela-cheia');
+    if (popup) popup.style.display = 'none';
+
+    const docEl = document.documentElement;
+    if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
+    else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen().catch(() => {});
+
+    // Elimina a camada do livro fechado
+    const cenaFechada = document.getElementById('cena-livro-fechado');
+    if (cenaFechada) {
+        cenaFechada.classList.remove('ativa');
+        const videoLoop = cenaFechada.querySelector('video');
+        if (videoLoop) {
+            videoLoop.pause();
+            videoLoop.src = ""; 
+        }
+    }
+
+    // Ativa a caverna com som
+    const cenaCaverna = document.getElementById('cena-caverna');
+    cenaCaverna.classList.add('ativa');
+    
+    const vidCav = cenaCaverna.querySelector('video');
+    if (vidCav) {
+        vidCav.muted = false;
+        vidCav.currentTime = 0; 
+        vidCav.play();
+    }
+    
+    processarCargaEpica();
+
+    // Tempo mínimo da caverna antes de revelar o mapa
+    setTimeout(() => {
+        tempoMinimoCavernaConcluido = true;
+        verificarTerminoCinematica();
+    }, 5000);
+}
+
+// Botão flutuante no mapa (alterna tela cheia no celular)
+function toggleFullscreenMobile() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const docEl = document.documentElement;
+        if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
+        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen().catch(() => {});
+    } else {
+        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen().catch(() => {});
+    }
+}
 
 // ==========================================
 // MOTOR CINEMATOGRÁFICO DEFINITIVO
@@ -6845,7 +6932,6 @@ window.addEventListener('DOMContentLoaded', () => {
 let mapaCarregou100 = false;
 let tempoMinimoCavernaConcluido = false;
 
-// 1. Clicou no livro fechado: vai direto para o livro abrindo com som
 function abrirLivro() {
     const cenaFechada = document.getElementById('cena-livro-fechado');
     const videoAbrindo = document.getElementById('video-livro-abrindo');
@@ -6879,7 +6965,6 @@ function abrirLivro() {
     };
 }
 
-// 2. Clicou na porta da floresta: vai para a transição da caverna
 function iniciarTransicao() {
     const cenaFloresta = document.getElementById('cena-floresta');
     const videoTransicao = document.getElementById('video-transicao');
@@ -6963,11 +7048,9 @@ function verificarTerminoCinematica() {
     }
 }
 
-// 3. FIM DA CINEMATOGRÁFICA: Constrói o mapa, restaura o painel do mestre no PC e MATA O ÁUDIO
 function concluirTranscendencia() {
     carregarMapaPrincipal();
 
-    // Silencia e pausa ABSOLUTAMENTE TODOS os vídeos da tela cinemática
     const todosOsVideos = document.querySelectorAll('#tela-cinematica video');
     todosOsVideos.forEach(v => {
         v.pause();
@@ -6975,7 +7058,6 @@ function concluirTranscendencia() {
         v.muted = true;
     });
 
-    // Garante que a camada da caverna suma e o vídeo pare de rodar som por trás
     const cenaCaverna = document.getElementById('cena-caverna');
     if (cenaCaverna) {
         cenaCaverna.classList.remove('ativa');
@@ -6994,7 +7076,7 @@ function concluirTranscendencia() {
         setTimeout(() => {
             telaCinematica.style.display = 'none';
             
-            // RESTAURA O PAINEL DO MESTRE NO COMPUTADOR (se a tela for maior que 600px)
+            // Restaura o painel do Mestre no computador
             const menuMestre = document.getElementById('menu-mestre');
             if (menuMestre && window.innerWidth > 600) {
                 menuMestre.style.display = 'block';
@@ -7003,93 +7085,14 @@ function concluirTranscendencia() {
     }, 200);
 }
 
-// Verifica se o dispositivo é um celular/tablet baseado na largura da tela
-function ehDispositivoMovel() {
-    return window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+function abrirCreditos() {
+    alert("Sistema de créditos será implementado aqui.");
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-    const videoFechado = document.querySelector('#cena-livro-fechado video');
-    
-    if (ehDispositivoMovel()) {
-        // No celular: exibe o popup preto bloqueando o fundo até aceitar a tela cheia
-        const popup = document.getElementById('popup-tela-cheia');
-        if (popup) popup.style.display = 'flex';
-        if (videoFechado) videoFechado.pause(); // Mantém pausado até o clique no popup
-    } else {
-        // No PC: roda direto, com som liberado no primeiro clique em qualquer lugar
-        if (videoFechado) {
-            videoFechado.muted = true;
-            videoFechado.play().then(() => { videoFechado.muted = false; }).catch(() => {});
-            document.body.addEventListener('click', () => {
-                if (videoFechado) { videoFechado.muted = false; videoFechado.play(); }
-            }, { once: true });
-        }
-    }
-});
-
-// Ação disparada ao tocar no botão do popup no celular
-function iniciarComTelaCheia() {
-    const popup = document.getElementById('popup-tela-cheia');
-    if (popup) popup.style.display = 'none';
-
-    const docEl = document.documentElement;
-    if (docEl.requestFullscreen) {
-        docEl.requestFullscreen().catch(() => {});
-    } else if (docEl.webkitRequestFullscreen) {
-        docEl.webkitRequestFullscreen().catch(() => {});
-    }
-
-    // Inicia o vídeo do livro fechado com som após a permissão do usuário
-    const videoFechado = document.querySelector('#cena-livro-fechado video');
-    if (videoFechado) {
-        videoFechado.muted = false;
-        videoFechado.play();
-    }
-}
-
-// Alternância de tela cheia pelo botão flutuante no mapa (celular)
-function toggleFullscreenMobile() {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        const docEl = document.documentElement;
-        if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
-        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen().catch(() => {});
-    } else {
-        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen().catch(() => {});
-    }
-}
-
-// Exibe o botão de alternância assim que entra no mapa principal (em celulares)
-const funcaoOriginalCarregarMapaPrincipal = window.carregarMapaPrincipal || carregarMapaPrincipal;
-carregarMapaPrincipal = function(provinciaOrigem) {
-    if (typeof funcaoOriginalCarregarMapaPrincipal === 'function') {
-        funcaoOriginalCarregarMapaPrincipal(provinciaOrigem);
-    }
-    
-    // Se for celular, mostra o botão no canto superior esquerdo após a cinematográfica acabar
-    if (ehDispositivoMovel()) {
-        const btnFs = document.getElementById('btn-toggle-fullscreen');
-        if (btnFs) btnFs.style.display = 'flex';
-    }
-};
-
+// Esconde os elementos do mapa e menus antes de entrar
 document.getElementById('map-container').style.display = 'none';
 document.getElementById('menu-provincias').style.display = 'none';
 if(document.getElementById('menu-mestre')) document.getElementById('menu-mestre').style.display = 'none';
-
-// Ação ao clicar em recusar a tela cheia no celular
-function recusarTelaCheia() {
-    const popup = document.getElementById('popup-tela-cheia');
-    if (popup) popup.style.display = 'none';
-
-    // Inicia o vídeo do livro fechado normalmente (sem o fullscreen), liberando o som no toque
-    const videoFechado = document.querySelector('#cena-livro-fechado video');
-    if (videoFechado) {
-        videoFechado.muted = false;
-        videoFechado.play();
-    }
-}
 
 precarregarImagens();
 
