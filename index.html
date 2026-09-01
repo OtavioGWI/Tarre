@@ -898,15 +898,15 @@
 <body>
 
 <!-- POPUP INICIAL DE TELA CHEIA (AGORA PARA PC E CELULAR) -->
-<div id="popup-tela-cheia" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: rgba(0,0,0,0.95); z-index: 30000; justify-content: center; align-items: center; font-family: serif; text-align: center; padding: 20px; box-sizing: border-box;">
+<div id="popup-tela-cheia" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: rgba(0,0,0,0.6); z-index: 30000; justify-content: center; align-items: center; font-family: serif; text-align: center; padding: 20px; box-sizing: border-box;">
     <div style="background: #2c2c2c; border: 2px solid #cd853f; padding: 25px; border-radius: 10px; max-width: 320px; width: 100%; box-shadow: 0 0 20px rgba(205,133,63,0.5);">
         <h3 style="color: #cd853f; margin-top: 0; font-size: 20px;">Início da Jornada</h3>
         <p style="color: #ddd; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">Escolha como deseja iniciar sua experiência em Tarre.</p>
         
-        <!-- Botão de Aceitar -->
         <button onclick="iniciarComTelaCheia()" class="btn-popup" style="background: #2E8B57; width: 100%; font-size: 15px; padding: 12px; margin-bottom: 10px;">Entrar em Tela Cheia</button>
         
-        <!-- Botão de Recusar -->
+        <button id="btn-pular-cinematica" onclick="pularCinematica()" class="btn-popup" style="background: #b8860b; color: #fff; width: 100%; font-size: 14px; padding: 10px; margin-bottom: 10px; border: 1px solid #daa520;">Pular Cinemática Direto ao Mapa</button>
+        
         <button onclick="recusarTelaCheia()" class="btn-popup" style="background: #444; color: #aaa; width: 100%; font-size: 13px; padding: 10px; border: 1px solid #555;">Continuar sem Tela Cheia</button>
     </div>
 </div>
@@ -2106,70 +2106,106 @@ function carregarMapaPrincipal(provinciaOrigem = null) {
  * Alternar Menu (mobile), Coordenadas, Medidor de Rota
  */
 
-// Estado global para senhas (case-insensitive)
+// ==========================================
+// SISTEMA DE SENHAS E BLOQUEIOS
+// ==========================================
+
+// Estado global para senhas
 const senhaConfig = {
     correta: '',
     destino: '',
     tipo: 'mapa'
 };
-// Abre modal de proteção por senha
+
+// 1. Abre modal de proteção por senha
 function abrirModalSenha(senha, destino, tipo = 'mapa') {
-        senhaConfig.correta = senha;
-        senhaConfig.destino = destino;
-        senhaConfig.tipo = tipo;
-        
-        const modal = document.getElementById('modal-senha');
-        const input = document.getElementById('input-senha-rpg');
-        const msg = document.getElementById('msg-erro-senha');
+    senhaConfig.correta = senha;
+    senhaConfig.destino = destino;
+    senhaConfig.tipo = tipo;
+    
+    const modal = document.getElementById('modal-senha');
+    const input = document.getElementById('input-senha-rpg');
+    const msg = document.getElementById('msg-erro-senha');
 
-        // Limpa estados anteriores
-        input.value = "";
-        input.disabled = false;
-        msg.style.display = 'none';
-        modal.style.display = 'flex';
-        
-        // Foca no campo automaticamente
-        setTimeout(() => input.focus(), 50); 
+    if (!modal || !input || !msg) return;
+
+    input.value = "";
+    input.disabled = false;
+    msg.style.display = 'none';
+    modal.style.display = 'flex';
+    
+    setTimeout(() => input.focus(), 50); 
+}
+
+// 2. Fechamento infalível do painel de senhas
+function fecharModalSenha(ignorarZoomOut) {
+    const modal = document.getElementById('modal-senha');
+    if (modal) {
+        modal.style.display = 'none';
     }
+    
+    try {
+        if (ignorarZoomOut !== true && typeof zoomOutPadrao === 'function') {
+            zoomOutPadrao();
+        }
+    } catch (e) {
+        console.error("Erro ao afastar a câmera:", e);
+    }
+}
 
-// Verifica senha e executa ação se correta
-// Verifica senha e executa ação se correta
+// 3. Verifica senha e executa ação se correta
 function verificarSenha() {
     const input = document.getElementById('input-senha-rpg');
     const msg = document.getElementById('msg-erro-senha');
     
+    if (!input || !msg) return;
+
     if (input.value.toLowerCase() === (senhaConfig.correta || "").toLowerCase()) {
         msg.style.display = 'block';
         msg.style.color = '#2ecc71'; 
         msg.innerHTML = "✨ Acesso concedido!";
         input.disabled = true;
 
+        // Aguarda menos de um segundo e dispara o fechamento + a ação
         setTimeout(() => {
-            fecharModalSenha(true); // O 'true' garante que a câmera não dê zoom out durante a transição
+            fecharModalSenha(true); 
             input.disabled = false;
             
-            if (senhaConfig.tipo === 'imagem') {
-                verImagemEstatica(senhaConfig.destino);
-            } else if (senhaConfig.tipo === 'funcao') {
-                new Function(senhaConfig.destino)(); 
-            } else {
-                abrirMapaProvincia(senhaConfig.destino);
+            try {
+                if (senhaConfig.tipo === 'imagem') {
+                    verImagemEstatica(senhaConfig.destino);
+                } else if (senhaConfig.tipo === 'funcao') {
+                    new Function(senhaConfig.destino)(); 
+                } else {
+                    abrirMapaProvincia(senhaConfig.destino);
+                }
+            } catch (e) {
+                console.error("Erro ao executar destino da senha:", e);
             }
-        }, 1200);
+        }, 800);
+        
     } else {
         msg.style.display = 'block';
         msg.style.color = '#ff4444';
         msg.innerHTML = "Senha incorreta. Por favor AGUARDE descobrirem a senha.";
         input.style.borderColor = "red";
-        setTimeout(() => input.style.borderColor = "#8b4513", 500);
+        
+        setTimeout(() => { 
+            if (input) input.style.borderColor = "#8b4513"; 
+        }, 500);
+        
         input.select(); 
     }
 }
 
+// Atalho: Enter envia senha
+const inputPass = document.getElementById('input-senha-rpg');
+if (inputPass) {
+    inputPass.addEventListener("keypress", e => {
+        if (e.key === "Enter") verificarSenha();
+    });
+}
 
-    // Atalho: Enter envia senha
-    const inputPass = document.getElementById('input-senha-rpg');
-    if (inputPass) inputPass.addEventListener("keypress", e => e.key === "Enter" && verificarSenha());
 // Ativa/desativa modo de coordenadas
 let modoCoordenadas = false;
 let modoPinGlobal = false;
@@ -6847,11 +6883,17 @@ window.addEventListener('DOMContentLoaded', () => {
     const popup = document.getElementById('popup-tela-cheia');
     if (popup) popup.style.display = 'flex';
 
-    // Garante que o vídeo do livro fechado fique pausado e silenciado até a escolha
+    // Oculta o botão de pular se o dispositivo for um celular
+    if (ehDispositivoMovel()) {
+        const btnPular = document.getElementById('btn-pular-cinematica');
+        if (btnPular) btnPular.style.display = 'none';
+    }
+
+    // Deixa o vídeo do livro tocar no fundo, mas SEM SOM (para os navegadores não bloquearem)
     const videoFechado = document.querySelector('#cena-livro-fechado video');
     if (videoFechado) {
-        videoFechado.pause();
         videoFechado.muted = true;
+        videoFechado.play().catch(() => {});
     }
 });
 
@@ -6883,7 +6925,7 @@ function recusarTelaCheia() {
     }
 }
 
-// 3. Botão: Pular Cinemática
+// Ação de Pular a Cinemática (Agora apenas visível no PC)
 function pularCinematica() {
     const popup = document.getElementById('popup-tela-cheia');
     if (popup) popup.style.display = 'none';
@@ -6892,7 +6934,7 @@ function pularCinematica() {
     if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
     else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen().catch(() => {});
 
-    // Elimina a camada do livro fechado
+    // Mata a camada do livro fechado
     const cenaFechada = document.getElementById('cena-livro-fechado');
     if (cenaFechada) {
         cenaFechada.classList.remove('ativa');
@@ -6903,7 +6945,7 @@ function pularCinematica() {
         }
     }
 
-    // Ativa a caverna com som
+    // Ativa a caverna direto e solta o som do carregamento
     const cenaCaverna = document.getElementById('cena-caverna');
     cenaCaverna.classList.add('ativa');
     
@@ -6916,12 +6958,12 @@ function pularCinematica() {
     
     processarCargaEpica();
 
-    // Tempo mínimo da caverna antes de revelar o mapa
     setTimeout(() => {
         tempoMinimoCavernaConcluido = true;
         verificarTerminoCinematica();
     }, 5000);
 }
+
 
 // Botão flutuante no mapa (alterna tela cheia no celular)
 function toggleFullscreenMobile() {
