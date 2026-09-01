@@ -800,9 +800,9 @@
     height: 100vh;
     opacity: 0; 
     pointer-events: none;
-    transition: opacity 1s ease;
-    object-fit: contain; /* Ajusta para mostrar o vídeo inteiro sem zoom agressivo em PCs */
-    background: #000; /* Garante fundo preto nas faixas que sobrarem */
+    /* A linha transition foi removida daqui para cortes instantâneos */
+    object-fit: contain; 
+    background: #000; 
 }
 
 .video-fundo {
@@ -906,9 +906,6 @@
         <!-- Botão de Aceitar -->
         <button onclick="iniciarComTelaCheia()" class="btn-popup" style="background: #2E8B57; width: 100%; font-size: 15px; padding: 12px; margin-bottom: 10px;">Entrar em Tela Cheia</button>
         
-        <!-- Botão de Pular a Cinemática -->
-        <button onclick="pularCinematica()" class="btn-popup" style="background: #b8860b; color: #fff; width: 100%; font-size: 14px; padding: 10px; margin-bottom: 10px; border: 1px solid #daa520;">Pular Cinemática Direto ao Mapa</button>
-        
         <!-- Botão de Recusar -->
         <button onclick="recusarTelaCheia()" class="btn-popup" style="background: #444; color: #aaa; width: 100%; font-size: 13px; padding: 10px; border: 1px solid #555;">Continuar sem Tela Cheia</button>
     </div>
@@ -936,11 +933,21 @@
 
     <!-- Camada 3: Floresta -->
     <div id="cena-floresta" class="camada-cena">
-        <video class="video-fundo" autoplay loop playsinline>
+        <video class="video-fundo" autoplay loop playsinline preload="auto">
             <source src="floresta.mp4" type="video/mp4">
         </video>
         <div id="hitbox-porta" onclick="iniciarTransicao()"></div>
+        <!-- Hitbox na água ajustada (mais para a esquerda e mais larga) -->
+        <div id="hitbox-agua" onclick="iniciarPeixe()" style="position: absolute; bottom: 5%; right: 18%; width: 30%; height: 25%; cursor: pointer; z-index: 10;"></div>
     </div>
+
+    <!-- Novas Camadas: Animações do Peixe -->
+    <video id="video-peixe" class="camada-cena" playsinline preload="auto">
+        <source src="peixe.mp4" type="video/mp4">
+    </video>
+    <video id="video-peixe-fim" class="camada-cena" playsinline preload="auto">
+        <source src="peixe_fim.mp4" type="video/mp4">
+    </video>
 
     <!-- Camada 4: Transição -->
     <video id="video-transicao" class="camada-cena" playsinline>
@@ -959,7 +966,7 @@
     </div>
 
     <!-- MARCA D'ÁGUA DA VERSÃO 2.0 -->
-    <div id="versao-cinematica">V2.0</div>
+    <div id="versao-cinematica">V2.1</div>
 </div>
 
 
@@ -4221,20 +4228,24 @@ function verImagemHistoria(arquivo, capituloIndex) {
  * @param {object} options - { restoreMenuIfContinent: bool } - Se true, só mostra menu no continente
  * Usado por: verImagemPersonagem, verImagemHistoria, verImagemDeus, etc
  */
-// Substitua a função fecharModais
-// Fecha os modais e garante o Zoom Out
-function fecharModais(ignorarZoomOut) { 
+
+let estadoPeixeAtivo = false;
+
+function fecharModais(ignorarZoomOut, ignorarAcaoPeixe = false) { 
     document.getElementById('modal-info').style.display = 'none';
     document.getElementById('modal-capital').style.display = 'none';
-    // Só ignora o zoom out se a variável for explicitamente "true"
-    if (ignorarZoomOut !== true) {
-        zoomOutPadrao();
+    
+    // Só reseta o z-index do menu se a intenção for realmente fechar e encerrar o peixe
+    if (!estadoPeixeAtivo || (estadoPeixeAtivo && !ignorarAcaoPeixe)) {
+        document.getElementById('modal-capital').style.zIndex = '5000';
     }
-}
+    
+    // Se o jogador estava no estado do peixe e a ação não for "apenas ver uma foto", encerra o peixe
+    if (estadoPeixeAtivo && !ignorarAcaoPeixe) {
+        encerrarPeixe();
+        return; 
+    }
 
-// Fecha o modal de senha e garante o Zoom Out
-function fecharModalSenha(ignorarZoomOut) {
-    document.getElementById('modal-senha').style.display = 'none';
     if (ignorarZoomOut !== true) {
         zoomOutPadrao();
     }
@@ -4454,20 +4465,23 @@ function verImagemEstatica(arquivo, callbackVoltar = null) {
     if (!arquivo || arquivo === 'none') return;
 
     fecharPopupSeguro();
-    fecharModais(true); 
+    
+    // O segundo "true" avisa a função fecharModais para NÃO encerrar o vídeo do peixe
+    fecharModais(true, true); 
 
     document.getElementById('map-container').style.display = 'none';
     document.getElementById('menu-provincias').style.display = 'none';
     
-    // Esconde o painel do mestre na tela cheia
     const menuMestre = document.getElementById('menu-mestre');
     if(menuMestre) menuMestre.style.display = 'none';
     
     const container = document.getElementById('provincia-container');
     container.style.display = 'flex';
+    
+    // Eleva a camada de fotos (9000 padrão) para 25000, ficando acima da tela cinematográfica (21000)
+    container.style.zIndex = '25000'; 
     document.getElementById('img-provincia').src = arquivo;
 
-    // 4. Gerencia o Botão Voltar (Limpeza e Criação)
     const btnAntigo = container.querySelector('.btn-voltar-foto');
     if (btnAntigo) btnAntigo.remove();
 
@@ -4475,12 +4489,11 @@ function verImagemEstatica(arquivo, callbackVoltar = null) {
     btnVoltarImg.innerHTML = "⬅ Voltar";
     btnVoltarImg.className = "btn-popup btn-voltar-foto";
     
-    // Z-INDEX altíssimo garante visibilidade do botão acima da imagem
-    // pointer-events: auto essencial para mobile (event propagation)
-    btnVoltarImg.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 9999; padding: 12px 24px; cursor: pointer; pointer-events: auto; background-color: #8b4513; color: white; border-radius: 5px;";
+    // O botão da foto precisa do z-index maior que a foto
+    btnVoltarImg.style.cssText = "position: absolute; top: 20px; left: 20px; font-size: 16px; z-index: 25001; padding: 12px 24px; cursor: pointer; pointer-events: auto; background-color: #8b4513; color: white; border-radius: 5px;";
     
     btnVoltarImg.onclick = function(e) {
-        e.stopPropagation(); // Impede que o clique "vaze" para a imagem atrás
+        e.stopPropagation(); 
         if (callbackVoltar) {
             callbackVoltar();
         } else {
@@ -4488,7 +4501,6 @@ function verImagemEstatica(arquivo, callbackVoltar = null) {
         }
     };
 
-    // appendChild coloca botão como ÚLTIMO filho -> fica visível na frente
     container.appendChild(btnVoltarImg);
 }
 
@@ -6456,8 +6468,9 @@ if (db) {
         }
     });
 }
+
 // ==========================================
-// SISTEMA DE BLOQUEIO DE MAPA (TELA PRETA)
+// SISTEMA DE BLOQUEIO DE MAPA (COM IMAGEM)
 // ==========================================
 let estadoBloqueio = false;
 
@@ -6470,16 +6483,12 @@ function alternarBloqueioMapa() {
 function aplicarTelaDeBloqueio(bloqueado) {
     estadoBloqueio = bloqueado;
     
-    // Injeta a tela preta no HTML de forma invisível (caso não exista)
     let tela = document.getElementById('tela-bloqueio');
     if (!tela) {
         tela = document.createElement('div');
         tela.id = 'tela-bloqueio';
-        tela.style.cssText = "display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #050505; z-index: 9998; align-items: center; justify-content: center; flex-direction: column; color: #ff4444; font-family: serif; user-select: none;";
-        tela.innerHTML = `
-            <h1 style="font-size: 2.5rem; text-transform: uppercase; letter-spacing: 5px; margin-bottom: 10px; text-shadow: 0 0 10px red;">Sinal Perdido</h1>
-            <p style="font-size: 1.2rem; color: #aaa; font-style: italic;">Você está sem acesso ao mapa de Tarre.</p>
-        `;
+        // Cria a base sem texto, apenas um canvas fixo no topo de tudo (exceto o mestre)
+        tela.style.cssText = "display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; z-index: 9998;";
         document.body.appendChild(tela);
     }
 
@@ -6487,28 +6496,29 @@ function aplicarTelaDeBloqueio(bloqueado) {
     const menuMestre = document.getElementById('menu-mestre');
 
     if (bloqueado) {
-        // 1. Eleva o menu do mestre (z-index 9999) para que ele supere a tela preta (z-index 9998)
+        // Define as imagens de bloqueio conforme o dispositivo do jogador
+        const isMobile = window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        tela.style.backgroundImage = isMobile ? "url('bloqueio.jpeg')" : "url('bloqueio_pc.jpeg')";
+        tela.style.backgroundSize = "cover";
+        tela.style.backgroundPosition = "center";
+        
+        // Garante que o menu do Mestre (e apenas o do Mestre) continue operando acima da imagem
         if (menuMestre) menuMestre.style.zIndex = '9999';
 
-        // 2. Fecha à força tudo que os jogadores possam estar lendo por trás da tela
         fecharModais(true);
         fecharPopupSeguro();
         document.getElementById('modal-viagem').style.display = 'none';
         document.getElementById('modal-senha').style.display = 'none';
 
-        // 3. Cobre o mapa
-        tela.style.display = 'flex';
+        tela.style.display = 'block';
 
-        // 4. Atualiza o botão no seu painel
         if (btnMestre) {
             btnMestre.innerHTML = "🗺️ Bloquear Mapa: ON";
             btnMestre.classList.add('btn-ferramenta-ativa');
         }
     } else {
-        // Remove a escuridão
         tela.style.display = 'none';
         
-        // Retorna o botão ao estado normal
         if (btnMestre) {
             btnMestre.innerHTML = "🗺️ Bloquear Mapa: OFF";
             btnMestre.classList.remove('btn-ferramenta-ativa');
@@ -6926,9 +6936,8 @@ function toggleFullscreenMobile() {
 }
 
 // ==========================================
-// MOTOR CINEMATOGRÁFICO DEFINITIVO
+// MOTOR CINEMATOGRÁFICO DEFINITIVO (SEM TELA PRETA)
 // ==========================================
-
 let mapaCarregou100 = false;
 let tempoMinimoCavernaConcluido = false;
 
@@ -6939,19 +6948,18 @@ function abrirLivro() {
     const videoLoop = cenaFechada.querySelector('video');
     if (videoLoop) {
         videoLoop.pause();
-        videoLoop.currentTime = 0;
         videoLoop.muted = true;
-        videoLoop.src = ""; // Elimina o buffer para o som não vazar
     }
 
-    cenaFechada.classList.remove('ativa');
     videoAbrindo.classList.add('ativa');
     videoAbrindo.muted = false;
     videoAbrindo.currentTime = 0; 
     videoAbrindo.play();
 
+    // Corte seco da cena anterior
+    setTimeout(() => { cenaFechada.classList.remove('ativa'); }, 100);
+
     videoAbrindo.onended = () => {
-        videoAbrindo.classList.remove('ativa');
         const cenaFloresta = document.getElementById('cena-floresta');
         cenaFloresta.classList.add('ativa');
         
@@ -6962,6 +6970,8 @@ function abrirLivro() {
             vidFl.muted = false;
             vidFl.play();
         }
+
+        setTimeout(() => { videoAbrindo.classList.remove('ativa'); }, 100);
     };
 }
 
@@ -6972,17 +6982,17 @@ function iniciarTransicao() {
     const videoLoopFloresta = cenaFloresta.querySelector('video');
     if (videoLoopFloresta) {
         videoLoopFloresta.pause();
-        videoLoopFloresta.currentTime = 0;
+        videoLoopFloresta.muted = true;
     }
 
-    cenaFloresta.classList.remove('ativa');
     videoTransicao.classList.add('ativa');
     videoTransicao.muted = false;
     videoTransicao.currentTime = 0; 
     videoTransicao.play();
 
+    setTimeout(() => { cenaFloresta.classList.remove('ativa'); }, 100);
+
     videoTransicao.onended = () => {
-        videoTransicao.classList.remove('ativa');
         const cenaCaverna = document.getElementById('cena-caverna');
         cenaCaverna.classList.add('ativa');
         
@@ -6993,12 +7003,75 @@ function iniciarTransicao() {
             vidCav.play();
         }
         
+        setTimeout(() => { videoTransicao.classList.remove('ativa'); }, 100);
+        
         processarCargaEpica();
 
         setTimeout(() => {
             tempoMinimoCavernaConcluido = true;
             verificarTerminoCinematica();
         }, 5000);
+    };
+}
+
+// ---- ANIMAÇÕES DO PEIXE (COM CORTES RÁPIDOS E MAIS VELOZES) ----
+function iniciarPeixe() {
+    const cenaFloresta = document.getElementById('cena-floresta');
+    const videoPeixe = document.getElementById('video-peixe');
+    
+    const vidFloresta = cenaFloresta.querySelector('video');
+    if (vidFloresta) {
+        vidFloresta.pause();
+        vidFloresta.muted = true;
+    }
+
+    videoPeixe.classList.add('ativa');
+    videoPeixe.muted = false;
+    videoPeixe.currentTime = 0;
+    
+    // Aumenta a velocidade do vídeo em 20%
+    videoPeixe.playbackRate = 1.4; 
+    videoPeixe.play();
+
+    setTimeout(() => { cenaFloresta.classList.remove('ativa'); }, 100);
+
+    videoPeixe.onended = () => {
+        videoPeixe.pause(); // Congela no último frame
+        estadoPeixeAtivo = true;
+        
+        // Eleva o menu da capital para aparecer ACIMA da cinematográfica
+        document.getElementById('modal-capital').style.zIndex = '22000';
+        menuCapital('hub'); 
+    };
+}
+
+function encerrarPeixe() {
+    estadoPeixeAtivo = false; 
+    const videoPeixe = document.getElementById('video-peixe');
+    const videoPeixeFim = document.getElementById('video-peixe-fim');
+    const cenaFloresta = document.getElementById('cena-floresta');
+
+    videoPeixeFim.classList.add('ativa');
+    videoPeixeFim.muted = false;
+    videoPeixeFim.currentTime = 0;
+    
+    // Aumenta a velocidade da saída do peixe em 20%
+    videoPeixeFim.playbackRate = 1.4;
+    videoPeixeFim.play();
+
+    setTimeout(() => { videoPeixe.classList.remove('ativa'); }, 100);
+
+    videoPeixeFim.onended = () => {
+        cenaFloresta.classList.add('ativa');
+        
+        const vidFloresta = cenaFloresta.querySelector('video');
+        if (vidFloresta) {
+            vidFloresta.muted = false;
+            vidFloresta.currentTime = 0;
+            vidFloresta.play();
+        }
+
+        setTimeout(() => { videoPeixeFim.classList.remove('ativa'); }, 100);
     };
 }
 
