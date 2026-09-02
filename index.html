@@ -2203,11 +2203,12 @@ function abrirModalSenha(senha, destino, tipo = 'mapa') {
     input.value = "";
     input.disabled = false;
     msg.style.display = 'none';
+    
+    modal.style.zIndex = '100000';
     modal.style.display = 'flex';
     
     setTimeout(() => input.focus(), 50); 
 }
-
 // 2. Fechamento infalível do painel de senhas
 function fecharModalSenha(ignorarZoomOut) {
     const modal = document.getElementById('modal-senha');
@@ -7262,14 +7263,16 @@ function silenciarTodosOsVideos() {
 
 window.addEventListener('DOMContentLoaded', () => {
     const popup = document.getElementById('popup-tela-cheia');
-    if (popup) popup.style.display = 'flex';
+    if (popup) {
+        popup.style.zIndex = '100000';
+        popup.style.display = 'flex';
+    }
 
     if (ehDispositivoMovel()) {
         const btnPular = document.getElementById('btn-pular-cinematica');
         if (btnPular) btnPular.style.display = 'none';
     }
 
-    // Corta qualquer som residual antes mesmo do clique inicial
     silenciarTodosOsVideos();
 
     const videoFechado = document.querySelector('#cena-livro-fechado video');
