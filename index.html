@@ -76,6 +76,24 @@
     
     <style>
 
+/* Hitbox do Pássaro Dinâmica */
+#hitbox-passaro {
+    position: absolute; 
+    top: 10%; 
+    left: 38%; 
+    width: 20%; 
+    height: 25%; 
+    cursor: pointer; 
+    z-index: 10;
+}
+
+@media only screen and (max-width: 600px) {
+    #hitbox-passaro {
+        left: 5%; /* Puxa para a esquerda no celular */
+        width: 35%; /* Deixa mais larga para facilitar o toque */
+    }
+}
+
 .leaflet-control-zoom {
     display: none !important;
 }
@@ -941,8 +959,9 @@
         <div id="hitbox-agua" onclick="iniciarPeixe()" style="position: absolute; bottom: 5%; right: 18%; width: 30%; height: 25%; cursor: pointer; z-index: 10;"></div>
         <!-- NOVA: Hitbox Pássaro (Canto Superior Esquerdo) -->
         <!-- Hitbox Pássaro ajustada (Mais para a direita e para o centro) -->
-<div id="hitbox-passaro" onclick="iniciarPassaro()" style="position: absolute; top: 10%; left: 38%; width: 20%; height: 25%; cursor: pointer; z-index: 10;"></div>
- </div>
+<!-- NOVA: Hitbox Pássaro Limpa -->
+<div id="hitbox-passaro" onclick="iniciarPassaro()"></div>
+</div>
 
     <!-- Camadas do Peixe -->
     <video id="video-peixe" class="camada-cena" playsinline preload="auto">
@@ -962,22 +981,22 @@
 
     <!-- NOVAS: Animações de Loop dos Personagens -->
     <video id="video-char-valkia" class="camada-cena" loop playsinline preload="auto">
-        <source src="valkia.mp4" type="video/mp4">
+        <source src="Valkia.mp4" type="video/mp4">
     </video>
     <video id="video-char-liesty" class="camada-cena" loop playsinline preload="auto">
-        <source src="liésty.mp4" type="video/mp4">
+        <source src="Liésty.mp4" type="video/mp4">
     </video>
     <video id="video-char-balon" class="camada-cena" loop playsinline preload="auto">
-        <source src="balon.mp4" type="video/mp4">
+        <source src="Balon.mp4" type="video/mp4">
     </video>
     <video id="video-char-lythael" class="camada-cena" loop playsinline preload="auto">
-        <source src="lythael.mp4" type="video/mp4">
+        <source src="Lythael.mp4" type="video/mp4">
     </video>
     <video id="video-char-greta" class="camada-cena" loop playsinline preload="auto">
-        <source src="greta.mp4" type="video/mp4">
+        <source src="Greta.mp4" type="video/mp4">
     </video>
     <video id="video-char-thorga" class="camada-cena" loop playsinline preload="auto">
-        <source src="thorga.mp4" type="video/mp4">
+        <source src="Thorga.mp4" type="video/mp4">
     </video>
 
     <!-- Camada 4: Transição -->
@@ -6930,25 +6949,6 @@ function ehDispositivoMovel() {
     return window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-    // Exibe o popup para todos (PC e Celular)
-    const popup = document.getElementById('popup-tela-cheia');
-    if (popup) popup.style.display = 'flex';
-
-    // Oculta o botão de pular se o dispositivo for um celular
-    if (ehDispositivoMovel()) {
-        const btnPular = document.getElementById('btn-pular-cinematica');
-        if (btnPular) btnPular.style.display = 'none';
-    }
-
-    // Deixa o vídeo do livro tocar no fundo, mas SEM SOM (para os navegadores não bloquearem)
-    const videoFechado = document.querySelector('#cena-livro-fechado video');
-    if (videoFechado) {
-        videoFechado.muted = true;
-        videoFechado.play().catch(() => {});
-    }
-});
-
 // 1. Botão: Entrar em Tela Cheia (Inicia a cinematográfica)
 function iniciarComTelaCheia() {
     const popup = document.getElementById('popup-tela-cheia');
@@ -7230,8 +7230,36 @@ function encerrarPassaro() {
     };
 }
 
+// A FOICE DO SILÊNCIO: Corta o som de qualquer vídeo no fundo
+function silenciarTodosOsVideos() {
+    const todosOsVideos = document.querySelectorAll('#tela-cinematica video');
+    todosOsVideos.forEach(v => {
+        v.muted = true;
+        // Não usamos v.pause() aqui para não destruir o frame estático de fundo (como o pássaro congelado)
+    });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const popup = document.getElementById('popup-tela-cheia');
+    if (popup) popup.style.display = 'flex';
+
+    if (ehDispositivoMovel()) {
+        const btnPular = document.getElementById('btn-pular-cinematica');
+        if (btnPular) btnPular.style.display = 'none';
+    }
+
+    // Corta qualquer som residual antes mesmo do clique inicial
+    silenciarTodosOsVideos();
+
+    const videoFechado = document.querySelector('#cena-livro-fechado video');
+    if (videoFechado) {
+        videoFechado.muted = true;
+        videoFechado.play().catch(() => {});
+    }
+});
+
+// Abre o loop do personagem clicado na foto personagens.jpeg
 function abrirVideoPersonagem(nome) {
-    // Esconde o menu modal
     document.getElementById('modal-personagens').style.display = 'none';
     
     const videoId = 'video-char-' + nome;
@@ -7239,14 +7267,27 @@ function abrirVideoPersonagem(nome) {
     
     if (!videoEl) return;
 
+    // Silencia qualquer áudio que estivesse tocando na floresta/pássaro
+    silenciarTodosOsVideos();
+
     videoEl.classList.add('ativa');
     videoEl.muted = false;
     videoEl.currentTime = 0;
-    videoEl.play();
     
-    // Configura o clique no vídeo para voltar ao modal
+    // MÁGICA PARA O GITHUB: Força o recarregamento do pacote de vídeo antes de dar play
+    videoEl.load(); 
+    
+    let playPromise = videoEl.play();
+    if (playPromise !== undefined) {
+        playPromise.catch(error => {
+            console.warn("GitHub atrasou a entrega do vídeo:", error);
+        });
+    }
+    
+    // Configura o clique para fechar e silenciar a si mesmo
     videoEl.onclick = function() {
         videoEl.pause();
+        videoEl.muted = true; // Silencia o loop ao fechar
         videoEl.classList.remove('ativa');
         document.getElementById('modal-personagens').style.display = 'flex';
     };
