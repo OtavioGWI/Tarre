@@ -919,15 +919,15 @@
 
    <div id="tela-cinematica">
     <!-- Camada 1: Livro Fechado -->
-<div id="cena-livro-fechado" class="camada-cena ativa">
-    <video class="video-fundo" autoplay loop muted playsinline>
-        <source src="livro_fechado.mp4" type="video/mp4">
-    </video>
-    <div id="hitbox-livro" onclick="abrirLivro()"></div>
-</div>
+    <div id="cena-livro-fechado" class="camada-cena ativa">
+        <video class="video-fundo" autoplay loop muted playsinline preload="auto">
+            <source src="livro_fechado.mp4" type="video/mp4">
+        </video>
+        <div id="hitbox-livro" onclick="abrirLivro()"></div>
+    </div>
 
     <!-- Camada 2: Livro Abrindo -->
-    <video id="video-livro-abrindo" class="camada-cena" playsinline>
+    <video id="video-livro-abrindo" class="camada-cena" playsinline preload="auto">
         <source src="livro.mp4" type="video/mp4">
     </video>
 
@@ -937,11 +937,14 @@
             <source src="floresta.mp4" type="video/mp4">
         </video>
         <div id="hitbox-porta" onclick="iniciarTransicao()"></div>
-        <!-- Hitbox na água ajustada (mais para a esquerda e mais larga) -->
+        <!-- Hitbox na água (Peixe) -->
         <div id="hitbox-agua" onclick="iniciarPeixe()" style="position: absolute; bottom: 5%; right: 18%; width: 30%; height: 25%; cursor: pointer; z-index: 10;"></div>
-    </div>
+        <!-- NOVA: Hitbox Pássaro (Canto Superior Esquerdo) -->
+        <!-- Hitbox Pássaro ajustada (Mais para a direita e para o centro) -->
+<div id="hitbox-passaro" onclick="iniciarPassaro()" style="position: absolute; top: 10%; left: 38%; width: 20%; height: 25%; cursor: pointer; z-index: 10;"></div>
+ </div>
 
-    <!-- Novas Camadas: Animações do Peixe -->
+    <!-- Camadas do Peixe -->
     <video id="video-peixe" class="camada-cena" playsinline preload="auto">
         <source src="peixe.mp4" type="video/mp4">
     </video>
@@ -949,14 +952,42 @@
         <source src="peixe_fim.mp4" type="video/mp4">
     </video>
 
+    <!-- NOVAS: Camadas do Pássaro -->
+    <video id="video-passaro" class="camada-cena" playsinline preload="auto">
+        <source src="passaro.mp4" type="video/mp4">
+    </video>
+    <video id="video-passaro-fim" class="camada-cena" playsinline preload="auto">
+        <source src="passaro_fim.mp4" type="video/mp4">
+    </video>
+
+    <!-- NOVAS: Animações de Loop dos Personagens -->
+    <video id="video-char-valkia" class="camada-cena" loop playsinline preload="auto">
+        <source src="valkia.mp4" type="video/mp4">
+    </video>
+    <video id="video-char-liesty" class="camada-cena" loop playsinline preload="auto">
+        <source src="liésty.mp4" type="video/mp4">
+    </video>
+    <video id="video-char-balon" class="camada-cena" loop playsinline preload="auto">
+        <source src="balon.mp4" type="video/mp4">
+    </video>
+    <video id="video-char-lythael" class="camada-cena" loop playsinline preload="auto">
+        <source src="lythael.mp4" type="video/mp4">
+    </video>
+    <video id="video-char-greta" class="camada-cena" loop playsinline preload="auto">
+        <source src="greta.mp4" type="video/mp4">
+    </video>
+    <video id="video-char-thorga" class="camada-cena" loop playsinline preload="auto">
+        <source src="thorga.mp4" type="video/mp4">
+    </video>
+
     <!-- Camada 4: Transição -->
-    <video id="video-transicao" class="camada-cena" playsinline>
+    <video id="video-transicao" class="camada-cena" playsinline preload="auto">
         <source src="floresta_caverna.mp4" type="video/mp4">
     </video>
 
     <!-- Camada 5: Caverna -->
     <div id="cena-caverna" class="camada-cena">
-        <video class="video-fundo" autoplay loop playsinline>
+        <video class="video-fundo" autoplay loop playsinline preload="auto">
             <source src="caverna.mp4" type="video/mp4">
         </video>
         <div id="ui-carregamento">
@@ -965,8 +996,29 @@
         </div>
     </div>
 
-    <!-- MARCA D'ÁGUA DA VERSÃO 2.0 -->
-    <div id="versao-cinematica">V2.1</div>
+    <!-- MARCA D'ÁGUA DA VERSÃO -->
+    <div id="versao-cinematica">V2.5</div>
+</div>
+
+<!-- NOVO: MODAL DOS PERSONAGENS SOBREPOSTO AO VÍDEO -->
+<div id="modal-personagens" style="display: none; position: fixed; z-index: 22000; left: 0; top: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.65); align-items: center; justify-content: center;">
+    <div class="modal-conteudo" style="max-width: 320px; padding: 20px; text-align: center; position: relative;">
+        <!-- Botão de Fechar no estilo do seu sistema -->
+        <span class="fechar-modal" onclick="encerrarPassaro()">&times;</span>
+        <h2 style="color: #cd853f; border-bottom: 1px solid #555; padding-bottom: 10px; margin-top: 0;">Os Pandemônios</h2>
+        
+        <div style="position: relative; display: inline-block; width: 100%; max-width: 250px;">
+            <img src="personagens.jpeg" style="width: 100%; border-radius: 8px; border: 2px solid #8b4513; display: block;">
+            
+            <!-- Hitboxes mapeadas exatamente em 6 partes verticais -->
+            <div style="position: absolute; top: 0%; left: 0; width: 100%; height: 16%; cursor: pointer;" onclick="abrirVideoPersonagem('valkia')"></div>
+            <div style="position: absolute; top: 16%; left: 0; width: 100%; height: 16%; cursor: pointer;" onclick="abrirVideoPersonagem('liesty')"></div>
+            <div style="position: absolute; top: 33%; left: 0; width: 100%; height: 16%; cursor: pointer;" onclick="abrirVideoPersonagem('balon')"></div>
+            <div style="position: absolute; top: 50%; left: 0; width: 100%; height: 16%; cursor: pointer;" onclick="abrirVideoPersonagem('lythael')"></div>
+            <div style="position: absolute; top: 66%; left: 0; width: 100%; height: 16%; cursor: pointer;" onclick="abrirVideoPersonagem('greta')"></div>
+            <div style="position: absolute; top: 83%; left: 0; width: 100%; height: 17%; cursor: pointer;" onclick="abrirVideoPersonagem('thorga')"></div>
+        </div>
+    </div>
 </div>
 
 
@@ -2690,7 +2742,7 @@ const dadosCapital = {
             nome: "Lythael Serindë", 
             raca: "Elfa alta",
             classe: "Sacerdote", 
-            foto: "Lythael.png",
+            foto: "Lythael.jpeg",
             desc: "Uma guardiã serena e observadora, cuja gentileza externa esconde uma força inabalável, dedicada a proteger e valorizar toda forma de vida.",
             stats: [1, 5, 4, 6, 1, 3, 2, 2], // For, Sab, Int, Man, Des, Con, Pre, Car
             hab_raca: "<b>🧘 Meditação:</b> Recupera 1d4+Nível de Mana 1x ao dia. <br><br><b>🌸 Rosas de Liora:</b> No início de cada combate, Liora desabrocha 4 rosas douradas. Lythael pode consumir uma rosa ao conjurar qualquer feitiço para dobrar o valor curado ou dobrar o dano causado naquele turno. Quando as rosas acabarem, ela pode recuperar uma rosa se curar 20 de vida de um aliado. Enquanto permanecer ao menos uma rosa no combate, para toda cura que Lythael realiza com sucesso acaba ela se auto cura em 1d4",
@@ -2727,7 +2779,7 @@ const dadosCapital = {
             nome: "Valkia Huniman", 
             raca: "Meio Anja",
             classe: "Cavaleira das Trevas", 
-            foto: "Valkia.png",
+            foto: "Valkia.jpeg",
             desc: "Embora aparente seriedade inicial, logo revela uma natureza vibrante e impetuosa, movida pelo desejo de provar sua evolução enquanto exalta constantemente os nomes de Ryuiki e Daruin.",
             stats: [6, 2, 1, 0, 3, 3, 8, 0], // For, Sab, Int, Man, Des, Con, Pre, Car
             hab_raca: "<b>✨ Aura Protetora:</b> Remove estados negativos e cura 1/4 da vida do alvo. <br><br><b>🗡️ Espada das Trevas Lâmina Sanguissedenta:</b> A arma causa 2d6+Força de dano. A espada absorve a vitalidade, curando Valkia em metade do dano causado. Ao usar habilidades ativas, Valkia pode escolher sacrificar seus próprios pontos de vida, perdendo 1d6 de vida para adicionar +2d4 de dano extra ao ataque.",
@@ -2758,7 +2810,7 @@ const dadosCapital = {
             nome: "Greta Thunder",
             raca: "Elfa da Floresta",
             classe: "Elementalista",
-            foto: "Greta.jpg",
+            foto: "Greta.png",
             desc: "Uma guardiã solitária de Desterroth que nutre profundo desprezo pela humanidade e outras raças confiando apenas na justiça da natureza e em seus cactos Agora ela é forçada a agir contra uma corrupção obscura que ameaça a floresta que jurou proteger",
             stats: [3, 2, 4, 5, 3, 2, 2, 2], // For, Sab, Int, Man, Des, Con, Pre, Car
             hab_raca: "<b>🗣️ Conversa Natural:</b> Comunica-se com elementos da natureza por 1 hora. <br><br><b>🔥 Mão Flamejante:</b> A mão decepada pode flutuar enquanto estiver num raio de 200m perto da Greta. Greta pode sempre saber em que direção a mão está. Toda vez que ela usa magia pode fazer com que a mão use uma magia de ataque de fogo em um único alvo dependendo do nível da magia utilizada. Nível 0: 1d2 de dano. Nível 1: 1d4 de dano. Nível 2: 1d4+1d4 por 1 turno de queimadura. Nível 3: 1d6+1d4 por 1d2 turnos de queimadura. Nível 4: 1d6+1d4 por 1d4 turnos de queimadura. Enquanto a mão estiver a 200m da Greta ela ganha +1 para conjurar magias de fogo.",
@@ -2831,7 +2883,7 @@ const dadosCapital = {
             nome: "Balon Blacktide", 
             raca: "Meio Demônio",
             classe: "Arqueiro", 
-            foto: "Balon.jpg",
+            foto: "Balon.png",
             desc: "Das lições da nobreza aos naufrágios da pirataria, este meio demônio de poucas palavras carrega no sobrenome a marca de sua sobrevivência e, na alma, o conflito eterno entre o sangue amaldiçoado e a luz que busca guiar seu caminho.",
             stats: [3, 2, 1, 0, 6, 2, 4, 1], // For, Sab, Int, Man, Des, Con, Pre, Car
             hab_raca: "<b>💢 Fúria Demoníaca:</b> Entra em fúria por (n+1) turnos (+4 For/Des, -4 Int/Sab/Prec). <br><br><b>🏹 Arco da Maré Negra:</b> A arma causa 2d4+Precisão de dano e ignora 1 de CA. O arco concede +3 de Mana ao usuário e habilita o uso de magias especiais ligadas à água. Sempre que houver qualquer fonte de água por perto, como poças, chuva ou mar, Balon puxa o líquido para formar flechas mágicas de água. Essas flechas causam +1d6 de dano e ignoram +1 de CA. <br><br><b>🔱 Ira do Leviatã Ultimate:</b> Atira uma flecha mágica para o alto, começa a chover e um peixe gigante feito de água surge do céu e ataca em uma área de 6x6 quadrados. Todos os inimigos na área sofrem 4d6 de dano perfurante, são derrubados no chão, e o terreno se torna inundado, cortando o deslocamento de todos pela metade por 2 turnos.",
@@ -2864,7 +2916,7 @@ const dadosCapital = {
             nome: "Thorga Punho de Ferro", 
             raca: "Anão",
             classe: "Cavaleiro das Trevas", 
-            foto: "Thorga.jpg",
+            foto: "Thorga.jpeg",
             desc: "Exilado injustamente das forjas ancestrais, Thorga é um mercenário impetuoso que rejeita a autoridade de reis e deuses, lutando pela pura emoção da batalha e para provar que sua força basta por si só.",
             stats: [8, 1, 1, 0, 2, 6, 2, 2], // For, Sab, Int, Man, Des, Con, Pre, Car
             hab_raca: "<b>🛡️ Pele de aço:</b> Uma vez por dia, reduz o dano de um ataque pela metade. <br><br><b>🎭 Máscara do Riso Sangrento:</b> Ao equipar a máscara, a arma de Thorga recebe +1d6 de dano base e ignora 1 de CA inimiga. A máscara se alimenta da violência. Sempre que Thorga causa dano, ele ganha 2 Marcas de Sangue, e se abater o alvo, ganha 4 Marcas. O limite máximo é 10 Marcas. Ao usar habilidades ativas, ele pode gastar essas marcas para receber +1d4 de dano extra ou +1 no acerto por cada marca consumida. A máscara devora a vitalidade derramada, permitindo que Thorga gaste 3 Marcas de Sangue a qualquer momento como ação livre para recuperar +1d8 de vida instantaneamente.",
@@ -2895,7 +2947,7 @@ const dadosCapital = {
             nome: "Liésty", 
             raca: "Elfa Negra",
             classe: "Bruxa", 
-            foto: "Liésty.jpg",
+            foto: "Liésty.png",
             desc: "Sobrevivente solitária de uma destruição brutal esta elfa negra trocou a companhia dos vivos pelo silêncio de sua cabana na floresta onde sua natureza sombria e suas artes arcanas servem como barreira contra um mundo que ela aprendeu a desprezar",
             stats: [2, 2, 3, 3, 3, 3, 2, 2], // For, Sab, Int, Man, Des, Con, Pre, Car
             hab_raca: "<b>🔥 Vontade Ardente:</b> Ataque em área de chamas causando 2d6*Nv+1d4*Nv <br><br><b>📖 Diário Brúxico:</b> A leitura concede +3 em qualquer teste de Arcanismo, História e Ocultismo. Em combate Liésty pode fazer um Sacrifício de Sangue sofrendo 1d4 de dano de vida para recuperar 1 ponto de Mana. Ela também possui a Conjuração Contínua onde ao invés de usar o feitiço no turno ela começa a murmurar e solta no próximo turno dobrando o dano e ganhando +2 no acerto. Ela pode continuar conjurando por até 3 turnos se quiser aumentando o multiplicador de dano e somando mais +2 no acerto por turno. O ato de ficar conjurando não gasta mana. Não pode ficar conjurando em ultimate",
@@ -7114,6 +7166,89 @@ function encerrarPeixe() {
         }
 
         setTimeout(() => { videoPeixeFim.classList.remove('ativa'); }, 100);
+    };
+}
+
+// ---- ANIMAÇÕES DO PÁSSARO E MENU DE PERSONAGENS ----
+let estadoPassaroAtivo = false;
+
+function iniciarPassaro() {
+    const cenaFloresta = document.getElementById('cena-floresta');
+    const videoPassaro = document.getElementById('video-passaro');
+    
+    const vidFloresta = cenaFloresta.querySelector('video');
+    if (vidFloresta) {
+        vidFloresta.pause();
+        vidFloresta.muted = true;
+    }
+
+    videoPassaro.classList.add('ativa');
+    videoPassaro.muted = false;
+    videoPassaro.currentTime = 0;
+    videoPassaro.playbackRate = 1.2; 
+    videoPassaro.play();
+
+    setTimeout(() => { cenaFloresta.classList.remove('ativa'); }, 50);
+
+    videoPassaro.onended = () => {
+        videoPassaro.pause(); // Trava no último frame
+        estadoPassaroAtivo = true;
+        
+        // Abre o modal transparente (o vídeo do pássaro continua visível atrás)
+        document.getElementById('modal-personagens').style.display = 'flex';
+    };
+}
+
+function encerrarPassaro() {
+    estadoPassaroAtivo = false;
+    // Esconde o menu modal
+    document.getElementById('modal-personagens').style.display = 'none';
+    
+    const videoPassaro = document.getElementById('video-passaro');
+    const videoPassaroFim = document.getElementById('video-passaro-fim');
+    const cenaFloresta = document.getElementById('cena-floresta');
+
+    videoPassaroFim.classList.add('ativa');
+    videoPassaroFim.muted = false;
+    videoPassaroFim.currentTime = 0;
+    videoPassaroFim.playbackRate = 1.2;
+    videoPassaroFim.play();
+
+    setTimeout(() => { videoPassaro.classList.remove('ativa'); }, 50);
+
+    videoPassaroFim.onended = () => {
+        cenaFloresta.classList.add('ativa');
+        
+        const vidFloresta = cenaFloresta.querySelector('video');
+        if (vidFloresta) {
+            vidFloresta.muted = false;
+            vidFloresta.currentTime = 0;
+            vidFloresta.play();
+        }
+
+        setTimeout(() => { videoPassaroFim.classList.remove('ativa'); }, 50);
+    };
+}
+
+function abrirVideoPersonagem(nome) {
+    // Esconde o menu modal
+    document.getElementById('modal-personagens').style.display = 'none';
+    
+    const videoId = 'video-char-' + nome;
+    const videoEl = document.getElementById(videoId);
+    
+    if (!videoEl) return;
+
+    videoEl.classList.add('ativa');
+    videoEl.muted = false;
+    videoEl.currentTime = 0;
+    videoEl.play();
+    
+    // Configura o clique no vídeo para voltar ao modal
+    videoEl.onclick = function() {
+        videoEl.pause();
+        videoEl.classList.remove('ativa');
+        document.getElementById('modal-personagens').style.display = 'flex';
     };
 }
 
