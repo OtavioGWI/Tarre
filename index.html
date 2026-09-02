@@ -6577,7 +6577,7 @@ if (db) {
 }
 
 // ==========================================
-// SISTEMA DE BLOQUEIO DE MAPA (COM IMAGEM)
+// SISTEMA DE BLOQUEIO DE MAPA (COM IMAGENS)
 // ==========================================
 let estadoBloqueio = false;
 
@@ -6594,8 +6594,8 @@ function aplicarTelaDeBloqueio(bloqueado) {
     if (!tela) {
         tela = document.createElement('div');
         tela.id = 'tela-bloqueio';
-        // Cria a base sem texto, apenas um canvas fixo no topo de tudo (exceto o mestre)
-        tela.style.cssText = "display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; z-index: 9998;";
+        // z-index 99998 para cobrir todos os vídeos e fotos
+        tela.style.cssText = "display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; z-index: 99998;";
         document.body.appendChild(tela);
     }
 
@@ -6603,19 +6603,28 @@ function aplicarTelaDeBloqueio(bloqueado) {
     const menuMestre = document.getElementById('menu-mestre');
 
     if (bloqueado) {
-        // Define as imagens de bloqueio conforme o dispositivo do jogador
         const isMobile = window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         tela.style.backgroundImage = isMobile ? "url('bloqueio.jpeg')" : "url('bloqueio_pc.jpeg')";
         tela.style.backgroundSize = "cover";
         tela.style.backgroundPosition = "center";
+        tela.style.backgroundRepeat = "no-repeat";
         
-        // Garante que o menu do Mestre (e apenas o do Mestre) continue operando acima da imagem
-        if (menuMestre) menuMestre.style.zIndex = '9999';
+        // MÁGICA DE PROTEÇÃO DO MESTRE:
+        // Força a exibição e eleva o painel para a camada 99999 (acima do bloqueio)
+        if (menuMestre) {
+            if (window.innerWidth > 600) { // Respeita a regra de não mostrar no celular
+                menuMestre.style.display = 'block';
+            }
+            menuMestre.style.zIndex = '99999';
+        }
 
-        fecharModais(true);
-        fecharPopupSeguro();
-        document.getElementById('modal-viagem').style.display = 'none';
-        document.getElementById('modal-senha').style.display = 'none';
+        // Pausa todos os vídeos que estão rodando
+        document.querySelectorAll('video').forEach(v => {
+            if (!v.paused) {
+                v.dataset.estavaTocando = 'true';
+                v.pause();
+            }
+        });
 
         tela.style.display = 'block';
 
@@ -6626,6 +6635,17 @@ function aplicarTelaDeBloqueio(bloqueado) {
     } else {
         tela.style.display = 'none';
         
+        // Retorna o menu do Mestre para a camada normal dele
+        if (menuMestre) menuMestre.style.zIndex = '2000';
+        
+        // Despausa apenas os vídeos que foram pausados pelo bloqueio
+        document.querySelectorAll('video').forEach(v => {
+            if (v.dataset.estavaTocando === 'true') {
+                v.play().catch(() => {});
+                v.dataset.estavaTocando = 'false';
+            }
+        });
+
         if (btnMestre) {
             btnMestre.innerHTML = "🗺️ Bloquear Mapa: OFF";
             btnMestre.classList.remove('btn-ferramenta-ativa');
@@ -6633,12 +6653,13 @@ function aplicarTelaDeBloqueio(bloqueado) {
     }
 }
 
-// Ouvinte Implacável: Garante que os jogadores que derem F5 voltem para a tela preta
+// Ouvinte Implacável: Garante que os jogadores sincronizem o bloqueio
 if (db) {
     db.ref('mapaBloqueado').on('value', (snapshot) => {
         aplicarTelaDeBloqueio(snapshot.val() || false);
     });
 }
+
 
 // ==========================================
 // CONTROLE SINCRONIZADO DE MASMORRAS
