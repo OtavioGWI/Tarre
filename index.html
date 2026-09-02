@@ -914,6 +914,10 @@
     </style>
 </head>
 <body>
+    <!-- CORTINA PRE-FIREBASE (Esconde a tela até o servidor confirmar o bloqueio) -->
+<div id="cortina-pre-firebase" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 999999; display: flex; justify-content: center; align-items: center; color: #555; font-family: sans-serif; font-size: 14px;">
+    Sincronizando com Tarre...
+</div>
 
 <!-- POPUP INICIAL DE TELA CHEIA (AGORA PARA PC E CELULAR) -->
 <div id="popup-tela-cheia" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: rgba(0,0,0,0.6); z-index: 30000; justify-content: center; align-items: center; font-family: serif; text-align: center; padding: 20px; box-sizing: border-box;">
@@ -6595,7 +6599,6 @@ function aplicarTelaDeBloqueio(bloqueado) {
     if (!tela) {
         tela = document.createElement('div');
         tela.id = 'tela-bloqueio';
-        // z-index 99998 para cobrir todos os vídeos e fotos
         tela.style.cssText = "display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; z-index: 99998;";
         document.body.appendChild(tela);
     }
@@ -6610,16 +6613,11 @@ function aplicarTelaDeBloqueio(bloqueado) {
         tela.style.backgroundPosition = "center";
         tela.style.backgroundRepeat = "no-repeat";
         
-        // MÁGICA DE PROTEÇÃO DO MESTRE:
-        // Força a exibição e eleva o painel para a camada 99999 (acima do bloqueio)
         if (menuMestre) {
-            if (window.innerWidth > 600) { // Respeita a regra de não mostrar no celular
-                menuMestre.style.display = 'block';
-            }
+            if (window.innerWidth > 600) { menuMestre.style.display = 'block'; }
             menuMestre.style.zIndex = '99999';
         }
 
-        // Pausa todos os vídeos que estão rodando
         document.querySelectorAll('video').forEach(v => {
             if (!v.paused) {
                 v.dataset.estavaTocando = 'true';
@@ -6635,17 +6633,24 @@ function aplicarTelaDeBloqueio(bloqueado) {
         }
     } else {
         tela.style.display = 'none';
-        
-        // Retorna o menu do Mestre para a camada normal dele
         if (menuMestre) menuMestre.style.zIndex = '2000';
         
-        // Despausa apenas os vídeos que foram pausados pelo bloqueio
         document.querySelectorAll('video').forEach(v => {
             if (v.dataset.estavaTocando === 'true') {
                 v.play().catch(() => {});
                 v.dataset.estavaTocando = 'false';
             }
         });
+
+        // GARANTIA EXTRA: Se estava no menu inicial quando desbloqueou, força o livro a tocar
+        const cenaFechada = document.getElementById('cena-livro-fechado');
+        if (cenaFechada && cenaFechada.classList.contains('ativa') && typeof telaInicialMostrada !== 'undefined' && telaInicialMostrada) {
+            const videoFechado = cenaFechada.querySelector('video');
+            if (videoFechado) {
+                videoFechado.muted = true;
+                videoFechado.play().catch(() => {});
+            }
+        }
 
         if (btnMestre) {
             btnMestre.innerHTML = "🗺️ Bloquear Mapa: OFF";
@@ -6654,12 +6659,69 @@ function aplicarTelaDeBloqueio(bloqueado) {
     }
 }
 
-// Ouvinte Implacável: Garante que os jogadores sincronizem o bloqueio
+let telaInicialMostrada = false;
+
+// Função que revela a tela de entrada oficial
+function iniciarTelaDeApresentacao() {
+    if (telaInicialMostrada) return;
+    telaInicialMostrada = true;
+
+    const popup = document.getElementById('popup-tela-cheia');
+    if (popup) {
+        popup.style.zIndex = '100000';
+        popup.style.display = 'flex';
+    }
+
+    if (typeof ehDispositivoMovel === 'function' && ehDispositivoMovel()) {
+        const btnPular = document.getElementById('btn-pular-cinematica');
+        if (btnPular) btnPular.style.display = 'none';
+    }
+
+    // Se NÃO estiver bloqueado, garantimos o play do livro
+    if (!estadoBloqueio) {
+        const videoFechado = document.querySelector('#cena-livro-fechado video');
+        if (videoFechado) {
+            videoFechado.muted = true;
+            videoFechado.play().catch(() => {});
+        }
+    }
+}
+
+let primeiraSincronizacao = false;
+
+// OUVINTE INTELIGENTE: Controla o bloqueio e a cortina preta
 if (db) {
     db.ref('mapaBloqueado').on('value', (snapshot) => {
-        aplicarTelaDeBloqueio(snapshot.val() || false);
+        const bloqueado = snapshot.val() || false;
+        
+        // Aplica o bloqueio (por baixo da cortina se for a primeira vez)
+        aplicarTelaDeBloqueio(bloqueado);
+
+        // Se for o primeiro contato com o Firebase ao abrir o site:
+        if (!primeiraSincronizacao) {
+            primeiraSincronizacao = true;
+            
+            // Derruba a cortina negra
+            const cortina = document.getElementById('cortina-pre-firebase');
+            if (cortina) cortina.style.display = 'none';
+
+            // Monta a tela do livro e os popups
+            iniciarTelaDeApresentacao();
+        }
     });
-}
+} 
+
+window.addEventListener('DOMContentLoaded', () => {
+    // Corta o som de qualquer autoplay imediatamente na raiz
+    silenciarTodosOsVideos();
+    
+    // Fallback caso o Firebase esteja offline ou com falha
+    if (!db) {
+        const cortina = document.getElementById('cortina-pre-firebase');
+        if (cortina) cortina.style.display = 'none';
+        iniciarTelaDeApresentacao();
+    }
+});
 
 
 // ==========================================
@@ -7261,26 +7323,6 @@ function silenciarTodosOsVideos() {
     });
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-    const popup = document.getElementById('popup-tela-cheia');
-    if (popup) {
-        popup.style.zIndex = '100000';
-        popup.style.display = 'flex';
-    }
-
-    if (ehDispositivoMovel()) {
-        const btnPular = document.getElementById('btn-pular-cinematica');
-        if (btnPular) btnPular.style.display = 'none';
-    }
-
-    silenciarTodosOsVideos();
-
-    const videoFechado = document.querySelector('#cena-livro-fechado video');
-    if (videoFechado) {
-        videoFechado.muted = true;
-        videoFechado.play().catch(() => {});
-    }
-});
 
 // Abre o loop do personagem clicado na foto personagens.jpeg
 function abrirVideoPersonagem(nome) {
