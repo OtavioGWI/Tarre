@@ -4859,16 +4859,18 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
         const btnArmadilha = criarBtn("🔍 Descobrir", "abrirModalSenha('navio', 'eventoNavioPrisao()', 'funcao')", "#2E8B57", true);
         criarPontoLocal([1308, 1888], "Ué", "Parece não haver nada aqui", null, false, btnArmadilha);
 
-        const btnAna = criarBtn("🔍 Descobrir", "abrirModalSenha('anao', 'balagar.png', 'imagem')", "#2E8B57", true);
-        criarPontoLocal([920, 662], "Ruínas", "Atarim", null, true, btnAna);
+        // NOVA SENHA DE BALAGAR: Adicionada a TODAS as ruínas do deserto!
+        const btnBalagar = criarBtn("🔍 Descobrir", "abrirModalSenha('balagar', 'abrirDungeonBalagar()', 'funcao')", "#2E8B57", true);
         
-        criarPontoLocal([1394, 814], "Ruínas", "Atarim", "Entrada deserto.png", true);
-        criarPontoLocal([660, 1652], "Ruínas", "Atarim");
-        criarPontoLocal([1310, 1502], "Ruínas", "Atarim");
+        criarPontoLocal([920, 662], "Ruínas", "Atarim", null, true, btnBalagar);
+        criarPontoLocal([1394, 814], "Ruínas", "Atarim", "Entrada deserto.png", true, btnBalagar);
+        criarPontoLocal([660, 1652], "Ruínas", "Atarim", null, false, btnBalagar);
+        criarPontoLocal([1310, 1502], "Ruínas", "Atarim", null, false, btnBalagar);
 
         const btnDepressao = criarBtn("🔍 Descobrir", "abrirModalSenha('tristeza', 'abrirDungeonDeserto()', 'funcao')", "#2E8B57", true);
         criarPontoLocal([1394, 915], "Castelo", "Zha Ruk", "Castelo deserto 2.png", true, btnDepressao);
-        
+
+
         criarPontoLocal([792, 912], "Castelo", "Zha Ruk", "Castelo deserto 1.png", true);
         criarPontoLocal([332, 1278], "Castelo", "Zha Ruk");
         criarPontoLocal([1020, 1188], "Castelo", "Zha Ruk");
@@ -5342,10 +5344,10 @@ function abrirMercadoDhenRak() {
 // 4. LEILÃO DE MIRAGENS (GALERIA INTERATIVA)
 // ==========================================
 const dadosLeilao = [
-    { nome: "Registro de Escavação Atarim", lance: "50.000 Moedas de Ouro", foto: "mapa_atarim.png" },
-    { nome: "Cálice das Lágrimas Secas", lance: "15.000 Moedas de Ouro", foto: "calice_areia.png" },
-    { nome: "Diadema do Falso Oásis", lance: "40.000 Moedas de Ouro", foto: "diadema_oasis.png" },
-    { nome: "Estátua do Rei Zha Ruk", lance: "25.000 Moedas de Ouro", foto: "estatua_zha.png" }
+    { nome: "Registro de Escavação Atarim", lance: "50.000 Moedas de Ouro", foto: "mapa_atarim.jpeg" },
+    { nome: "Cálice das Lágrimas Secas", lance: "15.000 Moedas de Ouro", foto: "calice_areia.jpeg" },
+    { nome: "Diadema do Falso Oásis", lance: "40.000 Moedas de Ouro", foto: "diadema_oasis.jpeg" },
+    { nome: "Concha do Mar Profundo", lance: "30.000 Moedas de Ouro", foto: "concha_mar.jpeg" }
 ]
 
 let itemLeilaoAtual = 0
@@ -5411,6 +5413,24 @@ const registroDungeons = {
             { sala: 2, titulo: "O Salão dos Lamentos", fotos: ["salao_tristeza.png"], cor: "#8b4513" },
             { sala: 3, titulo: "O Trono da Depressão", fotos: ["trono_depressao.png"], cor: "#4b0082" }
         ]
+    },
+    balagar: {
+        titulo: "⛏️ Escavações de Balagar",
+        progresso: { 'corredor': true }, // Define o ponto inicial visível
+        dados: [
+            { id: "portao", titulo: "Portão Balagar", fotos: ["portao.jpeg"], cor: "#8b0000" },
+            { id: "corredor", titulo: "Corredor Balagar", fotos: ["corredor.jpeg"], cor: "#cd853f" },
+            { id: "ponte", titulo: "Ponte de Balagar", fotos: ["ponte.jpeg"], cor: "#8b4513" },
+            { id: "elevador", titulo: "Elevador", fotos: ["elevador.jpeg"], cor: "#708090" },
+            { id: "forja", titulo: "Forja de Balagar", fotos: ["forja.jpeg"], cor: "#ff4500" },
+            { id: "sala_trono", titulo: "Sala do Trono", fotos: ["trono.jpeg"], cor: "#ffd700" },
+            { id: "balagar", titulo: "Balagar", fotos: ["balagar.jpeg"], cor: "#a0522d" },
+            { id: "aranha", titulo: "Aranha de Cristal", fotos: ["aranha_cristal.jpeg"], cor: "#4682b4" },
+            { id: "golem", titulo: "Golem", fotos: ["Golem_anao.jpeg"], cor: "#808080" },
+            { id: "robos", titulo: "Robôs", fotos: ["robos.jpeg"], cor: "#c0c0c0" },
+            { id: "torreta", titulo: "Torreta", fotos: ["torreta.jpeg"], cor: "#d2691e" },
+            { id: "tita", titulo: "Titã Colossal", fotos: ["tita.png"], cor: "#2f4f4f" }
+        ]
     }
 };
 
@@ -5472,12 +5492,79 @@ function detalharSala(num) {
     `;
 }
 
-function zoomFotoDungeon(arquivo, salaNum) {
+// ATUALIZE A FUNÇÃO DE ZOOM PARA SUPORTAR O BALAGAR
+function zoomFotoDungeon(arquivo, salaId) {
     verImagemEstatica(arquivo, function() {
         restaurarMapaMenu(); 
         document.getElementById('modal-capital').style.display = 'flex'; 
-        detalharSala(salaNum); 
+        if (dungeonAtiva === 'balagar') {
+            detalharSalaBalagar(salaId); 
+        } else {
+            detalharSala(salaId); 
+        }
     });
+}
+
+window.abrirDungeonBalagar = () => {
+    dungeonAtiva = 'balagar';
+    const d = registroDungeons['balagar'];
+    const modal = document.getElementById('modal-capital');
+    const container = document.getElementById('conteudo-menu-capital');
+    const titulo = document.getElementById('titulo-menu-capital');
+    
+    modal.style.display = 'flex';
+    titulo.innerText = d.titulo;
+    
+    // Lista apenas as salas que o mestre ativou (true)
+    let htmlSalas = d.dados.map(s => {
+        const desbloqueado = d.progresso[s.id] === true;
+        if (!desbloqueado) return ''; // Se não tá desbloqueado, nem aparece
+        
+        return `
+            <div class="andar-item andar-atual" style="border-left-color: ${s.cor}; margin-bottom: 10px;" onclick="detalharSalaBalagar('${s.id}')">
+                <span class="andar-titulo" style="font-size:16px;">✨ ${s.titulo}</span>
+                <span class="andar-sage">Toque para investigar a área</span>
+            </div>
+        `;
+    }).join('');
+
+    if (htmlSalas === '') {
+        htmlSalas = `<p style="color:#aaa; text-align:center; padding: 20px;">Vocês estão na escuridão. Não há caminhos visíveis ainda...</p>`;
+    }
+
+    container.innerHTML = `
+        <button onclick="fecharModais()" class="btn-popup" style="margin-bottom:15px; background:#444; width:100%;">⬅ Fechar</button>
+        <div style="background: rgba(205, 133, 63, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #cd853f;">
+            <p style="color:#fff; margin:0; font-size: 13px;">Exploração Profunda: <strong>Túneis de Balagar</strong></p>
+        </div>
+        <div class="torre-wrapper">
+            <div class="torre-container">
+                ${htmlSalas}
+            </div>
+        </div>
+    `;
+};
+
+function detalharSalaBalagar(id) {
+    const d = registroDungeons['balagar'];
+    const s = d.dados.find(item => item.id === id);
+    const container = document.getElementById('conteudo-menu-capital');
+    
+    const htmlFotos = s.fotos.map(foto => `
+        <img src="${foto}" 
+             onclick="zoomFotoDungeon('${foto}', '${id}')" 
+             style="display: block; margin: 0 auto 15px auto; max-width: 100%; height: auto; max-height: 450px; border-radius: 6px; border: 2px solid ${s.cor}; box-shadow: 0 4px 15px rgba(0,0,0,0.6); cursor: zoom-in;">
+    `).join('');
+
+    container.innerHTML = `
+        <button onclick="abrirDungeonBalagar()" class="btn-popup" style="margin-bottom:20px; background:#444; width:100%;">⬅ Voltar aos Túneis</button>
+        <div style="text-align:center;">
+            <h2 style="color:${s.cor}; margin-top:0; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 20px;">${s.titulo}</h2>
+            <div style="padding-bottom: 10px;">
+                ${htmlFotos}
+            </div>
+        </div>
+    `;
 }
 let barcosAtivos = [];
 let animacoesBarcosIDs = [];
@@ -6247,6 +6334,12 @@ function abrirMenuMestre(aba = 'principal') {
     const conteudo = document.getElementById('conteudo-mestre');
     conteudo.style.display = 'block';
     
+    // MÁGICA DE ESPAÇO: Alarga o painel apenas na aba de controles para caber 2 colunas
+    const menuMestre = document.getElementById('menu-mestre');
+    if (menuMestre) {
+        menuMestre.style.width = aba === 'controles' ? '480px' : '220px';
+    }
+    
     const setaStr = menuMestreMinimizado ? '▼' : '▲';
     const displayStr = menuMestreMinimizado ? 'none' : 'block';
     
@@ -6314,8 +6407,8 @@ function abrirMenuMestre(aba = 'principal') {
             
             <div id="conteudo-mestre-interno" style="display: ${displayStr}; border-top: 1px solid #555; padding-top: 12px; margin-top: 12px;">
                 <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">CLIMA GLOBAL</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 20px;">
-                    <button class="botao-provincia" onclick="alterarClima('normal')" style="margin:0; text-align:center;">☀️ Normal</button>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 20px;">
+                    <button class="botao-provincia" onclick="alterarClima('normal')" style="margin:0; text-align:center;">☀️ Norm</button>
                     <button class="botao-provincia" onclick="alterarClima('noite')" style="margin:0; text-align:center;">🌙 Noite</button>
                     <button class="botao-provincia" onclick="alterarClima('chuva')" style="margin:0; text-align:center;">🌧️ Chuva</button>
                     <button class="botao-provincia" onclick="alterarClima('neve')" style="margin:0; text-align:center;">❄️ Neve</button>
@@ -6325,32 +6418,57 @@ function abrirMenuMestre(aba = 'principal') {
                 <button class="botao-provincia" onclick="abrirMenuMestre('boatos')" style="color: #ffb6c1; border-color: #8b008b; margin-bottom: 20px;">🗣️ Gerenciar Boatos</button>
 
                 <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MASMORRAS</div>
-                <div style="margin-bottom: 15px;">
-                    <span style="color: #ffd700; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Torre dos Sábios</span>
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
-                        <button onclick="alterarProgresso('torre', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
-                        <span id="visor-torre" style="color: white; font-weight: bold;">Andar ${andarMaximoLiberado}</span>
-                        <button onclick="alterarProgresso('torre', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    
+                    <!-- COLUNA 1: Masmorras Lineares -->
+                    <div>
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: #ffd700; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Torre dos Sábios</span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
+                                <button onclick="alterarProgresso('torre', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
+                                <span id="visor-torre" style="color: white; font-weight: bold;">Andar ${andarMaximoLiberado}</span>
+                                <button onclick="alterarProgresso('torre', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: #add8e6; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Hukmal tep (Gelo)</span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
+                                <button onclick="alterarProgresso('hukmal', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
+                                <span id="visor-hukmal" style="color: white; font-weight: bold;">Sala ${registroDungeons['hukmal'].progresso}</span>
+                                <button onclick="alterarProgresso('hukmal', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: #cd853f; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Deserto (Tristeza)</span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
+                                <button onclick="alterarProgresso('deserto', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
+                                <span id="visor-deserto" style="color: white; font-weight: bold;">Sala ${registroDungeons['deserto'].progresso}</span>
+                                <button onclick="alterarProgresso('deserto', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <span style="color: #add8e6; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Hukmal tep (Gelo)</span>
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
-                        <button onclick="alterarProgresso('hukmal', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
-                        <span id="visor-hukmal" style="color: white; font-weight: bold;">Sala ${registroDungeons['hukmal'].progresso}</span>
-                        <button onclick="alterarProgresso('hukmal', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
+                    
+                    <!-- COLUNA 2: Escavações Balagar (Túneis) -->
+                    <div>
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: #cd853f; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">⛏️ Escavações Balagar</span>
+                            <!-- O segredo do scrollbar: max-height e overflow-y -->
+                            <div style="display: flex; flex-direction: column; gap: 5px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 4px; border: 1px solid #555; max-height: 180px; overflow-y: auto;">
+                                ${registroDungeons['balagar'].dados.map(s => {
+                                    const ativo = registroDungeons['balagar'].progresso[s.id] === true;
+                                    return `
+                                    <button onclick="alternarSalaBalagar('${s.id}')" style="background: ${ativo ? '#27ae60' : '#444'}; color: white; border: 1px solid #222; padding: 6px; cursor: pointer; border-radius: 3px; font-size: 12px; text-align: left; flex-shrink: 0;">
+                                        ${ativo ? '👁️' : '🙈'} ${s.titulo}
+                                    </button>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <span style="color: #cd853f; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Deserto (Tristeza)</span>
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; border: 1px solid #555;">
-                        <button onclick="alterarProgresso('deserto', -1)" style="background: #8b0000; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">-</button>
-                        <span id="visor-deserto" style="color: white; font-weight: bold;">Sala ${registroDungeons['deserto'].progresso}</span>
-                        <button onclick="alterarProgresso('deserto', 1)" style="background: #27ae60; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold;">+</button>
-                    </div>
+
                 </div>
                 
-                <button class="botao-provincia" onclick="abrirMenuMestre('principal')" style="color: #aaa; border-color: #555; text-align: center;">⬅ Voltar ao Painel</button>
+                <button class="botao-provincia" onclick="abrirMenuMestre('principal')" style="color: #aaa; border-color: #555; text-align: center; margin-top: 10px;">⬅ Voltar ao Painel</button>
             </div>
         `;
     } else if (aba === 'boatos') {
@@ -6736,13 +6854,23 @@ if (db) {
             if (dados.hukmal !== undefined) registroDungeons['hukmal'].progresso = dados.hukmal;
             if (dados.deserto !== undefined) registroDungeons['deserto'].progresso = dados.deserto;
             
-            // Se algum jogador estiver com o painel aberto na hora, atualiza a visão dele
+            // NOVO: Sincroniza a exploração de Balagar para todos os jogadores
+            if (dados.balagar !== undefined) registroDungeons['balagar'].progresso = dados.balagar;
+            
+            // Atualiza a tela dos jogadores se estiverem com alguma masmorra aberta
             const modalAberto = document.getElementById('modal-capital');
             const titulo = document.getElementById('titulo-menu-capital');
             if (modalAberto && modalAberto.style.display === 'flex' && titulo) {
                 if (titulo.innerText.includes("Torre dos Sábios")) abrirMenuTorre();
                 else if (titulo.innerText.includes("Masmorra Congelada")) abrirMenuDungeon('hukmal');
                 else if (titulo.innerText.includes("Masmorra da Tristeza")) abrirMenuDungeon('deserto');
+                else if (titulo.innerText.includes("Escavações de Balagar")) abrirDungeonBalagar();
+            }
+            
+            // Recarrega o menu do Mestre instantaneamente para os botões do Balagar mudarem de cor (Verde/Cinza)
+            const contMestre = document.getElementById('conteudo-mestre');
+            if (contMestre && contMestre.style.display !== 'none' && contMestre.innerHTML.includes('Escavações Balagar')) {
+                abrirMenuMestre('controles');
             }
             
             // Atualiza os visores no Painel do Mestre (se estiver na aba)
@@ -6768,6 +6896,12 @@ function alterarProgresso(tipo, delta) {
         let novo = d.progresso + delta;
         if (novo >= 0 && novo < d.dados.length) db.ref('progressoDungeons/' + tipo).set(novo);
     }
+}
+
+function alternarSalaBalagar(id) {
+    if (!db) return;
+    const atual = registroDungeons['balagar'].progresso[id] || false;
+    db.ref('progressoDungeons/balagar/' + id).set(!atual);
 }
 
 const tempoInicioBussola = Date.now();
