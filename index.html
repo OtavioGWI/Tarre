@@ -6335,6 +6335,21 @@ function alternarMenuMestre() {
 }
 
 function abrirMenuMestre(aba = 'principal') {
+    // --- NOVO: Marca o Mestre como logado e remove a barreira instantaneamente se o mapa estiver travado ---
+    mestreLogadoLocalmente = true;
+    if (typeof estadoBloqueio !== 'undefined' && estadoBloqueio) {
+        const tela = document.getElementById('tela-bloqueio');
+        if (tela) tela.style.display = 'none';
+        const menuMestre = document.getElementById('menu-mestre');
+        if (menuMestre) menuMestre.style.zIndex = '2000';
+        const btnBloqueio = document.getElementById('btn-bloqueio-mapa');
+        if (btnBloqueio) {
+            btnBloqueio.innerHTML = "🗺️ Bloquear Mapa: ON";
+            btnBloqueio.classList.add('btn-ferramenta-ativa');
+        }
+    }
+    // ---------------------------------------------------------------------------------
+
     // Memória de Scroll do Mestre
     let scrollBoatos = 0;
     let scrollBalagar = 0;
@@ -6407,6 +6422,7 @@ function abrirMenuMestre(aba = 'principal') {
                 </div>
 
                 <button class="botao-provincia" onclick="abrirMenuMestre('controles')" style="color: #87ceeb; border-color: #4682b4; margin-top: 10px;">⚙️ Controles do Mundo</button>
+            </div>
         `;
         
         atualizarBotoesMestre();
@@ -6525,12 +6541,17 @@ function abrirMenuMestre(aba = 'principal') {
     const newBalagar = document.getElementById('lista-scroll-balagar');
     if (newBoatos) newBoatos.scrollTop = scrollBoatos;
     if (newBalagar) newBalagar.scrollTop = scrollBalagar;
-} // <--- Fim da função abrirMenuMestre
-
+}
 
 function fecharMenuMestre() {
     document.getElementById('conteudo-mestre').style.display = 'none';
     document.getElementById('btn-login-mestre').style.display = 'block';
+    
+    // NOVO: Retira o privilégio do Mestre e recai a cortina se o mapa estiver bloqueado
+    mestreLogadoLocalmente = false;
+    if (typeof estadoBloqueio !== 'undefined' && estadoBloqueio) {
+        aplicarTelaDeBloqueio(true);
+    }
 }
 
 function ativarFerramentaMestre(forcarAtivar = false) {
@@ -6721,10 +6742,11 @@ if (db) {
 }
 
 // ==========================================
-// SISTEMA DE BLOQUEIO DE MAPA (COM IMAGENS)
+// SISTEMA DE BLOQUEIO DE MAPA (COM IMAGENS E BYPASS DO MESTRE)
 // ==========================================
 let estadoBloqueio = false;
 let aguardandoDesbloqueio = false; // Memória para o popup inicial
+let mestreLogadoLocalmente = false; // NOVO: Controla o bypass de visão do Mestre
 
 function alternarBloqueioMapa() {
     if (db) {
@@ -6740,13 +6762,14 @@ function aplicarTelaDeBloqueio(bloqueado) {
         tela = document.createElement('div');
         tela.id = 'tela-bloqueio';
         // Flexbox para permitir centralizar elementos dentro dela
-        tela.style.cssText = "display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; z-index: 99998; flex-direction: column; align-items: center; justify-content: center;";
+        tela.style.cssText = "display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; z-index: 99998; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;";
         
-        // NOVO: Botão "Nativo" de Acessar Fichas do Esquadrão na Tela de Bloqueio
+        // CORREÇÃO DO BOTÃO NO CELULAR: Removemos o 'position: absolute' e o 'bottom'.
+        // Agora ele faz parte do fluxo normal e usa margin-top para ficar abaixo da imagem principal.
         const btnFichas = document.createElement('button');
         btnFichas.innerHTML = "🛡️ Fichas do Esquadrão";
         btnFichas.className = "botao-provincia";
-        btnFichas.style.cssText = "width: auto; padding: 15px 30px; font-size: 16px; background: rgba(26,26,26,0.9); border: 2px solid #87ceeb; color: #87ceeb; cursor: pointer; border-radius: 8px; font-weight: bold; position: absolute; bottom: 40px; box-shadow: 0 0 20px rgba(135,206,235,0.4); z-index: 99999;";
+        btnFichas.style.cssText = "width: auto; padding: 15px 30px; font-size: 16px; background: rgba(26,26,26,0.9); border: 2px solid #87ceeb; color: #87ceeb; cursor: pointer; border-radius: 8px; font-weight: bold; box-shadow: 0 0 20px rgba(135,206,235,0.4); z-index: 99999; margin-top: 40vh; max-width: 90vw;";
         btnFichas.onclick = function() {
             const modal = document.getElementById('modal-capital');
             if (modal) modal.style.zIndex = '100000'; // Eleva o modal acima da tela de bloqueio
@@ -6760,6 +6783,18 @@ function aplicarTelaDeBloqueio(bloqueado) {
     const btnMestre = document.getElementById('btn-bloqueio-mapa');
     const menuMestre = document.getElementById('menu-mestre');
 
+    // MÁGICA: Se o Mestre já estiver logado neste computador, a tela preta não afeta ele!
+    if (mestreLogadoLocalmente) {
+        tela.style.display = 'none';
+        if (menuMestre) menuMestre.style.zIndex = '2000';
+        if (btnMestre) {
+            btnMestre.innerHTML = bloqueado ? "🗺️ Bloquear Mapa: ON" : "🗺️ Bloquear Mapa: OFF";
+            if (bloqueado) btnMestre.classList.add('btn-ferramenta-ativa');
+            else btnMestre.classList.remove('btn-ferramenta-ativa');
+        }
+        return; // Interrompe a execução aqui. O mestre não sofre as pausas abaixo.
+    }
+
     if (bloqueado) {
         const isMobile = window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         tela.style.backgroundImage = isMobile ? "url('bloqueio.jpeg')" : "url('bloqueio_pc.jpeg')";
@@ -6772,7 +6807,7 @@ function aplicarTelaDeBloqueio(bloqueado) {
             menuMestre.style.zIndex = '100001';
         }
 
-        // MUTA E PAUSA TODOS OS VÍDEOS (Impede vazamento de som)
+        // MUTA E PAUSA TODOS OS VÍDEOS (Impede totalmente vazamento de som em background)
         document.querySelectorAll('video').forEach(v => {
             v.muted = true;
             if (!v.paused) {
@@ -6785,7 +6820,6 @@ function aplicarTelaDeBloqueio(bloqueado) {
         const popup = document.getElementById('popup-tela-cheia');
         if (popup) popup.style.display = 'none';
 
-        // Usa 'flex' para o botão Fichas poder ficar posicionado
         tela.style.display = 'flex';
 
         if (btnMestre) {
@@ -6803,12 +6837,11 @@ function aplicarTelaDeBloqueio(bloqueado) {
             }
         });
 
-        // REGRAS DE RENOVAÇÃO: Se o mestre destravou e o jogador devia ver o popup, mostra agora!
+        // Se estava aguardando o bloqueio acabar para soltar o popup, solta agora!
         if (aguardandoDesbloqueio) {
             aguardandoDesbloqueio = false;
             iniciarTelaDeApresentacao();
         } else {
-            // Garantia extra para animação de livro
             const cenaFechada = document.getElementById('cena-livro-fechado');
             if (cenaFechada && cenaFechada.classList.contains('ativa') && typeof telaInicialMostrada !== 'undefined' && telaInicialMostrada) {
                 const videoFechado = cenaFechada.querySelector('video');
@@ -7254,13 +7287,10 @@ function recusarTelaCheia() {
 }
 
 // Ação de Pular a Cinemática (Agora apenas visível no PC)
+// Ação de Pular a Cinemática (Rápida e sem Tela Cheia)
 function pularCinematica() {
     const popup = document.getElementById('popup-tela-cheia');
     if (popup) popup.style.display = 'none';
-
-    const docEl = document.documentElement;
-    if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
-    else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen().catch(() => {});
 
     // Mata a camada do livro fechado
     const cenaFechada = document.getElementById('cena-livro-fechado');
@@ -7273,23 +7303,9 @@ function pularCinematica() {
         }
     }
 
-    // Ativa a caverna direto e solta o som do carregamento
-    const cenaCaverna = document.getElementById('cena-caverna');
-    cenaCaverna.classList.add('ativa');
-    
-    const vidCav = cenaCaverna.querySelector('video');
-    if (vidCav) {
-        vidCav.muted = false;
-        vidCav.currentTime = 0; 
-        vidCav.play();
-    }
-    
+    // Pula instantaneamente a caverna/túnel e avança para a liberação da tela
+    tempoMinimoCavernaConcluido = true;
     processarCargaEpica();
-
-    setTimeout(() => {
-        tempoMinimoCavernaConcluido = true;
-        verificarTerminoCinematica();
-    }, 5000);
 }
 
 
