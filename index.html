@@ -1158,7 +1158,7 @@
 
 <!-- NOVO MENU DO MESTRE (TOTALMENTE INDEPENDENTE) -->
 <div id="menu-mestre" class="apenas-desktop">
-    <button id="btn-login-mestre" class="botao-provincia" onclick="abrirModalSenha('123', 'abrirMenuMestre()', 'funcao')" style="color: #ff4444; border-color: #8b0000; text-align: center;">
+    <button id="btn-login-mestre" class="botao-provincia" onclick="abrirModalSenha('122333', 'abrirMenuMestre()', 'funcao')" style="color: #ff4444; border-color: #8b0000; text-align: center;">
         👑 Painel do Mestre
     </button>
     
@@ -4374,7 +4374,8 @@ function fecharModais(ignorarZoomOut, ignorarAcaoPeixe = false) {
         return; 
     }
 
-    if (ignorarZoomOut !== true) {
+    // NOVA TRAVA: Se a tela tá bloqueada, ignora qualquer pulo de câmera atrás do bloqueio
+    if (ignorarZoomOut !== true && !estadoBloqueio) {
         zoomOutPadrao();
     }
 }
@@ -6723,6 +6724,7 @@ if (db) {
 // SISTEMA DE BLOQUEIO DE MAPA (COM IMAGENS)
 // ==========================================
 let estadoBloqueio = false;
+let aguardandoDesbloqueio = false; // Memória para o popup inicial
 
 function alternarBloqueioMapa() {
     if (db) {
@@ -6737,7 +6739,21 @@ function aplicarTelaDeBloqueio(bloqueado) {
     if (!tela) {
         tela = document.createElement('div');
         tela.id = 'tela-bloqueio';
-        tela.style.cssText = "display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; z-index: 99998;";
+        // Flexbox para permitir centralizar elementos dentro dela
+        tela.style.cssText = "display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; z-index: 99998; flex-direction: column; align-items: center; justify-content: center;";
+        
+        // NOVO: Botão "Nativo" de Acessar Fichas do Esquadrão na Tela de Bloqueio
+        const btnFichas = document.createElement('button');
+        btnFichas.innerHTML = "🛡️ Fichas do Esquadrão";
+        btnFichas.className = "botao-provincia";
+        btnFichas.style.cssText = "width: auto; padding: 15px 30px; font-size: 16px; background: rgba(26,26,26,0.9); border: 2px solid #87ceeb; color: #87ceeb; cursor: pointer; border-radius: 8px; font-weight: bold; position: absolute; bottom: 40px; box-shadow: 0 0 20px rgba(135,206,235,0.4); z-index: 99999;";
+        btnFichas.onclick = function() {
+            const modal = document.getElementById('modal-capital');
+            if (modal) modal.style.zIndex = '100000'; // Eleva o modal acima da tela de bloqueio
+            menuCapital('esquadrao');
+        };
+        
+        tela.appendChild(btnFichas);
         document.body.appendChild(tela);
     }
 
@@ -6753,17 +6769,24 @@ function aplicarTelaDeBloqueio(bloqueado) {
         
         if (menuMestre) {
             if (window.innerWidth > 600) { menuMestre.style.display = 'block'; }
-            menuMestre.style.zIndex = '99999';
+            menuMestre.style.zIndex = '100001';
         }
 
+        // MUTA E PAUSA TODOS OS VÍDEOS (Impede vazamento de som)
         document.querySelectorAll('video').forEach(v => {
+            v.muted = true;
             if (!v.paused) {
                 v.dataset.estavaTocando = 'true';
                 v.pause();
             }
         });
 
-        tela.style.display = 'block';
+        // Oculta sumariamente o popup da tela cheia se tentar aparecer ou estiver aberto
+        const popup = document.getElementById('popup-tela-cheia');
+        if (popup) popup.style.display = 'none';
+
+        // Usa 'flex' para o botão Fichas poder ficar posicionado
+        tela.style.display = 'flex';
 
         if (btnMestre) {
             btnMestre.innerHTML = "🗺️ Bloquear Mapa: ON";
@@ -6780,13 +6803,19 @@ function aplicarTelaDeBloqueio(bloqueado) {
             }
         });
 
-        // GARANTIA EXTRA: Se estava no menu inicial quando desbloqueou, força o livro a tocar
-        const cenaFechada = document.getElementById('cena-livro-fechado');
-        if (cenaFechada && cenaFechada.classList.contains('ativa') && typeof telaInicialMostrada !== 'undefined' && telaInicialMostrada) {
-            const videoFechado = cenaFechada.querySelector('video');
-            if (videoFechado) {
-                videoFechado.muted = true;
-                videoFechado.play().catch(() => {});
+        // REGRAS DE RENOVAÇÃO: Se o mestre destravou e o jogador devia ver o popup, mostra agora!
+        if (aguardandoDesbloqueio) {
+            aguardandoDesbloqueio = false;
+            iniciarTelaDeApresentacao();
+        } else {
+            // Garantia extra para animação de livro
+            const cenaFechada = document.getElementById('cena-livro-fechado');
+            if (cenaFechada && cenaFechada.classList.contains('ativa') && typeof telaInicialMostrada !== 'undefined' && telaInicialMostrada) {
+                const videoFechado = cenaFechada.querySelector('video');
+                if (videoFechado) {
+                    videoFechado.muted = true;
+                    videoFechado.play().catch(() => {});
+                }
             }
         }
 
@@ -6802,6 +6831,13 @@ let telaInicialMostrada = false;
 // Função que revela a tela de entrada oficial
 function iniciarTelaDeApresentacao() {
     if (telaInicialMostrada) return;
+
+    // A ARMA: Se o mestre iniciou a sessão bloqueada, sequestra o popup até destravar
+    if (estadoBloqueio) {
+        aguardandoDesbloqueio = true;
+        return;
+    }
+
     telaInicialMostrada = true;
 
     const popup = document.getElementById('popup-tela-cheia');
