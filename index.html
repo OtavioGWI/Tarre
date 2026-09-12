@@ -1036,7 +1036,7 @@
     </div>
 
     <!-- MARCA D'ÁGUA DA VERSÃO -->
-    <div id="versao-cinematica">V2.5</div>
+    <div id="versao-cinematica">V2.7</div>
 </div>
 
 <!-- NOVO: MODAL DOS PERSONAGENS SOBREPOSTO AO VÍDEO -->
@@ -2214,7 +2214,10 @@ function fecharModalSenha(ignorarZoomOut) {
     
     try {
         if (ignorarZoomOut !== true && typeof zoomOutPadrao === 'function') {
-            zoomOutPadrao();
+            // CORREÇÃO: O Mestre afasta a câmera normalmente mesmo se o mapa estiver travado
+            if (!estadoBloqueio || (typeof mestreLogadoLocalmente !== 'undefined' && mestreLogadoLocalmente)) {
+                zoomOutPadrao();
+            }
         }
     } catch (e) {
         console.error("Erro ao afastar a câmera:", e);
@@ -4374,9 +4377,11 @@ function fecharModais(ignorarZoomOut, ignorarAcaoPeixe = false) {
         return; 
     }
 
-    // NOVA TRAVA: Se a tela tá bloqueada, ignora qualquer pulo de câmera atrás do bloqueio
-    if (ignorarZoomOut !== true && !estadoBloqueio) {
-        zoomOutPadrao();
+    // CORREÇÃO: O Mestre logado ignora a trava de bloqueio para o zoom out funcionar perfeitamente!
+    if (ignorarZoomOut !== true) {
+        if (!estadoBloqueio || (typeof mestreLogadoLocalmente !== 'undefined' && mestreLogadoLocalmente)) {
+            zoomOutPadrao();
+        }
     }
 }
 
@@ -4884,7 +4889,7 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
         criarPontoLocal([660, 1652], "Ruínas", "Atarim", null, false, btnBalagar);
         criarPontoLocal([1310, 1502], "Ruínas", "Atarim", null, false, btnBalagar);
 
-        const btnDepressao = criarBtn("🔍 Descobrir", "abrirModalSenha('tristeza', 'abrirDungeonDeserto()', 'funcao')", "#2E8B57", true);
+        const btnDepressao = criarBtn("🔍 Descobrir", "abrirModalSenha('correnteza', 'abrirDungeonDeserto()', 'funcao')", "#2E8B57", true);
         criarPontoLocal([1394, 915], "Castelo", "Zha Ruk", "Castelo deserto 2.png", true, btnDepressao);
 
 
@@ -5317,11 +5322,6 @@ function eventoNavioPrisao() {
     )
 }
 
-function eventoCasteloDepressao() {
-    fecharModais()
-    alert("O ar é pesado e sufocante. A tristeza drena vossa energia vital e apaga qualquer pingo de esperança. Preparem as rolagens de sanidade.")
-}
-
 // ==========================================
 // 3. MERCADO CLANDESTINO DHEN RAK
 // ==========================================
@@ -5421,14 +5421,17 @@ const registroDungeons = {
             { sala: 5, titulo: "O Ninho do Dragão", fotos: ["ninho_dragao.png", "Dragao_gelo.png", "Encapuzados 2.png"], cor: "#b0c4de" }
         ]
     },
-    deserto: {
+deserto: {
         titulo: "🌪️ A Masmorra da Tristeza",
         progresso: 0,
         dados: [
-            { sala: 0, titulo: "Os Portões de Areia", fotos: ["portoes_deserto.png"], cor: "#cd853f" },
-            { sala: 1, titulo: "O Poço da Fome", fotos: ["poco_deserto.png"], cor: "#a0522d" },
-            { sala: 2, titulo: "O Salão dos Lamentos", fotos: ["salao_tristeza.png"], cor: "#8b4513" },
-            { sala: 3, titulo: "O Trono da Depressão", fotos: ["trono_depressao.png"], cor: "#4b0082" }
+            { sala: 0, titulo: "O Início", fotos: ["trono_zuma.jpeg"], cor: "#cd853f" },
+            { sala: 1, titulo: "O Escorpião", fotos: ["escorpiao_terra.jpeg"], cor: "#d2691e" },
+            { sala: 2, titulo: "O Acampamento", fotos: ["acampamento.jpeg"], cor: "#8b4513" },
+            { sala: 3, titulo: "O Verme", fotos: ["verme_areia.png"], cor: "#a0522d" },
+            { sala: 4, titulo: "O Templo", fotos: ["templo_deserto.png"], cor: "#800000" },
+            { sala: 5, titulo: "As Múmias", fotos: ["mumias.jpeg"], cor: "#4b0082" },
+            { sala: 6, titulo: "A Depressão", fotos: ["depressao.png", "Encapuzados 2.png"], cor: "#2f4f4f" }
         ]
     },
     balagar: {
@@ -6952,7 +6955,7 @@ if (db) {
             if (modalAberto && modalAberto.style.display === 'flex' && titulo) {
                 if (titulo.innerText.includes("Torre dos Sábios")) abrirMenuTorre();
                 else if (titulo.innerText.includes("Masmorra Congelada")) abrirMenuDungeon('hukmal');
-                else if (titulo.innerText.includes("Masmorra da Tristeza")) abrirMenuDungeon('deserto');
+                else if (titulo.innerText.includes("Masmorra do Deserto")) abrirMenuDungeon('deserto');
                 else if (titulo.innerText.includes("Escavações de Balagar")) abrirDungeonBalagar();
             }
             
