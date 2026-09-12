@@ -7664,8 +7664,10 @@ function fecharImagemCompartilhada() {
 }
 
 // Ouvintes Integrados para os Jogadores
-let ultimaImagemTimestamp = 0;
-let ultimoFechamentoImagem = 0;
+// A MÁGICA: Começamos a contar do momento em que o site carrega (Date.now()). 
+// Assim, o jogador ignora fotos velhas que já estavam no servidor antes dele entrar.
+let ultimaImagemTimestamp = Date.now(); 
+let ultimoFechamentoImagem = Date.now(); 
 
 if (db) {
     // Escuta a ordem de ABRIR a imagem
