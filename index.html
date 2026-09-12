@@ -159,6 +159,22 @@
         padding: 15px;
         box-shadow: 0 0 15px rgba(0,0,0,0.8);
         transition: 0.3s;
+        /* Trava de altura para não vazar da tela e barra de rolagem */
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+
+    /* Estilização da barra de rolagem do Menu do Mestre */
+    #menu-mestre::-webkit-scrollbar {
+        width: 6px;
+    }
+    #menu-mestre::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+    }
+    #menu-mestre::-webkit-scrollbar-thumb {
+        background: #8b0000;
+        border-radius: 8px;
     }
 
 /* Remove o fundo branco do ícone de emoji */
@@ -1665,14 +1681,6 @@ function detalheCasa(casa) {
         </div>`;
 }
 
-// Adicione esta função nova logo abaixo para lidar com o clique e o retorno:
-function verImagemCasa(arquivo, casa) {
-    verImagemEstatica(arquivo, function() {
-        restaurarMapaMenu();
-        document.getElementById('modal-capital').style.display = 'flex';
-        detalheCasa(casa); // Força a volta exata para a aba da casa que foi clicada
-    });
-}
 
 // --- SISTEMA DE QUIZ DA ESCOLA ---
 function iniciarQuiz() {
@@ -1742,22 +1750,6 @@ function finalizarQuiz() {
         </div>`;
 }
 
-// Nova função para permitir expandir o emblema a partir da tela de resultado do quiz
-function verImagemResultadoQuiz(arquivo) {
-    verImagemEstatica(arquivo, function() {
-        restaurarMapaMenu();
-        document.getElementById('modal-capital').style.display = 'flex';
-        finalizarQuiz(); // Recarrega a tela de vitória mantendo os pontos calculados
-    });
-}
-
-function verImagemEscola(arquivo) {
-    verImagemEstatica(arquivo, function() {
-        restaurarMapaMenu();
-        document.getElementById('modal-capital').style.display = 'flex';
-        menuEscola('membros'); 
-    });
-}
 
 const dadosTorre = [
     { andar: 12, titulo: "O Primeiro Sábio", nome: "Aurelius, o Eterno", desc: "O pilar da sabedoria e fundador da ordem.", cor: "#ffd700", aprendizes: 1 },
@@ -3442,7 +3434,7 @@ function menuCapital(tipo) {
                     <div style="color: #cd853f; font-size: 13px; border-bottom: 1px solid #444; margin-bottom: 10px; font-weight: bold;">ℹ️ INFORMAÇÕES</div>
                     ${criarBtn("📚 Biblioteca Imperial", "abrirBiblioteca()", "#483D8B")}
                     ${criarBtn("💼 Serviços", "menuServicos('menu')", "#ffd700")}
-                    ${criarBtn("📸 Ver Cidade", "verImagemEstatica('Capital.png', () => { restaurarMapaMenu(); menuCapital('hub'); })", "#5F9EA0")}
+                    ${criarBtn("📸 Ver Cidade", "verImagemEstatica('Capital.png', () => { restaurarMapaMenu({ ignorarZoomOut: true }); menuCapital('hub'); })", "#5F9EA0")}
                 </section>
             </div>`;
         return;
@@ -3470,12 +3462,12 @@ function menuCapital(tipo) {
         titulo.innerText = "🛡️ Esquadrão";
         container.innerHTML = btnVoltar; 
         dadosCapital.esquadrao.forEach((item, index) => {
-            let img = item.foto ? `<img src="${item.foto}" class="foto-lista" onclick="verImagemPersonagem('${item.foto}')" style="cursor: zoom-in;">` : `<div class="foto-placeholder">?</div>`;
+            let img = item.foto ? `<img src="${item.foto}" class="foto-lista" onclick="salvarScrollModal(); verImagemPersonagem('${item.foto}')" style="cursor: zoom-in;">` : `<div class="foto-placeholder">?</div>`;
             
             let btnEvolucao = "";
             if (item.evolucao && item.evolucao.senha !== "???") {
                 if (item.evolucao.desbloqueado) {
-                    btnEvolucao = `<button onclick="verEvolucao(${index})" class="btn-popup" style="margin-top:5px; background: #8b008b; font-size: 11px; border: 1px solid #da70d6; width: 100%;">✨ Classe: ${item.evolucao.classeNova}</button>`;
+                    btnEvolucao = `<button onclick="salvarScrollModal(); verEvolucao(${index})" class="btn-popup" style="margin-top:5px; background: #8b008b; font-size: 11px; border: 1px solid #da70d6; width: 100%;">✨ Classe: ${item.evolucao.classeNova}</button>`;
                 } else {
                     btnEvolucao = `<button onclick="abrirModalSenha('${item.evolucao.senha}', 'desbloquearEvolucao(${index})', 'funcao')" class="btn-popup" style="margin-top:5px; background: #222; color: #888; font-size: 11px; border: 1px solid #555; width: 100%;">🔒 Desbloquear Evolução</button>`;
                 }
@@ -3489,7 +3481,7 @@ function menuCapital(tipo) {
                         <span class="classe-char">${item.raca} • ${item.classe}</span>
                         <p>${item.desc || ""}</p>
                         <div style="display: flex; gap: 5px; flex-direction: column;">
-                            <button onclick="abrirStatsPersonagem(${index})" class="btn-popup" style="margin-top:10px; background: #2c3e50; font-size: 11px; border: 1px solid #87CEEB; width: 100%;">📊 Estatísticas</button>
+                            <button onclick="salvarScrollModal(); abrirStatsPersonagem(${index})" class="btn-popup" style="margin-top:10px; background: #2c3e50; font-size: 11px; border: 1px solid #87CEEB; width: 100%;">📊 Estatísticas</button>
                             ${btnEvolucao}
                         </div>
                     </div>
@@ -4295,45 +4287,69 @@ function lerCapitulo(index) {
  */
 function verImagemDeus(arquivo) {
     verImagemEstatica(arquivo, function() {
-        restaurarMapaMenu(); // Volta mapa e menu
-        menuDeuses(); // Reabre a grade de deuses
+        restaurarMapaMenu({ ignorarZoomOut: true });
+        menuDeuses();
     });
 }
 
-/**
- * Exibe foto de personagem/criatura em fullscreen
- * Volta para o menu específico que estava aberto (rastreado em menuAtualAberto)
- * Funciona para: bestiário, esquadrão, procurados
- * @param {string} arquivo - Nome do arquivo PNG da foto
- */
 function verImagemPersonagem(arquivo) {
-    // Abre a imagem e define um bilhete de volta personalizado
     verImagemEstatica(arquivo, function() {
-        restaurarMapaMenu(); // Reexibe mapa e menu lateral
-        document.getElementById('modal-capital').style.display = 'flex'; // Reabre o modal
-        
-        // Volta para a aba específica que estava aberta (Ex: 'bestiario')
+        restaurarMapaMenu({ ignorarZoomOut: true });
+        document.getElementById('modal-capital').style.display = 'flex';
         if (menuAtualAberto) {
             menuCapital(menuAtualAberto);
         } else {
-            menuCapital('hub'); // Fallback caso perca o estado
+            menuCapital('hub');
         }
+        restaurarScrollModal(); // Mágica da memória do scroll!
     });
 }
-/**
- * Exibe foto linkada dentro de um capítulo do histórico em fullscreen
- * Volta para o mesmo capítulo após fechar a imagem
- * Fotos são embarcadas no texto com onclick="verImagemHistoria('arquivo.png', index)"
- * @param {string} arquivo - Nome do arquivo PNG da foto
- * @param {number} capituloIndex - Índice do capítulo para voltar para ele
- */
+
+function zoomFotoDungeon(arquivo, salaId) {
+    verImagemEstatica(arquivo, function() {
+        restaurarMapaMenu({ ignorarZoomOut: true });
+        document.getElementById('modal-capital').style.display = 'flex'; 
+        if (dungeonAtiva === 'balagar') {
+            detalharSalaBalagar(salaId); 
+        } else {
+            detalharSala(salaId); 
+        }
+        restaurarScrollModal(); // Mágica da memória nas masmorras!
+    });
+}
+
 function verImagemHistoria(arquivo, capituloIndex) {
     verImagemEstatica(arquivo, function() {
-        restaurarMapaMenu(); // Volta mapa e menu
-        document.getElementById('modal-capital').style.display = 'flex'; // Reabre o overlay
-        lerCapitulo(capituloIndex); // Volta para o texto exato do capítulo
+        restaurarMapaMenu({ ignorarZoomOut: true });
+        document.getElementById('modal-capital').style.display = 'flex';
+        lerCapitulo(capituloIndex);
     });
 }
+
+function verImagemCasa(arquivo, casa) {
+    verImagemEstatica(arquivo, function() {
+        restaurarMapaMenu({ ignorarZoomOut: true });
+        document.getElementById('modal-capital').style.display = 'flex';
+        detalheCasa(casa);
+    });
+}
+
+function verImagemResultadoQuiz(arquivo) {
+    verImagemEstatica(arquivo, function() {
+        restaurarMapaMenu({ ignorarZoomOut: true });
+        document.getElementById('modal-capital').style.display = 'flex';
+        finalizarQuiz();
+    });
+}
+
+function verImagemEscola(arquivo) {
+    verImagemEstatica(arquivo, function() {
+        restaurarMapaMenu({ ignorarZoomOut: true });
+        document.getElementById('modal-capital').style.display = 'flex';
+        menuEscola('membros'); 
+    });
+}
+
 /**
  * Centraliza a restauração visual após fechar visualização de imagem fullscreen
  * Oculta o container de imagem e reexibe o mapa + menu
@@ -5476,8 +5492,7 @@ function detalharSala(num) {
     const container = document.getElementById('conteudo-menu-capital');
     
     const htmlFotos = s.fotos.map(foto => `
-        <img src="${foto}" 
-             onclick="zoomFotoDungeon('${foto}', ${num})" 
+       <img src="${foto}" onclick="salvarScrollModal(); zoomFotoDungeon('${foto}', ${num})" 
              style="display: block; margin: 0 auto 15px auto; max-width: 100%; height: auto; max-height: 450px; border-radius: 6px; border: 2px solid ${s.cor}; box-shadow: 0 4px 15px rgba(0,0,0,0.6); cursor: zoom-in;">
     `).join('');
 
@@ -5492,18 +5507,6 @@ function detalharSala(num) {
     `;
 }
 
-// ATUALIZE A FUNÇÃO DE ZOOM PARA SUPORTAR O BALAGAR
-function zoomFotoDungeon(arquivo, salaId) {
-    verImagemEstatica(arquivo, function() {
-        restaurarMapaMenu(); 
-        document.getElementById('modal-capital').style.display = 'flex'; 
-        if (dungeonAtiva === 'balagar') {
-            detalharSalaBalagar(salaId); 
-        } else {
-            detalharSala(salaId); 
-        }
-    });
-}
 
 window.abrirDungeonBalagar = () => {
     dungeonAtiva = 'balagar';
@@ -5551,8 +5554,7 @@ function detalharSalaBalagar(id) {
     const container = document.getElementById('conteudo-menu-capital');
     
     const htmlFotos = s.fotos.map(foto => `
-        <img src="${foto}" 
-             onclick="zoomFotoDungeon('${foto}', '${id}')" 
+        <img src="${foto}" onclick="salvarScrollModal(); zoomFotoDungeon('${foto}', '${id}')" 
              style="display: block; margin: 0 auto 15px auto; max-width: 100%; height: auto; max-height: 450px; border-radius: 6px; border: 2px solid ${s.cor}; box-shadow: 0 4px 15px rgba(0,0,0,0.6); cursor: zoom-in;">
     `).join('');
 
@@ -5793,7 +5795,7 @@ function abrirStatsPersonagem(index) {
     titulo.innerText = `Estatísticas ${p.nome}`;
     
     container.innerHTML = `
-        <button onclick="menuCapital('esquadrao')" class="btn-popup" style="margin-bottom: 20px; background: #444; width: 100%;">Voltar ao Esquadrão</button>
+        <button onclick="menuCapital('esquadrao'); restaurarScrollModal();" class="btn-popup" style="margin-bottom: 20px; background: #444; width: 100%;">⬅ Voltar ao Esquadrão</button>
         
         <div style="position: relative; width: 260px; height: 260px; margin: 0 auto; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1px solid #555;">
             <canvas id="radarChart"></canvas>
@@ -5894,14 +5896,7 @@ function abrirStatsPersonagem(index) {
         divListas.innerHTML += p.htmlExtra;
     }
 }
-function desbloquearEvolucao(index) {
-    // Altera o estado dinamicamente e injeta o novo nome da classe
-    dadosCapital.esquadrao[index].evolucao.desbloqueado = true;
-    dadosCapital.esquadrao[index].classe = dadosCapital.esquadrao[index].evolucao.classeNova;
-    
-    // Abre a tela de lore direto após acertar a senha
-    verEvolucao(index);
-}
+
 function verEvolucao(index) {
     const p = dadosCapital.esquadrao[index];
     const ev = p.evolucao;
@@ -5911,12 +5906,21 @@ function verEvolucao(index) {
     titulo.innerText = `✨ O Despertar de ${p.nome}`;
 
     container.innerHTML = `
-        <button onclick="menuCapital('esquadrao')" class="btn-popup" style="margin-bottom: 20px; background: #444; width: 100%;">⬅ Voltar ao Esquadrão</button>
+        <button onclick="menuCapital('esquadrao'); restaurarScrollModal();" class="btn-popup" style="margin-bottom: 20px; background: #444; width: 100%;">⬅ Voltar ao Esquadrão</button>
         <div class="detalhe-box" style="border-color: #da70d6;">
             <h3 style="color: #da70d6; text-align: center; margin-top: 0; margin-bottom: 20px; text-transform: uppercase;">Nova Classe: ${ev.classeNova}</h3>
             <div style="font-size: 15px; line-height: 1.6; color: #ddd; white-space: pre-wrap; text-align: justify; padding: 10px;">${ev.lore}</div>
         </div>
     `;
+}
+
+function desbloquearEvolucao(index) {
+    // Altera o estado dinamicamente e injeta o novo nome da classe
+    dadosCapital.esquadrao[index].evolucao.desbloqueado = true;
+    dadosCapital.esquadrao[index].classe = dadosCapital.esquadrao[index].evolucao.classeNova;
+    
+    // Abre a tela de lore direto após acertar a senha
+    verEvolucao(index);
 }
 // --- SISTEMA DE MERCADO NEGRO (ALCOVA) ---
 const dadosMercadoNegro = {
@@ -6330,11 +6334,18 @@ function alternarMenuMestre() {
 }
 
 function abrirMenuMestre(aba = 'principal') {
+    // Memória de Scroll do Mestre
+    let scrollBoatos = 0;
+    let scrollBalagar = 0;
+    const divBoatos = document.getElementById('lista-scroll-boatos');
+    const divBalagar = document.getElementById('lista-scroll-balagar');
+    if (divBoatos) scrollBoatos = divBoatos.scrollTop;
+    if (divBalagar) scrollBalagar = divBalagar.scrollTop;
+
     document.getElementById('btn-login-mestre').style.display = 'none';
     const conteudo = document.getElementById('conteudo-mestre');
     conteudo.style.display = 'block';
     
-    // MÁGICA DE ESPAÇO: Alarga o painel apenas na aba de controles para caber 2 colunas
     const menuMestre = document.getElementById('menu-mestre');
     if (menuMestre) {
         menuMestre.style.width = aba === 'controles' ? '480px' : '220px';
@@ -6387,8 +6398,14 @@ function abrirMenuMestre(aba = 'principal') {
                     <button id="btn-acao-cronometro" class="botao-provincia" onclick="alternarCronometro()" style="width: 45%; margin: 0; border-color: #27ae60; color: #90EE90; font-size: 12px; text-align: center;">Iniciar</button>
                 </div>
 
+                <div style="color: #cd853f; font-size: 12px; margin-top: 15px; margin-bottom: 5px; text-align: center;">MÍDIA RÁPIDA (MAX 3MB)</div>
+                <div style="display: flex; gap: 5px; margin-bottom: 20px;">
+                    <input type="file" id="input-imagem-mestre" accept="image/png, image/jpeg, image/jpg, image/webp, image/gif" style="display: none;" onchange="processarUploadImagem(event)">
+                    <button id="btn-enviar-midia" class="botao-provincia" onclick="document.getElementById('input-imagem-mestre').click()" style="width: 50%; margin: 0; border-color: #27ae60; color: #90EE90; text-align: center;">📤 Enviar Imagem</button>
+                    <button class="botao-provincia" onclick="fecharImagemCompartilhada()" style="width: 50%; margin: 0; border-color: #8b0000; color: #ff4444; text-align: center;">❌ Fechar p/ Todos</button>
+                </div>
+
                 <button class="botao-provincia" onclick="abrirMenuMestre('controles')" style="color: #87ceeb; border-color: #4682b4; margin-top: 10px;">⚙️ Controles do Mundo</button>
-            </div>
         `;
         
         atualizarBotoesMestre();
@@ -6420,7 +6437,6 @@ function abrirMenuMestre(aba = 'principal') {
                 <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center;">MASMORRAS</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     
-                    <!-- COLUNA 1: Masmorras Lineares -->
                     <div>
                         <div style="margin-bottom: 15px;">
                             <span style="color: #ffd700; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">Torre dos Sábios</span>
@@ -6448,12 +6464,10 @@ function abrirMenuMestre(aba = 'principal') {
                         </div>
                     </div>
                     
-                    <!-- COLUNA 2: Escavações Balagar (Túneis) -->
                     <div>
                         <div style="margin-bottom: 15px;">
                             <span style="color: #cd853f; font-size: 13px; display: block; text-align: center; margin-bottom: 5px;">⛏️ Escavações Balagar</span>
-                            <!-- O segredo do scrollbar: max-height e overflow-y -->
-                            <div style="display: flex; flex-direction: column; gap: 5px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 4px; border: 1px solid #555; max-height: 180px; overflow-y: auto;">
+                            <div id="lista-scroll-balagar" style="display: flex; flex-direction: column; gap: 5px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 4px; border: 1px solid #555; max-height: 180px; overflow-y: auto;">
                                 ${registroDungeons['balagar'].dados.map(s => {
                                     const ativo = registroDungeons['balagar'].progresso[s.id] === true;
                                     return `
@@ -6465,7 +6479,6 @@ function abrirMenuMestre(aba = 'principal') {
                             </div>
                         </div>
                     </div>
-
                 </div>
                 
                 <button class="botao-provincia" onclick="abrirMenuMestre('principal')" style="color: #aaa; border-color: #555; text-align: center; margin-top: 10px;">⬅ Voltar ao Painel</button>
@@ -6497,7 +6510,7 @@ function abrirMenuMestre(aba = 'principal') {
                 </div>
                 
                 <div style="color: #cd853f; font-size: 12px; margin-bottom: 5px; text-align: center; border-bottom: 1px dashed #555; padding-bottom: 5px;">PÚBLICO ATUALMENTE</div>
-                <div style="max-height: 220px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px;">
+                <div id="lista-scroll-boatos" style="max-height: 220px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px;">
                     ${listaHtml}
                 </div>
                 
@@ -6505,7 +6518,14 @@ function abrirMenuMestre(aba = 'principal') {
             </div>
         `;
     }
-}
+
+    // A Mágica de restaurar a barra de rolagem (AGORA INSTANTÂNEA, SEM PULO VISUAL)
+    const newBoatos = document.getElementById('lista-scroll-boatos');
+    const newBalagar = document.getElementById('lista-scroll-balagar');
+    if (newBoatos) newBoatos.scrollTop = scrollBoatos;
+    if (newBalagar) newBalagar.scrollTop = scrollBalagar;
+} // <--- Fim da função abrirMenuMestre
+
 
 function fecharMenuMestre() {
     document.getElementById('conteudo-mestre').style.display = 'none';
@@ -7153,7 +7173,9 @@ if (db) {
 
         // 3. Se um Jogador estiver com a aba de boatos aberta no menu da capital, recarrega para ele ver instantaneamente
         if (typeof menuAtualAberto !== 'undefined' && menuAtualAberto === 'boatos') {
+            salvarScrollModal();
             menuCapital('boatos');
+            restaurarScrollModal();
         }
     });
 }
@@ -7579,7 +7601,113 @@ function concluirTranscendencia() {
 function abrirCreditos() {
     alert("Sistema de créditos será implementado aqui.");
 }
+// ==========================================
+// SISTEMA UNIFICADO DE MÍDIA RÁPIDA E CONTROLE
+// ==========================================
+function processarUploadImagem(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
+    if (file.size > 3 * 1024 * 1024) { 
+        alert("A imagem excede 3MB. Por favor, escolha um arquivo menor.");
+        event.target.value = '';
+        return;
+    }
+
+    // Feedback visual para o Mestre
+    const btn = document.getElementById('btn-enviar-midia');
+    if (btn) {
+        btn.innerHTML = "⏳ Enviando...";
+        btn.disabled = true;
+        btn.style.opacity = "0.7";
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64 = e.target.result;
+        if (db) {
+            db.ref('imagemCompartilhada').set({
+                base64: base64,
+                timestamp: Date.now()
+            }).then(() => {
+                // Sucesso!
+                if (btn) {
+                    btn.innerHTML = "✅ Sucesso!";
+                    setTimeout(() => {
+                        btn.innerHTML = "📤 Enviar Imagem";
+                        btn.disabled = false;
+                        btn.style.opacity = "1";
+                    }, 2000);
+                }
+            }).catch((err) => {
+                // Se der erro aqui, é porque você esqueceu de colocar as Regras novas no site do Firebase!
+                alert("Erro ao enviar! Você colou as novas 'Rules' no console do Firebase?");
+                if (btn) {
+                    btn.innerHTML = "📤 Enviar Imagem";
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                }
+            });
+        }
+    };
+    reader.readAsDataURL(file);
+    event.target.value = ''; 
+}
+
+function fecharImagemCompartilhada() {
+    if (db) {
+        // 1. Apaga do banco para novos jogadores não verem
+        db.ref('imagemCompartilhada').remove();
+        // 2. Dispara o pulso que arranca a foto da tela de quem já estiver vendo
+        db.ref('comandoFecharImagem').set(Date.now());
+    }
+}
+
+// Ouvintes Integrados para os Jogadores
+let ultimaImagemTimestamp = 0;
+let ultimoFechamentoImagem = 0;
+
+if (db) {
+    // Escuta a ordem de ABRIR a imagem
+    db.ref('imagemCompartilhada').on('value', (snapshot) => {
+        const dados = snapshot.val();
+        if (dados && dados.base64 && dados.timestamp > ultimaImagemTimestamp) {
+            ultimaImagemTimestamp = dados.timestamp;
+            verImagemEstatica(dados.base64);
+        } 
+    });
+
+    // Escuta a ordem FORÇADA de FECHAR a imagem
+    db.ref('comandoFecharImagem').on('value', (snapshot) => {
+        const timestamp = snapshot.val();
+        if (timestamp && timestamp > ultimoFechamentoImagem && timestamp >= (Date.now() - 5000)) {
+            ultimoFechamentoImagem = timestamp;
+            const container = document.getElementById('provincia-container');
+            // Se a tela de imagem estiver aberta (qualquer que seja), fecha tudo e volta pro mapa
+            if (container && container.style.display === 'flex') {
+                restaurarMapaMenu();
+            }
+        }
+    });
+}
+
+// ==========================================
+// SISTEMA DE MEMÓRIA DE SCROLL
+// ==========================================
+let scrollSalvoModal = 0;
+
+function salvarScrollModal() {
+    const mc = document.querySelector('#modal-capital .modal-conteudo');
+    if (mc) scrollSalvoModal = mc.scrollTop;
+}
+
+function restaurarScrollModal() {
+    const mc = document.querySelector('#modal-capital .modal-conteudo');
+    if (mc) {
+        // Execução síncrona: sem pulos ou piscar de tela
+        mc.scrollTop = scrollSalvoModal;
+    }
+}
 // Esconde os elementos do mapa e menus antes de entrar
 document.getElementById('map-container').style.display = 'none';
 document.getElementById('menu-provincias').style.display = 'none';
