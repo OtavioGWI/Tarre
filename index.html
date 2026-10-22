@@ -935,8 +935,8 @@
     Sincronizando com Tarre...
 </div>
 
-<!-- POPUP INICIAL DE TELA CHEIA (AGORA PARA PC E CELULAR) -->
-<div id="popup-tela-cheia" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: rgba(0,0,0,0.6); z-index: 30000; justify-content: center; align-items: center; font-family: serif; text-align: center; padding: 20px; box-sizing: border-box;">
+<!-- POPUP INICIAL (FUNDO TOTALMENTE PRETO) -->
+<div id="popup-tela-cheia" style="display: flex; position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: #000000; z-index: 30000; justify-content: center; align-items: center; font-family: serif; text-align: center; padding: 20px; box-sizing: border-box;">
     <div style="background: #2c2c2c; border: 2px solid #cd853f; padding: 25px; border-radius: 10px; max-width: 320px; width: 100%; box-shadow: 0 0 20px rgba(205,133,63,0.5);">
         <h3 style="color: #cd853f; margin-top: 0; font-size: 20px;">Início da Jornada</h3>
         <p style="color: #ddd; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">Escolha como deseja iniciar sua experiência em Tarre.</p>
@@ -946,32 +946,30 @@
         <button id="btn-pular-cinematica" onclick="pularCinematica()" class="btn-popup" style="background: #b8860b; color: #fff; width: 100%; font-size: 14px; padding: 10px; margin-bottom: 10px; border: 1px solid #daa520;">Pular Cinemática Direto ao Mapa</button>
         
         <button onclick="recusarTelaCheia()" class="btn-popup" style="background: #444; color: #aaa; width: 100%; font-size: 13px; padding: 10px; border: 1px solid #555;">Continuar sem Tela Cheia</button>
+        
+        <button id="btn-modo-lite" onclick="iniciarModoLite()" class="btn-popup" style="background: #333; color: #ccc; width: 100%; font-size: 13px; padding: 10px; border: 1px solid #555; margin-top: 10px;">Versão Pobre (Direto ao Mapa)</button>
     </div>
 </div>
 
-<!-- BOTÃO FLUTUANTE DE TELA CHEIA NO MAPA (APENAS CELULAR - CANTO SUPERIOR ESQUERDO) -->
-<button id="btn-toggle-fullscreen" onclick="toggleFullscreenMobile()" style="display: none; position: fixed; top: 15px; left: 15px; z-index: 1500; background: rgba(26, 26, 26, 0.9); border: 2px solid #8b4513; color: #ffdead; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.5);">
-    ⛶
-</button>
-
-
-   <div id="tela-cinematica">
+<!-- TELA CINEMÁTICA COMEÇA OCULTA -->
+<div id="tela-cinematica" style="display: none;">
+    <!-- Camada 1: Livro Fechado (Restante do seu HTML continua igual) -->
     <!-- Camada 1: Livro Fechado -->
     <div id="cena-livro-fechado" class="camada-cena ativa">
-        <video class="video-fundo" autoplay loop muted playsinline preload="auto">
+        <video class="video-fundo" loop muted playsinline preload="metadata">
             <source src="livro_fechado.mp4" type="video/mp4">
         </video>
         <div id="hitbox-livro" onclick="abrirLivro()"></div>
     </div>
 
     <!-- Camada 2: Livro Abrindo -->
-    <video id="video-livro-abrindo" class="camada-cena" playsinline preload="auto">
+    <video id="video-livro-abrindo" class="camada-cena" playsinline preload="metadata">
         <source src="livro.mp4" type="video/mp4">
     </video>
 
     <!-- Camada 3: Floresta -->
     <div id="cena-floresta" class="camada-cena">
-        <video class="video-fundo" autoplay loop playsinline preload="auto">
+        <video class="video-fundo" loop playsinline preload="metadata">
             <source src="floresta.mp4" type="video/mp4">
         </video>
         <div id="hitbox-porta" onclick="iniciarTransicao()"></div>
@@ -979,54 +977,54 @@
         <div id="hitbox-agua" onclick="iniciarPeixe()" style="position: absolute; bottom: 5%; right: 18%; width: 30%; height: 25%; cursor: pointer; z-index: 10;"></div>
         <!-- NOVA: Hitbox Pássaro (Canto Superior Esquerdo) -->
         <!-- Hitbox Pássaro ajustada (Mais para a direita e para o centro) -->
-<!-- NOVA: Hitbox Pássaro Limpa -->
-<div id="hitbox-passaro" onclick="iniciarPassaro()"></div>
-</div>
+        <!-- NOVA: Hitbox Pássaro Limpa -->
+        <div id="hitbox-passaro" onclick="iniciarPassaro()"></div>
+    </div>
 
     <!-- Camadas do Peixe -->
-    <video id="video-peixe" class="camada-cena" playsinline preload="auto">
+    <video id="video-peixe" class="camada-cena" playsinline preload="metadata">
         <source src="peixe.mp4" type="video/mp4">
     </video>
-    <video id="video-peixe-fim" class="camada-cena" playsinline preload="auto">
+    <video id="video-peixe-fim" class="camada-cena" playsinline preload="metadata">
         <source src="peixe_fim.mp4" type="video/mp4">
     </video>
 
     <!-- NOVAS: Camadas do Pássaro -->
-    <video id="video-passaro" class="camada-cena" playsinline preload="auto">
+    <video id="video-passaro" class="camada-cena" playsinline preload="metadata">
         <source src="passaro.mp4" type="video/mp4">
     </video>
-    <video id="video-passaro-fim" class="camada-cena" playsinline preload="auto">
+    <video id="video-passaro-fim" class="camada-cena" playsinline preload="metadata">
         <source src="passaro_fim.mp4" type="video/mp4">
     </video>
 
     <!-- NOVAS: Animações de Loop dos Personagens -->
-    <video id="video-char-valkia" class="camada-cena" loop playsinline preload="auto">
+    <video id="video-char-valkia" class="camada-cena" loop playsinline preload="metadata">
         <source src="Valkia.mp4" type="video/mp4">
     </video>
-    <video id="video-char-liesty" class="camada-cena" loop playsinline preload="auto">
+    <video id="video-char-liesty" class="camada-cena" loop playsinline preload="metadata">
         <source src="Liésty.mp4" type="video/mp4">
     </video>
-    <video id="video-char-balon" class="camada-cena" loop playsinline preload="auto">
+    <video id="video-char-balon" class="camada-cena" loop playsinline preload="metadata">
         <source src="Balon.mp4" type="video/mp4">
     </video>
-    <video id="video-char-lythael" class="camada-cena" loop playsinline preload="auto">
+    <video id="video-char-lythael" class="camada-cena" loop playsinline preload="metadata">
         <source src="Lythael.mp4" type="video/mp4">
     </video>
-    <video id="video-char-greta" class="camada-cena" loop playsinline preload="auto">
+    <video id="video-char-greta" class="camada-cena" loop playsinline preload="metadata">
         <source src="Greta.mp4" type="video/mp4">
     </video>
-    <video id="video-char-thorga" class="camada-cena" loop playsinline preload="auto">
+    <video id="video-char-thorga" class="camada-cena" loop playsinline preload="metadata">
         <source src="Thorga.mp4" type="video/mp4">
     </video>
 
     <!-- Camada 4: Transição -->
-    <video id="video-transicao" class="camada-cena" playsinline preload="auto">
+    <video id="video-transicao" class="camada-cena" playsinline preload="metadata">
         <source src="floresta_caverna.mp4" type="video/mp4">
     </video>
 
     <!-- Camada 5: Caverna -->
     <div id="cena-caverna" class="camada-cena">
-        <video class="video-fundo" autoplay loop playsinline preload="auto">
+        <video class="video-fundo" loop playsinline preload="metadata">
             <source src="caverna.mp4" type="video/mp4">
         </video>
         <div id="ui-carregamento">
@@ -6864,38 +6862,6 @@ function aplicarTelaDeBloqueio(bloqueado) {
 
 let telaInicialMostrada = false;
 
-// Função que revela a tela de entrada oficial
-function iniciarTelaDeApresentacao() {
-    if (telaInicialMostrada) return;
-
-    // A ARMA: Se o mestre iniciou a sessão bloqueada, sequestra o popup até destravar
-    if (estadoBloqueio) {
-        aguardandoDesbloqueio = true;
-        return;
-    }
-
-    telaInicialMostrada = true;
-
-    const popup = document.getElementById('popup-tela-cheia');
-    if (popup) {
-        popup.style.zIndex = '100000';
-        popup.style.display = 'flex';
-    }
-
-    if (typeof ehDispositivoMovel === 'function' && ehDispositivoMovel()) {
-        const btnPular = document.getElementById('btn-pular-cinematica');
-        if (btnPular) btnPular.style.display = 'none';
-    }
-
-    // Se NÃO estiver bloqueado, garantimos o play do livro
-    if (!estadoBloqueio) {
-        const videoFechado = document.querySelector('#cena-livro-fechado video');
-        if (videoFechado) {
-            videoFechado.muted = true;
-            videoFechado.play().catch(() => {});
-        }
-    }
-}
 
 let primeiraSincronizacao = false;
 
@@ -7275,6 +7241,18 @@ function iniciarComTelaCheia() {
         videoFechado.muted = false;
         videoFechado.play();
     }
+    // Exibe a tela cinematica que estava oculta
+    const telaCinematica = document.getElementById('tela-cinematica');
+    if (telaCinematica) telaCinematica.style.display = 'block';
+
+    // Dá o play no vídeo do livro fechado
+    const cenaFechada = document.getElementById('cena-livro-fechado');
+    if (cenaFechada) {
+        const videoLoop = cenaFechada.querySelector('video');
+        if (videoLoop) {
+            videoLoop.play();
+        }
+    }
 }
 
 // 2. Botão: Continuar sem Tela Cheia (Inicia a cinematográfica normal)
@@ -7282,11 +7260,42 @@ function recusarTelaCheia() {
     const popup = document.getElementById('popup-tela-cheia');
     if (popup) popup.style.display = 'none';
 
+    // Exibe a tela cinematica que estava oculta
+    const telaCinematica = document.getElementById('tela-cinematica');
+    if (telaCinematica) telaCinematica.style.display = 'block';
+
+    // Dá o play no vídeo do livro fechado
     const videoFechado = document.querySelector('#cena-livro-fechado video');
     if (videoFechado) {
         videoFechado.muted = false;
         videoFechado.play();
     }
+}
+
+function iniciarTelaDeApresentacao() {
+    if (telaInicialMostrada) return;
+
+    // A ARMA: Se o mestre iniciou a sessão bloqueada, sequestra o popup até destravar
+    if (estadoBloqueio) {
+        aguardandoDesbloqueio = true;
+        return;
+    }
+
+    telaInicialMostrada = true;
+
+    const popup = document.getElementById('popup-tela-cheia');
+    if (popup) {
+        popup.style.zIndex = '100000';
+        popup.style.display = 'flex';
+    }
+
+    if (typeof ehDispositivoMovel === 'function' && ehDispositivoMovel()) {
+        const btnPular = document.getElementById('btn-pular-cinematica');
+        if (btnPular) btnPular.style.display = 'none';
+    }
+
+    // O comando de play() automático que ficava aqui foi removido.
+    // O vídeo agora só começa a baixar/tocar se o usuário escolher as opções normais.
 }
 
 // Ação de Pular a Cinemática (Agora apenas visível no PC)
@@ -7764,6 +7773,19 @@ function restaurarScrollModal() {
         // Execução síncrona: sem pulos ou piscar de tela
         mc.scrollTop = scrollSalvoModal;
     }
+}
+
+function iniciarModoLite() {
+    window.modoLiteAtivo = true; 
+    
+    document.getElementById('popup-tela-cheia').style.display = 'none';
+    
+    // DESTRÓI a cinemática do DOM. Libera a RAM instantaneamente.
+    const telaCinematica = document.getElementById('tela-cinematica');
+    if (telaCinematica) telaCinematica.remove(); 
+    
+    tempoMinimoCavernaConcluido = true;
+    processarCargaEpica(); 
 }
 // Esconde os elementos do mapa e menus antes de entrar
 document.getElementById('map-container').style.display = 'none';
