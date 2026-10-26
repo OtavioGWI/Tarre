@@ -981,80 +981,47 @@
 
 <!-- TELA CINEMÁTICA COMEÇA OCULTA -->
 <div id="tela-cinematica" style="display: none;">
-    <!-- Camada 1: Livro Fechado (Restante do seu HTML continua igual) -->
     <!-- Camada 1: Livro Fechado -->
     <div id="cena-livro-fechado" class="camada-cena ativa">
-        <video class="video-fundo" loop muted playsinline preload="metadata">
-            <source src="livro_fechado.mp4" type="video/mp4">
-        </video>
+        <video class="video-fundo" loop muted playsinline preload="none" data-src="livro_fechado.mp4"></video>
         <div id="hitbox-livro" onclick="abrirLivro()"></div>
     </div>
 
     <!-- Camada 2: Livro Abrindo -->
-    <video id="video-livro-abrindo" class="camada-cena" playsinline preload="metadata">
-        <source src="livro.mp4" type="video/mp4">
-    </video>
+    <video id="video-livro-abrindo" class="camada-cena" playsinline preload="none" data-src="livro.mp4"></video>
 
     <!-- Camada 3: Floresta -->
     <div id="cena-floresta" class="camada-cena">
-        <video class="video-fundo" loop playsinline preload="metadata">
-            <source src="floresta.mp4" type="video/mp4">
-        </video>
+        <video class="video-fundo" loop playsinline preload="none" data-src="floresta.mp4"></video>
         <div id="hitbox-porta" onclick="iniciarTransicao()"></div>
         <!-- Hitbox na água (Peixe) -->
         <div id="hitbox-agua" onclick="iniciarPeixe()" style="position: absolute; bottom: 5%; right: 18%; width: 30%; height: 25%; cursor: pointer; z-index: 10;"></div>
-        <!-- NOVA: Hitbox Pássaro (Canto Superior Esquerdo) -->
-        <!-- Hitbox Pássaro ajustada (Mais para a direita e para o centro) -->
-        <!-- NOVA: Hitbox Pássaro Limpa -->
+        <!-- Hitbox Pássaro Limpa -->
         <div id="hitbox-passaro" onclick="iniciarPassaro()"></div>
     </div>
 
     <!-- Camadas do Peixe -->
-    <video id="video-peixe" class="camada-cena" playsinline preload="metadata">
-        <source src="peixe.mp4" type="video/mp4">
-    </video>
-    <video id="video-peixe-fim" class="camada-cena" playsinline preload="metadata">
-        <source src="peixe_fim.mp4" type="video/mp4">
-    </video>
+    <video id="video-peixe" class="camada-cena" playsinline preload="none" data-src="peixe.mp4"></video>
+    <video id="video-peixe-fim" class="camada-cena" playsinline preload="none" data-src="peixe_fim.mp4"></video>
 
     <!-- NOVAS: Camadas do Pássaro -->
-    <video id="video-passaro" class="camada-cena" playsinline preload="metadata">
-        <source src="passaro.mp4" type="video/mp4">
-    </video>
-    <video id="video-passaro-fim" class="camada-cena" playsinline preload="metadata">
-        <source src="passaro_fim.mp4" type="video/mp4">
-    </video>
+    <video id="video-passaro" class="camada-cena" playsinline preload="none" data-src="passaro.mp4"></video>
+    <video id="video-passaro-fim" class="camada-cena" playsinline preload="none" data-src="passaro_fim.mp4"></video>
 
     <!-- NOVAS: Animações de Loop dos Personagens -->
-    <video id="video-char-valkia" class="camada-cena" loop playsinline preload="metadata">
-        <source src="Valkia.mp4" type="video/mp4">
-    </video>
-    <video id="video-char-liesty" class="camada-cena" loop playsinline preload="metadata">
-        <source src="Liésty.mp4" type="video/mp4">
-    </video>
-    <video id="video-char-balon" class="camada-cena" loop playsinline preload="metadata">
-        <source src="Balon.mp4" type="video/mp4">
-    </video>
-    <video id="video-char-lythael" class="camada-cena" loop playsinline preload="metadata">
-        <source src="Lythael.mp4" type="video/mp4">
-    </video>
-    <video id="video-char-greta" class="camada-cena" loop playsinline preload="metadata">
-        <source src="Greta.mp4" type="video/mp4">
-    </video>
-    <video id="video-char-thorga" class="camada-cena" loop playsinline preload="metadata">
-        <source src="Thorga.mp4" type="video/mp4">
-    </video>
+    <video id="video-char-valkia" class="camada-cena" loop playsinline preload="none" data-src="Valkia.mp4"></video>
+    <video id="video-char-liesty" class="camada-cena" loop playsinline preload="none" data-src="Liésty.mp4"></video>
+    <video id="video-char-balon" class="camada-cena" loop playsinline preload="none" data-src="Balon.mp4"></video>
+    <video id="video-char-lythael" class="camada-cena" loop playsinline preload="none" data-src="Lythael.mp4"></video>
+    <video id="video-char-greta" class="camada-cena" loop playsinline preload="none" data-src="Greta.mp4"></video>
+    <video id="video-char-thorga" class="camada-cena" loop playsinline preload="none" data-src="Thorga.mp4"></video>
 
     <!-- Camada 4: Transição -->
-    <video id="video-transicao" class="camada-cena" playsinline preload="metadata">
-        <source src="floresta_caverna.mp4" type="video/mp4">
-    </video>
+    <video id="video-transicao" class="camada-cena" playsinline preload="none" data-src="floresta_caverna.mp4"></video>
 
     <!-- Camada 5: Caverna -->
     <div id="cena-caverna" class="camada-cena">
-        <video class="video-fundo" loop playsinline preload="metadata">
-            <source src="caverna.mp4" type="video/mp4">
-        </video>
+        <video class="video-fundo" loop playsinline preload="none" data-src="caverna.mp4"></video>
         <div id="ui-carregamento">
             <h2 style="color: #cd853f; text-shadow: 0 0 10px #000; font-size: 22px; letter-spacing: 4px; font-family: serif; margin: 0;">ATRAVESSANDO O PANDEMÔNIO</h2>
             <div id="texto-porcentagem-epico" style="color: #fff; font-size: 32px; font-weight: bold; text-shadow: 0 0 15px rgba(255,255,255,0.8); margin-top: 10px;">0%</div>
@@ -6800,63 +6767,7 @@ if (db) {
     });
 }
 
-let dadosAmbientacaoAtual = null;
-let ambientacaoAtivaMestre = false;
 
-// 1. OUVINTE DO FIREBASE
-if (typeof db !== 'undefined' && db !== null) {
-    db.ref('estado/ambientacao').on('value', (snapshot) => {
-        dadosAmbientacaoAtual = snapshot.val();
-        processarAmbientacao();
-    });
-}
-
-// 2. FUNÇÃO QUE DECIDE QUEM VÊ O VÍDEO
-function processarAmbientacao() {
-    const container = document.getElementById('container-ambientacao');
-    const video = document.getElementById('video-ambientacao');
-    
-    if (!container || !video) return;
-
-    // Bloqueio 1: Celular nunca carrega.
-    const isMobile = typeof ehDispositivoMovel === 'function' ? ehDispositivoMovel() : window.innerWidth <= 768;
-    
-    // Bloqueio 2: Mestre logado nunca carrega.
-    // Garanta que a variável abaixo reflita se o seu painel está aberto/desbloqueado
-    const isMestre = window.painelMestreAtivo === true; 
-
-    if (isMobile || isMestre || !dadosAmbientacaoAtual || !dadosAmbientacaoAtual.ativo) {
-        container.style.display = 'none';
-        video.pause();
-        if (video.src) video.src = ""; // Descarrega da memória RAM
-        return;
-    }
-
-    // Se chegou aqui, é jogador no PC e a ambientação está ligada
-    container.style.display = 'block';
-    
-    // Só carrega o src se for diferente, evitando engasgos e recarregamentos
-    if (!video.src.includes(dadosAmbientacaoAtual.video)) {
-        video.src = dadosAmbientacaoAtual.video;
-    }
-    video.play().catch(() => {});
-}
-
-// 3. FUNÇÃO DO BOTÃO DO MESTRE
-function alternarAmbientacao() {
-    ambientacaoAtivaMestre = !ambientacaoAtivaMestre;
-    const btn = document.getElementById('btn-ambientacao');
-    
-    if (ambientacaoAtivaMestre) {
-        btn.innerText = "Desativar Fundo: Deserto";
-        btn.style.background = "#2E8B57"; // Fica verde quando ativo
-        if (db) db.ref('estado/ambientacao').set({ ativo: true, video: 'fundo_deserto.mp4' });
-    } else {
-        btn.innerText = "Ativar Fundo: Deserto";
-        btn.style.background = "#8b0000"; // Volta ao vermelho/vinho
-        if (db) db.ref('estado/ambientacao').set({ ativo: false, video: '' });
-    }
-}
 
 function abrirMenuFundos() {
     document.getElementById('menu-selecao-fundo').style.display = 'block';
@@ -7592,6 +7503,7 @@ function iniciarTransicao() {
 
 // ---- ANIMAÇÕES DO PEIXE (COM CORTES RÁPIDOS E MAIS VELOZES) ----
 function iniciarPeixe() {
+    if (window.modoLiteAtivo) return;
     const cenaFloresta = document.getElementById('cena-floresta');
     const videoPeixe = document.getElementById('video-peixe');
     
@@ -7622,6 +7534,7 @@ function iniciarPeixe() {
 }
 
 function encerrarPeixe() {
+    if (window.modoLiteAtivo) return;
     estadoPeixeAtivo = false; 
     const videoPeixe = document.getElementById('video-peixe');
     const videoPeixeFim = document.getElementById('video-peixe-fim');
@@ -7655,6 +7568,7 @@ function encerrarPeixe() {
 let estadoPassaroAtivo = false;
 
 function iniciarPassaro() {
+    if (window.modoLiteAtivo) return;
     const cenaFloresta = document.getElementById('cena-floresta');
     const videoPassaro = document.getElementById('video-passaro');
     
@@ -7682,6 +7596,7 @@ function iniciarPassaro() {
 }
 
 function encerrarPassaro() {
+    if (window.modoLiteAtivo) return;
     estadoPassaroAtivo = false;
     // Esconde o menu modal
     document.getElementById('modal-personagens').style.display = 'none';
@@ -7724,6 +7639,7 @@ function silenciarTodosOsVideos() {
 
 // Abre o loop do personagem clicado na foto personagens.jpeg
 function abrirVideoPersonagem(nome) {
+    if (window.modoLiteAtivo) return;
     document.getElementById('modal-personagens').style.display = 'none';
     
     const videoId = 'video-char-' + nome;
@@ -7956,14 +7872,26 @@ function restaurarScrollModal() {
 function iniciarModoLite() {
     window.modoLiteAtivo = true; 
     
-    document.getElementById('popup-tela-cheia').style.display = 'none';
+    // Esconde o popup inicial
+    const popup = document.getElementById('popup-tela-cheia');
+    if (popup) popup.style.display = 'none';
     
+    // Parar e descarregar qualquer vídeo que por ventura estivesse em memória
+    document.querySelectorAll('video').forEach(v => {
+        v.pause();
+        v.src = "";
+        v.load();
+    });
+
     // DESTRÓI a cinemática do DOM. Libera a RAM instantaneamente.
     const telaCinematica = document.getElementById('tela-cinematica');
     if (telaCinematica) telaCinematica.remove(); 
     
+    // Garante que o carregamento do mapa avance direto sem aguardar vídeos
     tempoMinimoCavernaConcluido = true;
-    processarCargaEpica(); 
+    if (typeof processarCargaEpica === 'function') {
+        processarCargaEpica(); 
+    }
 }
 // Esconde os elementos do mapa e menus antes de entrar
 document.getElementById('map-container').style.display = 'none';
