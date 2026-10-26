@@ -7316,31 +7316,50 @@ function ehDispositivoMovel() {
     return window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-function tocarVideoComDataSrc(video) {
+function tocarVideoComDataSrc(video, desmutar = false) {
     if (!video) return;
+
+    // Força propriedade no DOM para iOS/Android não abrirem o player nativo
+    video.playsInline = true;
+    video.setAttribute('playsinline', 'true');
+
     if ((!video.src || video.src === "") && video.dataset.src) {
         video.src = video.dataset.src;
         video.load();
     }
-    video.play().catch(() => {});
+
+    // Se desmutar for solicitado, tenta tocar com som; se o celular negar, toca mudo sem travar em tela preta
+    video.muted = !desmutar;
+
+    let playPromise = video.play();
+    if (playPromise !== undefined) {
+        playPromise.then(() => {
+            if (desmutar) {
+                video.muted = false;
+            }
+        }).catch(() => {
+            video.muted = true;
+            video.play().catch(() => {});
+        });
+    }
 }
 
 function iniciarComTelaCheia() {
     const popup = document.getElementById('popup-tela-cheia');
     if (popup) popup.style.display = 'none';
 
-    const docEl = document.documentElement;
-    if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
-    else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen().catch(() => {});
-
     const telaCinematica = document.getElementById('tela-cinematica');
     if (telaCinematica) telaCinematica.style.display = 'block';
 
     const videoFechado = document.querySelector('#cena-livro-fechado video');
     if (videoFechado) {
-        videoFechado.muted = false;
-        tocarVideoComDataSrc(videoFechado);
+        tocarVideoComDataSrc(videoFechado, true);
     }
+
+    // A requisição de tela cheia vem DEPOIS do play do vídeo para não quebrar a cadeia de clique no celular
+    const docEl = document.documentElement;
+    if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
+    else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen().catch(() => {});
 }
 
 function recusarTelaCheia() {
@@ -7352,8 +7371,7 @@ function recusarTelaCheia() {
 
     const videoFechado = document.querySelector('#cena-livro-fechado video');
     if (videoFechado) {
-        videoFechado.muted = false;
-        tocarVideoComDataSrc(videoFechado);
+        tocarVideoComDataSrc(videoFechado, true);
     }
 }
 function iniciarTelaDeApresentacao() {
