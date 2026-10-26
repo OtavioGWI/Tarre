@@ -6464,7 +6464,7 @@ function abrirMenuMestre(aba = 'principal') {
                     <button class="botao-provincia" onclick="fecharImagemCompartilhada()" style="width: 50%; margin: 0; border-color: #8b0000; color: #ff4444; text-align: center;">❌ Fechar p/ Todos</button>
                 </div>
             
-        <button class="btn-fundo-mestre" onclick="abrirMenuFundos()">🖼️ Alterar Fundo</button>
+        <button class="botao-provincia" onclick="abrirMenuFundos()" style="color: #ff9800; border-color: #ff9800; margin-top: 10px;">🖼️ Alterar Fundo</button>
 
         
         <div id="menu-selecao-fundo">
@@ -6867,13 +6867,28 @@ function fecharMenuFundos() {
 }
 
 function alternarFundoDeserto(ativar) {
+    if (typeof firebase !== 'undefined' && firebase.database()) {
+        firebase.database().ref('fundoDeserto').set(ativar);
+    } else if (typeof db !== 'undefined') {
+        db.ref('fundoDeserto').set(ativar);
+    }
+}
+
+const refFundo = (typeof firebase !== 'undefined' && firebase.database()) ? firebase.database().ref('fundoDeserto') : db.ref('fundoDeserto');
+
+refFundo.on('value', (snapshot) => {
+    const ativo = !!snapshot.val();
     const elementoMapa = document.getElementById('map') || document.body;
-    if (ativar) {
+    
+    if (ativo) {
         elementoMapa.classList.add('fundo-deserto');
     } else {
         elementoMapa.classList.remove('fundo-deserto');
     }
-}
+    
+    const chk = document.getElementById('chk-fundo-deserto');
+    if (chk) chk.checked = ativo;
+});
 
 // ==========================================
 // SISTEMA DE BLOQUEIO DE MAPA (COM IMAGENS E BYPASS DO MESTRE)
