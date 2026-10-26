@@ -926,10 +926,38 @@
     pointer-events: none; /* Garante que não interfira nos cliques */
     user-select: none;
 }
+/* Botão com texto em laranja e fundo sem preenchimento colorido */
+.btn-fundo-mestre {
+    color: #ff9800 !important;
+    background-color: transparent;
+    border: 1px solid #ff9800;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+/* Estrutura do sub-menu de seleção de fundo */
+#menu-selecao-fundo {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 20px;
+    border: 2px solid #ff9800;
+    border-radius: 8px;
+    z-index: 10001;
+}
 
     </style>
 </head>
 <body>
+    <!-- CAMADA DE AMBIENTAÇÃO PARA PC (JOGADORES) -->
+<div id="container-ambientacao" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; z-index: 9000; background: #000; pointer-events: none;">
+    <!-- pointer-events: none permite que cliques vazem para botões importantes atrás do vídeo -->
+    <video id="video-ambientacao" class="video-fundo" loop muted playsinline preload="none" style="width: 100%; height: 100%; object-fit: cover;"></video>
+</div>
     <!-- CORTINA PRE-FIREBASE (Esconde a tela até o servidor confirmar o bloqueio) -->
 <div id="cortina-pre-firebase" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 999999; display: flex; justify-content: center; align-items: center; color: #555; font-family: sans-serif; font-size: 14px;">
     Sincronizando com Tarre...
@@ -3210,13 +3238,13 @@ Depois foram a uma cripta atrás da casa desceram a escadaria e encontraram o pr
 
     Eles caminharam um pouco pelas dunas escaldantes até que uma carruagem apareceu. Dela saiu um <span class="link-historia" onclick="verImagemHistoria('malo.png', 3)">Comerciante</span> que, ao ver o estado lastimável do grupo, ofereceu informações e suprimentos básicos para sobreviverem. Ele concedeu a eles armas e roupas, dizendo que deviam ter sido roubados pelos <b>Dhen Raks</b>, os ladrões do deserto. O comerciante disse que não iria cobrar nada deles agora porque não tinham nada, mas ressaltou que eles "cheiravam a investimentos" e que, quando se encontrassem na próxima vez, ele cobraria o favor.
 
-    Os jogadores pegaram as coisas e seguiram para o sul, de onde viram rastros de pessoas. Enquanto seguiam a trilha, uma criatura imensa feita como uma <span class="link-historia" onclick="verImagemHistoria('comedor_de_areia.jpg', 3)">criatura</span> surgiu debaixo da areia logo atrás deles. O grupo teve que sair correndo desesperadamente até chegar em um oásis que era uma área segura.
+    Os jogadores pegaram as coisas e seguiram para o sul, de onde viram rastros de pessoas. Enquanto seguiam a trilha, uma <span class="link-historia" onclick="verImagemHistoria('comedor_de_areia.jpg', 3)">criatura imensa</span> surgiu debaixo da areia logo atrás deles. O grupo teve que sair correndo desesperadamente até chegar em um oásis que era uma área segura.
 
     Ao redor do oásis tinham várias tendas de comerciantes. Falando com eles, os jogadores descobriram que tomar a água do oásis era proibido pela guarda local. Sem alternativas, seguiram mais ao sul.
 
     Chegaram então a um vilarejo, que futuramente descobririam ser um polo comercial alimentado puramente pelos itens roubados dos Dhen Raks. Explorando o local furtivamente, eles localizaram os seus itens saqueados dentro de uma loja. No meio da noite, invadiram o estabelecimento e conseguiram recuperar seus equipamentos, mas precisaram sair correndo antes de serem pegos.
 
-    Na fuga, conseguiram pular em um barco que partia com destino à capital do deserto. Somente lá, mais seguros, eles pararam para ler a carta que receberam do Império. Contudo, ao observarem a correspondência, repararam em um detalhe sombrio: o lacre da carta já estava aberto.`
+    Na fuga, conseguiram pular em um barco que partia com destino à capital do deserto. Somente lá, mais seguros, eles pararam para ler a carta que receberam do Império. Contudo, ao observarem a correspondência, repararam em um detalhe: o lacre da carta já estava aberto.`
 },
             {
                 titulo: "Capítulo 4: Desconhecido",
@@ -6435,6 +6463,20 @@ function abrirMenuMestre(aba = 'principal') {
                     <button id="btn-enviar-midia" class="botao-provincia" onclick="document.getElementById('input-imagem-mestre').click()" style="width: 50%; margin: 0; border-color: #27ae60; color: #90EE90; text-align: center;">📤 Enviar Imagem</button>
                     <button class="botao-provincia" onclick="fecharImagemCompartilhada()" style="width: 50%; margin: 0; border-color: #8b0000; color: #ff4444; text-align: center;">❌ Fechar p/ Todos</button>
                 </div>
+            
+        <button class="btn-fundo-mestre" onclick="abrirMenuFundos()">🖼️ Alterar Fundo</button>
+
+        
+        <div id="menu-selecao-fundo">
+            <h4>Selecionar Plano de Fundo</h4>
+            <div>
+                <label>
+                    <input type="checkbox" id="chk-fundo-deserto" onchange="alternarFundoDeserto(this.checked)"> Deserto 🏜️
+                </label>
+            </div>
+            <br>
+            <button onclick="fecharMenuFundos()">Fechar</button>
+        </div>
 
                 <button class="botao-provincia" onclick="abrirMenuMestre('controles')" style="color: #87ceeb; border-color: #4682b4; margin-top: 10px;">⚙️ Controles do Mundo</button>
             </div>
@@ -6556,6 +6598,8 @@ function abrirMenuMestre(aba = 'principal') {
     const newBalagar = document.getElementById('lista-scroll-balagar');
     if (newBoatos) newBoatos.scrollTop = scrollBoatos;
     if (newBalagar) newBalagar.scrollTop = scrollBalagar;
+    window.painelMestreAtivo = true;
+    processarAmbientacao();
 }
 
 function fecharMenuMestre() {
@@ -6754,6 +6798,81 @@ if (db) {
             }
         }
     });
+}
+
+let dadosAmbientacaoAtual = null;
+let ambientacaoAtivaMestre = false;
+
+// 1. OUVINTE DO FIREBASE
+if (typeof db !== 'undefined' && db !== null) {
+    db.ref('estado/ambientacao').on('value', (snapshot) => {
+        dadosAmbientacaoAtual = snapshot.val();
+        processarAmbientacao();
+    });
+}
+
+// 2. FUNÇÃO QUE DECIDE QUEM VÊ O VÍDEO
+function processarAmbientacao() {
+    const container = document.getElementById('container-ambientacao');
+    const video = document.getElementById('video-ambientacao');
+    
+    if (!container || !video) return;
+
+    // Bloqueio 1: Celular nunca carrega.
+    const isMobile = typeof ehDispositivoMovel === 'function' ? ehDispositivoMovel() : window.innerWidth <= 768;
+    
+    // Bloqueio 2: Mestre logado nunca carrega.
+    // Garanta que a variável abaixo reflita se o seu painel está aberto/desbloqueado
+    const isMestre = window.painelMestreAtivo === true; 
+
+    if (isMobile || isMestre || !dadosAmbientacaoAtual || !dadosAmbientacaoAtual.ativo) {
+        container.style.display = 'none';
+        video.pause();
+        if (video.src) video.src = ""; // Descarrega da memória RAM
+        return;
+    }
+
+    // Se chegou aqui, é jogador no PC e a ambientação está ligada
+    container.style.display = 'block';
+    
+    // Só carrega o src se for diferente, evitando engasgos e recarregamentos
+    if (!video.src.includes(dadosAmbientacaoAtual.video)) {
+        video.src = dadosAmbientacaoAtual.video;
+    }
+    video.play().catch(() => {});
+}
+
+// 3. FUNÇÃO DO BOTÃO DO MESTRE
+function alternarAmbientacao() {
+    ambientacaoAtivaMestre = !ambientacaoAtivaMestre;
+    const btn = document.getElementById('btn-ambientacao');
+    
+    if (ambientacaoAtivaMestre) {
+        btn.innerText = "Desativar Fundo: Deserto";
+        btn.style.background = "#2E8B57"; // Fica verde quando ativo
+        if (db) db.ref('estado/ambientacao').set({ ativo: true, video: 'fundo_deserto.mp4' });
+    } else {
+        btn.innerText = "Ativar Fundo: Deserto";
+        btn.style.background = "#8b0000"; // Volta ao vermelho/vinho
+        if (db) db.ref('estado/ambientacao').set({ ativo: false, video: '' });
+    }
+}
+
+function abrirMenuFundos() {
+    document.getElementById('menu-selecao-fundo').style.display = 'block';
+}
+
+function fecharMenuFundos() {
+    document.getElementById('menu-selecao-fundo').style.display = 'none';
+}
+
+function alternarFundoDeserto(ativar) {
+    const elementoMapa = document.getElementById('map') || document.body;
+    if (ativar) {
+        elementoMapa.classList.add('fundo-deserto');
+    } else {
+        elementoMapa.classList.remove('fundo-deserto');
+    }
 }
 
 // ==========================================
