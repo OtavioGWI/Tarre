@@ -7316,28 +7316,30 @@ function ehDispositivoMovel() {
     return window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-function tocarVideoComDataSrc(video, desmutar = false) {
+function tocarVideoComDataSrc(video, desmutar = true, callbackAoExibir = null) {
     if (!video) return;
 
-    // Força propriedade no DOM para iOS/Android não abrirem o player nativo
     video.playsInline = true;
     video.setAttribute('playsinline', 'true');
 
-    if ((!video.src || video.src === "") && video.dataset.src) {
+    if ((!video.src || video.src === "" || video.src === window.location.href) && video.dataset.src) {
         video.src = video.dataset.src;
-        video.load();
     }
 
-    // Se desmutar for solicitado, tenta tocar com som; se o celular negar, toca mudo sem travar em tela preta
+    // Tenta manter o som ativado
     video.muted = !desmutar;
 
-    let playPromise = video.play();
+    // Só executa a troca de visibilidade quando o vídeo realmente começar a renderizar
+    const aoRenderizar = () => {
+        video.removeEventListener('playing', aoRenderizar);
+        if (callbackAoExibir) callbackAoExibir();
+    };
+    video.addEventListener('playing', aoRenderizar);
+
+    const playPromise = video.play();
     if (playPromise !== undefined) {
-        playPromise.then(() => {
-            if (desmutar) {
-                video.muted = false;
-            }
-        }).catch(() => {
+        playPromise.catch(() => {
+            // Fallback apenas se o sistema operacional do celular vetar o áudio sem toque prévio
             video.muted = true;
             video.play().catch(() => {});
         });
@@ -7444,66 +7446,55 @@ let tempoMinimoCavernaConcluido = false;
 function abrirLivro() {
     const cenaFechada = document.getElementById('cena-livro-fechado');
     const videoAbrindo = document.getElementById('video-livro-abrindo');
-    
-    const videoLoop = cenaFechada.querySelector('video');
-    if (videoLoop) {
-        videoLoop.pause();
-        videoLoop.muted = true;
-    }
+    const videoLoop = cenaFechada ? cenaFechada.querySelector('video') : null;
 
-    videoAbrindo.classList.add('ativa');
-    videoAbrindo.muted = false;
-    videoAbrindo.currentTime = 0; 
-    tocarVideoComDataSrc(videoAbrindo);
+    videoAbrindo.currentTime = 0;
 
-    // Corte seco da cena anterior
-    setTimeout(() => { cenaFechada.classList.remove('ativa'); }, 100);
+    tocarVideoComDataSrc(videoAbrindo, true, () => {
+        // Transição suave: só esconde o livro fechado após o novo vídeo estar rodando na tela
+        videoAbrindo.classList.add('ativa');
+        if (videoLoop) videoLoop.pause();
+        if (cenaFechada) cenaFechada.classList.remove('ativa');
+    });
 
     videoAbrindo.onended = () => {
         const cenaFloresta = document.getElementById('cena-floresta');
-        cenaFloresta.classList.add('ativa');
-        
-        const vidFl = cenaFloresta.querySelector('video');
-        if (vidFl) {
-            vidFl.pause();
-            vidFl.currentTime = 0; 
-            vidFl.muted = false;
-            tocarVideoComDataSrc(vidFl);
-        }
+        const vidFl = cenaFloresta ? cenaFloresta.querySelector('video') : null;
 
-        setTimeout(() => { videoAbrindo.classList.remove('ativa'); }, 100);
+        if (vidFl) {
+            vidFl.currentTime = 0;
+            tocarVideoComDataSrc(vidFl, true, () => {
+                cenaFloresta.classList.add('ativa');
+                videoAbrindo.classList.remove('ativa');
+            });
+        }
     };
 }
 
 function iniciarTransicao() {
     const cenaFloresta = document.getElementById('cena-floresta');
     const videoTransicao = document.getElementById('video-transicao');
-    
-    const videoLoopFloresta = cenaFloresta.querySelector('video');
-    if (videoLoopFloresta) {
-        videoLoopFloresta.pause();
-        videoLoopFloresta.muted = true;
-    }
+    const videoLoopFloresta = cenaFloresta ? cenaFloresta.querySelector('video') : null;
 
-    videoTransicao.classList.add('ativa');
-    videoTransicao.muted = false;
-    videoTransicao.currentTime = 0; 
-    tocarVideoComDataSrc(videoTransicao);
+    videoTransicao.currentTime = 0;
 
-    setTimeout(() => { cenaFloresta.classList.remove('ativa'); }, 100);
+    tocarVideoComDataSrc(videoTransicao, true, () => {
+        videoTransicao.classList.add('ativa');
+        if (videoLoopFloresta) videoLoopFloresta.pause();
+        if (cenaFloresta) cenaFloresta.classList.remove('ativa');
+    });
 
     videoTransicao.onended = () => {
         const cenaCaverna = document.getElementById('cena-caverna');
-        cenaCaverna.classList.add('ativa');
-        
-        const vidCav = cenaCaverna.querySelector('video');
+        const vidCav = cenaCaverna ? cenaCaverna.querySelector('video') : null;
+
         if (vidCav) {
-            vidCav.muted = false;
-            vidCav.currentTime = 0; 
-            tocarVideoComDataSrc(vidCav);
+            vidCav.currentTime = 0;
+            tocarVideoComDataSrc(vidCav, true, () => {
+                cenaCaverna.classList.add('ativa');
+                videoTransicao.classList.remove('ativa');
+            });
         }
-        
-        setTimeout(() => { videoTransicao.classList.remove('ativa'); }, 100);
         
         processarCargaEpica();
 
@@ -7514,30 +7505,24 @@ function iniciarTransicao() {
     };
 }
 
-// ---- ANIMAÇÕES DO PEIXE ----
 function iniciarPeixe() {
     if (window.modoLiteAtivo) return;
     const cenaFloresta = document.getElementById('cena-floresta');
     const videoPeixe = document.getElementById('video-peixe');
-    
-    const vidFloresta = cenaFloresta.querySelector('video');
-    if (vidFloresta) {
-        vidFloresta.pause();
-        vidFloresta.muted = true;
-    }
+    const vidFloresta = cenaFloresta ? cenaFloresta.querySelector('video') : null;
 
-    videoPeixe.classList.add('ativa');
-    videoPeixe.muted = false;
     videoPeixe.currentTime = 0;
     videoPeixe.playbackRate = 1.4; 
-    tocarVideoComDataSrc(videoPeixe);
 
-    setTimeout(() => { cenaFloresta.classList.remove('ativa'); }, 100);
+    tocarVideoComDataSrc(videoPeixe, true, () => {
+        videoPeixe.classList.add('ativa');
+        if (vidFloresta) vidFloresta.pause();
+        if (cenaFloresta) cenaFloresta.classList.remove('ativa');
+    });
 
     videoPeixe.onended = () => {
         videoPeixe.pause();
         estadoPeixeAtivo = true;
-        
         document.getElementById('modal-capital').style.zIndex = '22000';
         menuCapital('hub'); 
     };
@@ -7550,51 +7535,44 @@ function encerrarPeixe() {
     const videoPeixeFim = document.getElementById('video-peixe-fim');
     const cenaFloresta = document.getElementById('cena-floresta');
 
-    videoPeixeFim.classList.add('ativa');
-    videoPeixeFim.muted = false;
     videoPeixeFim.currentTime = 0;
     videoPeixeFim.playbackRate = 1.4;
-    tocarVideoComDataSrc(videoPeixeFim);
 
-    setTimeout(() => { videoPeixe.classList.remove('ativa'); }, 100);
+    tocarVideoComDataSrc(videoPeixeFim, true, () => {
+        videoPeixeFim.classList.add('ativa');
+        if (videoPeixe) videoPeixe.classList.remove('ativa');
+    });
 
     videoPeixeFim.onended = () => {
-        cenaFloresta.classList.add('ativa');
-        
-        const vidFloresta = cenaFloresta.querySelector('video');
+        const vidFloresta = cenaFloresta ? cenaFloresta.querySelector('video') : null;
         if (vidFloresta) {
-            vidFloresta.muted = false;
             vidFloresta.currentTime = 0;
-            tocarVideoComDataSrc(vidFloresta);
+            tocarVideoComDataSrc(vidFloresta, true, () => {
+                cenaFloresta.classList.add('ativa');
+                videoPeixeFim.classList.remove('ativa');
+            });
         }
-
-        setTimeout(() => { videoPeixeFim.classList.remove('ativa'); }, 100);
     };
 }
-// ---- ANIMAÇÕES DO PÁSSARO E MENU DE PERSONAGENS ----
+
 function iniciarPassaro() {
     if (window.modoLiteAtivo) return;
     const cenaFloresta = document.getElementById('cena-floresta');
     const videoPassaro = document.getElementById('video-passaro');
-    
-    const vidFloresta = cenaFloresta.querySelector('video');
-    if (vidFloresta) {
-        vidFloresta.pause();
-        vidFloresta.muted = true;
-    }
+    const vidFloresta = cenaFloresta ? cenaFloresta.querySelector('video') : null;
 
-    videoPassaro.classList.add('ativa');
-    videoPassaro.muted = false;
     videoPassaro.currentTime = 0;
     videoPassaro.playbackRate = 1.2; 
-    tocarVideoComDataSrc(videoPassaro);
 
-    setTimeout(() => { cenaFloresta.classList.remove('ativa'); }, 50);
+    tocarVideoComDataSrc(videoPassaro, true, () => {
+        videoPassaro.classList.add('ativa');
+        if (vidFloresta) vidFloresta.pause();
+        if (cenaFloresta) cenaFloresta.classList.remove('ativa');
+    });
 
     videoPassaro.onended = () => {
         videoPassaro.pause();
         estadoPassaroAtivo = true;
-        
         document.getElementById('modal-personagens').style.display = 'flex';
     };
 }
@@ -7608,25 +7586,23 @@ function encerrarPassaro() {
     const videoPassaroFim = document.getElementById('video-passaro-fim');
     const cenaFloresta = document.getElementById('cena-floresta');
 
-    videoPassaroFim.classList.add('ativa');
-    videoPassaroFim.muted = false;
     videoPassaroFim.currentTime = 0;
     videoPassaroFim.playbackRate = 1.2;
-    tocarVideoComDataSrc(videoPassaroFim);
 
-    setTimeout(() => { videoPassaro.classList.remove('ativa'); }, 50);
+    tocarVideoComDataSrc(videoPassaroFim, true, () => {
+        videoPassaroFim.classList.add('ativa');
+        if (videoPassaro) videoPassaro.classList.remove('ativa');
+    });
 
     videoPassaroFim.onended = () => {
-        cenaFloresta.classList.add('ativa');
-        
-        const vidFloresta = cenaFloresta.querySelector('video');
+        const vidFloresta = cenaFloresta ? cenaFloresta.querySelector('video') : null;
         if (vidFloresta) {
-            vidFloresta.muted = false;
             vidFloresta.currentTime = 0;
-            tocarVideoComDataSrc(vidFloresta);
+            tocarVideoComDataSrc(vidFloresta, true, () => {
+                cenaFloresta.classList.add('ativa');
+                videoPassaroFim.classList.remove('ativa');
+            });
         }
-
-        setTimeout(() => { videoPassaroFim.classList.remove('ativa'); }, 50);
     };
 }
 
@@ -7641,11 +7617,10 @@ function abrirVideoPersonagem(nome) {
 
     silenciarTodosOsVideos();
 
-    videoEl.classList.add('ativa');
-    videoEl.muted = false;
     videoEl.currentTime = 0;
-    
-    tocarVideoComDataSrc(videoEl);
+    tocarVideoComDataSrc(videoEl, true, () => {
+        videoEl.classList.add('ativa');
+    });
     
     videoEl.onclick = function() {
         videoEl.pause();
