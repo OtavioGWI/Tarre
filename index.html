@@ -6874,20 +6874,50 @@ function alternarFundoDeserto(ativar) {
     }
 }
 
-const refFundo = (typeof firebase !== 'undefined' && firebase.database()) ? firebase.database().ref('fundoDeserto') : db.ref('fundoDeserto');
+// Executa a escuta globalmente após o carregamento do documento
+document.addEventListener('DOMContentLoaded', () => {
+    const refFundo = (typeof firebase !== 'undefined' && firebase.database()) 
+        ? firebase.database().ref('fundoDeserto') 
+        : (typeof db !== 'undefined' ? db.ref('fundoDeserto') : null);
 
-refFundo.on('value', (snapshot) => {
-    const ativo = !!snapshot.val();
-    const elementoMapa = document.getElementById('map') || document.body;
-    
-    if (ativo) {
-        elementoMapa.classList.add('fundo-deserto');
-    } else {
-        elementoMapa.classList.remove('fundo-deserto');
+    if (refFundo) {
+        refFundo.on('value', (snapshot) => {
+            const ativo = !!snapshot.val();
+            const container = document.getElementById('container-ambientacao');
+            const video = document.getElementById('video-ambientacao');
+            const chk = document.getElementById('chk-fundo-deserto');
+
+            if (chk) chk.checked = ativo;
+
+            if (!container || !video) return;
+
+            const isMobile = typeof ehDispositivoMovel === 'function' ? ehDispositivoMovel() : window.innerWidth <= 768;
+            if (isMobile || mestreLogadoLocalmente) {
+                container.style.display = 'none';
+                video.pause();
+                return;
+            }
+
+            if (ativo) {
+                container.style.display = 'block';
+                video.muted = true;
+                video.loop = true;
+                video.playsInline = true;
+
+                const caminhoVideo = 'fundo_deserto.mp4'; // Confirme o nome exato do arquivo na pasta
+                if (!video.src.includes(caminhoVideo)) {
+                    video.src = caminhoVideo;
+                    video.load();
+                }
+
+                video.play().catch(e => console.log("Erro no autoplay do vídeo:", e));
+            } else {
+                container.style.display = 'none';
+                video.pause();
+                video.src = "";
+            }
+        });
     }
-    
-    const chk = document.getElementById('chk-fundo-deserto');
-    if (chk) chk.checked = ativo;
 });
 
 // ==========================================
