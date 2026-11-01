@@ -4872,13 +4872,18 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
 
     if (nomeDoMapa === 'Deserto.jpg') {
         const btnLeilao = `<div class="wrapper-secreto sec-leilao_miragens">${criarBtn("🔍 Descobrir", "abrirModalSenha('leilao', 'abrirLeilaoMiragens()', 'funcao')", "#2E8B57", true)}</div>`;
-        const btnDhenRak = `<div class="wrapper-secreto sec-mercado_dhenrak">${criarBtn("🔍 Descobrir", "abrirModalSenha('ladroes', 'abrirMercadoDhenRak()', 'funcao')", "#2E8B57", true)}</div>`;
-        const btnArmadilha = `<div class="wrapper-secreto sec-navio_prisao">${criarBtn("🔍 Descobrir", "abrirModalSenha('navio', 'eventoNavioPrisao()', 'funcao')", "#2E8B57", true)}</div>`;
         const btnBalagar = `<div class="wrapper-secreto sec-balagar">${criarBtn("🔍 Descobrir", "abrirModalSenha('balagar', 'abrirDungeonBalagar()', 'funcao')", "#2E8B57", true)}</div>`;
         const btnDepressao = `<div class="wrapper-secreto sec-correnteza">${criarBtn("🔍 Descobrir", "abrirModalSenha('correnteza', 'abrirDungeonDeserto()', 'funcao')", "#2E8B57", true)}</div>`;
         
+// Dhen'Rak - Única versão que deve existir
+const btnDhenRak = `<div class="wrapper-secreto sec-mercado_dhenrak">${criarBtn("🔍 Descobrir", "abrirModalSenha('ladroes', 'abrirMercadoDhenRak()', 'funcao')", "#2E8B57", true)}</div>`;
+criarPontoLocal([188, 1910], "Cidade", "Samum", null, true, btnDhenRak);
+
+// Navio Prisão - Única versão que deve existir
+const btnArmadilha = `<div class="wrapper-secreto sec-navio_prisao">${criarBtn("🔍 Descobrir", "abrirModalSenha('navio', 'eventoNavioPrisao()', 'funcao')", "#2E8B57", true)}</div>`;
+criarPontoLocal([1308, 1888], "Ué", "Parece não haver nada aqui", null, false, btnArmadilha);s
+
         criarPontoLocal([240, 762], "Capital do Deserto", "Zha Ruk", "Capital deserto.png", true, btnLeilao);
-        
         criarPontoLocal([1314, 588], "Vilarejo", "Ghovar", "Vila deserto.png", true);
         criarPontoLocal([1422, 1582], "Vilarejo", "Ghovar", "Vila de areia.png", true);
         
@@ -4909,6 +4914,7 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
         criarPontoLocal([1082, 146], "Cidade", "Samum", "Cidade deserto 2.png", true);
         criarPontoLocal([752, 536], "Cidade", "Samum", "Cidade enterrada 2.png", true);
         criarPontoLocal([148, 170], "Cidade", "Samum");
+        
 
         criarPontoLocal([920, 662], "Ruínas", "Atarim", null, true, btnBalagar);
         criarPontoLocal([1394, 814], "Ruínas", "Atarim", "Entrada deserto.png", true, btnBalagar);
