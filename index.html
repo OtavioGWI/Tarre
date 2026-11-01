@@ -949,10 +949,32 @@
     border-radius: 8px;
     z-index: 10001;
 }
+/* Oculta por padrão */
+.wrapper-secreto { display: none; }
 
+/* O mestre vê tudo */
+body.mestre-desbloqueado .wrapper-secreto { display: block !important; }
+
+/* Liberações individuais para os jogadores */
+body.liberado-torre_sabios .sec-torre_sabios,
+body.liberado-pantano .sec-pantano,
+body.liberado-floresta_sonhos .sec-floresta_sonhos,
+body.liberado-leilao_miragens .sec-leilao_miragens,
+body.liberado-mercado_dhenrak .sec-mercado_dhenrak,
+body.liberado-navio_prisao .sec-navio_prisao,
+body.liberado-balagar .sec-balagar,
+body.liberado-correnteza .sec-correnteza,
+body.liberado-ninja .sec-ninja,
+body.liberado-mercado_negro .sec-mercado_negro,
+body.liberado-templo_mar .sec-templo_mar,
+body.liberado-ruinas_12 .sec-ruinas_12 {
+    display: block !important;
+}
     </style>
 </head>
 <body>
+
+    
     <!-- CAMADA DE AMBIENTAÇÃO PARA PC (JOGADORES) -->
 <div id="container-ambientacao" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; z-index: 9000; background: #000; pointer-events: none;">
     <!-- pointer-events: none permite que cliques vazem para botões importantes atrás do vídeo -->
@@ -1029,7 +1051,7 @@
     </div>
 
     <!-- MARCA D'ÁGUA DA VERSÃO -->
-    <div id="versao-cinematica">V2.7</div>
+    <div id="versao-cinematica">V2.8</div>
 </div>
 
 <!-- NOVO: MODAL DOS PERSONAGENS SOBREPOSTO AO VÍDEO -->
@@ -4697,9 +4719,9 @@ function adicionarMarcadoresPrincipais() {
             if (arquivo) botoes += criarBtn("📸 Ver Cidade", `verImagemEstatica('${arquivo}')`, "#5F9EA0", true);
             botoes += criarBtn("⚡ Panteão", "menuDeuses()", "#4682B4", true);
         }
-        else if (nome === "Torre dos Sábios") {
+       else if (nome === "Torre dos Sábios") {
             if (arquivo) botoes += criarBtn("📸 Ver Exterior", `verImagemEstatica('${arquivo}')`, "#5F9EA0", true);
-            botoes += criarBtn("🔮 Acessar Interior", `abrirModalSenha('fofoca', 'abrirMenuTorre()', 'funcao')`, "#9370DB", true);
+            botoes += `<div class="wrapper-secreto sec-torre_sabios">${criarBtn("🔮 Acessar Interior", `abrirModalSenha('fofoca', 'abrirMenuTorre()', 'funcao')`, "#9370DB", true)}</div>`;
         }
         else if (nome === "Ilha Paradisíaca") {
             if (arquivo) botoes += criarBtn("📸 Ver Ilha", `verImagemEstatica('${arquivo}')`, "#5F9EA0", true);
@@ -4713,7 +4735,8 @@ function adicionarMarcadoresPrincipais() {
             
             if (nome === "Pântano" || nome === "Floresta dos Sonhos") {
                 let senha = (nome === "Pântano") ? "Seita" : "perdido";
-                botoes += criarBtn("🔍 Descobrir", `abrirModalSenha('${senha}', 'bloqueado.jpg', 'imagem')`, "#2E8B57", true);
+                let classId = (nome === "Pântano") ? "sec-pantano" : "sec-floresta_sonhos";
+                botoes += `<div class="wrapper-secreto ${classId}">${criarBtn("🔍 Descobrir", `abrirModalSenha('${senha}', 'bloqueado.jpg', 'imagem')`, "#2E8B57", true)}</div>`;
             }
         }
 
@@ -4848,7 +4871,12 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
     }
 
     if (nomeDoMapa === 'Deserto.jpg') {
-        const btnLeilao = criarBtn("🔍 Descobrir", "abrirModalSenha('leilao', 'abrirLeilaoMiragens()', 'funcao')", "#2E8B57", true);
+        const btnLeilao = `<div class="wrapper-secreto sec-leilao_miragens">${criarBtn("🔍 Descobrir", "abrirModalSenha('leilao', 'abrirLeilaoMiragens()', 'funcao')", "#2E8B57", true)}</div>`;
+        const btnDhenRak = `<div class="wrapper-secreto sec-mercado_dhenrak">${criarBtn("🔍 Descobrir", "abrirModalSenha('ladroes', 'abrirMercadoDhenRak()', 'funcao')", "#2E8B57", true)}</div>`;
+        const btnArmadilha = `<div class="wrapper-secreto sec-navio_prisao">${criarBtn("🔍 Descobrir", "abrirModalSenha('navio', 'eventoNavioPrisao()', 'funcao')", "#2E8B57", true)}</div>`;
+        const btnBalagar = `<div class="wrapper-secreto sec-balagar">${criarBtn("🔍 Descobrir", "abrirModalSenha('balagar', 'abrirDungeonBalagar()', 'funcao')", "#2E8B57", true)}</div>`;
+        const btnDepressao = `<div class="wrapper-secreto sec-correnteza">${criarBtn("🔍 Descobrir", "abrirModalSenha('correnteza', 'abrirDungeonDeserto()', 'funcao')", "#2E8B57", true)}</div>`;
+        
         criarPontoLocal([240, 762], "Capital do Deserto", "Zha Ruk", "Capital deserto.png", true, btnLeilao);
         
         criarPontoLocal([1314, 588], "Vilarejo", "Ghovar", "Vila deserto.png", true);
@@ -4882,21 +4910,11 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
         criarPontoLocal([752, 536], "Cidade", "Samum", "Cidade enterrada 2.png", true);
         criarPontoLocal([148, 170], "Cidade", "Samum");
 
-        const btnDhenRak = criarBtn("🔍 Descobrir", "abrirModalSenha('ladroes', 'abrirMercadoDhenRak()', 'funcao')", "#2E8B57", true);
-        criarPontoLocal([188, 1910], "Cidade", "Samum", null, true, btnDhenRak);
-
-        const btnArmadilha = criarBtn("🔍 Descobrir", "abrirModalSenha('navio', 'eventoNavioPrisao()', 'funcao')", "#2E8B57", true);
-        criarPontoLocal([1308, 1888], "Ué", "Parece não haver nada aqui", null, false, btnArmadilha);
-
-        // NOVA SENHA DE BALAGAR: Adicionada a TODAS as ruínas do deserto!
-        const btnBalagar = criarBtn("🔍 Descobrir", "abrirModalSenha('balagar', 'abrirDungeonBalagar()', 'funcao')", "#2E8B57", true);
-        
         criarPontoLocal([920, 662], "Ruínas", "Atarim", null, true, btnBalagar);
         criarPontoLocal([1394, 814], "Ruínas", "Atarim", "Entrada deserto.png", true, btnBalagar);
         criarPontoLocal([660, 1652], "Ruínas", "Atarim", null, false, btnBalagar);
         criarPontoLocal([1310, 1502], "Ruínas", "Atarim", null, false, btnBalagar);
 
-        const btnDepressao = criarBtn("🔍 Descobrir", "abrirModalSenha('correnteza', 'abrirDungeonDeserto()', 'funcao')", "#2E8B57", true);
         criarPontoLocal([1394, 915], "Castelo", "Zha Ruk", "Castelo deserto 2.png", true, btnDepressao);
 
 
@@ -4913,7 +4931,7 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
         criarPontoLocal([1366, 1578], "Cidade Sagrada", "Igreja dos 12 Deuses", "Cidade Santa.png", true, btnPanteao);
         criarPontoLocal([1336, 1740], "Cidade Sagrada", "Igreja dos 12 Deuses", "Cidade Santa.png", true, btnPanteao);
         criarPontoLocal([446, 1336], "Vilarejo", "Dinastia Xogum");
-        const btnNinja = criarBtn("🔍 Descobrir", "abrirModalSenha('ninja', 'vila oculta.png', 'imagem')", "#2E8B57", true);
+        const btnNinja = `<div class="wrapper-secreto sec-ninja">${criarBtn("🔍 Descobrir", "abrirModalSenha('ninja', 'vila oculta.png', 'imagem')", "#2E8B57", true)}</div>`;
         criarPontoLocal([180, 912], "Cidade", "Dinastia Xogum", "cidade lago 1.png", true, btnNinja);
         criarPontoLocal([898, 1908], "Cidade", "Dinastia Kemono", "capital do lago.png", true); 
         criarPontoLocal([726, 1366], "Cidade", "Dinastia Kemono", "cidade lago 2.png", true); 
@@ -4951,12 +4969,13 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
         criarPontoLocal(   [1133, 536], "Cidade", "Desconhecido");
         criarPontoLocal(    [994, 437], "Cidade", "Desconhecido");
 
-        const btnMercado = criarBtn("🔍 Descobrir", "abrirModalSenha('mercado', 'abrirMercadoNegro()', 'funcao')", "#2E8B57", true);
+       const btnMercado = `<div class="wrapper-secreto sec-mercado_negro">${criarBtn("🔍 Descobrir", "abrirModalSenha('mercado', 'abrirMercadoNegro()', 'funcao')", "#2E8B57", true)}</div>`;
+        const btnDescobrir = `<div class="wrapper-secreto sec-templo_mar">${criarBtn("🔍 Descobrir", "abrirModalSenha('mar', 'Mar.jpg', 'mapa')", "#2E8B57", true)}</div>`;
+        const btnRuinas = `<div class="wrapper-secreto sec-ruinas_12">${criarBtn("🔍 Descobrir", "abrirModalSenha('12', 'Templo do fim do mundo.png', 'imagem')", "#2E8B57", true)}</div>`;
         criarPontoLocal([904, 269], "Cidade", "Desconhecido", "Cidade pirata.png", true, btnMercado);
         criarPontoLocal(  [333, 1571], "Cidade", "Desconhecido");
         criarPontoLocal( [291, 1628], "Cidade", "Desconhecido");
         criarPontoLocal( [1311, 391], "Cidade", "Desconhecido", "Cidade alcova.jpg", true);
-        const btnDescobrir = criarBtn("🔍 Descobrir", "abrirModalSenha('mar', 'Mar.jpg', 'mapa')", "#2E8B57", true);
         criarPontoLocal([1052, 540], "Cidade", "Desconhecido", "Alc\\ova.png", true, btnDescobrir);
         criarPontoLocal( [1131, 688], "Cidade", "Desconhecido", "Alcova 2.png", true);
         criarPontoLocal( [1189, 1455], "Cidade", "Desconhecido", "Alcova 3.png", true);
@@ -4965,7 +4984,6 @@ function adicionarMarcadoresLocais(nomeDoMapa) {
         criarPontoLocal(  [482, 1192], "Ilha dos Afogados", "Desconhecido", "lugar no mar.png", true);
         criarPontoLocal( [778, 1442], "Ilha Naval", "Marinha Imperial", "ilha naval.png", true);
         criarPontoLocal( [866, 1518], "Ilha Naval", "Marinha Imperial", "ilha naval.png", true);
-        const btnRuinas = criarBtn("🔍 Descobrir", "abrirModalSenha('12', 'Templo do fim do mundo.png', 'imagem')", "#2E8B57", true);
         criarPontoLocal([134, 1355], "Ruínas", "Desconhecido", null, true, btnRuinas);
     }
 
@@ -6055,6 +6073,26 @@ function mudarCorPing(novaCor, tipo) {
 
     atualizarVisualBotao();
 }
+if (typeof db !== 'undefined' && db) {
+    db.ref('segredosLiberados').on('value', (snapshot) => {
+        const segredos = snapshot.val() || {};
+        const chaves = ['torre_sabios', 'pantano', 'floresta_sonhos', 'leilao_miragens', 'mercado_dhenrak', 'navio_prisao', 'balagar', 'correnteza', 'ninja', 'mercado_negro', 'templo_mar', 'ruinas_12'];
+        
+        chaves.forEach(key => {
+            if (segredos[key]) {
+                document.body.classList.add('liberado-' + key);
+            } else {
+                document.body.classList.remove('liberado-' + key);
+            }
+        });
+    });
+}
+
+function alternarSegredoGlobal(chave, estado) {
+    if (typeof db !== 'undefined' && db) {
+        db.ref('segredosLiberados/' + chave).set(estado);
+    }
+}
 
 
 // ==========================================
@@ -6347,6 +6385,7 @@ function alternarMenuMestre() {
 function abrirMenuMestre(aba = 'principal') {
     // --- NOVO: Marca o Mestre como logado e remove a barreira instantaneamente se o mapa estiver travado ---
     mestreLogadoLocalmente = true;
+    document.body.classList.add('mestre-desbloqueado');
     if (typeof estadoBloqueio !== 'undefined' && estadoBloqueio) {
         const tela = document.getElementById('tela-bloqueio');
         if (tela) tela.style.display = 'none';
@@ -6432,7 +6471,7 @@ function abrirMenuMestre(aba = 'principal') {
                 </div>
             
         <button class="botao-provincia" onclick="abrirMenuFundos()" style="color: #ff9800; border-color: #ff9800; margin-top: 10px;">🖼️ Alterar Fundo</button>
-
+        <button class="botao-provincia" onclick="abrirGabaritoSenhas()" style="color: #ffb6c1; border-color: #ff69b4; margin-top: 10px;">📖 Gabarito de Senhas</button>
         
         <div id="menu-selecao-fundo">
             <h4>Selecionar Plano de Fundo</h4>
@@ -6606,6 +6645,58 @@ function ativarFerramentaMestre(forcarAtivar = false) {
         document.getElementById('map-container').classList.add('mapa-intangivel');
     }
     atualizarBotoesMestre();
+}
+
+// Adicione este botão dentro do HTML do menu do mestre (em abrirMenuMestre) onde preferir:
+// <button class="botao-provincia" onclick="abrirGabaritoSenhas()" style="color: #ffb6c1; border-color: #ff69b4; margin-top: 10px;">📖 Gabarito de Senhas</button>
+
+function abrirGabaritoSenhas() {
+    let modal = document.getElementById('modal-gabarito-senhas');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modal-gabarito-senhas';
+        modal.style.cssText = "display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #1a1a1a; color: #fff; border: 2px solid #ff69b4; border-radius: 8px; padding: 20px; z-index: 30000; max-height: 80vh; overflow-y: auto; width: 450px; box-shadow: 0 0 20px rgba(0,0,0,0.9);";
+        document.body.appendChild(modal);
+    }
+
+    const lista = [
+        { id: 'torre_sabios', prov: 'Continente', nome: 'Torre dos Sábios', senha: 'fofoca' },
+        { id: 'pantano', prov: 'Continente', nome: 'Pântano', senha: 'Seita' },
+        { id: 'floresta_sonhos', prov: 'Continente', nome: 'Floresta Sonhos', senha: 'perdido' },
+        { id: 'leilao_miragens', prov: 'Deserto', nome: 'Leilão Miragens', senha: 'leilao' },
+        { id: 'mercado_dhenrak', prov: 'Deserto', nome: 'Mercado Dhen\'Rak', senha: 'ladroes' },
+        { id: 'navio_prisao', prov: 'Deserto', nome: 'Navio Prisão', senha: 'navio' },
+        { id: 'balagar', prov: 'Deserto', nome: 'Escavações Balagar', senha: 'balagar' },
+        { id: 'correnteza', prov: 'Deserto', nome: 'Masmorra Deserto', senha: 'correnteza' },
+        { id: 'ninja', prov: 'Lago', nome: 'Vila Ninja', senha: 'ninja' },
+        { id: 'mercado_negro', prov: 'Alcova', nome: 'Mercado Negro', senha: 'mercado' },
+        { id: 'templo_mar', prov: 'Alcova', nome: 'Fundo do Mar', senha: 'mar' },
+        { id: 'ruinas_12', prov: 'Alcova', nome: 'Ruínas/Templo 12', senha: '12' }
+    ];
+
+    let html = `<h3 style="color: #ffb6c1; text-align: center; margin-top: 0; border-bottom: 1px solid #555; padding-bottom: 10px;">📖 Gabarito e Liberação Global</h3>
+                <table style="width:100%; font-size: 13px; text-align: left; border-collapse: collapse;">
+                <tr style="color: #cd853f; border-bottom: 1px solid #444;">
+                    <th>Província</th><th>Local</th><th>Senha</th><th>Liberar</th>
+                </tr>`;
+    
+    lista.forEach(item => {
+        const check = document.body.classList.contains('liberado-' + item.id) ? 'checked' : '';
+        html += `
+            <tr style="border-bottom: 1px solid #333; height: 35px;">
+                <td style="color:#aaa;">${item.prov}</td>
+                <td>${item.nome}</td>
+                <td style="color:#2ecc71;">${item.senha}</td>
+                <td style="text-align:center;">
+                    <input type="checkbox" onchange="alternarSegredoGlobal('${item.id}', this.checked)" ${check} style="cursor:pointer; transform: scale(1.3);">
+                </td>
+            </tr>`;
+    });
+
+    html += `</table><button class="botao-provincia" onclick="document.getElementById('modal-gabarito-senhas').style.display='none'" style="width: 100%; margin-top: 15px; border-color: #ff4444; color: #ff4444;">❌ Fechar Gabarito</button>`;
+    
+    modal.innerHTML = html;
+    modal.style.display = 'block';
 }
 
 function alternarFocoMestre() {
